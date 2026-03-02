@@ -1,0 +1,16 @@
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { useNavigate } from 'react-router-dom';
+import { Layers, ArrowLeft, Eye } from 'lucide-react';
+import { PhaseNav } from './PhaseNav';
+import { ThemeToggle } from './ThemeToggle';
+import { Button } from '@/components/ui/button';
+export function AppLayout({ children, title, backTo, backLabel = 'Back', showPhaseNav = true, }) {
+    const navigate = useNavigate();
+    // Determine if this is a sub-page (has back navigation)
+    const isSubPage = !!backTo;
+    return (_jsxs("div", { className: "min-h-screen bg-background animate-fade-in flex flex-col", children: [_jsx("header", { className: "border-b border-stone-200 dark:border-stone-800 bg-card/80 backdrop-blur-sm sticky top-0 z-20", children: _jsx("div", { className: "px-4 sm:px-6 py-3", children: isSubPage ? (
+                    /* Sub-page header with back button */
+                    _jsxs("div", { className: "max-w-3xl mx-auto flex items-center gap-4", children: [_jsxs(Button, { variant: "ghost", size: "sm", onClick: () => navigate(backTo), className: "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 -ml-2", children: [_jsx(ArrowLeft, { className: "w-4 h-4 mr-2", strokeWidth: 1.5 }), backLabel] }), title && (_jsxs(_Fragment, { children: [_jsx("div", { className: "h-4 w-px bg-stone-200 dark:bg-stone-700" }), _jsx("h1", { className: "text-sm font-medium text-stone-900 dark:text-stone-100 truncate", children: title })] })), _jsx("div", { className: "ml-auto", children: _jsx(ThemeToggle, {}) })] })) : (
+                    /* Main page header with phase nav - full width */
+                    _jsxs("div", { className: "flex items-center justify-between gap-4", children: [_jsx("div", { className: "w-10 shrink-0" }), showPhaseNav && (_jsx("div", { className: "flex-1 flex justify-center", children: _jsx(PhaseNav, {}) })), _jsxs("div", { className: "flex items-center gap-2 shrink-0", children: [_jsxs(Button, { variant: "outline", size: "sm", onClick: () => navigate('/full-preview'), className: "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100", title: "View the full application preview with all sections", children: [_jsx(Eye, { className: "w-4 h-4 mr-1.5", strokeWidth: 1.5 }), _jsx("span", { className: "hidden sm:inline", children: "Full Preview" })] }), _jsx(ThemeToggle, {})] })] })) }) }), _jsx("main", { className: "flex-1 max-w-3xl mx-auto px-6 py-12 w-full", children: children }), _jsx("footer", { className: "py-8 flex justify-center", children: _jsxs("a", { href: "https://buildermethods.com/design-os", target: "_blank", rel: "noopener noreferrer", className: "flex items-center gap-2 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-400 transition-colors group", children: [_jsx("span", { className: "text-xs", children: "Powered by" }), _jsx("div", { className: "w-5 h-5 rounded bg-stone-300 dark:bg-stone-600 flex items-center justify-center transition-colors group-hover:bg-stone-400 dark:group-hover:bg-stone-500", children: _jsx(Layers, { className: "w-3 h-3 text-stone-100 dark:text-stone-900", strokeWidth: 1.5 }) }), _jsx("span", { className: "text-xs font-medium", children: "Design OS" })] }) })] }));
+}

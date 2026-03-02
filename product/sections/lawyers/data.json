@@ -1,0 +1,854 @@
+{
+  "_meta": {
+    "models": {
+      "lawyers": "Each lawyer is an external legal professional who handles challan resolution and legal cases on behalf of the platform. They are onboarded with full credential verification, KYC compliance, and expertise tracking to ensure quality service delivery."
+    },
+    "relationships": [
+      "Lawyers are assigned to Incidents through Assignments",
+      "Lawyers earn Commissions when they successfully resolve Incidents",
+      "Only active lawyers with completed KYC are eligible for new Incident assignments"
+    ]
+  },
+  "lawyers": [
+    {
+      "id": "lwr-001",
+      "lawyerId": "LWR-2024-001",
+      "photo": "https://i.pravatar.cc/150?u=advocate.sharma",
+      "firstName": "Rajesh",
+      "lastName": "Sharma",
+      "email": "rajesh.sharma@legalpartners.in",
+      "mobile": "+91 98765 43210",
+      "gender": "Male",
+      "dateOfBirth": "1985-06-15",
+      "category": "Motor Vehicle Act",
+      "subCategory": "Traffic Violations & Challans",
+      "currentAddress": {
+        "country": "India",
+        "state": "Delhi",
+        "city": "New Delhi",
+        "area": "Connaught Place",
+        "addressLine": "Block A, 23/5, Rajendra Place",
+        "pinCode": "110008"
+      },
+      "permanentAddress": {
+        "country": "India",
+        "state": "Delhi",
+        "city": "New Delhi",
+        "area": "Connaught Place",
+        "addressLine": "Block A, 23/5, Rajendra Place",
+        "pinCode": "110008"
+      },
+      "qualifications": [
+        {
+          "degree": "BALLB",
+          "university": "Delhi University",
+          "yearOfCompletion": 2008,
+          "percentage": 78.5,
+          "certificateUrl": "/documents/lwr-001/ballb-cert.pdf"
+        },
+        {
+          "degree": "LLM in Criminal Law",
+          "university": "National Law University, Delhi",
+          "yearOfCompletion": 2010,
+          "percentage": 82.3,
+          "certificateUrl": "/documents/lwr-001/llm-cert.pdf"
+        }
+      ],
+      "experience": [
+        {
+          "company": "Legal Associates & Partners",
+          "role": "Senior Associate",
+          "startDate": "2010-07-01",
+          "endDate": "2018-12-31",
+          "functionalArea": "Traffic & Motor Vehicle Law"
+        },
+        {
+          "company": "Independent Practice",
+          "role": "Advocate",
+          "startDate": "2019-01-01",
+          "endDate": null,
+          "functionalArea": "Motor Vehicle Act & Traffic Violations"
+        }
+      ],
+      "kycDocuments": {
+        "aadhaar": {
+          "number": "XXXX-XXXX-4521",
+          "documentUrl": "/documents/lwr-001/aadhaar.pdf",
+          "uploadedAt": "2024-01-10T09:30:00Z"
+        },
+        "pan": {
+          "number": "ABCPS1234K",
+          "documentUrl": "/documents/lwr-001/pan.pdf",
+          "uploadedAt": "2024-01-10T09:32:00Z"
+        },
+        "drivingLicence": {
+          "documentUrl": "/documents/lwr-001/dl.pdf",
+          "uploadedAt": "2024-01-10T09:35:00Z"
+        },
+        "cancelledCheque": {
+          "documentUrl": "/documents/lwr-001/cheque.pdf",
+          "uploadedAt": "2024-01-10T09:38:00Z"
+        },
+        "barId": {
+          "number": "D/1234/2008",
+          "documentUrl": "/documents/lwr-001/bar-id.pdf",
+          "uploadedAt": "2024-01-10T09:40:00Z"
+        },
+        "ballbCertificate": {
+          "documentUrl": "/documents/lwr-001/ballb-cert.pdf",
+          "uploadedAt": "2024-01-10T09:42:00Z"
+        }
+      },
+      "bankDetails": {
+        "accountHolderName": "Rajesh Sharma",
+        "accountNumber": "123456789012",
+        "bankName": "HDFC Bank",
+        "ifscCode": "HDFC0001234"
+      },
+      "expertise": {
+        "yearsOfExperience": 15,
+        "preferredLanguages": ["Hindi", "English"],
+        "preferredLocations": ["Delhi", "Gurgaon", "Noida"],
+        "caseTypes": ["Traffic Challans", "MVA Violations", "Speeding Tickets", "Red Light Violations"]
+      },
+      "company": null,
+      "onboardingStatus": "Complete",
+      "kycStatus": "Verified",
+      "activityState": "Active",
+      "source": "Website",
+      "createdAt": "2024-01-10T09:00:00Z",
+      "lastUpdatedAt": "2024-01-10T10:15:00Z"
+    },
+    {
+      "id": "lwr-002",
+      "lawyerId": "LWR-2024-002",
+      "photo": "https://i.pravatar.cc/150?u=advocate.mehta",
+      "firstName": "Priya",
+      "lastName": "Mehta",
+      "email": "priya.mehta@lexcounsel.com",
+      "mobile": "+91 98123 45678",
+      "gender": "Female",
+      "dateOfBirth": "1990-03-22",
+      "category": "Criminal Law",
+      "subCategory": "White Collar Crime",
+      "currentAddress": {
+        "country": "India",
+        "state": "Maharashtra",
+        "city": "Mumbai",
+        "area": "Bandra West",
+        "addressLine": "401, Serenity Apartments, Linking Road",
+        "pinCode": "400050"
+      },
+      "permanentAddress": {
+        "country": "India",
+        "state": "Gujarat",
+        "city": "Ahmedabad",
+        "area": "Vastrapur",
+        "addressLine": "23, Satellite Road",
+        "pinCode": "380015"
+      },
+      "qualifications": [
+        {
+          "degree": "BALLB (Hons)",
+          "university": "Government Law College, Mumbai",
+          "yearOfCompletion": 2012,
+          "percentage": 85.2,
+          "certificateUrl": "/documents/lwr-002/ballb-cert.pdf"
+        }
+      ],
+      "experience": [
+        {
+          "company": "Trilegal",
+          "role": "Associate",
+          "startDate": "2012-08-01",
+          "endDate": "2020-05-31",
+          "functionalArea": "Criminal Litigation"
+        },
+        {
+          "company": "Mehta & Associates",
+          "role": "Partner",
+          "startDate": "2020-06-01",
+          "endDate": null,
+          "functionalArea": "Criminal & Traffic Law"
+        }
+      ],
+      "kycDocuments": {
+        "aadhaar": {
+          "number": "XXXX-XXXX-7823",
+          "documentUrl": "/documents/lwr-002/aadhaar.pdf",
+          "uploadedAt": "2024-01-15T11:20:00Z"
+        },
+        "pan": {
+          "number": "DEFPM5678L",
+          "documentUrl": "/documents/lwr-002/pan.pdf",
+          "uploadedAt": "2024-01-15T11:22:00Z"
+        },
+        "drivingLicence": {
+          "documentUrl": "/documents/lwr-002/dl.pdf",
+          "uploadedAt": "2024-01-15T11:25:00Z"
+        },
+        "cancelledCheque": {
+          "documentUrl": "/documents/lwr-002/cheque.pdf",
+          "uploadedAt": "2024-01-15T11:28:00Z"
+        },
+        "barId": {
+          "number": "M/5678/2012",
+          "documentUrl": "/documents/lwr-002/bar-id.pdf",
+          "uploadedAt": "2024-01-15T11:30:00Z"
+        },
+        "ballbCertificate": {
+          "documentUrl": "/documents/lwr-002/ballb-cert.pdf",
+          "uploadedAt": "2024-01-15T11:32:00Z"
+        }
+      },
+      "bankDetails": {
+        "accountHolderName": "Priya Mehta",
+        "accountNumber": "987654321098",
+        "bankName": "ICICI Bank",
+        "ifscCode": "ICIC0005678"
+      },
+      "expertise": {
+        "yearsOfExperience": 12,
+        "preferredLanguages": ["English", "Hindi", "Gujarati"],
+        "preferredLocations": ["Mumbai", "Pune", "Ahmedabad"],
+        "caseTypes": ["Traffic Violations", "Criminal Offenses", "Motor Vehicle Disputes"]
+      },
+      "company": {
+        "name": "Mehta & Associates",
+        "email": "info@mehtaassociates.in",
+        "phone": "+91 22 2345 6789",
+        "website": "https://mehtaassociates.in",
+        "address": "Suite 801, Nariman Point, Mumbai - 400021",
+        "gstNumber": "27AABCM1234F1Z5",
+        "panNumber": "AABCM1234F",
+        "gstDocumentUrl": "/documents/lwr-002/company-gst.pdf",
+        "panDocumentUrl": "/documents/lwr-002/company-pan.pdf",
+        "mainOffice": "Mumbai",
+        "branchOffices": ["Pune", "Ahmedabad"]
+      },
+      "onboardingStatus": "Complete",
+      "kycStatus": "Verified",
+      "activityState": "Active",
+      "source": "Website",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "lastUpdatedAt": "2024-01-15T12:00:00Z"
+    },
+    {
+      "id": "lwr-003",
+      "lawyerId": "LWR-2024-003",
+      "photo": "https://i.pravatar.cc/150?u=advocate.kumar",
+      "firstName": "Anil",
+      "lastName": "Kumar",
+      "email": "anil.kumar@gmail.com",
+      "mobile": "+91 99887 76543",
+      "gender": "Male",
+      "dateOfBirth": "1988-11-08",
+      "category": "Motor Vehicle Act",
+      "subCategory": "Accident Claims",
+      "currentAddress": {
+        "country": "India",
+        "state": "Karnataka",
+        "city": "Bangalore",
+        "area": "Koramangala",
+        "addressLine": "12th Main, 4th Block",
+        "pinCode": "560034"
+      },
+      "permanentAddress": {
+        "country": "India",
+        "state": "Karnataka",
+        "city": "Bangalore",
+        "area": "Koramangala",
+        "addressLine": "12th Main, 4th Block",
+        "pinCode": "560034"
+      },
+      "qualifications": [
+        {
+          "degree": "LLB",
+          "university": "Bangalore University",
+          "yearOfCompletion": 2011,
+          "percentage": 72.8,
+          "certificateUrl": "/documents/lwr-003/llb-cert.pdf"
+        }
+      ],
+      "experience": [
+        {
+          "company": "Kumar Legal Services",
+          "role": "Advocate",
+          "startDate": "2011-09-01",
+          "endDate": null,
+          "functionalArea": "Motor Vehicle Act & Insurance Claims"
+        }
+      ],
+      "kycDocuments": {
+        "aadhaar": {
+          "number": "XXXX-XXXX-9012",
+          "documentUrl": "/documents/lwr-003/aadhaar.pdf",
+          "uploadedAt": "2024-01-18T14:10:00Z"
+        },
+        "pan": {
+          "number": "GHIAK9012M",
+          "documentUrl": "/documents/lwr-003/pan.pdf",
+          "uploadedAt": "2024-01-18T14:12:00Z"
+        },
+        "drivingLicence": {
+          "documentUrl": "/documents/lwr-003/dl.pdf",
+          "uploadedAt": "2024-01-18T14:15:00Z"
+        },
+        "cancelledCheque": {
+          "documentUrl": null,
+          "uploadedAt": null
+        },
+        "barId": {
+          "number": "K/9012/2011",
+          "documentUrl": "/documents/lwr-003/bar-id.pdf",
+          "uploadedAt": "2024-01-18T14:18:00Z"
+        },
+        "ballbCertificate": {
+          "documentUrl": "/documents/lwr-003/llb-cert.pdf",
+          "uploadedAt": "2024-01-18T14:20:00Z"
+        }
+      },
+      "bankDetails": {
+        "accountHolderName": "Anil Kumar",
+        "accountNumber": "456789012345",
+        "bankName": "State Bank of India",
+        "ifscCode": "SBIN0009012"
+      },
+      "expertise": {
+        "yearsOfExperience": 13,
+        "preferredLanguages": ["Kannada", "English", "Hindi"],
+        "preferredLocations": ["Bangalore", "Mysore"],
+        "caseTypes": ["MVA Claims", "Traffic Challans", "Accident Compensation"]
+      },
+      "company": null,
+      "onboardingStatus": "Incomplete",
+      "kycStatus": "Pending",
+      "activityState": "Active",
+      "source": "Website",
+      "createdAt": "2024-01-18T14:00:00Z",
+      "lastUpdatedAt": "2024-01-18T14:30:00Z"
+    },
+    {
+      "id": "lwr-004",
+      "lawyerId": "LWR-2023-087",
+      "photo": "https://i.pravatar.cc/150?u=advocate.singh",
+      "firstName": "Harpreet",
+      "lastName": "Singh",
+      "email": "harpreet.singh@legalhub.in",
+      "mobile": "+91 97654 32109",
+      "gender": "Male",
+      "dateOfBirth": "1982-01-25",
+      "category": "Corporate Litigation",
+      "subCategory": "Commercial Disputes",
+      "currentAddress": {
+        "country": "India",
+        "state": "Punjab",
+        "city": "Chandigarh",
+        "area": "Sector 17",
+        "addressLine": "SCO 234-235, First Floor",
+        "pinCode": "160017"
+      },
+      "permanentAddress": {
+        "country": "India",
+        "state": "Punjab",
+        "city": "Ludhiana",
+        "area": "Civil Lines",
+        "addressLine": "H.No. 45, Model Town",
+        "pinCode": "141001"
+      },
+      "qualifications": [
+        {
+          "degree": "BALLB",
+          "university": "Panjab University",
+          "yearOfCompletion": 2004,
+          "percentage": 80.1,
+          "certificateUrl": "/documents/lwr-004/ballb-cert.pdf"
+        },
+        {
+          "degree": "LLM in Corporate Law",
+          "university": "Panjab University",
+          "yearOfCompletion": 2006,
+          "percentage": 76.5,
+          "certificateUrl": "/documents/lwr-004/llm-cert.pdf"
+        }
+      ],
+      "experience": [
+        {
+          "company": "Singh & Partners",
+          "role": "Managing Partner",
+          "startDate": "2006-10-01",
+          "endDate": null,
+          "functionalArea": "Corporate Litigation & Traffic Law"
+        }
+      ],
+      "kycDocuments": {
+        "aadhaar": {
+          "number": "XXXX-XXXX-3456",
+          "documentUrl": "/documents/lwr-004/aadhaar.pdf",
+          "uploadedAt": "2023-12-05T10:00:00Z"
+        },
+        "pan": {
+          "number": "JKLHS3456N",
+          "documentUrl": "/documents/lwr-004/pan.pdf",
+          "uploadedAt": "2023-12-05T10:05:00Z"
+        },
+        "drivingLicence": {
+          "documentUrl": "/documents/lwr-004/dl.pdf",
+          "uploadedAt": "2023-12-05T10:10:00Z"
+        },
+        "cancelledCheque": {
+          "documentUrl": "/documents/lwr-004/cheque.pdf",
+          "uploadedAt": "2023-12-05T10:15:00Z"
+        },
+        "barId": {
+          "number": "P/3456/2004",
+          "documentUrl": "/documents/lwr-004/bar-id.pdf",
+          "uploadedAt": "2023-12-05T10:20:00Z"
+        },
+        "ballbCertificate": {
+          "documentUrl": "/documents/lwr-004/ballb-cert.pdf",
+          "uploadedAt": "2023-12-05T10:25:00Z"
+        }
+      },
+      "bankDetails": {
+        "accountHolderName": "Harpreet Singh",
+        "accountNumber": "234567890123",
+        "bankName": "Punjab National Bank",
+        "ifscCode": "PUNB0003456"
+      },
+      "expertise": {
+        "yearsOfExperience": 20,
+        "preferredLanguages": ["Punjabi", "Hindi", "English"],
+        "preferredLocations": ["Chandigarh", "Ludhiana", "Amritsar"],
+        "caseTypes": ["Traffic Violations", "Commercial Disputes", "Contract Law"]
+      },
+      "company": null,
+      "onboardingStatus": "Complete",
+      "kycStatus": "Verified",
+      "activityState": "Inactive",
+      "source": "Referral",
+      "createdAt": "2023-12-05T09:00:00Z",
+      "lastUpdatedAt": "2024-01-20T16:30:00Z"
+    },
+    {
+      "id": "lwr-005",
+      "lawyerId": "LWR-2024-005",
+      "photo": "https://i.pravatar.cc/150?u=advocate.reddy",
+      "firstName": "Lakshmi",
+      "lastName": "Reddy",
+      "email": "lakshmi.reddy@redlegal.co.in",
+      "mobile": "+91 98234 56789",
+      "gender": "Female",
+      "dateOfBirth": "1992-07-14",
+      "category": "Consumer Protection Law",
+      "subCategory": "Consumer Rights & Disputes",
+      "currentAddress": {
+        "country": "India",
+        "state": "Telangana",
+        "city": "Hyderabad",
+        "area": "Jubilee Hills",
+        "addressLine": "Road No. 45, Plot 123",
+        "pinCode": "500033"
+      },
+      "permanentAddress": {
+        "country": "India",
+        "state": "Telangana",
+        "city": "Hyderabad",
+        "area": "Jubilee Hills",
+        "addressLine": "Road No. 45, Plot 123",
+        "pinCode": "500033"
+      },
+      "qualifications": [
+        {
+          "degree": "BALLB (Hons)",
+          "university": "Osmania University",
+          "yearOfCompletion": 2014,
+          "percentage": 88.7,
+          "certificateUrl": "/documents/lwr-005/ballb-cert.pdf"
+        }
+      ],
+      "experience": [
+        {
+          "company": "Legal Aid Society",
+          "role": "Legal Consultant",
+          "startDate": "2014-08-01",
+          "endDate": "2019-12-31",
+          "functionalArea": "Consumer Protection"
+        },
+        {
+          "company": "Reddy Legal Services",
+          "role": "Senior Advocate",
+          "startDate": "2020-01-01",
+          "endDate": null,
+          "functionalArea": "Consumer Rights & Traffic Law"
+        }
+      ],
+      "kycDocuments": {
+        "aadhaar": {
+          "number": "XXXX-XXXX-6789",
+          "documentUrl": "/documents/lwr-005/aadhaar.pdf",
+          "uploadedAt": "2024-01-22T09:45:00Z"
+        },
+        "pan": {
+          "number": "MNOLR6789O",
+          "documentUrl": "/documents/lwr-005/pan.pdf",
+          "uploadedAt": "2024-01-22T09:48:00Z"
+        },
+        "drivingLicence": {
+          "documentUrl": "/documents/lwr-005/dl.pdf",
+          "uploadedAt": "2024-01-22T09:50:00Z"
+        },
+        "cancelledCheque": {
+          "documentUrl": "/documents/lwr-005/cheque.pdf",
+          "uploadedAt": "2024-01-22T09:52:00Z"
+        },
+        "barId": {
+          "number": "T/6789/2014",
+          "documentUrl": "/documents/lwr-005/bar-id.pdf",
+          "uploadedAt": "2024-01-22T09:55:00Z"
+        },
+        "ballbCertificate": {
+          "documentUrl": "/documents/lwr-005/ballb-cert.pdf",
+          "uploadedAt": "2024-01-22T09:58:00Z"
+        }
+      },
+      "bankDetails": {
+        "accountHolderName": "Lakshmi Reddy",
+        "accountNumber": "567890123456",
+        "bankName": "Axis Bank",
+        "ifscCode": "UTIB0006789"
+      },
+      "expertise": {
+        "yearsOfExperience": 10,
+        "preferredLanguages": ["Telugu", "English", "Hindi"],
+        "preferredLocations": ["Hyderabad", "Secunderabad", "Warangal"],
+        "caseTypes": ["Consumer Disputes", "Traffic Challans", "Service Deficiency"]
+      },
+      "company": null,
+      "onboardingStatus": "Complete",
+      "kycStatus": "Verified",
+      "activityState": "Active",
+      "source": "Website",
+      "createdAt": "2024-01-22T09:00:00Z",
+      "lastUpdatedAt": "2024-01-22T10:15:00Z"
+    },
+    {
+      "id": "lwr-006",
+      "lawyerId": "LWR-2024-006",
+      "photo": "https://i.pravatar.cc/150?u=advocate.verma",
+      "firstName": "Vikram",
+      "lastName": "Verma",
+      "email": "vikram.verma@lawfirm.com",
+      "mobile": "+91 91234 56780",
+      "gender": "Male",
+      "dateOfBirth": "1987-04-30",
+      "category": "Employment and Labour Laws",
+      "subCategory": "Labour Disputes",
+      "currentAddress": {
+        "country": "India",
+        "state": "Uttar Pradesh",
+        "city": "Noida",
+        "area": "Sector 62",
+        "addressLine": "C-45, Industrial Area",
+        "pinCode": "201309"
+      },
+      "permanentAddress": {
+        "country": "India",
+        "state": "Uttar Pradesh",
+        "city": "Lucknow",
+        "area": "Gomti Nagar",
+        "addressLine": "23/7, Vikas Khand",
+        "pinCode": "226010"
+      },
+      "qualifications": [
+        {
+          "degree": "LLB",
+          "university": "Lucknow University",
+          "yearOfCompletion": 2009,
+          "percentage": 75.3,
+          "certificateUrl": "/documents/lwr-006/llb-cert.pdf"
+        }
+      ],
+      "experience": [
+        {
+          "company": "Verma & Co.",
+          "role": "Partner",
+          "startDate": "2009-09-01",
+          "endDate": null,
+          "functionalArea": "Labour Law & Traffic Violations"
+        }
+      ],
+      "kycDocuments": {
+        "aadhaar": {
+          "number": "XXXX-XXXX-2345",
+          "documentUrl": "/documents/lwr-006/aadhaar.pdf",
+          "uploadedAt": "2024-01-25T11:00:00Z"
+        },
+        "pan": {
+          "number": "PQRVV2345P",
+          "documentUrl": "/documents/lwr-006/pan.pdf",
+          "uploadedAt": "2024-01-25T11:03:00Z"
+        },
+        "drivingLicence": {
+          "documentUrl": null,
+          "uploadedAt": null
+        },
+        "cancelledCheque": {
+          "documentUrl": null,
+          "uploadedAt": null
+        },
+        "barId": {
+          "number": "U/2345/2009",
+          "documentUrl": "/documents/lwr-006/bar-id.pdf",
+          "uploadedAt": "2024-01-25T11:06:00Z"
+        },
+        "ballbCertificate": {
+          "documentUrl": "/documents/lwr-006/llb-cert.pdf",
+          "uploadedAt": "2024-01-25T11:09:00Z"
+        }
+      },
+      "bankDetails": {
+        "accountHolderName": "Vikram Verma",
+        "accountNumber": "678901234567",
+        "bankName": "Kotak Mahindra Bank",
+        "ifscCode": "KKBK0002345"
+      },
+      "expertise": {
+        "yearsOfExperience": 15,
+        "preferredLanguages": ["Hindi", "English"],
+        "preferredLocations": ["Noida", "Delhi", "Ghaziabad"],
+        "caseTypes": ["Labour Disputes", "Traffic Violations", "Employment Law"]
+      },
+      "company": null,
+      "onboardingStatus": "Incomplete",
+      "kycStatus": "Missing",
+      "activityState": "Active",
+      "source": "Website",
+      "createdAt": "2024-01-25T10:30:00Z",
+      "lastUpdatedAt": "2024-01-25T11:15:00Z"
+    },
+    {
+      "id": "lwr-007",
+      "lawyerId": "LWR-2023-042",
+      "photo": "https://i.pravatar.cc/150?u=advocate.patel",
+      "firstName": "Neha",
+      "lastName": "Patel",
+      "email": "neha.patel@patellegal.in",
+      "mobile": "+91 94567 89012",
+      "gender": "Female",
+      "dateOfBirth": "1989-09-17",
+      "category": "Taxation",
+      "subCategory": "GST & Income Tax",
+      "currentAddress": {
+        "country": "India",
+        "state": "Gujarat",
+        "city": "Ahmedabad",
+        "area": "CG Road",
+        "addressLine": "301, Shivalik Plaza",
+        "pinCode": "380009"
+      },
+      "permanentAddress": {
+        "country": "India",
+        "state": "Gujarat",
+        "city": "Ahmedabad",
+        "area": "CG Road",
+        "addressLine": "301, Shivalik Plaza",
+        "pinCode": "380009"
+      },
+      "qualifications": [
+        {
+          "degree": "BALLB",
+          "university": "Gujarat University",
+          "yearOfCompletion": 2011,
+          "percentage": 81.9,
+          "certificateUrl": "/documents/lwr-007/ballb-cert.pdf"
+        },
+        {
+          "degree": "CA (Chartered Accountant)",
+          "university": "ICAI",
+          "yearOfCompletion": 2014,
+          "percentage": null,
+          "certificateUrl": "/documents/lwr-007/ca-cert.pdf"
+        }
+      ],
+      "experience": [
+        {
+          "company": "Deloitte India",
+          "role": "Tax Consultant",
+          "startDate": "2014-07-01",
+          "endDate": "2021-03-31",
+          "functionalArea": "Taxation & Compliance"
+        },
+        {
+          "company": "Patel Legal & Tax Consultancy",
+          "role": "Founder & Managing Partner",
+          "startDate": "2021-04-01",
+          "endDate": null,
+          "functionalArea": "Tax Law, GST & Traffic Violations"
+        }
+      ],
+      "kycDocuments": {
+        "aadhaar": {
+          "number": "XXXX-XXXX-8901",
+          "documentUrl": "/documents/lwr-007/aadhaar.pdf",
+          "uploadedAt": "2023-11-20T13:00:00Z"
+        },
+        "pan": {
+          "number": "STUVP8901Q",
+          "documentUrl": "/documents/lwr-007/pan.pdf",
+          "uploadedAt": "2023-11-20T13:03:00Z"
+        },
+        "drivingLicence": {
+          "documentUrl": "/documents/lwr-007/dl.pdf",
+          "uploadedAt": "2023-11-20T13:06:00Z"
+        },
+        "cancelledCheque": {
+          "documentUrl": "/documents/lwr-007/cheque.pdf",
+          "uploadedAt": "2023-11-20T13:09:00Z"
+        },
+        "barId": {
+          "number": "G/8901/2011",
+          "documentUrl": "/documents/lwr-007/bar-id.pdf",
+          "uploadedAt": "2023-11-20T13:12:00Z"
+        },
+        "ballbCertificate": {
+          "documentUrl": "/documents/lwr-007/ballb-cert.pdf",
+          "uploadedAt": "2023-11-20T13:15:00Z"
+        }
+      },
+      "bankDetails": {
+        "accountHolderName": "Neha Patel",
+        "accountNumber": "789012345678",
+        "bankName": "HDFC Bank",
+        "ifscCode": "HDFC0008901"
+      },
+      "expertise": {
+        "yearsOfExperience": 13,
+        "preferredLanguages": ["Gujarati", "Hindi", "English"],
+        "preferredLocations": ["Ahmedabad", "Gandhinagar", "Surat"],
+        "caseTypes": ["Tax Disputes", "Traffic Challans", "GST Litigation"]
+      },
+      "company": {
+        "name": "Patel Legal & Tax Consultancy",
+        "email": "info@patellegal.in",
+        "phone": "+91 79 4012 3456",
+        "website": "https://patellegal.in",
+        "address": "301, Shivalik Plaza, CG Road, Ahmedabad - 380009",
+        "gstNumber": "24AABCP8901G1Z3",
+        "panNumber": "AABCP8901G",
+        "gstDocumentUrl": "/documents/lwr-007/company-gst.pdf",
+        "panDocumentUrl": "/documents/lwr-007/company-pan.pdf",
+        "mainOffice": "Ahmedabad",
+        "branchOffices": ["Surat", "Gandhinagar"]
+      },
+      "onboardingStatus": "Complete",
+      "kycStatus": "Verified",
+      "activityState": "Inactive",
+      "source": "Website",
+      "createdAt": "2023-11-20T12:00:00Z",
+      "lastUpdatedAt": "2024-01-10T14:20:00Z"
+    },
+    {
+      "id": "lwr-008",
+      "lawyerId": "LWR-2024-008",
+      "photo": "https://i.pravatar.cc/150?u=advocate.iyer",
+      "firstName": "Ramesh",
+      "lastName": "Iyer",
+      "email": "ramesh.iyer@advocateiyer.com",
+      "mobile": "+91 96789 01234",
+      "gender": "Male",
+      "dateOfBirth": "1995-12-03",
+      "category": "Motor Vehicle Act",
+      "subCategory": "Traffic Violations & Challans",
+      "currentAddress": {
+        "country": "India",
+        "state": "Tamil Nadu",
+        "city": "Chennai",
+        "area": "Anna Nagar",
+        "addressLine": "2nd Avenue, Block C",
+        "pinCode": "600040"
+      },
+      "permanentAddress": {
+        "country": "India",
+        "state": "Tamil Nadu",
+        "city": "Chennai",
+        "area": "Anna Nagar",
+        "addressLine": "2nd Avenue, Block C",
+        "pinCode": "600040"
+      },
+      "qualifications": [
+        {
+          "degree": "BALLB",
+          "university": "Tamil Nadu Dr. Ambedkar Law University",
+          "yearOfCompletion": 2017,
+          "percentage": 79.4,
+          "certificateUrl": "/documents/lwr-008/ballb-cert.pdf"
+        }
+      ],
+      "experience": [
+        {
+          "company": "Chennai Legal Consultancy",
+          "role": "Junior Associate",
+          "startDate": "2017-09-01",
+          "endDate": "2022-08-31",
+          "functionalArea": "Motor Vehicle Law"
+        },
+        {
+          "company": "Independent Practice",
+          "role": "Advocate",
+          "startDate": "2022-09-01",
+          "endDate": null,
+          "functionalArea": "Traffic Law & MVA"
+        }
+      ],
+      "kycDocuments": {
+        "aadhaar": {
+          "number": "XXXX-XXXX-0123",
+          "documentUrl": "/documents/lwr-008/aadhaar.pdf",
+          "uploadedAt": "2024-01-28T15:30:00Z"
+        },
+        "pan": {
+          "number": "WXYI0123R",
+          "documentUrl": "/documents/lwr-008/pan.pdf",
+          "uploadedAt": "2024-01-28T15:33:00Z"
+        },
+        "drivingLicence": {
+          "documentUrl": "/documents/lwr-008/dl.pdf",
+          "uploadedAt": "2024-01-28T15:36:00Z"
+        },
+        "cancelledCheque": {
+          "documentUrl": "/documents/lwr-008/cheque.pdf",
+          "uploadedAt": "2024-01-28T15:39:00Z"
+        },
+        "barId": {
+          "number": "TN/0123/2017",
+          "documentUrl": "/documents/lwr-008/bar-id.pdf",
+          "uploadedAt": "2024-01-28T15:42:00Z"
+        },
+        "ballbCertificate": {
+          "documentUrl": "/documents/lwr-008/ballb-cert.pdf",
+          "uploadedAt": "2024-01-28T15:45:00Z"
+        }
+      },
+      "bankDetails": {
+        "accountHolderName": "Ramesh Iyer",
+        "accountNumber": "890123456789",
+        "bankName": "Indian Bank",
+        "ifscCode": "IDIB0000123"
+      },
+      "expertise": {
+        "yearsOfExperience": 7,
+        "preferredLanguages": ["Tamil", "English"],
+        "preferredLocations": ["Chennai", "Coimbatore", "Madurai"],
+        "caseTypes": ["Traffic Challans", "MVA Violations", "Driving Licence Issues"]
+      },
+      "company": null,
+      "onboardingStatus": "Complete",
+      "kycStatus": "Verified",
+      "activityState": "Active",
+      "source": "Website",
+      "createdAt": "2024-01-28T15:00:00Z",
+      "lastUpdatedAt": "2024-01-28T16:00:00Z"
+    }
+  ]
+}

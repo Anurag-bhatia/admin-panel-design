@@ -1,0 +1,370 @@
+{
+  "_meta": {
+    "models": {
+      "employees": "Internal operations staff members with complete profile information, reporting structure, system access credentials, and granular permissions. Each employee can be active (participating in operations) or inactive (access revoked, excluded from workflows).",
+      "teams": "Functional groupings of employees organized by operational purpose such as Screening, Resolution, or Escalations. Teams have designated leads and are used for workload distribution and performance tracking.",
+      "permissions": "Two-layer access control model where Module Access defines which sections an employee can view, and Flow Access defines specific actions they can perform within each module."
+    },
+    "relationships": [
+      "Each Employee belongs to a department and has a primary reporting manager (another Employee)",
+      "Each Employee may have a secondary reporting manager for dotted-line reporting",
+      "Employees can be members of one or more Teams",
+      "Each Team has one designated team lead (an Employee)",
+      "Each Employee has a unique permissions configuration controlling their system access"
+    ]
+  },
+  "employees": [
+    {
+      "id": "emp-001",
+      "profilePicture": null,
+      "firstName": "Priya",
+      "lastName": "Sharma",
+      "fullName": "Priya Sharma",
+      "mobile": "+919876543210",
+      "email": "priya.sharma@company.com",
+      "gender": "Female",
+      "dateOfBirth": "1990-03-15",
+      "department": "Operations",
+      "designation": "Operations Manager",
+      "dateOfJoining": "2022-01-10",
+      "primaryReportingManager": null,
+      "secondaryReportingManager": null,
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Incidents", "Teams", "Employees", "Lawyers", "Finance", "Reports", "Settings"],
+        "flowAccess": {
+          "Incidents": ["view", "screen", "assign", "reassign", "approve"],
+          "Lawyers": ["view", "add", "edit", "deactivate"],
+          "Finance": ["view", "approve_refunds", "release_payouts"],
+          "Teams": ["view", "add", "edit"],
+          "Employees": ["view", "add", "edit", "manage_permissions"]
+        }
+      }
+    },
+    {
+      "id": "emp-002",
+      "profilePicture": null,
+      "firstName": "Rahul",
+      "lastName": "Verma",
+      "fullName": "Rahul Verma",
+      "mobile": "+919876543211",
+      "email": "rahul.verma@company.com",
+      "gender": "Male",
+      "dateOfBirth": "1992-07-22",
+      "department": "Operations",
+      "designation": "Senior Operations Executive",
+      "dateOfJoining": "2022-06-15",
+      "primaryReportingManager": "emp-001",
+      "secondaryReportingManager": null,
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Incidents", "Lawyers", "Reports"],
+        "flowAccess": {
+          "Incidents": ["view", "screen", "assign"],
+          "Lawyers": ["view"],
+          "Reports": ["view"]
+        }
+      }
+    },
+    {
+      "id": "emp-003",
+      "profilePicture": null,
+      "firstName": "Anjali",
+      "lastName": "Desai",
+      "fullName": "Anjali Desai",
+      "mobile": "+919876543212",
+      "email": "anjali.desai@company.com",
+      "gender": "Female",
+      "dateOfBirth": "1994-11-08",
+      "department": "Operations",
+      "designation": "Operations Executive",
+      "dateOfJoining": "2023-02-20",
+      "primaryReportingManager": "emp-001",
+      "secondaryReportingManager": "emp-002",
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Incidents", "Lawyers"],
+        "flowAccess": {
+          "Incidents": ["view", "screen"],
+          "Lawyers": ["view"]
+        }
+      }
+    },
+    {
+      "id": "emp-004",
+      "profilePicture": null,
+      "firstName": "Vikram",
+      "lastName": "Singh",
+      "fullName": "Vikram Singh",
+      "mobile": "+919876543213",
+      "email": "vikram.singh@company.com",
+      "gender": "Male",
+      "dateOfBirth": "1991-05-14",
+      "department": "Operations",
+      "designation": "Operations Executive",
+      "dateOfJoining": "2023-04-10",
+      "primaryReportingManager": "emp-001",
+      "secondaryReportingManager": "emp-002",
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Incidents", "Lawyers"],
+        "flowAccess": {
+          "Incidents": ["view", "screen", "assign"],
+          "Lawyers": ["view"]
+        }
+      }
+    },
+    {
+      "id": "emp-005",
+      "profilePicture": null,
+      "firstName": "Kavita",
+      "lastName": "Patel",
+      "fullName": "Kavita Patel",
+      "mobile": "+919876543214",
+      "email": "kavita.patel@company.com",
+      "gender": "Female",
+      "dateOfBirth": "1993-09-25",
+      "department": "Finance",
+      "designation": "Finance Manager",
+      "dateOfJoining": "2022-03-01",
+      "primaryReportingManager": null,
+      "secondaryReportingManager": null,
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Finance", "Reports", "Incidents"],
+        "flowAccess": {
+          "Finance": ["view", "approve_refunds", "release_payouts", "reconcile"],
+          "Reports": ["view", "export"],
+          "Incidents": ["view"]
+        }
+      }
+    },
+    {
+      "id": "emp-006",
+      "profilePicture": null,
+      "firstName": "Amit",
+      "lastName": "Joshi",
+      "fullName": "Amit Joshi",
+      "mobile": "+919876543215",
+      "email": "amit.joshi@company.com",
+      "gender": "Male",
+      "dateOfBirth": "1995-12-30",
+      "department": "Finance",
+      "designation": "Finance Executive",
+      "dateOfJoining": "2023-01-15",
+      "primaryReportingManager": "emp-005",
+      "secondaryReportingManager": null,
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Finance", "Reports"],
+        "flowAccess": {
+          "Finance": ["view", "reconcile"],
+          "Reports": ["view"]
+        }
+      }
+    },
+    {
+      "id": "emp-007",
+      "profilePicture": null,
+      "firstName": "Sneha",
+      "lastName": "Reddy",
+      "fullName": "Sneha Reddy",
+      "mobile": "+919876543216",
+      "email": "sneha.reddy@company.com",
+      "gender": "Female",
+      "dateOfBirth": "1996-04-18",
+      "department": "Customer Success",
+      "designation": "Support Manager",
+      "dateOfJoining": "2022-08-20",
+      "primaryReportingManager": null,
+      "secondaryReportingManager": null,
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Support", "Disputes", "Subscribers", "Incidents"],
+        "flowAccess": {
+          "Support": ["view", "respond", "close", "escalate"],
+          "Disputes": ["view", "resolve", "escalate"],
+          "Subscribers": ["view"],
+          "Incidents": ["view"]
+        }
+      }
+    },
+    {
+      "id": "emp-008",
+      "profilePicture": null,
+      "firstName": "Rohan",
+      "lastName": "Mehta",
+      "fullName": "Rohan Mehta",
+      "mobile": "+919876543217",
+      "email": "rohan.mehta@company.com",
+      "gender": "Male",
+      "dateOfBirth": "1997-08-05",
+      "department": "Customer Success",
+      "designation": "Support Executive",
+      "dateOfJoining": "2023-05-10",
+      "primaryReportingManager": "emp-007",
+      "secondaryReportingManager": null,
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Support", "Subscribers"],
+        "flowAccess": {
+          "Support": ["view", "respond"],
+          "Subscribers": ["view"]
+        }
+      }
+    },
+    {
+      "id": "emp-009",
+      "profilePicture": null,
+      "firstName": "Deepak",
+      "lastName": "Kumar",
+      "fullName": "Deepak Kumar",
+      "mobile": "+919876543218",
+      "email": "deepak.kumar@company.com",
+      "gender": "Male",
+      "dateOfBirth": "1989-02-12",
+      "department": "Operations",
+      "designation": "Operations Executive",
+      "dateOfJoining": "2022-11-05",
+      "primaryReportingManager": "emp-001",
+      "secondaryReportingManager": null,
+      "status": "inactive",
+      "permissions": {
+        "moduleAccess": [],
+        "flowAccess": {}
+      }
+    },
+    {
+      "id": "emp-010",
+      "profilePicture": null,
+      "firstName": "Meera",
+      "lastName": "Gupta",
+      "fullName": "Meera Gupta",
+      "mobile": "+919876543219",
+      "email": "meera.gupta@company.com",
+      "gender": "Female",
+      "dateOfBirth": "1992-06-28",
+      "department": "Legal",
+      "designation": "Legal Coordinator",
+      "dateOfJoining": "2023-03-15",
+      "primaryReportingManager": "emp-001",
+      "secondaryReportingManager": null,
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Lawyers", "Incidents", "Reports"],
+        "flowAccess": {
+          "Lawyers": ["view", "add", "edit", "manage_performance"],
+          "Incidents": ["view"],
+          "Reports": ["view"]
+        }
+      }
+    },
+    {
+      "id": "emp-011",
+      "profilePicture": null,
+      "firstName": "Arjun",
+      "lastName": "Nair",
+      "fullName": "Arjun Nair",
+      "mobile": "+919876543220",
+      "email": "arjun.nair@company.com",
+      "gender": "Male",
+      "dateOfBirth": "1994-10-09",
+      "department": "Operations",
+      "designation": "Operations Executive",
+      "dateOfJoining": "2023-07-01",
+      "primaryReportingManager": "emp-001",
+      "secondaryReportingManager": "emp-002",
+      "status": "active",
+      "permissions": {
+        "moduleAccess": ["Incidents"],
+        "flowAccess": {
+          "Incidents": ["view", "screen"]
+        }
+      }
+    },
+    {
+      "id": "emp-012",
+      "profilePicture": null,
+      "firstName": "Pooja",
+      "lastName": "Iyer",
+      "fullName": "Pooja Iyer",
+      "mobile": "+919876543221",
+      "email": "pooja.iyer@company.com",
+      "gender": "Female",
+      "dateOfBirth": "1993-01-20",
+      "department": "Finance",
+      "designation": "Finance Executive",
+      "dateOfJoining": "2022-09-12",
+      "primaryReportingManager": "emp-005",
+      "secondaryReportingManager": null,
+      "status": "inactive",
+      "permissions": {
+        "moduleAccess": [],
+        "flowAccess": {}
+      }
+    }
+  ],
+  "teams": [
+    {
+      "id": "team-001",
+      "name": "Screening Team",
+      "department": "Operations",
+      "teamLead": "emp-002",
+      "members": ["emp-002", "emp-003", "emp-004", "emp-011"],
+      "memberCount": 4,
+      "status": "active"
+    },
+    {
+      "id": "team-002",
+      "name": "Resolution Team",
+      "department": "Operations",
+      "teamLead": "emp-004",
+      "members": ["emp-004", "emp-003"],
+      "memberCount": 2,
+      "status": "active"
+    },
+    {
+      "id": "team-003",
+      "name": "Finance Operations",
+      "department": "Finance",
+      "teamLead": "emp-005",
+      "members": ["emp-005", "emp-006"],
+      "memberCount": 2,
+      "status": "active"
+    },
+    {
+      "id": "team-004",
+      "name": "Customer Support",
+      "department": "Customer Success",
+      "teamLead": "emp-007",
+      "members": ["emp-007", "emp-008"],
+      "memberCount": 2,
+      "status": "active"
+    },
+    {
+      "id": "team-005",
+      "name": "Escalations Team",
+      "department": "Operations",
+      "teamLead": "emp-001",
+      "members": ["emp-001", "emp-002"],
+      "memberCount": 2,
+      "status": "inactive"
+    }
+  ],
+  "departments": ["Operations", "Finance", "Customer Success", "Legal"],
+  "designations": ["Operations Manager", "Senior Operations Executive", "Operations Executive", "Finance Manager", "Finance Executive", "Support Manager", "Support Executive", "Legal Coordinator"],
+  "modules": ["Incidents", "Leads", "Subscribers", "Lawyers", "Partners", "Payments", "Disputes", "Support", "Reports", "Teams", "Employees", "Finance", "Settings"],
+  "flows": {
+    "Incidents": ["view", "screen", "assign", "reassign", "approve"],
+    "Lawyers": ["view", "add", "edit", "deactivate", "manage_performance"],
+    "Finance": ["view", "approve_refunds", "release_payouts", "reconcile"],
+    "Support": ["view", "respond", "close", "escalate"],
+    "Disputes": ["view", "resolve", "escalate"],
+    "Subscribers": ["view", "add", "edit"],
+    "Leads": ["view", "add", "qualify", "convert"],
+    "Teams": ["view", "add", "edit", "manage_members"],
+    "Employees": ["view", "add", "edit", "manage_permissions", "deactivate"],
+    "Reports": ["view", "export"],
+    "Settings": ["view", "modify_configurations"]
+  }
+}

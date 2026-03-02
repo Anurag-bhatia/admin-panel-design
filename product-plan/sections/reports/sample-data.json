@@ -1,0 +1,1280 @@
+{
+  "_meta": {
+    "models": {
+      "executiveSummary": "High-level metrics across all business domains, providing a quick overview of platform health and performance.",
+      "incidentsReport": "Operational metrics for challan resolution including volumes, SLA performance, and resolution outcomes.",
+      "leadsReport": "Sales pipeline metrics tracking lead progression, conversion rates, and source effectiveness.",
+      "subscribersReport": "Client base metrics including active accounts, churn rates, and usage patterns.",
+      "lawyersReport": "Legal network performance metrics including success rates, resolution times, and commissions.",
+      "partnersReport": "Partner contribution metrics including subscribers onboarded and revenue impact.",
+      "paymentsReport": "Financial metrics tracking collections, invoices, refunds, and payouts.",
+      "disputesReport": "Customer dispute metrics including volumes, resolution times, and outcomes.",
+      "supportReport": "Support ticket metrics including resolution times, categories, and recurring issues.",
+      "teamReport": "Internal team performance metrics including workload, SLA adherence, and productivity.",
+      "filterOptions": "Available filter values for refining report data across all tabs.",
+      "metricCard": "Individual metric display with current value, trend indicator, and drill-down capability.",
+      "chartData": "Time-series or categorical data for visualizations.",
+      "detailRecord": "Underlying record details shown when drilling down from summary metrics."
+    },
+    "relationships": [
+      "Executive Summary aggregates key metrics from all other report categories",
+      "Each report tab (Incidents, Leads, etc.) contains metric cards, charts, and detailed records",
+      "Metric cards can be clicked to reveal underlying detail records",
+      "Filter options apply across all report tabs to refine displayed data",
+      "Chart data represents trends and breakdowns for each report category",
+      "Detail records correspond to the actual entities from the global data model (Incidents, Leads, Subscribers, etc.)"
+    ]
+  },
+  "executiveSummary": {
+    "incidents": {
+      "total": 1847,
+      "resolved": 1423,
+      "pending": 312,
+      "failed": 89,
+      "refunded": 23,
+      "trend": 12.5
+    },
+    "leads": {
+      "total": 456,
+      "converted": 87,
+      "active": 234,
+      "lost": 135,
+      "conversionRate": 19.1,
+      "trend": 8.3
+    },
+    "subscribers": {
+      "total": 189,
+      "active": 167,
+      "inactive": 22,
+      "newThisMonth": 14,
+      "churnRate": 2.3,
+      "trend": -1.2
+    },
+    "lawyers": {
+      "total": 45,
+      "active": 38,
+      "avgSuccessRate": 77.1,
+      "avgResolutionDays": 28.3,
+      "trend": 3.7
+    },
+    "partners": {
+      "total": 12,
+      "active": 10,
+      "subscribersOnboarded": 78,
+      "revenueContribution": 1456000,
+      "trend": 15.2
+    },
+    "payments": {
+      "totalCollections": 8945000,
+      "pendingPayments": 456000,
+      "refundsIssued": 123000,
+      "payoutsProcessed": 2345000,
+      "trend": 6.8
+    },
+    "disputes": {
+      "total": 34,
+      "open": 12,
+      "resolved": 19,
+      "escalated": 3,
+      "avgResolutionDays": 4.2,
+      "trend": -8.5
+    },
+    "support": {
+      "total": 267,
+      "open": 45,
+      "closed": 222,
+      "avgResolutionHours": 6.8,
+      "trend": -3.2
+    },
+    "team": {
+      "totalEmployees": 34,
+      "avgIncidentsHandled": 42.7,
+      "avgSlaAdherence": 86.3,
+      "trend": 4.1
+    }
+  },
+  "incidentsReport": {
+    "summary": {
+      "totalIncidents": {
+        "value": 1847,
+        "trend": 12.5,
+        "label": "Total Incidents",
+        "description": "All challans submitted across all subscribers"
+      },
+      "resolved": {
+        "value": 1423,
+        "trend": 15.2,
+        "label": "Resolved",
+        "description": "Successfully closed incidents"
+      },
+      "pending": {
+        "value": 312,
+        "trend": -5.3,
+        "label": "Pending",
+        "description": "Currently in progress with assigned lawyers"
+      },
+      "failed": {
+        "value": 89,
+        "trend": 8.7,
+        "label": "Failed",
+        "description": "Could not be resolved within SLA"
+      },
+      "refunded": {
+        "value": 23,
+        "trend": -12.4,
+        "label": "Refunded",
+        "description": "Refund issued to subscriber"
+      },
+      "avgResolutionTime": {
+        "value": 28.3,
+        "trend": -4.5,
+        "label": "Avg Resolution Time (days)",
+        "description": "Average time from assignment to resolution"
+      },
+      "slaAdherence": {
+        "value": 86.3,
+        "trend": 2.1,
+        "label": "SLA Adherence (%)",
+        "description": "Percentage resolved within 45-day TAT"
+      }
+    },
+    "chartData": {
+      "volumeTrend": [
+        { "month": "Aug", "created": 142, "resolved": 128 },
+        { "month": "Sep", "created": 156, "resolved": 145 },
+        { "month": "Oct", "created": 178, "resolved": 162 },
+        { "month": "Nov", "created": 165, "resolved": 171 },
+        { "month": "Dec", "created": 189, "resolved": 183 },
+        { "month": "Jan", "created": 203, "resolved": 195 }
+      ],
+      "statusBreakdown": [
+        { "status": "Resolved", "count": 1423, "percentage": 77.0 },
+        { "status": "Pending", "count": 312, "percentage": 16.9 },
+        { "status": "Failed", "count": 89, "percentage": 4.8 },
+        { "status": "Refunded", "count": 23, "percentage": 1.3 }
+      ],
+      "stateBreakdown": [
+        { "state": "Maharashtra", "count": 567 },
+        { "state": "Karnataka", "count": 423 },
+        { "state": "Delhi", "count": 298 },
+        { "state": "Tamil Nadu", "count": 234 },
+        { "state": "Gujarat", "count": 189 },
+        { "state": "Others", "count": 136 }
+      ],
+      "ageingAnalysis": [
+        { "range": "0-15 days", "count": 124 },
+        { "range": "16-30 days", "count": 98 },
+        { "range": "31-45 days", "count": 67 },
+        { "range": "46-60 days", "count": 18 },
+        { "range": "60+ days", "count": 5 }
+      ]
+    },
+    "detailRecords": [
+      {
+        "id": "INC-2024-1234",
+        "subscriberName": "LogiFleet Solutions",
+        "challanNumber": "MH-CH-2024-8765",
+        "state": "Maharashtra",
+        "amount": 2500,
+        "status": "resolved",
+        "assignedLawyer": "Adv. Priya Sharma",
+        "createdDate": "2024-12-15",
+        "resolvedDate": "2025-01-08",
+        "resolutionDays": 24,
+        "slaStatus": "within"
+      },
+      {
+        "id": "INC-2024-1235",
+        "subscriberName": "Metro Cabs Pvt Ltd",
+        "challanNumber": "KA-CH-2024-3421",
+        "state": "Karnataka",
+        "amount": 1800,
+        "status": "pending",
+        "assignedLawyer": "Adv. Rajesh Kumar",
+        "createdDate": "2025-01-20",
+        "resolvedDate": null,
+        "resolutionDays": 20,
+        "slaStatus": "within"
+      },
+      {
+        "id": "INC-2024-1236",
+        "subscriberName": "Swift Transport Co",
+        "challanNumber": "DL-CH-2024-9876",
+        "state": "Delhi",
+        "amount": 5000,
+        "status": "resolved",
+        "assignedLawyer": "Adv. Meena Singh",
+        "createdDate": "2024-11-10",
+        "resolvedDate": "2024-12-18",
+        "resolutionDays": 38,
+        "slaStatus": "within"
+      },
+      {
+        "id": "INC-2024-1237",
+        "subscriberName": "CityLine Logistics",
+        "challanNumber": "TN-CH-2024-5543",
+        "state": "Tamil Nadu",
+        "amount": 3200,
+        "status": "failed",
+        "assignedLawyer": "Adv. Arun Prasad",
+        "createdDate": "2024-10-05",
+        "resolvedDate": null,
+        "resolutionDays": 97,
+        "slaStatus": "breached"
+      },
+      {
+        "id": "INC-2024-1238",
+        "subscriberName": "Express Wheels Ltd",
+        "challanNumber": "GJ-CH-2024-7621",
+        "state": "Gujarat",
+        "amount": 1500,
+        "status": "refunded",
+        "assignedLawyer": "Adv. Kavita Desai",
+        "createdDate": "2024-11-28",
+        "resolvedDate": null,
+        "resolutionDays": 73,
+        "slaStatus": "breached"
+      }
+    ]
+  },
+  "leadsReport": {
+    "summary": {
+      "totalLeads": {
+        "value": 456,
+        "trend": 8.3,
+        "label": "Total Leads",
+        "description": "All leads in the pipeline"
+      },
+      "newLeads": {
+        "value": 67,
+        "trend": 15.2,
+        "label": "New Leads",
+        "description": "Leads added this period"
+      },
+      "converted": {
+        "value": 87,
+        "trend": 12.1,
+        "label": "Converted",
+        "description": "Leads converted to subscribers"
+      },
+      "conversionRate": {
+        "value": 19.1,
+        "trend": 3.4,
+        "label": "Conversion Rate (%)",
+        "description": "Percentage of leads converted to paying customers"
+      },
+      "avgConversionDays": {
+        "value": 42.7,
+        "trend": -8.2,
+        "label": "Avg Conversion Days",
+        "description": "Average time from lead creation to conversion"
+      }
+    },
+    "chartData": {
+      "pipelineStages": [
+        { "stage": "New", "count": 78 },
+        { "stage": "Assigned", "count": 56 },
+        { "stage": "Follow-up", "count": 43 },
+        { "stage": "Quotation", "count": 31 },
+        { "stage": "Projected", "count": 18 },
+        { "stage": "Invoiced", "count": 8 }
+      ],
+      "conversionFunnel": [
+        { "stage": "New", "count": 456, "percentage": 100 },
+        { "stage": "Qualified", "count": 312, "percentage": 68.4 },
+        { "stage": "Quotation", "count": 187, "percentage": 41.0 },
+        { "stage": "Projected", "count": 134, "percentage": 29.4 },
+        { "stage": "Converted", "count": 87, "percentage": 19.1 }
+      ],
+      "sourceBreakdown": [
+        { "source": "Website", "count": 156, "converted": 34 },
+        { "source": "Referral", "count": 123, "converted": 28 },
+        { "source": "Partner", "count": 98, "converted": 18 },
+        { "source": "Direct", "count": 79, "converted": 7 }
+      ],
+      "monthlyTrend": [
+        { "month": "Aug", "new": 52, "converted": 9 },
+        { "month": "Sep", "new": 61, "converted": 12 },
+        { "month": "Oct", "new": 58, "converted": 15 },
+        { "month": "Nov", "new": 73, "converted": 18 },
+        { "month": "Dec", "new": 79, "converted": 16 },
+        { "month": "Jan", "new": 67, "converted": 17 }
+      ]
+    },
+    "detailRecords": [
+      {
+        "id": "LEAD-2024-567",
+        "companyName": "SpeedX Logistics",
+        "contactPerson": "Rahul Mehta",
+        "email": "rahul@speedxlogistics.com",
+        "phone": "+91 98765 43210",
+        "stage": "Quotation",
+        "source": "Website",
+        "assignedTo": "Anjali Verma",
+        "createdDate": "2025-01-15",
+        "lastActivity": "2025-02-05"
+      },
+      {
+        "id": "LEAD-2024-568",
+        "companyName": "Alpha Fleet Services",
+        "contactPerson": "Sneha Kapoor",
+        "email": "sneha@alphafleet.in",
+        "phone": "+91 87654 32109",
+        "stage": "Follow-up",
+        "source": "Referral",
+        "assignedTo": "Vikram Singh",
+        "createdDate": "2025-01-22",
+        "lastActivity": "2025-02-08"
+      },
+      {
+        "id": "LEAD-2024-569",
+        "companyName": "Urban Transport Co",
+        "contactPerson": "Deepak Joshi",
+        "email": "deepak@urbantransport.com",
+        "phone": "+91 76543 21098",
+        "stage": "New",
+        "source": "Partner",
+        "assignedTo": "Priya Reddy",
+        "createdDate": "2025-02-03",
+        "lastActivity": "2025-02-03"
+      },
+      {
+        "id": "LEAD-2024-570",
+        "companyName": "Gateway Movers",
+        "contactPerson": "Kavita Nair",
+        "email": "kavita@gatewaymovers.co.in",
+        "phone": "+91 65432 10987",
+        "stage": "Projected",
+        "source": "Website",
+        "assignedTo": "Anjali Verma",
+        "createdDate": "2024-12-20",
+        "lastActivity": "2025-02-04"
+      },
+      {
+        "id": "LEAD-2024-571",
+        "companyName": "BlueLine Couriers",
+        "contactPerson": "Amit Patel",
+        "email": "amit@bluelinecouriers.com",
+        "phone": "+91 54321 09876",
+        "stage": "Lost",
+        "source": "Direct",
+        "assignedTo": "Vikram Singh",
+        "createdDate": "2024-11-05",
+        "lastActivity": "2024-12-18",
+        "lostReason": "Budget constraints"
+      }
+    ]
+  },
+  "subscribersReport": {
+    "summary": {
+      "totalSubscribers": {
+        "value": 189,
+        "trend": -1.2,
+        "label": "Total Subscribers",
+        "description": "All active and inactive subscriber accounts"
+      },
+      "activeSubscribers": {
+        "value": 167,
+        "trend": 2.4,
+        "label": "Active Subscribers",
+        "description": "Currently active accounts"
+      },
+      "newThisMonth": {
+        "value": 14,
+        "trend": 16.7,
+        "label": "New This Month",
+        "description": "Subscribers added this period"
+      },
+      "churnRate": {
+        "value": 2.3,
+        "trend": -18.2,
+        "label": "Churn Rate (%)",
+        "description": "Percentage of subscribers who became inactive"
+      },
+      "avgIncidentsPerSubscriber": {
+        "value": 9.8,
+        "trend": 5.4,
+        "label": "Avg Incidents/Subscriber",
+        "description": "Average number of challans submitted per account"
+      },
+      "avgSubscriptionValue": {
+        "value": 47340,
+        "trend": 8.9,
+        "label": "Avg Subscription Value (₹)",
+        "description": "Average revenue per subscriber"
+      }
+    },
+    "chartData": {
+      "growthTrend": [
+        { "month": "Aug", "active": 142, "new": 8, "churned": 3 },
+        { "month": "Sep", "active": 149, "new": 10, "churned": 3 },
+        { "month": "Oct", "active": 156, "new": 12, "churned": 5 },
+        { "month": "Nov", "active": 161, "new": 9, "churned": 4 },
+        { "month": "Dec", "active": 165, "new": 11, "churned": 7 },
+        { "month": "Jan", "active": 167, "new": 14, "churned": 12 }
+      ],
+      "usageDistribution": [
+        { "range": "1-5 incidents", "count": 45 },
+        { "range": "6-10 incidents", "count": 67 },
+        { "range": "11-20 incidents", "count": 52 },
+        { "range": "21-50 incidents", "count": 21 },
+        { "range": "50+ incidents", "count": 4 }
+      ],
+      "revenueSegments": [
+        { "segment": "Enterprise", "count": 12, "revenue": 2456000 },
+        { "segment": "Mid-Market", "count": 45, "revenue": 3890000 },
+        { "segment": "Small Business", "count": 132, "revenue": 2599000 }
+      ]
+    },
+    "detailRecords": [
+      {
+        "id": "SUB-2024-123",
+        "companyName": "LogiFleet Solutions",
+        "contactPerson": "Arjun Sharma",
+        "email": "arjun@logifleet.com",
+        "status": "active",
+        "subscriptionDate": "2023-06-15",
+        "totalIncidents": 47,
+        "resolvedIncidents": 43,
+        "pendingIncidents": 4,
+        "totalSpend": 118500,
+        "lastActivity": "2025-02-08"
+      },
+      {
+        "id": "SUB-2024-124",
+        "companyName": "Metro Cabs Pvt Ltd",
+        "contactPerson": "Sanjay Gupta",
+        "email": "sanjay@metrocabs.in",
+        "status": "active",
+        "subscriptionDate": "2023-09-20",
+        "totalIncidents": 32,
+        "resolvedIncidents": 28,
+        "pendingIncidents": 4,
+        "totalSpend": 81000,
+        "lastActivity": "2025-02-07"
+      },
+      {
+        "id": "SUB-2024-125",
+        "companyName": "Swift Transport Co",
+        "contactPerson": "Neha Desai",
+        "email": "neha@swifttransport.com",
+        "status": "active",
+        "subscriptionDate": "2024-01-10",
+        "totalIncidents": 23,
+        "resolvedIncidents": 21,
+        "pendingIncidents": 2,
+        "totalSpend": 57500,
+        "lastActivity": "2025-02-06"
+      },
+      {
+        "id": "SUB-2024-126",
+        "companyName": "Legacy Movers",
+        "contactPerson": "Ramesh Iyer",
+        "email": "ramesh@legacymovers.co.in",
+        "status": "inactive",
+        "subscriptionDate": "2023-03-12",
+        "totalIncidents": 18,
+        "resolvedIncidents": 18,
+        "pendingIncidents": 0,
+        "totalSpend": 45000,
+        "lastActivity": "2024-11-15"
+      },
+      {
+        "id": "SUB-2024-127",
+        "companyName": "Express Wheels Ltd",
+        "contactPerson": "Pooja Malhotra",
+        "email": "pooja@expresswheels.com",
+        "status": "active",
+        "subscriptionDate": "2024-08-05",
+        "totalIncidents": 12,
+        "resolvedIncidents": 10,
+        "pendingIncidents": 2,
+        "totalSpend": 30000,
+        "lastActivity": "2025-02-09"
+      }
+    ]
+  },
+  "lawyersReport": {
+    "summary": {
+      "totalLawyers": {
+        "value": 45,
+        "trend": 0,
+        "label": "Total Lawyers",
+        "description": "All lawyers in the network"
+      },
+      "activeLawyers": {
+        "value": 38,
+        "trend": 2.7,
+        "label": "Active Lawyers",
+        "description": "Currently handling cases"
+      },
+      "avgSuccessRate": {
+        "value": 77.1,
+        "trend": 3.7,
+        "label": "Avg Success Rate (%)",
+        "description": "Percentage of cases successfully resolved"
+      },
+      "avgResolutionTime": {
+        "value": 28.3,
+        "trend": -4.5,
+        "label": "Avg Resolution Time (days)",
+        "description": "Average days to resolve assigned cases"
+      },
+      "totalCommissionsEarned": {
+        "value": 2345000,
+        "trend": 12.3,
+        "label": "Total Commissions (₹)",
+        "description": "Commissions earned this period"
+      },
+      "avgCasesPerLawyer": {
+        "value": 37.4,
+        "trend": 8.1,
+        "label": "Avg Cases/Lawyer",
+        "description": "Average case load per active lawyer"
+      }
+    },
+    "chartData": {
+      "performanceDistribution": [
+        { "range": "90-100%", "count": 8 },
+        { "range": "80-89%", "count": 15 },
+        { "range": "70-79%", "count": 12 },
+        { "range": "60-69%", "count": 7 },
+        { "range": "Below 60%", "count": 3 }
+      ],
+      "resolutionTimeTrend": [
+        { "month": "Aug", "avgDays": 32.1 },
+        { "month": "Sep", "avgDays": 31.5 },
+        { "month": "Oct", "avgDays": 29.8 },
+        { "month": "Nov", "avgDays": 28.9 },
+        { "month": "Dec", "avgDays": 27.6 },
+        { "month": "Jan", "avgDays": 28.3 }
+      ],
+      "commissionsByState": [
+        { "state": "Maharashtra", "commission": 756000 },
+        { "state": "Karnataka", "commission": 543000 },
+        { "state": "Delhi", "commission": 432000 },
+        { "state": "Tamil Nadu", "commission": 321000 },
+        { "state": "Gujarat", "commission": 293000 }
+      ]
+    },
+    "detailRecords": [
+      {
+        "id": "LAW-2024-034",
+        "name": "Adv. Priya Sharma",
+        "email": "priya.sharma@legalnetwork.com",
+        "phone": "+91 98765 12345",
+        "state": "Maharashtra",
+        "status": "active",
+        "casesAssigned": 67,
+        "casesResolved": 58,
+        "casesPending": 9,
+        "successRate": 86.6,
+        "avgResolutionDays": 24.5,
+        "commissionsEarned": 145000,
+        "joinedDate": "2023-04-15"
+      },
+      {
+        "id": "LAW-2024-035",
+        "name": "Adv. Rajesh Kumar",
+        "email": "rajesh.kumar@legalnetwork.com",
+        "phone": "+91 87654 23456",
+        "state": "Karnataka",
+        "status": "active",
+        "casesAssigned": 54,
+        "casesResolved": 43,
+        "casesPending": 11,
+        "successRate": 79.6,
+        "avgResolutionDays": 31.2,
+        "commissionsEarned": 107500,
+        "joinedDate": "2023-07-22"
+      },
+      {
+        "id": "LAW-2024-036",
+        "name": "Adv. Meena Singh",
+        "email": "meena.singh@legalnetwork.com",
+        "phone": "+91 76543 34567",
+        "state": "Delhi",
+        "status": "active",
+        "casesAssigned": 48,
+        "casesResolved": 41,
+        "casesPending": 7,
+        "successRate": 85.4,
+        "avgResolutionDays": 26.8,
+        "commissionsEarned": 102500,
+        "joinedDate": "2023-05-10"
+      },
+      {
+        "id": "LAW-2024-037",
+        "name": "Adv. Arun Prasad",
+        "email": "arun.prasad@legalnetwork.com",
+        "phone": "+91 65432 45678",
+        "state": "Tamil Nadu",
+        "status": "active",
+        "casesAssigned": 39,
+        "casesResolved": 25,
+        "casesPending": 14,
+        "successRate": 64.1,
+        "avgResolutionDays": 38.6,
+        "commissionsEarned": 62500,
+        "joinedDate": "2023-09-18"
+      },
+      {
+        "id": "LAW-2024-038",
+        "name": "Adv. Kavita Desai",
+        "email": "kavita.desai@legalnetwork.com",
+        "phone": "+91 54321 56789",
+        "state": "Gujarat",
+        "status": "inactive",
+        "casesAssigned": 28,
+        "casesResolved": 22,
+        "casesPending": 0,
+        "successRate": 78.6,
+        "avgResolutionDays": 29.4,
+        "commissionsEarned": 55000,
+        "joinedDate": "2023-11-03"
+      }
+    ]
+  },
+  "partnersReport": {
+    "summary": {
+      "totalPartners": {
+        "value": 12,
+        "trend": 0,
+        "label": "Total Partners",
+        "description": "All partners in the network"
+      },
+      "activePartners": {
+        "value": 10,
+        "trend": 0,
+        "label": "Active Partners",
+        "description": "Currently active partners"
+      },
+      "subscribersOnboarded": {
+        "value": 78,
+        "trend": 15.2,
+        "label": "Subscribers Onboarded",
+        "description": "Total subscribers brought by partners"
+      },
+      "revenueContribution": {
+        "value": 1456000,
+        "trend": 18.7,
+        "label": "Revenue Contribution (₹)",
+        "description": "Total revenue from partner-sourced subscribers"
+      },
+      "avgSubscribersPerPartner": {
+        "value": 6.5,
+        "trend": 15.2,
+        "label": "Avg Subscribers/Partner",
+        "description": "Average subscribers onboarded per partner"
+      }
+    },
+    "chartData": {
+      "performanceRanking": [
+        { "partner": "TechFlow Solutions", "subscribers": 23, "revenue": 456000 },
+        { "partner": "DataBridge Partners", "subscribers": 18, "revenue": 378000 },
+        { "partner": "FleetConnect India", "subscribers": 14, "revenue": 287000 },
+        { "partner": "LogiLink Associates", "subscribers": 11, "revenue": 198000 },
+        { "partner": "TransportHub Co", "subscribers": 8, "revenue": 137000 },
+        { "partner": "Others", "subscribers": 4, "revenue": 0 }
+      ],
+      "onboardingTrend": [
+        { "month": "Aug", "subscribers": 8 },
+        { "month": "Sep", "subscribers": 11 },
+        { "month": "Oct", "subscribers": 14 },
+        { "month": "Nov", "subscribers": 10 },
+        { "month": "Dec", "subscribers": 17 },
+        { "month": "Jan", "subscribers": 18 }
+      ]
+    },
+    "detailRecords": [
+      {
+        "id": "PART-2024-007",
+        "companyName": "TechFlow Solutions",
+        "contactPerson": "Vikram Chawla",
+        "email": "vikram@techflow.in",
+        "phone": "+91 98765 67890",
+        "status": "active",
+        "subscribersOnboarded": 23,
+        "revenueContribution": 456000,
+        "avgConversionRate": 34.5,
+        "joinedDate": "2023-05-12",
+        "lastOnboarding": "2025-02-05"
+      },
+      {
+        "id": "PART-2024-008",
+        "companyName": "DataBridge Partners",
+        "contactPerson": "Anjali Menon",
+        "email": "anjali@databridge.com",
+        "phone": "+91 87654 78901",
+        "status": "active",
+        "subscribersOnboarded": 18,
+        "revenueContribution": 378000,
+        "avgConversionRate": 28.1,
+        "joinedDate": "2023-07-20",
+        "lastOnboarding": "2025-01-28"
+      },
+      {
+        "id": "PART-2024-009",
+        "companyName": "FleetConnect India",
+        "contactPerson": "Karan Bhatia",
+        "email": "karan@fleetconnect.in",
+        "phone": "+91 76543 89012",
+        "status": "active",
+        "subscribersOnboarded": 14,
+        "revenueContribution": 287000,
+        "avgConversionRate": 31.8,
+        "joinedDate": "2023-08-15",
+        "lastOnboarding": "2025-02-01"
+      },
+      {
+        "id": "PART-2024-010",
+        "companyName": "LogiLink Associates",
+        "contactPerson": "Ritu Agarwal",
+        "email": "ritu@logilink.co.in",
+        "phone": "+91 65432 90123",
+        "status": "active",
+        "subscribersOnboarded": 11,
+        "revenueContribution": 198000,
+        "avgConversionRate": 22.4,
+        "joinedDate": "2023-10-08",
+        "lastOnboarding": "2025-01-18"
+      },
+      {
+        "id": "PART-2024-011",
+        "companyName": "TransportHub Co",
+        "contactPerson": "Suresh Pillai",
+        "email": "suresh@transporthub.com",
+        "phone": "+91 54321 01234",
+        "status": "inactive",
+        "subscribersOnboarded": 8,
+        "revenueContribution": 137000,
+        "avgConversionRate": 18.9,
+        "joinedDate": "2023-09-25",
+        "lastOnboarding": "2024-11-20"
+      }
+    ]
+  },
+  "paymentsReport": {
+    "summary": {
+      "totalCollections": {
+        "value": 8945000,
+        "trend": 6.8,
+        "label": "Total Collections (₹)",
+        "description": "All payments received from subscribers"
+      },
+      "invoicesGenerated": {
+        "value": 1234,
+        "trend": 9.2,
+        "label": "Invoices Generated",
+        "description": "Total invoices issued this period"
+      },
+      "pendingPayments": {
+        "value": 456000,
+        "trend": -12.3,
+        "label": "Pending Payments (₹)",
+        "description": "Outstanding receivables from subscribers"
+      },
+      "refundsIssued": {
+        "value": 123000,
+        "trend": -8.5,
+        "label": "Refunds Issued (₹)",
+        "description": "Total refunds processed"
+      },
+      "payoutsProcessed": {
+        "value": 2345000,
+        "trend": 11.7,
+        "label": "Payouts Processed (₹)",
+        "description": "Commissions paid to lawyers and partners"
+      },
+      "avgInvoiceValue": {
+        "value": 7250,
+        "trend": -2.1,
+        "label": "Avg Invoice Value (₹)",
+        "description": "Average value per invoice"
+      }
+    },
+    "chartData": {
+      "collectionsTrend": [
+        { "month": "Aug", "collections": 1234000, "refunds": 23000, "payouts": 345000 },
+        { "month": "Sep", "collections": 1345000, "refunds": 18000, "payouts": 378000 },
+        { "month": "Oct", "collections": 1456000, "refunds": 25000, "payouts": 412000 },
+        { "month": "Nov", "collections": 1389000, "refunds": 21000, "payouts": 389000 },
+        { "month": "Dec", "collections": 1521000, "refunds": 19000, "payouts": 432000 },
+        { "month": "Jan", "collections": 1567000, "refunds": 17000, "payouts": 389000 }
+      ],
+      "paymentMethods": [
+        { "method": "Credit", "amount": 5234000, "percentage": 58.5 },
+        { "method": "Direct Payment", "amount": 2456000, "percentage": 27.5 },
+        { "method": "Wallet", "amount": 1255000, "percentage": 14.0 }
+      ],
+      "outstandingAgeing": [
+        { "range": "0-30 days", "amount": 234000 },
+        { "range": "31-60 days", "amount": 123000 },
+        { "range": "61-90 days", "amount": 67000 },
+        { "range": "90+ days", "amount": 32000 }
+      ]
+    },
+    "detailRecords": [
+      {
+        "id": "PAY-2024-5678",
+        "subscriberName": "LogiFleet Solutions",
+        "invoiceNumber": "INV-2024-1234",
+        "amount": 25000,
+        "paymentDate": "2025-02-05",
+        "paymentMethod": "Credit",
+        "status": "completed",
+        "type": "collection"
+      },
+      {
+        "id": "PAY-2024-5679",
+        "subscriberName": "Metro Cabs Pvt Ltd",
+        "invoiceNumber": "INV-2024-1235",
+        "amount": 18000,
+        "paymentDate": "2025-02-07",
+        "paymentMethod": "Direct Payment",
+        "status": "completed",
+        "type": "collection"
+      },
+      {
+        "id": "PAY-2024-5680",
+        "lawyerName": "Adv. Priya Sharma",
+        "referenceNumber": "COM-2024-789",
+        "amount": 15000,
+        "paymentDate": "2025-02-08",
+        "paymentMethod": "Bank Transfer",
+        "status": "completed",
+        "type": "payout"
+      },
+      {
+        "id": "PAY-2024-5681",
+        "subscriberName": "Express Wheels Ltd",
+        "invoiceNumber": "INV-2024-1236",
+        "amount": 5000,
+        "paymentDate": "2025-02-06",
+        "paymentMethod": "Credit",
+        "status": "completed",
+        "type": "refund"
+      },
+      {
+        "id": "PAY-2024-5682",
+        "subscriberName": "Swift Transport Co",
+        "invoiceNumber": "INV-2024-1237",
+        "amount": 32000,
+        "paymentDate": null,
+        "paymentMethod": "Credit",
+        "status": "pending",
+        "type": "collection",
+        "dueDate": "2025-02-15"
+      }
+    ]
+  },
+  "disputesReport": {
+    "summary": {
+      "totalDisputes": {
+        "value": 34,
+        "trend": -8.5,
+        "label": "Total Disputes",
+        "description": "All disputes raised this period"
+      },
+      "openDisputes": {
+        "value": 12,
+        "trend": -15.4,
+        "label": "Open Disputes",
+        "description": "Currently unresolved disputes"
+      },
+      "resolvedDisputes": {
+        "value": 19,
+        "trend": 5.6,
+        "label": "Resolved Disputes",
+        "description": "Successfully resolved this period"
+      },
+      "escalatedDisputes": {
+        "value": 3,
+        "trend": 0,
+        "label": "Escalated Disputes",
+        "description": "Disputes requiring management intervention"
+      },
+      "avgResolutionTime": {
+        "value": 4.2,
+        "trend": -22.3,
+        "label": "Avg Resolution Time (days)",
+        "description": "Average days to resolve disputes"
+      },
+      "resolutionRate": {
+        "value": 84.6,
+        "trend": 12.1,
+        "label": "Resolution Rate (%)",
+        "description": "Percentage of disputes resolved favorably"
+      }
+    },
+    "chartData": {
+      "categoryBreakdown": [
+        { "category": "Refund Request", "count": 12 },
+        { "category": "Service Quality", "count": 9 },
+        { "category": "Billing Issue", "count": 7 },
+        { "category": "Resolution Delay", "count": 4 },
+        { "category": "Other", "count": 2 }
+      ],
+      "resolutionTrend": [
+        { "month": "Aug", "raised": 5, "resolved": 4 },
+        { "month": "Sep", "raised": 7, "resolved": 6 },
+        { "month": "Oct", "raised": 6, "resolved": 5 },
+        { "month": "Nov", "raised": 4, "resolved": 5 },
+        { "month": "Dec", "raised": 8, "resolved": 7 },
+        { "month": "Jan", "raised": 4, "resolved": 3 }
+      ],
+      "outcomeDistribution": [
+        { "outcome": "Resolved - Refund Issued", "count": 8 },
+        { "outcome": "Resolved - Service Credit", "count": 6 },
+        { "outcome": "Resolved - No Action", "count": 5 },
+        { "outcome": "Pending Investigation", "count": 12 },
+        { "outcome": "Escalated", "count": 3 }
+      ]
+    },
+    "detailRecords": [
+      {
+        "id": "DIS-2024-089",
+        "subscriberName": "LogiFleet Solutions",
+        "incidentId": "INC-2024-1234",
+        "category": "Refund Request",
+        "description": "Requesting refund for challan that was already paid by driver",
+        "status": "open",
+        "priority": "medium",
+        "assignedTo": "Customer Success Team",
+        "createdDate": "2025-02-05",
+        "targetDate": "2025-02-12"
+      },
+      {
+        "id": "DIS-2024-090",
+        "subscriberName": "Metro Cabs Pvt Ltd",
+        "incidentId": "INC-2024-1178",
+        "category": "Service Quality",
+        "description": "Lawyer not responding to case updates",
+        "status": "resolved",
+        "priority": "high",
+        "assignedTo": "Operations Manager",
+        "createdDate": "2025-01-28",
+        "resolvedDate": "2025-02-02",
+        "resolution": "Reassigned to different lawyer, case resolved"
+      },
+      {
+        "id": "DIS-2024-091",
+        "subscriberName": "Swift Transport Co",
+        "incidentId": "INC-2024-1201",
+        "category": "Billing Issue",
+        "description": "Incorrect charge amount on invoice",
+        "status": "resolved",
+        "priority": "low",
+        "assignedTo": "Finance Team",
+        "createdDate": "2025-01-30",
+        "resolvedDate": "2025-02-01",
+        "resolution": "Invoice corrected and reissued"
+      },
+      {
+        "id": "DIS-2024-092",
+        "subscriberName": "CityLine Logistics",
+        "incidentId": "INC-2024-1156",
+        "category": "Resolution Delay",
+        "description": "Case pending for more than 45 days without resolution",
+        "status": "escalated",
+        "priority": "high",
+        "assignedTo": "Senior Management",
+        "createdDate": "2025-01-25",
+        "targetDate": "2025-02-08"
+      },
+      {
+        "id": "DIS-2024-093",
+        "subscriberName": "Express Wheels Ltd",
+        "incidentId": "INC-2024-1189",
+        "category": "Refund Request",
+        "description": "Challan marked as resolved but still showing on RTO portal",
+        "status": "open",
+        "priority": "medium",
+        "assignedTo": "Operations Team",
+        "createdDate": "2025-02-03",
+        "targetDate": "2025-02-10"
+      }
+    ]
+  },
+  "supportReport": {
+    "summary": {
+      "totalTickets": {
+        "value": 267,
+        "trend": -3.2,
+        "label": "Total Tickets",
+        "description": "All support tickets raised this period"
+      },
+      "openTickets": {
+        "value": 45,
+        "trend": -12.8,
+        "label": "Open Tickets",
+        "description": "Currently unresolved tickets"
+      },
+      "closedTickets": {
+        "value": 222,
+        "trend": 4.7,
+        "label": "Closed Tickets",
+        "description": "Resolved tickets this period"
+      },
+      "avgResolutionTime": {
+        "value": 6.8,
+        "trend": -18.1,
+        "label": "Avg Resolution Time (hours)",
+        "description": "Average hours to resolve tickets"
+      },
+      "firstResponseTime": {
+        "value": 1.2,
+        "trend": -25.3,
+        "label": "First Response Time (hours)",
+        "description": "Average time to first response"
+      },
+      "satisfactionScore": {
+        "value": 4.3,
+        "trend": 7.5,
+        "label": "Satisfaction Score",
+        "description": "Average customer satisfaction rating (out of 5)"
+      }
+    },
+    "chartData": {
+      "categoryBreakdown": [
+        { "category": "Account Access", "count": 67 },
+        { "category": "Case Status Inquiry", "count": 54 },
+        { "category": "Billing Question", "count": 43 },
+        { "category": "Technical Issue", "count": 38 },
+        { "category": "Feature Request", "count": 32 },
+        { "category": "Other", "count": 33 }
+      ],
+      "volumeTrend": [
+        { "month": "Aug", "raised": 38, "closed": 36 },
+        { "month": "Sep", "raised": 42, "closed": 40 },
+        { "month": "Oct", "raised": 51, "closed": 48 },
+        { "month": "Nov", "raised": 46, "closed": 44 },
+        { "month": "Dec", "raised": 48, "closed": 46 },
+        { "month": "Jan", "raised": 42, "closed": 38 }
+      ],
+      "priorityDistribution": [
+        { "priority": "Low", "count": 156, "avgResolutionHours": 12.5 },
+        { "priority": "Medium", "count": 87, "avgResolutionHours": 6.2 },
+        { "priority": "High", "count": 21, "avgResolutionHours": 2.8 },
+        { "priority": "Critical", "count": 3, "avgResolutionHours": 0.9 }
+      ]
+    },
+    "detailRecords": [
+      {
+        "id": "SUP-2024-1567",
+        "subscriberName": "LogiFleet Solutions",
+        "category": "Case Status Inquiry",
+        "subject": "Update on INC-2024-1234",
+        "priority": "medium",
+        "status": "closed",
+        "assignedTo": "Priya Gupta",
+        "createdDate": "2025-02-07T09:30:00",
+        "closedDate": "2025-02-07T14:15:00",
+        "resolutionHours": 4.75
+      },
+      {
+        "id": "SUP-2024-1568",
+        "subscriberName": "Metro Cabs Pvt Ltd",
+        "category": "Billing Question",
+        "subject": "Invoice clarification for January",
+        "priority": "low",
+        "status": "closed",
+        "assignedTo": "Rahul Verma",
+        "createdDate": "2025-02-06T11:00:00",
+        "closedDate": "2025-02-06T15:30:00",
+        "resolutionHours": 4.5
+      },
+      {
+        "id": "SUP-2024-1569",
+        "subscriberName": "Swift Transport Co",
+        "category": "Technical Issue",
+        "subject": "Unable to upload bulk challans",
+        "priority": "high",
+        "status": "open",
+        "assignedTo": "Tech Support",
+        "createdDate": "2025-02-08T16:20:00",
+        "closedDate": null,
+        "resolutionHours": null
+      },
+      {
+        "id": "SUP-2024-1570",
+        "subscriberName": "CityLine Logistics",
+        "category": "Account Access",
+        "subject": "Password reset request",
+        "priority": "medium",
+        "status": "closed",
+        "assignedTo": "Anjali Kapoor",
+        "createdDate": "2025-02-08T10:15:00",
+        "closedDate": "2025-02-08T10:45:00",
+        "resolutionHours": 0.5
+      },
+      {
+        "id": "SUP-2024-1571",
+        "subscriberName": "Express Wheels Ltd",
+        "category": "Feature Request",
+        "subject": "Request for mobile app",
+        "priority": "low",
+        "status": "open",
+        "assignedTo": "Product Team",
+        "createdDate": "2025-02-05T14:00:00",
+        "closedDate": null,
+        "resolutionHours": null
+      }
+    ]
+  },
+  "teamReport": {
+    "summary": {
+      "totalEmployees": {
+        "value": 34,
+        "trend": 3.0,
+        "label": "Total Employees",
+        "description": "All internal team members"
+      },
+      "avgIncidentsHandled": {
+        "value": 42.7,
+        "trend": 8.9,
+        "label": "Avg Incidents Handled",
+        "description": "Average incidents per employee this period"
+      },
+      "avgSlaAdherence": {
+        "value": 86.3,
+        "trend": 4.1,
+        "label": "Avg SLA Adherence (%)",
+        "description": "Average percentage of cases resolved within SLA"
+      },
+      "avgResolutionTime": {
+        "value": 31.5,
+        "trend": -3.8,
+        "label": "Avg Resolution Time (days)",
+        "description": "Average time to close assigned incidents"
+      },
+      "totalEscalations": {
+        "value": 23,
+        "trend": -18.2,
+        "label": "Total Escalations",
+        "description": "Cases escalated to management"
+      }
+    },
+    "chartData": {
+      "performanceByTeam": [
+        { "team": "Operations", "employees": 18, "incidents": 892, "slaAdherence": 87.5 },
+        { "team": "Sales", "employees": 8, "incidents": 0, "slaAdherence": 0 },
+        { "team": "Customer Success", "employees": 5, "incidents": 234, "slaAdherence": 91.2 },
+        { "team": "Finance", "employees": 3, "incidents": 0, "slaAdherence": 0 }
+      ],
+      "workloadDistribution": [
+        { "range": "0-20 incidents", "count": 8 },
+        { "range": "21-40 incidents", "count": 12 },
+        { "range": "41-60 incidents", "count": 9 },
+        { "range": "61-80 incidents", "count": 4 },
+        { "range": "80+ incidents", "count": 1 }
+      ],
+      "productivityTrend": [
+        { "month": "Aug", "avgIncidents": 38.2, "slaAdherence": 82.1 },
+        { "month": "Sep", "avgIncidents": 39.5, "slaAdherence": 83.5 },
+        { "month": "Oct", "avgIncidents": 41.1, "slaAdherence": 84.8 },
+        { "month": "Nov", "avgIncidents": 40.8, "slaAdherence": 85.2 },
+        { "month": "Dec", "avgIncidents": 42.3, "slaAdherence": 86.1 },
+        { "month": "Jan", "avgIncidents": 42.7, "slaAdherence": 86.3 }
+      ]
+    },
+    "detailRecords": [
+      {
+        "id": "EMP-2024-045",
+        "name": "Anjali Verma",
+        "email": "anjali.verma@company.com",
+        "department": "Sales",
+        "role": "Sales Manager",
+        "incidentsHandled": 0,
+        "leadsConverted": 23,
+        "slaAdherence": 0,
+        "avgResolutionDays": 0,
+        "escalations": 0
+      },
+      {
+        "id": "EMP-2024-046",
+        "name": "Vikram Singh",
+        "email": "vikram.singh@company.com",
+        "department": "Operations",
+        "role": "Operations Lead",
+        "incidentsHandled": 67,
+        "leadsConverted": 0,
+        "slaAdherence": 89.6,
+        "avgResolutionDays": 27.3,
+        "escalations": 3
+      },
+      {
+        "id": "EMP-2024-047",
+        "name": "Priya Reddy",
+        "email": "priya.reddy@company.com",
+        "department": "Operations",
+        "role": "Case Manager",
+        "incidentsHandled": 54,
+        "leadsConverted": 0,
+        "slaAdherence": 85.2,
+        "avgResolutionDays": 29.8,
+        "escalations": 5
+      },
+      {
+        "id": "EMP-2024-048",
+        "name": "Rahul Sharma",
+        "email": "rahul.sharma@company.com",
+        "department": "Customer Success",
+        "role": "Customer Success Manager",
+        "incidentsHandled": 48,
+        "leadsConverted": 0,
+        "slaAdherence": 91.7,
+        "avgResolutionDays": 25.6,
+        "escalations": 2
+      },
+      {
+        "id": "EMP-2024-049",
+        "name": "Neha Kapoor",
+        "email": "neha.kapoor@company.com",
+        "department": "Finance",
+        "role": "Finance Manager",
+        "incidentsHandled": 0,
+        "leadsConverted": 0,
+        "slaAdherence": 0,
+        "avgResolutionDays": 0,
+        "escalations": 0
+      }
+    ]
+  },
+  "filterOptions": {
+    "dateRanges": [
+      { "label": "Last 7 days", "value": "7d" },
+      { "label": "Last 30 days", "value": "30d" },
+      { "label": "Last 90 days", "value": "90d" },
+      { "label": "Last 6 months", "value": "6m" },
+      { "label": "Last year", "value": "1y" },
+      { "label": "Custom", "value": "custom" }
+    ],
+    "states": [
+      "All States",
+      "Maharashtra",
+      "Karnataka",
+      "Delhi",
+      "Tamil Nadu",
+      "Gujarat",
+      "Uttar Pradesh",
+      "West Bengal",
+      "Rajasthan",
+      "Madhya Pradesh"
+    ],
+    "serviceTypes": [
+      "All Services",
+      "Challan Resolution",
+      "Legal Consultation",
+      "Document Verification",
+      "Court Representation"
+    ],
+    "statuses": {
+      "incidents": ["All", "Pending", "Resolved", "Failed", "Refunded"],
+      "leads": ["All", "New", "Assigned", "Follow-up", "Quotation", "Projected", "Invoiced", "Sales", "Lost"],
+      "subscribers": ["All", "Active", "Inactive"],
+      "disputes": ["All", "Open", "Resolved", "Escalated"],
+      "support": ["All", "Open", "In Progress", "Closed"]
+    }
+  }
+}

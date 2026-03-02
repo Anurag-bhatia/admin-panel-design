@@ -1,0 +1,188 @@
+{
+  "_meta": {
+    "models": {
+      "refunds": "Each refund represents money being returned to a subscriber or customer when an incident (challan) could not be resolved successfully.",
+      "lawyerFees": "Each lawyer fee represents a commission or expense owed to a lawyer for work done on an incident, derived from the incident's expense record and the lawyer's invoicing."
+    },
+    "relationships": [
+      "Each Refund links to one Incident (the challan that couldn't be resolved)",
+      "Each Refund belongs to a Subscriber or Customer who originally paid",
+      "Each Refund references the Original Payment ID it was charged against",
+      "Each Lawyer Fee links to one Incident and one Lawyer",
+      "Lawyer Fee amounts are derived from the Incident's expense record (Total Amount) and the Lawyer's commission (Commission Amount)",
+      "Clicking a Lawyer Fee row navigates to the Lawyer's profile page in the Lawyers section"
+    ]
+  },
+  "refunds": [
+    {
+      "id": "RFD-10001",
+      "linkedIncident": "IRN-44821",
+      "customerSubscriber": "Bharat Fleet Solutions Pvt. Ltd.",
+      "originalPaymentId": "PAY-88210",
+      "refundAmount": 4500.00,
+      "refundStatus": "Completed",
+      "approvedBy": "Priya Sharma",
+      "refundDate": "2025-12-18"
+    },
+    {
+      "id": "RFD-10002",
+      "linkedIncident": "IRN-44956",
+      "customerSubscriber": "Rajesh Kumar",
+      "originalPaymentId": "PAY-88345",
+      "refundAmount": 2000.00,
+      "refundStatus": "Initiated",
+      "approvedBy": null,
+      "refundDate": null
+    },
+    {
+      "id": "RFD-10003",
+      "linkedIncident": "IRN-45102",
+      "customerSubscriber": "TransLogix India Ltd.",
+      "originalPaymentId": "PAY-88501",
+      "refundAmount": 12750.00,
+      "refundStatus": "Approved",
+      "approvedBy": "Amit Verma",
+      "refundDate": null
+    },
+    {
+      "id": "RFD-10004",
+      "linkedIncident": "IRN-45230",
+      "customerSubscriber": "QuickMove Logistics",
+      "originalPaymentId": "PAY-88672",
+      "refundAmount": 1500.00,
+      "refundStatus": "Completed",
+      "approvedBy": "Priya Sharma",
+      "refundDate": "2026-01-05"
+    },
+    {
+      "id": "RFD-10005",
+      "linkedIncident": "IRN-45318",
+      "customerSubscriber": "Suresh Patel",
+      "originalPaymentId": "PAY-88790",
+      "refundAmount": 8200.00,
+      "refundStatus": "Initiated",
+      "approvedBy": null,
+      "refundDate": null
+    },
+    {
+      "id": "RFD-10006",
+      "linkedIncident": "IRN-45410",
+      "customerSubscriber": "GreenWheels Transport Co.",
+      "originalPaymentId": "PAY-88903",
+      "refundAmount": 3400.00,
+      "refundStatus": "Approved",
+      "approvedBy": "Neha Gupta",
+      "refundDate": null
+    },
+    {
+      "id": "RFD-10007",
+      "linkedIncident": "IRN-45522",
+      "customerSubscriber": "Metro Cab Services",
+      "originalPaymentId": "PAY-89012",
+      "refundAmount": 950.00,
+      "refundStatus": "Completed",
+      "approvedBy": "Amit Verma",
+      "refundDate": "2026-01-22"
+    },
+    {
+      "id": "RFD-10008",
+      "linkedIncident": "IRN-45601",
+      "customerSubscriber": "Anita Deshmukh",
+      "originalPaymentId": "PAY-89134",
+      "refundAmount": 22000.00,
+      "refundStatus": "Initiated",
+      "approvedBy": null,
+      "refundDate": null
+    }
+  ],
+  "lawyerFees": [
+    {
+      "lawyerId": "LAW-2001",
+      "lawyerName": "Adv. Vikram Mehta",
+      "incidentId": "IRN-44100",
+      "challanNo": "CH-DL-2025-98234",
+      "totalAmount": 6500.00,
+      "commissionAmount": 1950.00,
+      "status": "Completed",
+      "dueDate": "2025-12-10",
+      "paidDate": "2025-12-08"
+    },
+    {
+      "lawyerId": "LAW-2003",
+      "lawyerName": "Adv. Sonal Rao",
+      "incidentId": "IRN-44256",
+      "challanNo": "CH-MH-2025-45120",
+      "totalAmount": 4200.00,
+      "commissionAmount": 1260.00,
+      "status": "To Pay",
+      "dueDate": "2026-02-15",
+      "paidDate": null
+    },
+    {
+      "lawyerId": "LAW-2007",
+      "lawyerName": "Adv. Rohan Kapoor",
+      "incidentId": "IRN-44389",
+      "challanNo": "CH-KA-2025-77801",
+      "totalAmount": 11000.00,
+      "commissionAmount": 3300.00,
+      "status": "Completed",
+      "dueDate": "2025-11-30",
+      "paidDate": "2025-11-28"
+    },
+    {
+      "lawyerId": "LAW-2001",
+      "lawyerName": "Adv. Vikram Mehta",
+      "incidentId": "IRN-44510",
+      "challanNo": "CH-DL-2025-99102",
+      "totalAmount": 3800.00,
+      "commissionAmount": 1140.00,
+      "status": "To Pay",
+      "dueDate": "2026-02-28",
+      "paidDate": null
+    },
+    {
+      "lawyerId": "LAW-2012",
+      "lawyerName": "Adv. Meera Joshi",
+      "incidentId": "IRN-44678",
+      "challanNo": "CH-GJ-2025-33456",
+      "totalAmount": 7500.00,
+      "commissionAmount": 2250.00,
+      "status": "To Pay",
+      "dueDate": "2026-03-05",
+      "paidDate": null
+    },
+    {
+      "lawyerId": "LAW-2003",
+      "lawyerName": "Adv. Sonal Rao",
+      "incidentId": "IRN-44801",
+      "challanNo": "CH-MH-2026-10234",
+      "totalAmount": 5600.00,
+      "commissionAmount": 1680.00,
+      "status": "Completed",
+      "dueDate": "2026-01-20",
+      "paidDate": "2026-01-18"
+    },
+    {
+      "lawyerId": "LAW-2019",
+      "lawyerName": "Adv. Deepak Tiwari",
+      "incidentId": "IRN-44923",
+      "challanNo": "CH-UP-2026-12890",
+      "totalAmount": 15200.00,
+      "commissionAmount": 4560.00,
+      "status": "To Pay",
+      "dueDate": "2026-03-10",
+      "paidDate": null
+    },
+    {
+      "lawyerId": "LAW-2007",
+      "lawyerName": "Adv. Rohan Kapoor",
+      "incidentId": "IRN-45050",
+      "challanNo": "CH-KA-2026-15670",
+      "totalAmount": 2900.00,
+      "commissionAmount": 870.00,
+      "status": "Completed",
+      "dueDate": "2026-02-01",
+      "paidDate": "2026-01-30"
+    }
+  ]
+}

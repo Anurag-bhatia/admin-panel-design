@@ -1,0 +1,620 @@
+{
+  "_meta": {
+    "models": {
+      "partners": "External business introducers who onboard subscribers on the platform. Partners have their own accounts, can view their linked subscribers, and earn commissions on business they bring in.",
+      "linkedSubscribers": "Subscribers that have been onboarded by a specific partner. Shows subscriber details and their incident count.",
+      "payouts": "System-calculated commission payments sent to partners based on their linked subscribers' activity.",
+      "documents": "Uploaded business documents like GST certificates, PAN cards, and other compliance documentation.",
+      "activityLog": "Complete audit trail of all actions taken on a partner account for tracking and compliance."
+    },
+    "relationships": [
+      "Each Partner has many Linked Subscribers (customers they brought in)",
+      "Each Partner has many Payouts (commission payments based on subscriber activity)",
+      "Each Partner can upload multiple Documents (GST, PAN, etc.)",
+      "Each Partner has an Activity Log tracking all account changes and actions"
+    ]
+  },
+  "partners": [
+    {
+      "id": "partner-001",
+      "partnerId": "PTR-001",
+      "firstName": "Rajesh",
+      "lastName": "Kumar",
+      "email": "rajesh.kumar@fleetpro.com",
+      "mobile": "+919876543210",
+      "companyName": "FleetPro Solutions",
+      "officialEmail": "business@fleetpro.com",
+      "phone": "+911145678900",
+      "address": "123 Business Park, Tech Road",
+      "country": "India",
+      "state": "Delhi",
+      "city": "New Delhi",
+      "pinCode": "110001",
+      "website": "www.fleetpro.com",
+      "productsAllowed": ["Challan Resolution", "Legal Consultation"],
+      "subscriberTypesAllowed": ["Fleet Operators", "Enterprise"],
+      "bankAccountNumber": "1234567890123456",
+      "bankName": "HDFC Bank",
+      "status": "active",
+      "dateOnboarded": "2023-05-15",
+      "linkedSubscribers": [
+        {
+          "id": "LWD-1160523",
+          "name": "ABC Logistics",
+          "company": "ABC Logistics Pvt Ltd",
+          "mobile": "+919111111111",
+          "status": "active",
+          "dateSubscribed": "2023-06-01",
+          "incidentCount": 12
+        },
+        {
+          "id": "LWD-1160524",
+          "name": "XYZ Transport",
+          "company": "XYZ Transport Services",
+          "mobile": "+919111111112",
+          "status": "active",
+          "dateSubscribed": "2023-07-10",
+          "incidentCount": 8
+        },
+        {
+          "id": "LWD-1160525",
+          "name": "Delhi Couriers",
+          "company": "Delhi Couriers Co",
+          "mobile": "+919111111113",
+          "status": "paused",
+          "dateSubscribed": "2023-08-20",
+          "incidentCount": 3
+        }
+      ],
+      "earnings": 45000,
+      "totalPayouts": 40000,
+      "payoutHistory": [
+        {
+          "id": "payout-001",
+          "amount": 20000,
+          "date": "2024-01-15",
+          "status": "completed",
+          "paymentMethod": "Bank Transfer"
+        },
+        {
+          "id": "payout-002",
+          "amount": 20000,
+          "date": "2024-02-15",
+          "status": "completed",
+          "paymentMethod": "Bank Transfer"
+        }
+      ],
+      "documents": [
+        {
+          "id": "doc-001",
+          "type": "GST Certificate",
+          "name": "GST_27AAHCR5055K1Z0.pdf",
+          "uploadedDate": "2023-05-20"
+        },
+        {
+          "id": "doc-002",
+          "type": "PAN Card",
+          "name": "PAN_AAAPK5055K.pdf",
+          "uploadedDate": "2023-05-20"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "log-001",
+          "action": "Partner Onboarded",
+          "timestamp": "2023-05-15T10:30:00Z",
+          "details": "Partner account created by admin"
+        },
+        {
+          "id": "log-002",
+          "action": "Subscriber Added",
+          "timestamp": "2023-06-01T14:22:00Z",
+          "details": "ABC Logistics linked to partner"
+        },
+        {
+          "id": "log-003",
+          "action": "Document Uploaded",
+          "timestamp": "2023-05-20T09:15:00Z",
+          "details": "GST certificate uploaded"
+        }
+      ]
+    },
+    {
+      "id": "partner-002",
+      "partnerId": "PTR-002",
+      "firstName": "Priya",
+      "lastName": "Singh",
+      "email": "priya.singh@transportnet.in",
+      "mobile": "+918765432109",
+      "companyName": "TransportNet India",
+      "officialEmail": "partners@transportnet.in",
+      "phone": "+912298765432",
+      "address": "456 Corporate Tower, Marine Drive",
+      "country": "India",
+      "state": "Maharashtra",
+      "city": "Mumbai",
+      "pinCode": "400020",
+      "website": "www.transportnet.in",
+      "productsAllowed": ["Challan Resolution"],
+      "subscriberTypesAllowed": ["Fleet Operators"],
+      "bankAccountNumber": "9876543210123456",
+      "bankName": "ICICI Bank",
+      "status": "active",
+      "dateOnboarded": "2023-08-22",
+      "linkedSubscribers": [
+        {
+          "id": "LWD-1160526",
+          "name": "Mumbai Freight",
+          "company": "Mumbai Freight Express",
+          "mobile": "+919222222221",
+          "status": "active",
+          "dateSubscribed": "2023-09-05",
+          "incidentCount": 18
+        },
+        {
+          "id": "LWD-1160527",
+          "name": "West India Roads",
+          "company": "West India Roads Ltd",
+          "mobile": "+919222222222",
+          "status": "active",
+          "dateSubscribed": "2023-10-12",
+          "incidentCount": 7
+        }
+      ],
+      "earnings": 32500,
+      "totalPayouts": 25000,
+      "payoutHistory": [
+        {
+          "id": "payout-003",
+          "amount": 25000,
+          "date": "2024-02-10",
+          "status": "completed",
+          "paymentMethod": "Bank Transfer"
+        }
+      ],
+      "documents": [
+        {
+          "id": "doc-003",
+          "type": "GST Certificate",
+          "name": "GST_27AABCT1234K1Z0.pdf",
+          "uploadedDate": "2023-08-25"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "log-004",
+          "action": "Partner Onboarded",
+          "timestamp": "2023-08-22T11:45:00Z",
+          "details": "Partner account created by admin"
+        },
+        {
+          "id": "log-005",
+          "action": "Status Updated",
+          "timestamp": "2024-01-10T16:20:00Z",
+          "details": "Partner status set to active"
+        }
+      ]
+    },
+    {
+      "id": "partner-003",
+      "partnerId": "PTR-003",
+      "firstName": "Vikram",
+      "lastName": "Patel",
+      "email": "vikram@roadsafety.net",
+      "mobile": "+917654321098",
+      "companyName": "Road Safety Consultants",
+      "officialEmail": "business@roadsafety.net",
+      "phone": "+917954321098",
+      "address": "789 Industrial Estate, Highway Road",
+      "country": "India",
+      "state": "Gujarat",
+      "city": "Ahmedabad",
+      "pinCode": "380015",
+      "website": "www.roadsafety.net",
+      "productsAllowed": ["Challan Resolution", "Legal Consultation"],
+      "subscriberTypesAllowed": ["Fleet Operators", "Individual"],
+      "bankAccountNumber": "5555666677778888",
+      "bankName": "Axis Bank",
+      "status": "active",
+      "dateOnboarded": "2023-11-10",
+      "linkedSubscribers": [
+        {
+          "id": "LWD-1160528",
+          "name": "Gujarat Fleet Services",
+          "company": "Gujarat Fleet Services Pvt",
+          "mobile": "+919333333331",
+          "status": "active",
+          "dateSubscribed": "2023-11-20",
+          "incidentCount": 5
+        }
+      ],
+      "earnings": 12000,
+      "totalPayouts": 10000,
+      "payoutHistory": [
+        {
+          "id": "payout-004",
+          "amount": 10000,
+          "date": "2024-01-20",
+          "status": "completed",
+          "paymentMethod": "Bank Transfer"
+        }
+      ],
+      "documents": [],
+      "activityLog": [
+        {
+          "id": "log-006",
+          "action": "Partner Onboarded",
+          "timestamp": "2023-11-10T13:00:00Z",
+          "details": "Partner account created by admin"
+        }
+      ]
+    },
+    {
+      "id": "partner-004",
+      "partnerId": "PTR-004",
+      "firstName": "Amit",
+      "lastName": "Desai",
+      "email": "amit@legalsolutions.com",
+      "mobile": "+916543210987",
+      "companyName": "Legal Solutions Group",
+      "officialEmail": "partners@legalsolutions.com",
+      "phone": "+919876543210",
+      "address": "321 Legal Square, Justice Road",
+      "country": "India",
+      "state": "Karnataka",
+      "city": "Bangalore",
+      "pinCode": "560001",
+      "website": "www.legalsolutions.com",
+      "productsAllowed": ["Legal Consultation"],
+      "subscriberTypesAllowed": ["Fleet Operators", "Enterprise"],
+      "bankAccountNumber": "1111222233334444",
+      "bankName": "Kotak Mahindra Bank",
+      "status": "inactive",
+      "dateOnboarded": "2023-03-05",
+      "linkedSubscribers": [
+        {
+          "id": "LWD-1160529",
+          "name": "Bangalore Express",
+          "company": "Bangalore Express Logistics",
+          "mobile": "+919444444441",
+          "status": "inactive",
+          "dateSubscribed": "2023-03-20",
+          "incidentCount": 2
+        }
+      ],
+      "earnings": 5000,
+      "totalPayouts": 5000,
+      "payoutHistory": [
+        {
+          "id": "payout-005",
+          "amount": 5000,
+          "date": "2023-12-15",
+          "status": "completed",
+          "paymentMethod": "Bank Transfer"
+        }
+      ],
+      "documents": [
+        {
+          "id": "doc-004",
+          "type": "PAN Card",
+          "name": "PAN_AAAPK5555K.pdf",
+          "uploadedDate": "2023-03-10"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "log-007",
+          "action": "Partner Onboarded",
+          "timestamp": "2023-03-05T09:30:00Z",
+          "details": "Partner account created by admin"
+        },
+        {
+          "id": "log-008",
+          "action": "Status Updated",
+          "timestamp": "2024-01-05T10:15:00Z",
+          "details": "Partner status changed to inactive"
+        }
+      ]
+    },
+    {
+      "id": "partner-005",
+      "partnerId": "PTR-005",
+      "firstName": "Sneha",
+      "lastName": "Chopra",
+      "email": "sneha@commerce-hub.in",
+      "mobile": "+915432109876",
+      "companyName": "Commerce Hub India",
+      "officialEmail": "business@commerce-hub.in",
+      "phone": "+911245678901",
+      "address": "654 Business Complex, NH-8",
+      "country": "India",
+      "state": "Haryana",
+      "city": "Gurgaon",
+      "pinCode": "122002",
+      "website": "www.commerce-hub.in",
+      "productsAllowed": ["Challan Resolution"],
+      "subscriberTypesAllowed": ["Fleet Operators", "Individual", "Enterprise"],
+      "bankAccountNumber": "3333444455556666",
+      "bankName": "HDFC Bank",
+      "status": "active",
+      "dateOnboarded": "2024-01-08",
+      "linkedSubscribers": [
+        {
+          "id": "LWD-1160530",
+          "name": "Delhi Traders",
+          "company": "Delhi Traders Association",
+          "mobile": "+919555555551",
+          "status": "active",
+          "dateSubscribed": "2024-01-15",
+          "incidentCount": 1
+        },
+        {
+          "id": "LWD-1160531",
+          "name": "NCR Logistics",
+          "company": "NCR Logistics Hub",
+          "mobile": "+919555555552",
+          "status": "active",
+          "dateSubscribed": "2024-01-20",
+          "incidentCount": 4
+        }
+      ],
+      "earnings": 8500,
+      "totalPayouts": 0,
+      "payoutHistory": [],
+      "documents": [
+        {
+          "id": "doc-005",
+          "type": "GST Certificate",
+          "name": "GST_27AABCH1234K1Z0.pdf",
+          "uploadedDate": "2024-01-10"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "log-009",
+          "action": "Partner Onboarded",
+          "timestamp": "2024-01-08T14:45:00Z",
+          "details": "Partner account created by admin"
+        },
+        {
+          "id": "log-010",
+          "action": "Subscriber Added",
+          "timestamp": "2024-01-15T10:20:00Z",
+          "details": "Delhi Traders linked to partner"
+        }
+      ]
+    },
+    {
+      "id": "partner-006",
+      "partnerId": "PTR-006",
+      "firstName": "Rohit",
+      "lastName": "Mishra",
+      "email": "rohit.mishra@speedway.co.in",
+      "mobile": "+914321098765",
+      "companyName": "SpeedWay Transport",
+      "officialEmail": "admin@speedway.co.in",
+      "phone": "+914098765432",
+      "address": "999 Tech Park, HITEC City",
+      "country": "India",
+      "state": "Telangana",
+      "city": "Hyderabad",
+      "pinCode": "500081",
+      "website": "www.speedway.co.in",
+      "productsAllowed": ["Challan Resolution"],
+      "subscriberTypesAllowed": ["Fleet Operators"],
+      "bankAccountNumber": "7777888899990000",
+      "bankName": "Yes Bank",
+      "status": "active",
+      "dateOnboarded": "2023-09-18",
+      "linkedSubscribers": [
+        {
+          "id": "LWD-1160532",
+          "name": "Hyderabad Movers",
+          "company": "Hyderabad Movers Ltd",
+          "mobile": "+919666666661",
+          "status": "active",
+          "dateSubscribed": "2023-10-05",
+          "incidentCount": 9
+        },
+        {
+          "id": "LWD-1160533",
+          "name": "Telangana Express",
+          "company": "Telangana Express Services",
+          "mobile": "+919666666662",
+          "status": "active",
+          "dateSubscribed": "2023-11-10",
+          "incidentCount": 6
+        },
+        {
+          "id": "LWD-1160534",
+          "name": "South India Cargo",
+          "company": "South India Cargo Co",
+          "mobile": "+919666666663",
+          "status": "inactive",
+          "dateSubscribed": "2023-12-01",
+          "incidentCount": 0
+        }
+      ],
+      "earnings": 38000,
+      "totalPayouts": 30000,
+      "payoutHistory": [
+        {
+          "id": "payout-006",
+          "amount": 15000,
+          "date": "2024-01-10",
+          "status": "completed",
+          "paymentMethod": "Bank Transfer"
+        },
+        {
+          "id": "payout-007",
+          "amount": 15000,
+          "date": "2024-02-10",
+          "status": "completed",
+          "paymentMethod": "Bank Transfer"
+        }
+      ],
+      "documents": [
+        {
+          "id": "doc-006",
+          "type": "GST Certificate",
+          "name": "GST_36AABCH5678K1Z0.pdf",
+          "uploadedDate": "2023-09-22"
+        },
+        {
+          "id": "doc-007",
+          "type": "PAN Card",
+          "name": "PAN_AAAPK5678K.pdf",
+          "uploadedDate": "2023-09-22"
+        },
+        {
+          "id": "doc-008",
+          "type": "MSME Certificate",
+          "name": "MSME_REG_2023.pdf",
+          "uploadedDate": "2023-10-01"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "log-011",
+          "action": "Partner Onboarded",
+          "timestamp": "2023-09-18T10:00:00Z",
+          "details": "Partner account created by admin"
+        },
+        {
+          "id": "log-012",
+          "action": "Document Uploaded",
+          "timestamp": "2023-09-22T15:30:00Z",
+          "details": "Multiple documents uploaded"
+        },
+        {
+          "id": "log-013",
+          "action": "Subscriber Added",
+          "timestamp": "2023-10-05T12:45:00Z",
+          "details": "Hyderabad Movers linked to partner"
+        }
+      ]
+    },
+    {
+      "id": "partner-007",
+      "partnerId": "PTR-007",
+      "firstName": "Anjali",
+      "lastName": "Verma",
+      "email": "anjali@corporatefleet.com",
+      "mobile": "+913210987654",
+      "companyName": "Corporate Fleet Management",
+      "officialEmail": "fleet@corporatefleet.com",
+      "phone": "+911352468101",
+      "address": "111 Plaza Avenue, Ring Road",
+      "country": "India",
+      "state": "Uttar Pradesh",
+      "city": "Lucknow",
+      "pinCode": "226001",
+      "website": "www.corporatefleet.com",
+      "productsAllowed": ["Challan Resolution", "Legal Consultation"],
+      "subscriberTypesAllowed": ["Fleet Operators", "Enterprise"],
+      "bankAccountNumber": "4444555566667777",
+      "bankName": "Federal Bank",
+      "status": "active",
+      "dateOnboarded": "2023-12-01",
+      "linkedSubscribers": [
+        {
+          "id": "LWD-1160535",
+          "name": "Lucknow Transport",
+          "company": "Lucknow Transport Pvt Ltd",
+          "mobile": "+919777777771",
+          "status": "active",
+          "dateSubscribed": "2023-12-10",
+          "incidentCount": 3
+        }
+      ],
+      "earnings": 6000,
+      "totalPayouts": 0,
+      "payoutHistory": [],
+      "documents": [],
+      "activityLog": [
+        {
+          "id": "log-014",
+          "action": "Partner Onboarded",
+          "timestamp": "2023-12-01T11:15:00Z",
+          "details": "Partner account created by admin"
+        }
+      ]
+    },
+    {
+      "id": "partner-008",
+      "partnerId": "PTR-008",
+      "firstName": "Suresh",
+      "lastName": "Reddy",
+      "email": "suresh.reddy@innovate.in",
+      "mobile": "+912109876543",
+      "companyName": "Innovate Fleet Solutions",
+      "officialEmail": "contact@innovate.in",
+      "phone": "+913388888888",
+      "address": "222 Innovation Park, Park Road",
+      "country": "India",
+      "state": "West Bengal",
+      "city": "Kolkata",
+      "pinCode": "700001",
+      "website": "www.innovate.in",
+      "productsAllowed": ["Challan Resolution"],
+      "subscriberTypesAllowed": ["Individual", "Fleet Operators"],
+      "bankAccountNumber": "8888999900001111",
+      "bankName": "SBI",
+      "status": "active",
+      "dateOnboarded": "2023-10-25",
+      "linkedSubscribers": [
+        {
+          "id": "LWD-1160536",
+          "name": "Kolkata Couriers",
+          "company": "Kolkata Couriers Express",
+          "mobile": "+919888888881",
+          "status": "active",
+          "dateSubscribed": "2023-11-01",
+          "incidentCount": 11
+        },
+        {
+          "id": "LWD-1160537",
+          "name": "Eastern Roads",
+          "company": "Eastern Roads Transport",
+          "mobile": "+919888888882",
+          "status": "paused",
+          "dateSubscribed": "2023-11-15",
+          "incidentCount": 2
+        }
+      ],
+      "earnings": 28500,
+      "totalPayouts": 20000,
+      "payoutHistory": [
+        {
+          "id": "payout-008",
+          "amount": 20000,
+          "date": "2024-02-05",
+          "status": "completed",
+          "paymentMethod": "Bank Transfer"
+        }
+      ],
+      "documents": [
+        {
+          "id": "doc-009",
+          "type": "GST Certificate",
+          "name": "GST_19AABCH9999K1Z0.pdf",
+          "uploadedDate": "2023-10-28"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "log-015",
+          "action": "Partner Onboarded",
+          "timestamp": "2023-10-25T09:45:00Z",
+          "details": "Partner account created by admin"
+        },
+        {
+          "id": "log-016",
+          "action": "Document Uploaded",
+          "timestamp": "2023-10-28T14:20:00Z",
+          "details": "GST certificate uploaded"
+        }
+      ]
+    }
+  ]
+}

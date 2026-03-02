@@ -1,0 +1,103 @@
+{
+  "_meta": {
+    "models": {
+      "supportSubmissions": "Each support submission represents an inbound message from a public touchpoint (landing page, contact form, campaign) that needs to be reviewed and routed into the appropriate workflow. These are unconverted entries awaiting triage."
+    },
+    "relationships": [
+      "Support Submissions can be converted to Leads (for prospective clients)",
+      "Support Submissions can be converted to Disputes (for service issues)",
+      "Support Submissions can be converted to Partnerships (for potential partners)",
+      "Once converted, the submission is linked to the new entity and hidden from the active view"
+    ]
+  },
+  "supportSubmissions": [
+    {
+      "id": "LWD-1160523",
+      "subject": "Interested in bulk challan resolution for fleet",
+      "message": "Hi, we're a logistics company operating 120 trucks in Delhi NCR. We receive around 40-50 challans monthly and are looking for a streamlined solution. Would like to understand your pricing and turnaround time for bulk processing. Please reach out.",
+      "source": "Website Landing Page",
+      "type": "business inquiry",
+      "submittedAt": "2024-02-08T14:32:00Z",
+      "contactName": "Rajesh Kumar",
+      "contactEmail": "rajesh.kumar@swiftlogistics.in",
+      "contactPhone": "+91 98765 43210"
+    },
+    {
+      "id": "LWD-1160524",
+      "subject": "Challan was dismissed but still charged",
+      "message": "I paid 2500 rupees for challan resolution service last month. The lawyer got it dismissed successfully but you still charged me the full amount. I was told I'd get a refund if resolved favorably. This is unfair and I want my money back immediately.",
+      "source": "Campaign Form - Refund Policy",
+      "type": "complaint",
+      "submittedAt": "2024-02-08T10:15:00Z",
+      "contactName": "Priya Sharma",
+      "contactEmail": "priya.sharma@gmail.com",
+      "contactPhone": "+91 87654 32109"
+    },
+    {
+      "id": "LWD-1160525",
+      "subject": "Partnership opportunity for RTO data integration",
+      "message": "We provide real-time RTO data APIs covering all major cities in India. Our data includes challan records, vehicle registration details, and license verification. We've worked with several fintech and logistics platforms. Would like to explore a partnership for data integration with your platform.",
+      "source": "Referral Page",
+      "type": "business inquiry",
+      "submittedAt": "2024-02-07T16:45:00Z",
+      "contactName": "Amit Patel",
+      "contactEmail": "amit@rtodataservices.com",
+      "contactPhone": "+91 99887 76655"
+    },
+    {
+      "id": "LWD-1160526",
+      "subject": "How to track my challan status?",
+      "message": "I submitted my challan 5 days ago but haven't received any update. How do I check the status? Is there a tracking portal or will I get email updates?",
+      "source": "Website Landing Page",
+      "type": "query",
+      "submittedAt": "2024-02-07T11:20:00Z",
+      "contactName": "Vikram Singh",
+      "contactEmail": "vikram.singh@yahoo.com",
+      "contactPhone": null
+    },
+    {
+      "id": "LWD-1160527",
+      "subject": "Lawyer assigned is not responding",
+      "message": "My challan SUB/2024/1847 was assigned to Advocate Meera Reddy 10 days ago. I've tried calling multiple times but she's not picking up. The hearing date is approaching and I'm getting worried. Please assign someone else or escalate this urgently.",
+      "source": "Website Landing Page",
+      "type": "support request",
+      "submittedAt": "2024-02-06T09:30:00Z",
+      "contactName": "Sandeep Malhotra",
+      "contactEmail": "sandeep.m@outlook.com",
+      "contactPhone": "+91 98123 45678"
+    },
+    {
+      "id": "LWD-1160528",
+      "subject": "Need invoice for last month's services",
+      "message": "Can you provide a GST invoice for the challan resolution services we used in January? We processed 23 challans through your platform. Need this for our monthly accounting. Company name is Velocity Transport Pvt Ltd, GSTIN: 07AABCU9603R1ZV.",
+      "source": "Campaign Form - Invoice Request",
+      "type": "query",
+      "submittedAt": "2024-02-06T15:10:00Z",
+      "contactName": "Kavita Desai",
+      "contactEmail": "accounts@velocitytransport.in",
+      "contactPhone": "+91 93456 78901"
+    },
+    {
+      "id": "LWD-1160529",
+      "subject": "Referral program for fleet operators",
+      "message": "I run a fleet management consulting firm and work with 50+ logistics companies. Many of them struggle with challan management. Would you be interested in a referral partnership? I can introduce qualified leads in exchange for a commission structure.",
+      "source": "Referral Page",
+      "type": "business inquiry",
+      "submittedAt": "2024-02-05T13:50:00Z",
+      "contactName": "Rohit Verma",
+      "contactEmail": "rohit@fleetconsultpro.com",
+      "contactPhone": "+91 91234 56789"
+    },
+    {
+      "id": "LWD-1160530",
+      "subject": "Wrong challan details uploaded",
+      "message": "I accidentally uploaded the wrong challan document yesterday (uploaded my friend's challan instead of mine). Challan ID CH-9876. Can this be corrected or do I need to create a new submission? Also worried this might cause issues with the lawyer.",
+      "source": "Website Landing Page",
+      "type": "support request",
+      "submittedAt": "2024-02-05T08:25:00Z",
+      "contactName": "Neha Gupta",
+      "contactEmail": "neha.gupta@gmail.com",
+      "contactPhone": "+91 88990 01234"
+    }
+  ]
+}

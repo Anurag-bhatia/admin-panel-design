@@ -1,0 +1,815 @@
+{
+  "_meta": {
+    "models": {
+      "disputes": "Each dispute represents a formal challenge raised against an outcome, charge, refund decision, or service delivery. Disputes are review-driven and follow a strict lifecycle from Open through to Resolved or Rejected.",
+      "investigationNotes": "Internal notes added by reviewers during the investigation process, capturing reasoning, findings, and decisions.",
+      "evidence": "Documents and files uploaded by either the disputing party or the internal team to support or refute the dispute claim.",
+      "activityLog": "A chronological audit trail of every action taken on a dispute, including status changes, assignments, and comments.",
+      "linkedIncidentSnapshot": "A read-only summary of the incident connected to the dispute, showing its outcome, timeline, and financial result."
+    },
+    "relationships": [
+      "Each Dispute links to an Incident, Subscriber, Customer, or Payment reference — no standalone disputes allowed",
+      "Each Dispute has many Investigation Notes (added by reviewers during review)",
+      "Each Dispute has many Evidence items (uploaded by either party)",
+      "Each Dispute has many Activity Log entries (auto-generated audit trail)",
+      "Each Dispute may have one Linked Incident Snapshot (read-only view of the connected incident)"
+    ]
+  },
+  "disputes": [
+    {
+      "id": "dsp-001",
+      "disputeId": "DID-10421",
+      "linkedEntity": {
+        "type": "incident",
+        "id": "IRN-78234",
+        "label": "IRN-78234 — Rajesh Transport Co."
+      },
+      "subscriberName": "Rajesh Transport Co.",
+      "subscriberId": "SUB-1042",
+      "customerName": null,
+      "disputeType": "refund",
+      "reason": "Refund not processed after challan was disposed by court",
+      "description": "Subscriber claims that challan CH-DL-2025-98234 was disposed by the Delhi court on 12 Jan 2026, but the refund of ₹4,500 has not been credited to their account. They have submitted the court disposal certificate as evidence. The incident was marked as 'Not Settled' but subscriber disputes this classification.",
+      "raisedBy": "subscriber",
+      "priority": "high",
+      "status": "open",
+      "createdOn": "2026-02-18T09:30:00Z",
+      "lastUpdated": "2026-02-18T09:30:00Z",
+      "assignedTo": null,
+      "source": "Incident Detail View",
+      "slaDeadline": "2026-02-28T09:30:00Z",
+      "slaDays": 10,
+      "disputedAmount": 4500,
+      "linkedIncidentSnapshot": {
+        "incidentId": "IRN-78234",
+        "subscriberName": "Rajesh Transport Co.",
+        "vehicleNumber": "DL-01-AB-1234",
+        "challanNumber": "CH-DL-2025-98234",
+        "type": "Contest",
+        "outcome": "Not Settled",
+        "assignedLawyer": "Adv. Priya Sharma",
+        "createdOn": "2025-12-05T10:00:00Z",
+        "resolvedOn": "2026-01-15T14:30:00Z",
+        "financialOutcome": {
+          "challanAmount": 5000,
+          "amountPaid": 500,
+          "refundDue": 4500,
+          "refundStatus": "Pending"
+        },
+        "timelineSummary": [
+          "05 Dec 2025 — Challan received, added to New Incidents",
+          "06 Dec 2025 — Screened, valid challan confirmed",
+          "08 Dec 2025 — Assigned to Adv. Priya Sharma",
+          "12 Jan 2026 — Court hearing, challan disposed",
+          "15 Jan 2026 — Marked as Not Settled (disputed by subscriber)"
+        ]
+      },
+      "investigationNotes": [],
+      "evidence": [
+        {
+          "id": "ev-001",
+          "fileName": "court-disposal-certificate.pdf",
+          "uploadedBy": "Rajesh Transport Co.",
+          "uploadedOn": "2026-02-18T09:35:00Z",
+          "fileSize": "245 KB",
+          "type": "Court Document"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "act-001",
+          "action": "Dispute Created",
+          "performedBy": "System",
+          "timestamp": "2026-02-18T09:30:00Z",
+          "details": "Dispute raised from Incident Detail View for IRN-78234"
+        }
+      ]
+    },
+    {
+      "id": "dsp-002",
+      "disputeId": "DID-10422",
+      "linkedEntity": {
+        "type": "incident",
+        "id": "IRN-81045",
+        "label": "IRN-81045 — BlueDart Logistics"
+      },
+      "subscriberName": "BlueDart Logistics",
+      "subscriberId": "SUB-2087",
+      "customerName": null,
+      "disputeType": "service",
+      "reason": "Lawyer failed to appear at court hearing",
+      "description": "Subscriber reports that the assigned lawyer Adv. Manish Gupta did not appear at the scheduled court hearing on 10 Feb 2026 for challan CH-MH-2025-45210. As a result, the hearing was postponed by 30 days and the challan is now at risk of exceeding the 45-day TAT. Subscriber is demanding reassignment and expedited resolution.",
+      "raisedBy": "subscriber",
+      "priority": "critical",
+      "status": "under_review",
+      "createdOn": "2026-02-11T14:20:00Z",
+      "lastUpdated": "2026-02-20T11:45:00Z",
+      "assignedTo": "Neha Kapoor",
+      "source": "Support Module",
+      "slaDeadline": "2026-02-25T14:20:00Z",
+      "slaDays": 14,
+      "disputedAmount": null,
+      "linkedIncidentSnapshot": {
+        "incidentId": "IRN-81045",
+        "subscriberName": "BlueDart Logistics",
+        "vehicleNumber": "MH-04-CD-5678",
+        "challanNumber": "CH-MH-2025-45210",
+        "type": "Contest",
+        "outcome": "Pending",
+        "assignedLawyer": "Adv. Manish Gupta",
+        "createdOn": "2025-12-28T08:00:00Z",
+        "resolvedOn": null,
+        "financialOutcome": {
+          "challanAmount": 10000,
+          "amountPaid": 0,
+          "refundDue": 0,
+          "refundStatus": "N/A"
+        },
+        "timelineSummary": [
+          "28 Dec 2025 — Challan received",
+          "29 Dec 2025 — Screened and validated",
+          "02 Jan 2026 — Assigned to Adv. Manish Gupta",
+          "10 Feb 2026 — Court hearing missed by lawyer",
+          "11 Feb 2026 — Dispute raised by subscriber"
+        ]
+      },
+      "investigationNotes": [
+        {
+          "id": "note-001",
+          "author": "Neha Kapoor",
+          "timestamp": "2026-02-14T10:00:00Z",
+          "content": "Contacted Adv. Manish Gupta. He claims he was not notified of the hearing date change. Checking internal notification logs to verify."
+        },
+        {
+          "id": "note-002",
+          "author": "Neha Kapoor",
+          "timestamp": "2026-02-17T16:30:00Z",
+          "content": "Notification logs confirm SMS and email were sent on 05 Feb 2026. Lawyer received the email (opened at 06 Feb 09:12 AM). Likely negligence on lawyer's part. Recommending reassignment and performance review."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "ev-002",
+          "fileName": "court-adjournment-notice.pdf",
+          "uploadedBy": "BlueDart Logistics",
+          "uploadedOn": "2026-02-11T14:25:00Z",
+          "fileSize": "180 KB",
+          "type": "Court Document"
+        },
+        {
+          "id": "ev-003",
+          "fileName": "notification-log-screenshot.png",
+          "uploadedBy": "Neha Kapoor",
+          "uploadedOn": "2026-02-17T16:35:00Z",
+          "fileSize": "92 KB",
+          "type": "Internal Record"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "act-002",
+          "action": "Dispute Created",
+          "performedBy": "Amit Verma (Support)",
+          "timestamp": "2026-02-11T14:20:00Z",
+          "details": "Converted from Support Ticket TKT-4521"
+        },
+        {
+          "id": "act-003",
+          "action": "Reviewer Assigned",
+          "performedBy": "System",
+          "timestamp": "2026-02-12T09:00:00Z",
+          "details": "Auto-assigned to Neha Kapoor based on workload"
+        },
+        {
+          "id": "act-004",
+          "action": "Status Changed",
+          "performedBy": "Neha Kapoor",
+          "timestamp": "2026-02-12T09:15:00Z",
+          "details": "Status changed from Open to Under Review"
+        },
+        {
+          "id": "act-005",
+          "action": "Investigation Note Added",
+          "performedBy": "Neha Kapoor",
+          "timestamp": "2026-02-14T10:00:00Z",
+          "details": "Contacted lawyer, checking notification logs"
+        },
+        {
+          "id": "act-006",
+          "action": "Evidence Uploaded",
+          "performedBy": "Neha Kapoor",
+          "timestamp": "2026-02-17T16:35:00Z",
+          "details": "Uploaded notification-log-screenshot.png"
+        }
+      ]
+    },
+    {
+      "id": "dsp-003",
+      "disputeId": "DID-10423",
+      "linkedEntity": {
+        "type": "payment",
+        "id": "PAY-30291",
+        "label": "PAY-30291 — Sharma Fleet Services"
+      },
+      "subscriberName": "Sharma Fleet Services",
+      "subscriberId": "SUB-3045",
+      "customerName": null,
+      "disputeType": "payment",
+      "reason": "Double charge on monthly subscription",
+      "description": "Subscriber was charged twice for the January 2026 subscription — once on 01 Jan and again on 03 Jan. Total overcharge of ₹15,000. Subscriber requests immediate reversal of the duplicate payment.",
+      "raisedBy": "subscriber",
+      "priority": "high",
+      "status": "resolved",
+      "createdOn": "2026-01-05T11:00:00Z",
+      "lastUpdated": "2026-01-12T15:30:00Z",
+      "assignedTo": "Vikram Singh",
+      "source": "Manual (Admin)",
+      "slaDeadline": "2026-01-15T11:00:00Z",
+      "slaDays": 10,
+      "disputedAmount": 15000,
+      "linkedIncidentSnapshot": null,
+      "investigationNotes": [
+        {
+          "id": "note-003",
+          "author": "Vikram Singh",
+          "timestamp": "2026-01-07T09:00:00Z",
+          "content": "Verified with finance team. Payment gateway timeout on 01 Jan caused a retry that went through on 03 Jan. Both charges are confirmed in the ledger. Recommending full reversal of duplicate charge."
+        },
+        {
+          "id": "note-004",
+          "author": "Vikram Singh",
+          "timestamp": "2026-01-12T15:00:00Z",
+          "content": "Refund of ₹15,000 processed via NEFT. Transaction ID: NEFT-2026-01-12-8834. Subscriber confirmed receipt. Closing dispute as resolved."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "ev-004",
+          "fileName": "bank-statement-jan-2026.pdf",
+          "uploadedBy": "Sharma Fleet Services",
+          "uploadedOn": "2026-01-05T11:10:00Z",
+          "fileSize": "320 KB",
+          "type": "Financial Record"
+        },
+        {
+          "id": "ev-005",
+          "fileName": "payment-gateway-log.xlsx",
+          "uploadedBy": "Vikram Singh",
+          "uploadedOn": "2026-01-07T09:15:00Z",
+          "fileSize": "58 KB",
+          "type": "Internal Record"
+        },
+        {
+          "id": "ev-006",
+          "fileName": "refund-confirmation-neft.pdf",
+          "uploadedBy": "Vikram Singh",
+          "uploadedOn": "2026-01-12T15:20:00Z",
+          "fileSize": "45 KB",
+          "type": "Financial Record"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "act-007",
+          "action": "Dispute Created",
+          "performedBy": "Admin (Ravi Mehta)",
+          "timestamp": "2026-01-05T11:00:00Z",
+          "details": "Manually created against payment PAY-30291"
+        },
+        {
+          "id": "act-008",
+          "action": "Reviewer Assigned",
+          "performedBy": "Admin (Ravi Mehta)",
+          "timestamp": "2026-01-05T11:05:00Z",
+          "details": "Assigned to Vikram Singh"
+        },
+        {
+          "id": "act-009",
+          "action": "Status Changed",
+          "performedBy": "Vikram Singh",
+          "timestamp": "2026-01-06T09:00:00Z",
+          "details": "Status changed from Open to Under Review"
+        },
+        {
+          "id": "act-010",
+          "action": "Refund Approved",
+          "performedBy": "Vikram Singh",
+          "timestamp": "2026-01-12T14:45:00Z",
+          "details": "Refund of ₹15,000 approved. Sent to finance for processing."
+        },
+        {
+          "id": "act-011",
+          "action": "Dispute Resolved",
+          "performedBy": "Vikram Singh",
+          "timestamp": "2026-01-12T15:30:00Z",
+          "details": "Refund credited. Dispute closed as Resolved."
+        }
+      ]
+    },
+    {
+      "id": "dsp-004",
+      "disputeId": "DID-10424",
+      "linkedEntity": {
+        "type": "incident",
+        "id": "IRN-76901",
+        "label": "IRN-76901 — Delhivery Pvt. Ltd."
+      },
+      "subscriberName": "Delhivery Pvt. Ltd.",
+      "subscriberId": "SUB-1001",
+      "customerName": "Suresh Kumar (Driver)",
+      "disputeType": "legal_escalation",
+      "reason": "Challan resolution resulted in incorrect penalty amount",
+      "description": "The driver Suresh Kumar was asked to pay ₹8,000 as penalty after the contest hearing, but the original challan amount was only ₹2,000. Subscriber alleges the lawyer negotiated a worse outcome than simply paying the original fine. They are threatening legal action against the company and demanding compensation for the difference plus damages. This has been escalated due to the legal threat and the amount involved.",
+      "raisedBy": "customer",
+      "priority": "critical",
+      "status": "escalated",
+      "createdOn": "2026-02-01T08:45:00Z",
+      "lastUpdated": "2026-02-22T17:00:00Z",
+      "assignedTo": "Priya Malhotra",
+      "source": "Incident Detail View",
+      "slaDeadline": "2026-02-15T08:45:00Z",
+      "slaDays": 14,
+      "disputedAmount": 6000,
+      "linkedIncidentSnapshot": {
+        "incidentId": "IRN-76901",
+        "subscriberName": "Delhivery Pvt. Ltd.",
+        "vehicleNumber": "HR-26-EF-9012",
+        "challanNumber": "CH-HR-2025-12098",
+        "type": "Contest",
+        "outcome": "Settled",
+        "assignedLawyer": "Adv. Rakesh Jain",
+        "createdOn": "2025-11-10T09:00:00Z",
+        "resolvedOn": "2026-01-20T16:00:00Z",
+        "financialOutcome": {
+          "challanAmount": 2000,
+          "amountPaid": 8000,
+          "refundDue": 0,
+          "refundStatus": "N/A"
+        },
+        "timelineSummary": [
+          "10 Nov 2025 — Challan received from Delhivery batch upload",
+          "11 Nov 2025 — Screened, valid for contest",
+          "15 Nov 2025 — Assigned to Adv. Rakesh Jain",
+          "20 Jan 2026 — Court hearing, penalty imposed at ₹8,000",
+          "20 Jan 2026 — Marked as Settled"
+        ]
+      },
+      "investigationNotes": [
+        {
+          "id": "note-005",
+          "author": "Priya Malhotra",
+          "timestamp": "2026-02-05T11:00:00Z",
+          "content": "Reviewed court order. The judge imposed enhanced penalty due to repeat offence on the same vehicle. Lawyer's contest was valid but the outcome was determined by prior violation history which was not flagged during screening."
+        },
+        {
+          "id": "note-006",
+          "author": "Priya Malhotra",
+          "timestamp": "2026-02-10T14:30:00Z",
+          "content": "Escalating to legal head. The subscriber's legal team has sent a formal notice. We need to determine liability — was this a screening failure or an unforeseeable court decision? Recommending partial compensation of ₹6,000 (the difference) as goodwill."
+        },
+        {
+          "id": "note-007",
+          "author": "Arjun Nair (Legal Head)",
+          "timestamp": "2026-02-15T10:00:00Z",
+          "content": "Reviewed the case. This is a screening gap — prior violations should have been checked. Approving ₹6,000 compensation. Also flagging this as a process improvement item for the screening workflow."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "ev-007",
+          "fileName": "court-order-enhanced-penalty.pdf",
+          "uploadedBy": "Priya Malhotra",
+          "uploadedOn": "2026-02-05T11:10:00Z",
+          "fileSize": "410 KB",
+          "type": "Court Document"
+        },
+        {
+          "id": "ev-008",
+          "fileName": "legal-notice-delhivery.pdf",
+          "uploadedBy": "Delhivery Pvt. Ltd.",
+          "uploadedOn": "2026-02-08T09:00:00Z",
+          "fileSize": "520 KB",
+          "type": "Legal Notice"
+        },
+        {
+          "id": "ev-009",
+          "fileName": "prior-violation-history.xlsx",
+          "uploadedBy": "Priya Malhotra",
+          "uploadedOn": "2026-02-10T14:40:00Z",
+          "fileSize": "34 KB",
+          "type": "Internal Record"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "act-012",
+          "action": "Dispute Created",
+          "performedBy": "System",
+          "timestamp": "2026-02-01T08:45:00Z",
+          "details": "Raised from Incident Detail View for IRN-76901"
+        },
+        {
+          "id": "act-013",
+          "action": "Reviewer Assigned",
+          "performedBy": "Admin (Ravi Mehta)",
+          "timestamp": "2026-02-02T09:00:00Z",
+          "details": "Assigned to Priya Malhotra"
+        },
+        {
+          "id": "act-014",
+          "action": "Status Changed",
+          "performedBy": "Priya Malhotra",
+          "timestamp": "2026-02-03T09:30:00Z",
+          "details": "Status changed from Open to Under Review"
+        },
+        {
+          "id": "act-015",
+          "action": "Priority Changed",
+          "performedBy": "Priya Malhotra",
+          "timestamp": "2026-02-08T09:30:00Z",
+          "details": "Priority changed from High to Critical after legal notice received"
+        },
+        {
+          "id": "act-016",
+          "action": "Escalated",
+          "performedBy": "Priya Malhotra",
+          "timestamp": "2026-02-10T14:35:00Z",
+          "details": "Escalated to Legal Head (Arjun Nair) due to formal legal notice and compensation decision required"
+        },
+        {
+          "id": "act-017",
+          "action": "Status Changed",
+          "performedBy": "System",
+          "timestamp": "2026-02-10T14:35:00Z",
+          "details": "Status changed from Under Review to Escalated"
+        }
+      ]
+    },
+    {
+      "id": "dsp-005",
+      "disputeId": "DID-10425",
+      "linkedEntity": {
+        "type": "incident",
+        "id": "IRN-79500",
+        "label": "IRN-79500 — FastTrack Movers"
+      },
+      "subscriberName": "FastTrack Movers",
+      "subscriberId": "SUB-4012",
+      "customerName": null,
+      "disputeType": "refund",
+      "reason": "Refund amount incorrect — partial instead of full",
+      "description": "Subscriber received a refund of ₹1,200 but claims the full challan amount of ₹3,500 should have been refunded since the challan was disposed. Finance team processed partial refund deducting service charges, but subscriber says no service charge clause exists in their contract.",
+      "raisedBy": "subscriber",
+      "priority": "medium",
+      "status": "under_review",
+      "createdOn": "2026-02-15T16:00:00Z",
+      "lastUpdated": "2026-02-21T10:00:00Z",
+      "assignedTo": "Vikram Singh",
+      "source": "Financials Tab",
+      "slaDeadline": "2026-02-22T16:00:00Z",
+      "slaDays": 7,
+      "disputedAmount": 2300,
+      "linkedIncidentSnapshot": {
+        "incidentId": "IRN-79500",
+        "subscriberName": "FastTrack Movers",
+        "vehicleNumber": "UP-32-GH-3456",
+        "challanNumber": "CH-UP-2025-67890",
+        "type": "Contest",
+        "outcome": "Refund",
+        "assignedLawyer": "Adv. Sunita Devi",
+        "createdOn": "2025-11-20T10:00:00Z",
+        "resolvedOn": "2026-01-28T12:00:00Z",
+        "financialOutcome": {
+          "challanAmount": 3500,
+          "amountPaid": 0,
+          "refundDue": 3500,
+          "refundStatus": "Partial (₹1,200 processed)"
+        },
+        "timelineSummary": [
+          "20 Nov 2025 — Challan received",
+          "21 Nov 2025 — Screened, valid",
+          "25 Nov 2025 — Assigned to Adv. Sunita Devi",
+          "28 Jan 2026 — Challan disposed, moved to Refund queue",
+          "05 Feb 2026 — Partial refund of ₹1,200 processed"
+        ]
+      },
+      "investigationNotes": [
+        {
+          "id": "note-008",
+          "author": "Vikram Singh",
+          "timestamp": "2026-02-19T11:00:00Z",
+          "content": "Pulled the subscriber's contract (SUB-4012). Contract version dated Aug 2025 does not mention service charge deductions on refunds. The ₹2,300 deduction appears to be incorrectly applied. Checking with finance on the deduction logic."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "ev-010",
+          "fileName": "subscriber-contract-aug2025.pdf",
+          "uploadedBy": "Vikram Singh",
+          "uploadedOn": "2026-02-19T11:10:00Z",
+          "fileSize": "890 KB",
+          "type": "Contract"
+        },
+        {
+          "id": "ev-011",
+          "fileName": "refund-receipt-partial.pdf",
+          "uploadedBy": "FastTrack Movers",
+          "uploadedOn": "2026-02-15T16:10:00Z",
+          "fileSize": "67 KB",
+          "type": "Financial Record"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "act-018",
+          "action": "Dispute Created",
+          "performedBy": "System",
+          "timestamp": "2026-02-15T16:00:00Z",
+          "details": "Raised from Financials Tab for IRN-79500"
+        },
+        {
+          "id": "act-019",
+          "action": "Reviewer Assigned",
+          "performedBy": "System",
+          "timestamp": "2026-02-16T09:00:00Z",
+          "details": "Auto-assigned to Vikram Singh"
+        },
+        {
+          "id": "act-020",
+          "action": "Status Changed",
+          "performedBy": "Vikram Singh",
+          "timestamp": "2026-02-17T09:30:00Z",
+          "details": "Status changed from Open to Under Review"
+        }
+      ]
+    },
+    {
+      "id": "dsp-006",
+      "disputeId": "DID-10426",
+      "linkedEntity": {
+        "type": "subscriber",
+        "id": "SUB-5023",
+        "label": "SUB-5023 — Gupta Carriers Pvt. Ltd."
+      },
+      "subscriberName": "Gupta Carriers Pvt. Ltd.",
+      "subscriberId": "SUB-5023",
+      "customerName": null,
+      "disputeType": "service",
+      "reason": "Bulk challans not processed within TAT",
+      "description": "Subscriber uploaded a batch of 45 challans on 10 Jan 2026. As of today, 12 challans are still in New Incidents queue and have not been screened. The 45-day TAT is at risk for all 12. Subscriber is demanding immediate processing and SLA credit.",
+      "raisedBy": "subscriber",
+      "priority": "high",
+      "status": "open",
+      "createdOn": "2026-02-20T10:30:00Z",
+      "lastUpdated": "2026-02-20T10:30:00Z",
+      "assignedTo": null,
+      "source": "Support Module",
+      "slaDeadline": "2026-03-02T10:30:00Z",
+      "slaDays": 10,
+      "disputedAmount": null,
+      "linkedIncidentSnapshot": null,
+      "investigationNotes": [],
+      "evidence": [
+        {
+          "id": "ev-012",
+          "fileName": "batch-upload-receipt-45-challans.pdf",
+          "uploadedBy": "Gupta Carriers Pvt. Ltd.",
+          "uploadedOn": "2026-02-20T10:35:00Z",
+          "fileSize": "156 KB",
+          "type": "Upload Receipt"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "act-021",
+          "action": "Dispute Created",
+          "performedBy": "Pooja Sharma (Support)",
+          "timestamp": "2026-02-20T10:30:00Z",
+          "details": "Converted from Support Ticket TKT-5102. 12 of 45 challans stuck in New Incidents."
+        }
+      ]
+    },
+    {
+      "id": "dsp-007",
+      "disputeId": "DID-10427",
+      "linkedEntity": {
+        "type": "incident",
+        "id": "IRN-74200",
+        "label": "IRN-74200 — Metro Logistics"
+      },
+      "subscriberName": "Metro Logistics",
+      "subscriberId": "SUB-2050",
+      "customerName": "Ravi Yadav (Driver)",
+      "disputeType": "refund",
+      "reason": "Claims challan was already paid before submission",
+      "description": "Customer Ravi Yadav says he already paid the challan fine of ₹2,000 directly at the RTO before the subscriber submitted it for resolution. The challan was processed through the system and lawyer fees of ₹800 were deducted. Customer wants a full refund of ₹2,800 (original fine + lawyer fees). Investigation found the claim to be false — no prior payment record exists at the RTO.",
+      "raisedBy": "customer",
+      "priority": "low",
+      "status": "rejected",
+      "createdOn": "2026-01-20T13:00:00Z",
+      "lastUpdated": "2026-02-03T11:00:00Z",
+      "assignedTo": "Neha Kapoor",
+      "source": "Support Module",
+      "slaDeadline": "2026-02-03T13:00:00Z",
+      "slaDays": 14,
+      "disputedAmount": 2800,
+      "linkedIncidentSnapshot": {
+        "incidentId": "IRN-74200",
+        "subscriberName": "Metro Logistics",
+        "vehicleNumber": "RJ-14-JK-7890",
+        "challanNumber": "CH-RJ-2025-33456",
+        "type": "Pay & Close",
+        "outcome": "Settled",
+        "assignedLawyer": null,
+        "createdOn": "2025-10-15T08:00:00Z",
+        "resolvedOn": "2025-11-02T10:00:00Z",
+        "financialOutcome": {
+          "challanAmount": 2000,
+          "amountPaid": 2000,
+          "refundDue": 0,
+          "refundStatus": "N/A"
+        },
+        "timelineSummary": [
+          "15 Oct 2025 — Challan received",
+          "16 Oct 2025 — Screened, Pay & Close",
+          "02 Nov 2025 — Payment processed, settled"
+        ]
+      },
+      "investigationNotes": [
+        {
+          "id": "note-009",
+          "author": "Neha Kapoor",
+          "timestamp": "2026-01-25T10:00:00Z",
+          "content": "Checked RTO payment portal for challan CH-RJ-2025-33456. No prior payment found. The challan was unpaid at the time of submission. Customer's claim appears to be false."
+        },
+        {
+          "id": "note-010",
+          "author": "Neha Kapoor",
+          "timestamp": "2026-01-28T14:00:00Z",
+          "content": "Called customer Ravi Yadav. He initially insisted on the claim but could not provide any payment receipt. When asked for bank statement showing the debit, he said he would send it but never followed up."
+        },
+        {
+          "id": "note-011",
+          "author": "Neha Kapoor",
+          "timestamp": "2026-02-03T10:30:00Z",
+          "content": "7-day grace period for evidence submission has passed. No evidence received. Rejecting the dispute as unsupported. Notified subscriber and customer."
+        }
+      ],
+      "evidence": [],
+      "activityLog": [
+        {
+          "id": "act-022",
+          "action": "Dispute Created",
+          "performedBy": "Amit Verma (Support)",
+          "timestamp": "2026-01-20T13:00:00Z",
+          "details": "Converted from Support Ticket TKT-4800"
+        },
+        {
+          "id": "act-023",
+          "action": "Reviewer Assigned",
+          "performedBy": "System",
+          "timestamp": "2026-01-21T09:00:00Z",
+          "details": "Auto-assigned to Neha Kapoor"
+        },
+        {
+          "id": "act-024",
+          "action": "Status Changed",
+          "performedBy": "Neha Kapoor",
+          "timestamp": "2026-01-22T09:00:00Z",
+          "details": "Status changed from Open to Under Review"
+        },
+        {
+          "id": "act-025",
+          "action": "Dispute Rejected",
+          "performedBy": "Neha Kapoor",
+          "timestamp": "2026-02-03T11:00:00Z",
+          "details": "No evidence provided within grace period. Claim unsubstantiated."
+        }
+      ]
+    },
+    {
+      "id": "dsp-008",
+      "disputeId": "DID-10428",
+      "linkedEntity": {
+        "type": "incident",
+        "id": "IRN-80102",
+        "label": "IRN-80102 — ABC Trucking Co."
+      },
+      "subscriberName": "ABC Trucking Co.",
+      "subscriberId": "SUB-1089",
+      "customerName": null,
+      "disputeType": "payment",
+      "reason": "Commission charged despite challan being dismissed",
+      "description": "Subscriber reports that a lawyer commission of ₹1,500 was deducted for incident IRN-80102 even though the challan was dismissed by the court (no action required). Since no legal work resulted in the dismissal, subscriber argues the commission should not apply. The contract states commissions are only for successful contestations.",
+      "raisedBy": "internal",
+      "priority": "medium",
+      "status": "resolved",
+      "createdOn": "2026-01-28T09:00:00Z",
+      "lastUpdated": "2026-02-08T16:00:00Z",
+      "assignedTo": "Vikram Singh",
+      "source": "Financials Tab",
+      "slaDeadline": "2026-02-07T09:00:00Z",
+      "slaDays": 10,
+      "disputedAmount": 1500,
+      "linkedIncidentSnapshot": {
+        "incidentId": "IRN-80102",
+        "subscriberName": "ABC Trucking Co.",
+        "vehicleNumber": "GJ-01-LM-2345",
+        "challanNumber": "CH-GJ-2025-88901",
+        "type": "Contest",
+        "outcome": "Settled",
+        "assignedLawyer": "Adv. Deepak Patel",
+        "createdOn": "2025-12-01T10:00:00Z",
+        "resolvedOn": "2026-01-18T11:00:00Z",
+        "financialOutcome": {
+          "challanAmount": 5000,
+          "amountPaid": 0,
+          "refundDue": 0,
+          "refundStatus": "N/A"
+        },
+        "timelineSummary": [
+          "01 Dec 2025 — Challan received",
+          "02 Dec 2025 — Screened, valid for contest",
+          "05 Dec 2025 — Assigned to Adv. Deepak Patel",
+          "18 Jan 2026 — Court dismissed the challan",
+          "18 Jan 2026 — Marked as Settled, commission of ₹1,500 auto-calculated"
+        ]
+      },
+      "investigationNotes": [
+        {
+          "id": "note-012",
+          "author": "Vikram Singh",
+          "timestamp": "2026-02-01T10:00:00Z",
+          "content": "Court order confirms challan was dismissed due to procedural error by traffic police, not due to lawyer's contestation. The auto-commission logic triggered because the incident was marked as Settled. This is a system logic gap."
+        },
+        {
+          "id": "note-013",
+          "author": "Vikram Singh",
+          "timestamp": "2026-02-05T14:00:00Z",
+          "content": "Discussed with finance and product team. Commission reversal approved. Also flagging this as a product bug — commission should not auto-trigger on court dismissals. Created internal ticket PROD-892 for the fix."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "ev-013",
+          "fileName": "court-dismissal-order.pdf",
+          "uploadedBy": "Vikram Singh",
+          "uploadedOn": "2026-02-01T10:10:00Z",
+          "fileSize": "275 KB",
+          "type": "Court Document"
+        }
+      ],
+      "activityLog": [
+        {
+          "id": "act-026",
+          "action": "Dispute Created",
+          "performedBy": "Admin (Ravi Mehta)",
+          "timestamp": "2026-01-28T09:00:00Z",
+          "details": "Raised internally after finance audit flagged commission on dismissed challan"
+        },
+        {
+          "id": "act-027",
+          "action": "Reviewer Assigned",
+          "performedBy": "Admin (Ravi Mehta)",
+          "timestamp": "2026-01-28T09:05:00Z",
+          "details": "Assigned to Vikram Singh"
+        },
+        {
+          "id": "act-028",
+          "action": "Status Changed",
+          "performedBy": "Vikram Singh",
+          "timestamp": "2026-01-29T09:00:00Z",
+          "details": "Status changed from Open to Under Review"
+        },
+        {
+          "id": "act-029",
+          "action": "Refund Approved",
+          "performedBy": "Vikram Singh",
+          "timestamp": "2026-02-05T14:30:00Z",
+          "details": "Commission reversal of ₹1,500 approved. Sent to finance."
+        },
+        {
+          "id": "act-030",
+          "action": "Dispute Resolved",
+          "performedBy": "Vikram Singh",
+          "timestamp": "2026-02-08T16:00:00Z",
+          "details": "Commission reversed. Product bug flagged. Dispute closed."
+        }
+      ]
+    }
+  ],
+  "stageCounts": {
+    "open": 2,
+    "under_review": 2,
+    "escalated": 1,
+    "resolved": 2,
+    "rejected": 1
+  },
+  "reviewers": [
+    { "id": "usr-001", "name": "Neha Kapoor", "role": "Dispute Reviewer", "activeDisputes": 1 },
+    { "id": "usr-002", "name": "Vikram Singh", "role": "Senior Reviewer", "activeDisputes": 1 },
+    { "id": "usr-003", "name": "Priya Malhotra", "role": "Dispute Reviewer", "activeDisputes": 1 },
+    { "id": "usr-004", "name": "Arjun Nair", "role": "Legal Head", "activeDisputes": 0 },
+    { "id": "usr-005", "name": "Ravi Mehta", "role": "Admin", "activeDisputes": 0 }
+  ]
+}
