@@ -34,6 +34,10 @@ export interface PaymentsProps {
   refunds: Refund[]
   /** List of lawyer fee records */
   lawyerFees: LawyerFee[]
+  /** List of leads for the Leads sub-section */
+  leads?: import('@/../product/sections/sales-crm/types').Lead[]
+  /** Available users for lead assignment */
+  users?: import('@/../product/sections/sales-crm/types').User[]
   /** Called when user approves a refund */
   onApproveRefund?: (id: string) => void
   /** Called when user processes a refund */
@@ -48,4 +52,8 @@ export interface PaymentsProps {
   onViewLawyerProfile?: (lawyerId: string) => void
   /** Called when user exports lawyer fees */
   onExportLawyerFees?: () => void
+  /** Called when user wants to view a lead's details */
+  onViewLead?: (id: string) => void
+  /** Called when user wants to assign a lead */
+  onAssignLead?: (id: string) => void
 }

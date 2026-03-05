@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { PaymentsProps, Refund, LawyerFee } from '@/../product/sections/payments/types'
+import type { Lead } from '@/../product/sections/sales-crm/types'
 import { PaymentsSidebar } from './PaymentsSidebar'
 import { PaymentsStageTabs } from './PaymentsStageTabs'
 import { PaymentsTableHeader, type PaymentFilters } from './PaymentsTableHeader'
@@ -7,6 +8,7 @@ import { RefundRow } from './RefundRow'
 import { LawyerFeeRow } from './LawyerFeeRow'
 import { RefundBulkActionsBar } from './RefundBulkActionsBar'
 import { Pagination } from './Pagination'
+import { LeadsTable } from '@/sections/sales-crm/components/LeadsTable'
 
 const REFUND_TABS = [
   { key: 'to_refund', label: 'To Refund' },
@@ -16,6 +18,11 @@ const REFUND_TABS = [
 const LAWYER_FEE_TABS = [
   { key: 'to_pay', label: 'To Pay' },
   { key: 'completed', label: 'Completed' },
+]
+
+const LEADS_TABS = [
+  { key: 'ready_to_invoice', label: 'Ready to Invoice' },
+  { key: 'converted', label: 'Converted' },
 ]
 
 const REFUND_STATUS_OPTIONS = [
@@ -44,6 +51,8 @@ function isLawyerFeeInStage(fee: LawyerFee, stage: string): boolean {
 export function PaymentsDashboard({
   refunds,
   lawyerFees,
+  leads = [],
+  users = [],
   onApproveRefund,
   onProcessRefund,
   onBulkApproveRefunds,
@@ -51,19 +60,25 @@ export function PaymentsDashboard({
   onExportRefunds,
   onViewLawyerProfile,
   onExportLawyerFees,
+  onViewLead,
+  onAssignLead,
 }: PaymentsProps) {
   // Sidebar state
-  const [sidebarView, setSidebarView] = useState<'refunds' | 'lawyer-fees'>('refunds')
+  const [sidebarView, setSidebarView] = useState<'refunds' | 'lawyer-fees' | 'leads'>('refunds')
 
   // Active stage tab
   const [refundStage, setRefundStage] = useState('to_refund')
   const [feeStage, setFeeStage] = useState('to_pay')
+  const [leadsStage, setLeadsStage] = useState('ready_to_invoice')
 
   // Search
   const [searchQuery, setSearchQuery] = useState('')
 
   // Selection (refunds only)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  // Selection (leads)
+  const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set())
 
   // Refund stage counts
   const refundStageCounts = useMemo(() => ({
@@ -76,6 +91,30 @@ export function PaymentsDashboard({
     to_pay: lawyerFees.filter((f) => f.status === 'To Pay').length,
     completed: lawyerFees.filter((f) => f.status === 'Completed').length,
   }), [lawyerFees])
+
+  // Leads stage counts
+  const leadsStageCounts = useMemo(() => ({
+    ready_to_invoice: leads.filter((l) => l.status === 'invoiced').length,
+    converted: leads.filter((l) => l.status === 'sales').length,
+  }), [leads])
+
+  // Filtered leads
+  const filteredLeads = useMemo(() => {
+    const statusFilter = leadsStage === 'ready_to_invoice' ? 'invoiced' : 'sales'
+    let filtered = leads.filter((l) => l.status === statusFilter)
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (l) =>
+          l.id.toLowerCase().includes(query) ||
+          l.companyAlias.toLowerCase().includes(query) ||
+          l.contactPerson.toLowerCase().includes(query)
+      )
+    }
+
+    return filtered
+  }, [leads, leadsStage, searchQuery])
 
   // Filtered refunds
   const filteredRefunds = useMemo(() => {
@@ -137,9 +176,10 @@ export function PaymentsDashboard({
   const someSelected = selectedIds.size > 0 && !allSelected
 
   // Clear selection on view/stage change
-  const handleSidebarChange = (view: 'refunds' | 'lawyer-fees') => {
+  const handleSidebarChange = (view: 'refunds' | 'lawyer-fees' | 'leads') => {
     setSidebarView(view)
     setSelectedIds(new Set())
+    setSelectedLeadIds(new Set())
     setSearchQuery('')
   }
 
@@ -166,12 +206,19 @@ export function PaymentsDashboard({
             counts={refundStageCounts}
             onTabChange={handleRefundStageChange}
           />
-        ) : (
+        ) : sidebarView === 'lawyer-fees' ? (
           <PaymentsStageTabs
             tabs={LAWYER_FEE_TABS}
             activeTab={feeStage}
             counts={feeStageCounts}
             onTabChange={setFeeStage}
+          />
+        ) : (
+          <PaymentsStageTabs
+            tabs={LEADS_TABS}
+            activeTab={leadsStage}
+            counts={leadsStageCounts}
+            onTabChange={setLeadsStage}
           />
         )}
 
@@ -180,7 +227,9 @@ export function PaymentsDashboard({
           searchPlaceholder={
             sidebarView === 'refunds'
               ? 'Search by Refund ID, incident, customer...'
-              : 'Search by Lawyer ID, name, incident...'
+              : sidebarView === 'lawyer-fees'
+              ? 'Search by Lawyer ID, name, incident...'
+              : 'Search by Lead ID, company, contact...'
           }
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -280,7 +329,7 @@ export function PaymentsDashboard({
                 )}
               </tbody>
             </table>
-          ) : (
+          ) : sidebarView === 'lawyer-fees' ? (
             <table className="w-full">
               <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                 <tr>
@@ -355,6 +404,29 @@ export function PaymentsDashboard({
                 )}
               </tbody>
             </table>
+          ) : (
+            <div className="p-4">
+              <LeadsTable
+                leads={filteredLeads}
+                users={users}
+                selectedLeads={selectedLeadIds}
+                onSelectLead={(id, selected) => {
+                  const next = new Set(selectedLeadIds)
+                  if (selected) next.add(id)
+                  else next.delete(id)
+                  setSelectedLeadIds(next)
+                }}
+                onSelectAll={(selected) => {
+                  if (selected) {
+                    setSelectedLeadIds(new Set(filteredLeads.map((l) => l.id)))
+                  } else {
+                    setSelectedLeadIds(new Set())
+                  }
+                }}
+                onViewLead={onViewLead}
+                onAssignLead={onAssignLead}
+              />
+            </div>
           )}
         </div>
 
@@ -362,7 +434,13 @@ export function PaymentsDashboard({
         <Pagination
           currentPage={1}
           totalPages={1}
-          totalItems={sidebarView === 'refunds' ? filteredRefunds.length : filteredFees.length}
+          totalItems={
+            sidebarView === 'refunds'
+              ? filteredRefunds.length
+              : sidebarView === 'lawyer-fees'
+              ? filteredFees.length
+              : filteredLeads.length
+          }
           itemsPerPage={25}
         />
       </div>

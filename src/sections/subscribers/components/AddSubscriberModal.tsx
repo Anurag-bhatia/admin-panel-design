@@ -48,6 +48,8 @@ export function AddSubscriberModal({
     subType: '',
     serviceType: '',
     numberOfVehicles: 0,
+    subscriberEmail: '',
+    subscriberPhone: '',
     phoneNumber: '',
     country: 'India',
     state: '',
@@ -73,11 +75,13 @@ export function AddSubscriberModal({
     subType: 'Sub Type is required',
     serviceType: 'Service Type is required',
     numberOfVehicles: 'Number of Vehicles must be greater than 0',
+    subscriberEmail: 'Subscriber Email is required',
+    subscriberPhone: 'Subscriber Phone Number is required',
     phoneNumber: 'Phone Number is required',
     country: 'Country is required',
     state: 'State is required',
     city: 'City is required',
-    companyAlias: 'Company Alias is required',
+    companyAlias: 'Company Name is required',
     subscriberName: 'Subscriber Name is required',
     emailId: 'Email ID is required',
     contactPerson: 'Contact Person is required',
@@ -91,7 +95,7 @@ export function AddSubscriberModal({
   const getStepFields = (stepId: string): string[] => {
     switch (stepId) {
       case 'classification': {
-        const base = ['subscriberName', 'source', 'type', 'subType', 'serviceType', 'numberOfVehicles']
+        const base = ['subscriberName', 'source', 'type', 'subType', 'serviceType', 'numberOfVehicles', 'subscriberEmail', 'subscriberPhone']
         return isCompany ? [...base, 'companyAlias', 'gstNumber'] : base
       }
       case 'contact':
@@ -247,14 +251,14 @@ export function AddSubscriberModal({
 
                 <div>
                   <label className={labelClass}>
-                    Type <span className="text-red-500">*</span>
+                    Subscriber Type <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formData.type}
                     onChange={e => setFormData({ ...formData, type: e.target.value, subType: '' })}
                     className={selectClass(!!errors.type)}
                   >
-                    <option value="">Select Type</option>
+                    <option value="">Select Subscriber Type</option>
                     {subscriberTypes.map((type) => (
                       <option key={type} value={type}>{type}</option>
                     ))}
@@ -312,6 +316,34 @@ export function AddSubscriberModal({
                   />
                   {errors.numberOfVehicles && <p className="text-xs text-red-500 mt-1">{errors.numberOfVehicles}</p>}
                 </div>
+
+                <div>
+                  <label className={labelClass}>
+                    Subscriber Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.subscriberEmail}
+                    onChange={e => setFormData({ ...formData, subscriberEmail: e.target.value })}
+                    placeholder="e.g., info@fastlane.com"
+                    className={inputClass(!!errors.subscriberEmail)}
+                  />
+                  {errors.subscriberEmail && <p className="text-xs text-red-500 mt-1">{errors.subscriberEmail}</p>}
+                </div>
+
+                <div>
+                  <label className={labelClass}>
+                    Subscriber Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.subscriberPhone}
+                    onChange={e => setFormData({ ...formData, subscriberPhone: e.target.value })}
+                    placeholder="e.g., +919876543210"
+                    className={inputClass(!!errors.subscriberPhone)}
+                  />
+                  {errors.subscriberPhone && <p className="text-xs text-red-500 mt-1">{errors.subscriberPhone}</p>}
+                </div>
               </div>
 
               {/* Company Checkbox */}
@@ -341,7 +373,7 @@ export function AddSubscriberModal({
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className={labelClass}>
-                      Company Alias <span className="text-red-500">*</span>
+                      Company Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
