@@ -94,6 +94,11 @@ export function SubscribersDashboard({
         onDeleteDocument={(subscriberId, docId) => console.log('Delete document:', subscriberId, docId)}
         onViewIncident={onViewIncident}
         onViewChallan={(challanId) => console.log('View challan:', challanId)}
+        users={users}
+        partners={partners}
+        subscriberSources={subscriberSources}
+        subscriberTypes={subscriberTypes}
+        subscriberSubTypes={subscriberSubTypes}
       />
     )
   }

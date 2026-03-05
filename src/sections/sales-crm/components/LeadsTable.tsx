@@ -74,7 +74,7 @@ export function LeadsTable({
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-visible">
       {/* Desktop Table */}
       <div className="hidden lg:block overflow-x-auto">
         <table className="w-full">

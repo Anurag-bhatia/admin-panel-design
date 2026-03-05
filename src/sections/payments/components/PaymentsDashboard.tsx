@@ -9,6 +9,7 @@ import { LawyerFeeRow } from './LawyerFeeRow'
 import { RefundBulkActionsBar } from './RefundBulkActionsBar'
 import { Pagination } from './Pagination'
 import { LeadsTable } from '@/sections/sales-crm/components/LeadsTable'
+import { LeadDetailView } from '@/sections/sales-crm/components/LeadDetailView'
 
 const REFUND_TABS = [
   { key: 'to_refund', label: 'To Refund' },
@@ -79,6 +80,10 @@ export function PaymentsDashboard({
 
   // Selection (leads)
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set())
+
+  // Lead detail view
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
+  const selectedLead = selectedLeadId ? leads.find(l => l.id === selectedLeadId) : null
 
   // Refund stage counts
   const refundStageCounts = useMemo(() => ({
@@ -188,6 +193,30 @@ export function PaymentsDashboard({
     setSelectedIds(new Set())
   }
 
+  // Show lead detail view if a lead is selected
+  if (selectedLead) {
+    return (
+      <div className="flex h-full bg-slate-100 dark:bg-slate-950">
+        <PaymentsSidebar
+          view={sidebarView}
+          onViewChange={(view) => {
+            handleSidebarChange(view)
+            setSelectedLeadId(null)
+          }}
+        />
+        <div className="flex-1 overflow-auto">
+          <LeadDetailView
+            lead={selectedLead}
+            timelineActivities={[]}
+            documents={[]}
+            users={users}
+            onClose={() => setSelectedLeadId(null)}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-full bg-slate-100 dark:bg-slate-950">
       {/* Sidebar */}
@@ -240,7 +269,7 @@ export function PaymentsDashboard({
         />
 
         {/* Table */}
-        <div className="flex-1 overflow-auto bg-white dark:bg-slate-900">
+        <div className={`flex-1 bg-white dark:bg-slate-900 ${sidebarView === 'leads' ? 'overflow-visible' : 'overflow-auto'}`}>
           {sidebarView === 'refunds' ? (
             <table className="w-full">
               <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
@@ -423,7 +452,7 @@ export function PaymentsDashboard({
                     setSelectedLeadIds(new Set())
                   }
                 }}
-                onViewLead={onViewLead}
+                onViewLead={(id) => setSelectedLeadId(id)}
                 onAssignLead={onAssignLead}
               />
             </div>

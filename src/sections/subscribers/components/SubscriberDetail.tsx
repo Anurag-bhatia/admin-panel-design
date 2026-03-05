@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
-import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Wallet, Users, AlertTriangle, Truck, ChevronDown, Calendar } from 'lucide-react'
+import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Wallet, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download } from 'lucide-react'
 import type { Subscriber, Subscription, User as UserType, Vehicle } from '@/../product/sections/subscribers/types'
+import { AddSubscriberModal } from './AddSubscriberModal'
 
 type TabType = 'details' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'wallet' | 'team'
 
@@ -23,6 +24,11 @@ interface SubscriberDetailProps {
   onViewTransaction?: (transactionId: string) => void
   onAssignTeamMember?: () => void
   onRemoveTeamMember?: (userId: string) => void
+  users?: UserType[]
+  partners?: any[]
+  subscriberSources?: string[]
+  subscriberTypes?: string[]
+  subscriberSubTypes?: Record<string, string[]>
 }
 
 export function SubscriberDetail({
@@ -43,12 +49,29 @@ export function SubscriberDetail({
   onViewChallan,
   onViewTransaction,
   onAssignTeamMember,
-  onRemoveTeamMember
+  onRemoveTeamMember,
+  users = [],
+  partners = [],
+  subscriberSources = [],
+  subscriberTypes = [],
+  subscriberSubTypes = {}
 }: SubscriberDetailProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
   const [showDocumentUpload, setShowDocumentUpload] = useState(false)
   const [expandedVehicle, setExpandedVehicle] = useState<string | null>(null)
   const [challanSubTab, setChallanSubTab] = useState<Record<string, 'pending' | 'paid'>>({})
+  const [showAddVehicleModal, setShowAddVehicleModal] = useState(false)
+  const [newVehicleNumber, setNewVehicleNumber] = useState('')
+  const [vehicleSearch, setVehicleSearch] = useState('')
+  const [vehicleStatusFilter, setVehicleStatusFilter] = useState<string>('')
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('')
+  const [showVehicleFilters, setShowVehicleFilters] = useState(false)
+  const [vehiclePage, setVehiclePage] = useState(1)
+  const vehiclePageSize = 5
+  const [showAddTeamModal, setShowAddTeamModal] = useState(false)
+  const [newTeamName, setNewTeamName] = useState('')
+  const [newTeamEmail, setNewTeamEmail] = useState('')
+  const [showEditModal, setShowEditModal] = useState(false)
 
   // Group challans by vehicle number
   const challansByVehicle = useMemo(() => {
@@ -60,6 +83,33 @@ export function SubscriberDetail({
     })
     return grouped
   }, [challans])
+
+  // Filter vehicles
+  const filteredVehicles = useMemo(() => {
+    return vehicles.filter((v) => {
+      if (vehicleSearch) {
+        const q = vehicleSearch.toLowerCase()
+        const matches = v.vehicleNumber.toLowerCase().includes(q) ||
+          v.make?.toLowerCase().includes(q) ||
+          v.model?.toLowerCase().includes(q)
+        if (!matches) return false
+      }
+      if (vehicleStatusFilter && v.status !== vehicleStatusFilter) return false
+      if (vehicleTypeFilter && v.vehicleType !== vehicleTypeFilter) return false
+      return true
+    })
+  }, [vehicles, vehicleSearch, vehicleStatusFilter, vehicleTypeFilter])
+
+  const vehicleTotalPages = Math.ceil(filteredVehicles.length / vehiclePageSize)
+  const paginatedVehicles = useMemo(() => {
+    const start = (vehiclePage - 1) * vehiclePageSize
+    return filteredVehicles.slice(start, start + vehiclePageSize)
+  }, [filteredVehicles, vehiclePage, vehiclePageSize])
+
+  const vehicleTypes = useMemo(() => {
+    const types = new Set(vehicles.map(v => v.vehicleType).filter(Boolean))
+    return Array.from(types)
+  }, [vehicles])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
@@ -107,7 +157,7 @@ export function SubscriberDetail({
             <p className="text-slate-500 dark:text-slate-400 mt-1">Subscriber ID: {subscriber.id}</p>
           </div>
           <button
-            onClick={() => onEdit?.(subscriber.id)}
+            onClick={() => setShowEditModal(true)}
             className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors"
           >
             Edit Details
@@ -147,10 +197,13 @@ export function SubscriberDetail({
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
                   <InfoField label="Subscriber Name" value={subscriber.subscriberName} />
                   <InfoField label="Source" value={subscriber.source} />
-                  <InfoField label="Type" value={subscriber.type} />
+                  <InfoField label="Subscriber Type" value={subscriber.type} />
                   <InfoField label="Sub Type" value={subscriber.subType} />
                   {subscriber.serviceType && <InfoField label="Service Type" value={subscriber.serviceType} />}
                   <InfoField label="Number of Vehicles" value={`${subscriber.numberOfTrucks}`} />
+                  <InfoField label="Subscriber Email" value={(subscriber as any).subscriberEmail || subscriber.emailId || '—'} />
+                  <InfoField label="Subscriber Phone Number" value={(subscriber as any).subscriberPhone || subscriber.phoneNumber || '—'} />
+                  <InfoField label="Subscription" value={(subscriber as any).subscription || subscription?.subscriptionName || '—'} />
                 </div>
               </div>
 
@@ -159,7 +212,7 @@ export function SubscriberDetail({
                   <div className="border-t border-slate-200/60 dark:border-slate-700/60 mb-8" />
                   <SectionHeader>Company Details</SectionHeader>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
-                    <InfoField label="Company Alias" value={subscriber.companyAlias} />
+                    <InfoField label="Company Name" value={subscriber.companyAlias} />
                     <InfoField label="GST Number" value={subscriber.gstNumber} />
                   </div>
                 </div>
@@ -200,7 +253,6 @@ export function SubscriberDetail({
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
                   <InfoField label="Created" value={formatDate(subscriber.createdDate)} />
                   <InfoField label="Last Updated" value={formatDate(subscriber.lastUpdated)} />
-                  <InfoField label="Last Login" value={formatDate(subscriber.lastLogin)} />
                 </div>
               </div>
 
@@ -450,13 +502,29 @@ export function SubscriberDetail({
                   </div>
                 ) : (
                   documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                       <div className="flex items-center gap-3">
                         <FileText className="w-5 h-5 text-slate-400" />
                         <div>
                           <p className="font-medium text-slate-900 dark:text-slate-50">{doc.fileName}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">{doc.category} • Uploaded {formatDate(doc.uploadedDate)}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Uploaded {formatDate(doc.uploadedDate)}</p>
                         </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => console.log('View document:', doc.id)}
+                          className="p-2 rounded-lg text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                          title="View"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => console.log('Download document:', doc.id)}
+                          className="p-2 rounded-lg text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                          title="Download"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                   ))
@@ -468,11 +536,95 @@ export function SubscriberDetail({
           {/* Vehicles Tab */}
           {activeTab === 'vehicles' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Linked Vehicles ({vehicles.length})</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Linked Vehicles ({vehicles.length})</h2>
+                <button
+                  onClick={() => setShowAddVehicleModal(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Vehicle
+                </button>
+              </div>
+
+              {/* Search & Filter */}
+              {vehicles.length > 0 && (
+                <div className="mb-4">
+                  <div className="flex gap-3">
+                    <div className="flex-1 relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder="Search by vehicle number, make, or model..."
+                        value={vehicleSearch}
+                        onChange={e => { setVehicleSearch(e.target.value); setVehiclePage(1) }}
+                        className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      />
+                    </div>
+                    <button
+                      onClick={() => setShowVehicleFilters(!showVehicleFilters)}
+                      className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        showVehicleFilters
+                          ? 'bg-cyan-600 text-white'
+                          : 'bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <Filter className="w-4 h-4" />
+                      Filters
+                    </button>
+                  </div>
+
+                  {showVehicleFilters && (
+                    <div className="mt-3 flex flex-wrap gap-3">
+                      <select
+                        value={vehicleStatusFilter}
+                        onChange={e => { setVehicleStatusFilter(e.target.value); setVehiclePage(1) }}
+                        className="pl-3 pr-8 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      >
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                      <select
+                        value={vehicleTypeFilter}
+                        onChange={e => { setVehicleTypeFilter(e.target.value); setVehiclePage(1) }}
+                        className="pl-3 pr-8 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      >
+                        <option value="">All Types</option>
+                        {vehicleTypes.map(t => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
+                      {(vehicleStatusFilter || vehicleTypeFilter || vehicleSearch) && (
+                        <button
+                          onClick={() => { setVehicleStatusFilter(''); setVehicleTypeFilter(''); setVehicleSearch('') }}
+                          className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                        >
+                          Clear all
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {vehicles.length === 0 ? (
                 <div className="text-center py-12">
                   <Truck className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                   <p className="text-slate-500 dark:text-slate-400">No vehicles linked to this subscriber yet</p>
+                </div>
+              ) : filteredVehicles.length === 0 ? (
+                <div className="text-center py-12">
+                  <Search className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">No vehicles match your search or filters</p>
+                  <button
+                    onClick={() => { setVehicleStatusFilter(''); setVehicleTypeFilter(''); setVehicleSearch('') }}
+                    className="mt-2 text-sm text-cyan-600 dark:text-cyan-400 hover:underline"
+                  >
+                    Clear filters
+                  </button>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -488,7 +640,7 @@ export function SubscriberDetail({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {vehicles.map((vehicle) => (
+                      {paginatedVehicles.map((vehicle) => (
                         <tr key={vehicle.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                           <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{vehicle.vehicleNumber}</td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300 capitalize">{vehicle.vehicleType}</td>
@@ -508,6 +660,44 @@ export function SubscriberDetail({
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {/* Pagination */}
+              {filteredVehicles.length > vehiclePageSize && (
+                <div className="mt-4 flex items-center justify-between">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Showing <span className="font-semibold text-slate-700 dark:text-slate-300">{(vehiclePage - 1) * vehiclePageSize + 1}</span> to <span className="font-semibold text-slate-700 dark:text-slate-300">{Math.min(vehiclePage * vehiclePageSize, filteredVehicles.length)}</span> of <span className="font-semibold text-slate-700 dark:text-slate-300">{filteredVehicles.length}</span>
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setVehiclePage(p => Math.max(1, p - 1))}
+                      disabled={vehiclePage === 1}
+                      className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    {Array.from({ length: vehicleTotalPages }, (_, i) => i + 1).map(page => (
+                      <button
+                        key={page}
+                        onClick={() => setVehiclePage(page)}
+                        className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                          vehiclePage === page
+                            ? 'bg-cyan-600 text-white'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setVehiclePage(p => Math.min(vehicleTotalPages, p + 1))}
+                      disabled={vehiclePage === vehicleTotalPages}
+                      className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -601,7 +791,18 @@ export function SubscriberDetail({
           {/* Team Tab */}
           {activeTab === 'team' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Team Members ({teamMembers.length})</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Team Members ({teamMembers.length})</h2>
+                <button
+                  onClick={() => setShowAddTeamModal(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Team Member
+                </button>
+              </div>
 
               {teamMembers.length === 0 ? (
                 <div className="text-center py-12">
@@ -624,6 +825,142 @@ export function SubscriberDetail({
           )}
         </div>
       </div>
+
+      {/* Edit Subscriber Modal */}
+      {showEditModal && (
+        <AddSubscriberModal
+          mode="edit"
+          initialData={subscriber}
+          users={users}
+          partners={partners}
+          subscriberSources={subscriberSources}
+          subscriberTypes={subscriberTypes}
+          subscriberSubTypes={subscriberSubTypes}
+          onSubmit={(data) => {
+            console.log('Save subscriber:', subscriber.id, data)
+            onEdit?.(subscriber.id)
+            setShowEditModal(false)
+          }}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
+
+      {/* Add Team Member Modal */}
+      {showAddTeamModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Add Team Member</h3>
+              <button
+                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail('') }}
+                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={newTeamName}
+                  onChange={e => setNewTeamName(e.target.value)}
+                  placeholder="e.g., Rajesh Kumar"
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={newTeamEmail}
+                  onChange={e => setNewTeamEmail(e.target.value)}
+                  placeholder="e.g., rajesh@company.com"
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail('') }}
+                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (newTeamName.trim() && newTeamEmail.trim()) {
+                    console.log('Add team member:', newTeamName.trim(), newTeamEmail.trim(), 'for subscriber:', subscriber.id)
+                    setShowAddTeamModal(false)
+                    setNewTeamName('')
+                    setNewTeamEmail('')
+                  }
+                }}
+                disabled={!newTeamName.trim() || !newTeamEmail.trim()}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Member
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Vehicle Modal */}
+      {showAddVehicleModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Add Vehicle</h3>
+              <button
+                onClick={() => { setShowAddVehicleModal(false); setNewVehicleNumber('') }}
+                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+            <div className="px-6 py-5">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Vehicle Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={newVehicleNumber}
+                onChange={e => setNewVehicleNumber(e.target.value.toUpperCase())}
+                placeholder="e.g., MH02AB1234"
+                className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                autoFocus
+              />
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => { setShowAddVehicleModal(false); setNewVehicleNumber('') }}
+                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (newVehicleNumber.trim()) {
+                    console.log('Add vehicle:', newVehicleNumber.trim(), 'for subscriber:', subscriber.id)
+                    setShowAddVehicleModal(false)
+                    setNewVehicleNumber('')
+                  }
+                }}
+                disabled={!newVehicleNumber.trim()}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Vehicle
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

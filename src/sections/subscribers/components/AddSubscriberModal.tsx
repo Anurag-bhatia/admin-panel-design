@@ -10,6 +10,8 @@ interface AddSubscriberModalProps {
   subscriberSubTypes: Record<string, string[]>
   onSubmit: (data: Omit<Subscriber, 'id' | 'createdDate' | 'lastUpdated' | 'lastLogin' | 'subscriptionId' | 'status'>) => void
   onClose: () => void
+  mode?: 'add' | 'edit'
+  initialData?: Partial<Subscriber> & Record<string, any>
 }
 
 const STEPS = [
@@ -38,33 +40,36 @@ export function AddSubscriberModal({
   subscriberTypes,
   subscriberSubTypes,
   onSubmit,
-  onClose
+  onClose,
+  mode = 'add',
+  initialData
 }: AddSubscriberModalProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const [isCompany, setIsCompany] = useState(false)
+  const [isCompany, setIsCompany] = useState(initialData ? !!(initialData.companyAlias || initialData.gstNumber) : false)
   const [formData, setFormData] = useState({
-    source: '',
-    type: '',
-    subType: '',
-    serviceType: '',
-    numberOfVehicles: 0,
-    subscriberEmail: '',
-    subscriberPhone: '',
-    phoneNumber: '',
-    country: 'India',
-    state: '',
-    city: '',
-    companyAlias: '',
-    subscriberName: '',
-    emailId: '',
-    contactPerson: '',
-    gstNumber: '',
-    area: '',
-    addressLane: '',
-    pinCode: '',
-    assignedOwner: '',
-    partnerId: null as string | null,
-    drivingLicenseNumber: null as string | null,
+    source: initialData?.source || '',
+    type: initialData?.type || '',
+    subType: initialData?.subType || '',
+    serviceType: initialData?.serviceType || '',
+    numberOfVehicles: initialData?.numberOfTrucks || initialData?.numberOfVehicles || 0,
+    subscriberEmail: initialData?.subscriberEmail || initialData?.emailId || '',
+    subscriberPhone: initialData?.subscriberPhone || initialData?.phoneNumber || '',
+    subscription: initialData?.subscription || '',
+    phoneNumber: initialData?.phoneNumber || '',
+    country: initialData?.country || 'India',
+    state: initialData?.state || '',
+    city: initialData?.city || '',
+    companyAlias: initialData?.companyAlias || '',
+    subscriberName: initialData?.subscriberName || '',
+    emailId: initialData?.emailId || '',
+    contactPerson: initialData?.contactPerson || '',
+    gstNumber: initialData?.gstNumber || '',
+    area: initialData?.area || '',
+    addressLane: initialData?.addressLane || '',
+    pinCode: initialData?.pinCode || '',
+    assignedOwner: initialData?.assignedOwner || '',
+    partnerId: initialData?.partnerId || null as string | null,
+    drivingLicenseNumber: initialData?.drivingLicenseNumber || null as string | null,
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -77,6 +82,7 @@ export function AddSubscriberModal({
     numberOfVehicles: 'Number of Vehicles must be greater than 0',
     subscriberEmail: 'Subscriber Email is required',
     subscriberPhone: 'Subscriber Phone Number is required',
+    subscription: 'Subscription is required',
     phoneNumber: 'Phone Number is required',
     country: 'Country is required',
     state: 'State is required',
@@ -95,7 +101,7 @@ export function AddSubscriberModal({
   const getStepFields = (stepId: string): string[] => {
     switch (stepId) {
       case 'classification': {
-        const base = ['subscriberName', 'source', 'type', 'subType', 'serviceType', 'numberOfVehicles', 'subscriberEmail', 'subscriberPhone']
+        const base = ['subscriberName', 'source', 'type', 'subType', 'serviceType', 'numberOfVehicles', 'subscriberEmail', 'subscriberPhone', 'subscription']
         return isCompany ? [...base, 'companyAlias', 'gstNumber'] : base
       }
       case 'contact':
@@ -159,7 +165,7 @@ export function AddSubscriberModal({
       <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl max-w-4xl w-full my-8">
         {/* Header */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-800">
-          <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white">Add New Subscriber</h2>
+          <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white">{mode === 'edit' ? 'Edit Subscriber' : 'Add New Subscriber'}</h2>
           <button
             onClick={onClose}
             className="p-1.5 sm:p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
@@ -343,6 +349,23 @@ export function AddSubscriberModal({
                     className={inputClass(!!errors.subscriberPhone)}
                   />
                   {errors.subscriberPhone && <p className="text-xs text-red-500 mt-1">{errors.subscriberPhone}</p>}
+                </div>
+
+                <div>
+                  <label className={labelClass}>
+                    Subscription <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={formData.subscription}
+                    onChange={e => setFormData({ ...formData, subscription: e.target.value })}
+                    className={selectClass(!!errors.subscription)}
+                  >
+                    <option value="">Choose Subscription</option>
+                    <option value="Udrive">Udrive</option>
+                    <option value="Bsafe">Bsafe</option>
+                    <option value="Vcare">Vcare</option>
+                  </select>
+                  {errors.subscription && <p className="text-xs text-red-500 mt-1">{errors.subscription}</p>}
                 </div>
               </div>
 
@@ -597,7 +620,7 @@ export function AddSubscriberModal({
                 onClick={handleSubmit}
                 className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors"
               >
-                Add Subscriber
+                {mode === 'edit' ? 'Save Changes' : 'Add Subscriber'}
               </button>
             ) : (
               <button

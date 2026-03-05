@@ -161,7 +161,7 @@ export function DisputeDetailView({
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                  SLA Deadline
+                  TAT Deadline
                 </span>
                 <Clock className={`h-4 w-4 ${
                   slaInfo.status === 'critical'
@@ -182,9 +182,6 @@ export function DisputeDetailView({
               >
                 {slaInfo.daysLeft <= 0 ? 'Overdue' : `${Math.abs(slaInfo.daysLeft)} days`}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                {dispute.slaDays}-day SLA window
-              </p>
               <div className="mt-2 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${

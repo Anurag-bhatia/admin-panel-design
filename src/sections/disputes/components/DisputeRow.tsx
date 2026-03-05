@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   ChevronDown,
 } from 'lucide-react'
+
 import type {
   Dispute,
   DisputePriority,
@@ -107,9 +108,6 @@ export function DisputeRow({
   const typeConfig = TYPE_LABELS[dispute.disputeType] || { label: dispute.disputeType, className: '' }
   const priorityConfig = PRIORITY_LABELS[dispute.priority] || { label: dispute.priority, className: '' }
 
-  // Check if SLA is overdue
-  const isOverdue = new Date(dispute.slaDeadline) < new Date()
-
   return (
     <tr
       className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${
@@ -129,21 +127,9 @@ export function DisputeRow({
 
       {/* Dispute ID */}
       <td className="px-4 py-3">
-        <div>
-          <span className={`font-mono text-sm font-medium ${
-            isOverdue
-              ? 'text-red-600 dark:text-red-400'
-              : 'text-slate-900 dark:text-white'
-          }`}>
-            {dispute.disputeId}
-          </span>
-          {isOverdue && (
-            <div className="flex items-center gap-1 mt-0.5">
-              <AlertTriangle className="h-3 w-3 text-red-500" />
-              <span className="text-xs text-red-500 font-medium">SLA Overdue</span>
-            </div>
-          )}
-        </div>
+        <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">
+          {dispute.disputeId}
+        </span>
       </td>
 
       {/* Linked Entity */}
@@ -306,7 +292,7 @@ export function DisputeRow({
                   </button>
                   {showPriorityDropdown && (
                     <div className="absolute right-full top-0 mr-1 w-36 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1">
-                      {PRIORITY_OPTIONS.filter((p) => p.key !== dispute.priority).map(
+                      {PRIORITY_OPTIONS.map(
                         (priority) => (
                           <button
                             key={priority.key}
