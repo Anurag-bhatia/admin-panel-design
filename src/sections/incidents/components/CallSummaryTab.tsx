@@ -12,7 +12,6 @@ interface CallRecord {
   summary: string
   keyPoints: string[]
   sentiment: 'positive' | 'neutral' | 'negative'
-  nextSteps?: string
 }
 
 const SAMPLE_CALLS: CallRecord[] = [
@@ -233,18 +232,6 @@ export function CallSummaryTab() {
                         ))}
                       </ul>
                     </div>
-
-                    {/* Next Steps */}
-                    {call.nextSteps && (
-                      <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
-                        <h4 className="text-sm font-medium text-amber-800 dark:text-amber-400 mb-1">
-                          Next Steps
-                        </h4>
-                        <p className="text-sm text-amber-700 dark:text-amber-300">
-                          {call.nextSteps}
-                        </p>
-                      </div>
-                    )}
 
                     {/* Play Recording Button */}
                     <div className="flex items-center gap-3 pt-2">

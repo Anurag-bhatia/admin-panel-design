@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ArrowLeft, Edit, Shield, User, Lock, Activity, FileText, Upload, Download, Eye, Trash2, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { ArrowLeft, Edit, Shield, User, Lock, Activity, FileText, Upload, Download, Eye, X } from 'lucide-react'
 import type { Employee, EmployeeDocument } from '@/../product/sections/team/types'
 
 type TabType = 'details' | 'documents' | 'permissions'
@@ -20,6 +20,7 @@ export function EmployeeDetailView({
   onManagePermissions,
 }: EmployeeDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
+  const [showUploadModal, setShowUploadModal] = useState(false)
 
   const primaryManager = employee.primaryReportingManager
     ? employees.find(emp => emp.id === employee.primaryReportingManager)
@@ -246,7 +247,10 @@ export function EmployeeDetailView({
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
                 Documents ({employee.documents?.length || 0})
               </h2>
-              <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors text-sm shadow-sm">
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors text-sm shadow-sm"
+              >
                 <Upload className="w-4 h-4" />
                 Upload Document
               </button>
@@ -266,6 +270,11 @@ export function EmployeeDetailView({
               </div>
             )}
           </div>
+        )}
+
+        {/* Upload Document Modal */}
+        {showUploadModal && (
+          <UploadDocumentModal onClose={() => setShowUploadModal(false)} />
         )}
 
         {/* Permissions Tab */}
@@ -337,45 +346,16 @@ function InfoField({ label, value }: { label: string; value: string }) {
 }
 
 function DocumentRow({ document: doc }: { document: EmployeeDocument }) {
-  const statusConfig = {
-    verified: { icon: <CheckCircle className="w-4 h-4" />, label: 'Verified', classes: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-800' },
-    pending: { icon: <Clock className="w-4 h-4" />, label: 'Pending', classes: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 ring-1 ring-amber-200 dark:ring-amber-800' },
-    rejected: { icon: <XCircle className="w-4 h-4" />, label: 'Rejected', classes: 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 ring-1 ring-red-200 dark:ring-red-800' },
-  }
-
-  const typeLabels: Record<string, string> = {
-    aadhaar: 'Aadhaar Card',
-    pan: 'PAN Card',
-    offer_letter: 'Offer Letter',
-    resume: 'Resume / CV',
-    address_proof: 'Address Proof',
-    bank_details: 'Bank Details',
-    education: 'Education',
-    other: 'Other',
-  }
-
-  const status = statusConfig[doc.status]
-
   return (
     <div className="flex items-center gap-4 p-4 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
       <div className="w-10 h-10 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center flex-shrink-0">
         <FileText className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{doc.name}</p>
-        <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-xs text-slate-400 dark:text-slate-500">{typeLabels[doc.type] || doc.type}</span>
-          <span className="text-xs text-slate-300 dark:text-slate-600">&bull;</span>
-          <span className="text-xs text-slate-400 dark:text-slate-500">{doc.fileName}</span>
-          <span className="text-xs text-slate-300 dark:text-slate-600">&bull;</span>
-          <span className="text-xs text-slate-400 dark:text-slate-500">{doc.fileSize}</span>
-        </div>
+        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{doc.fileName}</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{doc.fileSize}</p>
       </div>
       <div className="flex items-center gap-3 flex-shrink-0">
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${status.classes}`}>
-          {status.icon}
-          {status.label}
-        </span>
         <div className="hidden sm:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors" title="View">
             <Eye className="w-4 h-4 text-slate-400 dark:text-slate-500" />
@@ -383,8 +363,149 @@ function DocumentRow({ document: doc }: { document: EmployeeDocument }) {
           <button className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors" title="Download">
             <Download className="w-4 h-4 text-slate-400 dark:text-slate-500" />
           </button>
-          <button className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors" title="Delete">
-            <Trash2 className="w-4 h-4 text-slate-400 dark:text-slate-500 hover:text-red-500" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function UploadDocumentModal({ onClose }: { onClose: () => void }) {
+  const [documentName, setDocumentName] = useState('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) setSelectedFile(file)
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) setSelectedFile(file)
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Upload Document</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Add a new document to this employee's profile</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5 space-y-5">
+          {/* Document Name */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Document Name
+            </label>
+            <input
+              type="text"
+              value={documentName}
+              onChange={(e) => setDocumentName(e.target.value)}
+              placeholder="e.g. Aadhaar Card - Front & Back"
+              className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-colors"
+            />
+          </div>
+
+          {/* File Upload Area */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              File
+            </label>
+            {selectedFile ? (
+              <div className="flex items-center gap-3 p-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                <div className="w-10 h-10 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{selectedFile.name}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{formatFileSize(selectedFile.size)}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedFile(null)}
+                  className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md transition-colors"
+                >
+                  <X className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                </button>
+              </div>
+            ) : (
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`flex flex-col items-center justify-center gap-2 p-8 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${
+                  isDragging
+                    ? 'border-cyan-400 bg-cyan-50/50 dark:bg-cyan-900/10'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                }`}
+              >
+                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                  <Upload className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Drop file here or <span className="text-cyan-600 dark:text-cyan-400">browse</span>
+                  </p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                    PDF, JPG, PNG up to 10MB
+                  </p>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleFileSelect}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100 dark:border-slate-800">
+          <button
+            onClick={onClose}
+            className="px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!documentName || !selectedFile}
+            className="px-4 py-2.5 text-sm font-medium bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 dark:disabled:text-slate-600 text-white disabled:cursor-not-allowed rounded-lg transition-colors shadow-sm"
+          >
+            Upload
           </button>
         </div>
       </div>
