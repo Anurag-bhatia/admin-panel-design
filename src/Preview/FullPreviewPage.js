@@ -5,7 +5,7 @@ import SectionRenderer from './SectionRenderer';
 import { LoginPage } from '../sections/auth/components/LoginPage';
 import { SECTION_DATA, SECTION_IDS, isSectionId, } from './sectionRegistry';
 const FullPreviewPage = () => {
-    const [activeSection, setActiveSection] = useState('incidents');
+    const [activeSection, setActiveSection] = useState('team');
     const [activeSubRoute, setActiveSubRoute] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(true);
     // Build navigation items from SECTION_DATA
@@ -75,11 +75,11 @@ const FullPreviewPage = () => {
         return crumbs;
     }, [activeSection, activeSubRoute]);
     if (!isLoggedIn) {
-        return _jsx(LoginPage, { onLogin: () => {
+        return (_jsx(LoginPage, { onLogin: () => {
                 setIsLoggedIn(true);
-                setActiveSection('incidents');
+                setActiveSection('team');
                 setActiveSubRoute('');
-            } });
+            } }));
     }
     return (_jsx(AppShell, { navigationItems: navigationItems, user: mockUser, breadcrumbs: breadcrumbs, onNavigate: handleNavigate, onLogout: () => setIsLoggedIn(false), children: _jsx(SectionRenderer, { sectionId: activeSection, subRoute: activeSubRoute }) }));
 };

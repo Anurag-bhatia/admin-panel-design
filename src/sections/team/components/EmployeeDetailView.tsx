@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { ArrowLeft, Edit, Shield, User, Lock, Activity } from 'lucide-react'
-import type { Employee } from '@/../product/sections/team/types'
+import { ArrowLeft, Edit, Shield, User, Lock, Activity, FileText, Upload, Download, Eye, Trash2, CheckCircle, Clock, XCircle } from 'lucide-react'
+import type { Employee, EmployeeDocument } from '@/../product/sections/team/types'
 
-type TabType = 'details' | 'permissions'
+type TabType = 'details' | 'documents' | 'permissions'
 
 interface EmployeeDetailViewProps {
   employee: Employee
@@ -31,6 +31,7 @@ export function EmployeeDetailView({
   const getTabIcon = (tab: TabType) => {
     const icons = {
       details: <User className="w-4 h-4" />,
+      documents: <FileText className="w-4 h-4" />,
       permissions: <Lock className="w-4 h-4" />,
     }
     return icons[tab]
@@ -38,6 +39,7 @@ export function EmployeeDetailView({
 
   const tabLabels: Record<TabType, string> = {
     details: 'Details',
+    documents: 'Documents',
     permissions: 'Permissions',
   }
 
@@ -105,7 +107,7 @@ export function EmployeeDetailView({
         {/* Tabs */}
         <div className="mb-6 overflow-x-auto">
           <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
-            {(['details', 'permissions'] as TabType[]).map((tab) => (
+            {(['details', 'documents', 'permissions'] as TabType[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -197,7 +199,7 @@ export function EmployeeDetailView({
                 <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                   <Activity className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">Recent Activity</h3>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">Timeline</h3>
               </div>
               {employee.recentActivity && employee.recentActivity.length > 0 ? (
                 <div className="space-y-0">
@@ -216,19 +218,11 @@ export function EmployeeDetailView({
                         <p className="text-sm font-medium text-slate-800 dark:text-slate-100 leading-snug">
                           {activity.action}
                         </p>
-                        <p className="text-sm text-cyan-600 dark:text-cyan-400 font-mono mt-0.5">
-                          {activity.target}
-                        </p>
-                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5">
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                           {new Date(activity.timestamp).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
-                          })}{' '}
-                          at{' '}
-                          {new Date(activity.timestamp).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true,
+                            year: 'numeric',
                           })}
                         </p>
                       </div>
@@ -238,10 +232,39 @@ export function EmployeeDetailView({
               ) : (
                 <div className="text-center py-10">
                   <Activity className="w-10 h-10 text-slate-200 dark:text-slate-700 mx-auto mb-3" />
-                  <p className="text-sm text-slate-400 dark:text-slate-500">No recent activity</p>
+                  <p className="text-sm text-slate-400 dark:text-slate-500">No timeline events</p>
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Documents Tab */}
+        {activeTab === 'documents' && (
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+                Documents ({employee.documents?.length || 0})
+              </h2>
+              <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors text-sm shadow-sm">
+                <Upload className="w-4 h-4" />
+                Upload Document
+              </button>
+            </div>
+
+            {employee.documents && employee.documents.length > 0 ? (
+              <div className="space-y-3">
+                {employee.documents.map((doc) => (
+                  <DocumentRow key={doc.id} document={doc} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <FileText className="w-12 h-12 text-slate-200 dark:text-slate-700 mx-auto mb-4" />
+                <p className="text-base font-medium text-slate-500 dark:text-slate-400 mb-1">No documents uploaded</p>
+                <p className="text-sm text-slate-400 dark:text-slate-500">Upload employee documents like Aadhaar, PAN, offer letter, etc.</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -309,6 +332,62 @@ function InfoField({ label, value }: { label: string; value: string }) {
     <div>
       <p className="text-sm text-slate-400 dark:text-slate-500 mb-1">{label}</p>
       <p className="text-base font-medium text-slate-900 dark:text-slate-50">{value}</p>
+    </div>
+  )
+}
+
+function DocumentRow({ document: doc }: { document: EmployeeDocument }) {
+  const statusConfig = {
+    verified: { icon: <CheckCircle className="w-4 h-4" />, label: 'Verified', classes: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-800' },
+    pending: { icon: <Clock className="w-4 h-4" />, label: 'Pending', classes: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 ring-1 ring-amber-200 dark:ring-amber-800' },
+    rejected: { icon: <XCircle className="w-4 h-4" />, label: 'Rejected', classes: 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 ring-1 ring-red-200 dark:ring-red-800' },
+  }
+
+  const typeLabels: Record<string, string> = {
+    aadhaar: 'Aadhaar Card',
+    pan: 'PAN Card',
+    offer_letter: 'Offer Letter',
+    resume: 'Resume / CV',
+    address_proof: 'Address Proof',
+    bank_details: 'Bank Details',
+    education: 'Education',
+    other: 'Other',
+  }
+
+  const status = statusConfig[doc.status]
+
+  return (
+    <div className="flex items-center gap-4 p-4 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+      <div className="w-10 h-10 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center flex-shrink-0">
+        <FileText className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{doc.name}</p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-xs text-slate-400 dark:text-slate-500">{typeLabels[doc.type] || doc.type}</span>
+          <span className="text-xs text-slate-300 dark:text-slate-600">&bull;</span>
+          <span className="text-xs text-slate-400 dark:text-slate-500">{doc.fileName}</span>
+          <span className="text-xs text-slate-300 dark:text-slate-600">&bull;</span>
+          <span className="text-xs text-slate-400 dark:text-slate-500">{doc.fileSize}</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-3 flex-shrink-0">
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${status.classes}`}>
+          {status.icon}
+          {status.label}
+        </span>
+        <div className="hidden sm:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors" title="View">
+            <Eye className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+          </button>
+          <button className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors" title="Download">
+            <Download className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+          </button>
+          <button className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors" title="Delete">
+            <Trash2 className="w-4 h-4 text-slate-400 dark:text-slate-500 hover:text-red-500" />
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

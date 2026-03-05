@@ -15,8 +15,8 @@ interface AddSubscriberModalProps {
 const STEPS = [
   { id: 'classification', label: 'Classification' },
   { id: 'contact', label: 'POC' },
-  { id: 'location', label: 'Location' },
-  { id: 'assignment', label: 'Assignment' },
+  { id: 'location', label: 'Address' },
+  { id: 'assignment', label: 'Partner' },
 ]
 
 const inputClass = (hasError: boolean) =>
@@ -424,7 +424,7 @@ export function AddSubscriberModal({
           {/* Step 3: Location Information */}
           {currentStep === 2 && (
             <div>
-              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Location Information</h3>
+              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Address Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>
@@ -519,23 +519,6 @@ export function AddSubscriberModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>
-                    SPOC <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={formData.assignedOwner}
-                    onChange={e => setFormData({ ...formData, assignedOwner: e.target.value })}
-                    className={selectClass(!!errors.assignedOwner)}
-                  >
-                    <option value="">Select SPOC</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>{user.fullName}</option>
-                    ))}
-                  </select>
-                  {errors.assignedOwner && <p className="text-xs text-red-500 mt-1">{errors.assignedOwner}</p>}
-                </div>
-
-                <div>
-                  <label className={labelClass}>
                     Partner (Optional)
                   </label>
                   <select
@@ -549,7 +532,6 @@ export function AddSubscriberModal({
                     ))}
                   </select>
                 </div>
-
               </div>
             </div>
           )}

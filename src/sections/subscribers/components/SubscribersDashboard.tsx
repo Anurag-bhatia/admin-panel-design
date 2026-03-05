@@ -46,7 +46,7 @@ export function SubscribersDashboard({
   const subscriberDrivers = selectedSubscriber ? drivers.filter((drv: any) => drv.subscriberId === selectedSubscriber.id) : []
   const subscriberFollowUps = selectedSubscriber ? followUps.filter((fup: any) => fup.subscriberId === selectedSubscriber.id) : []
 
-  // Sample incidents data (would come from incidents section in real app)
+  // Sample incidents data
   const incidents = selectedSubscriber ? [
     {
       id: 'IRN-124501',
@@ -62,6 +62,20 @@ export function SubscribersDashboard({
     }
   ] : []
 
+  // Sample challans data
+  const challans = selectedSubscriber ? [
+    { id: 'MH11279200417102541', vehicleNumber: 'MH02AB1234', violation: 'Overspeeding', amount: 2000, status: 'pending', date: '2024-02-10T08:30:00Z' },
+    { id: 'MH11279200417102542', vehicleNumber: 'MH02AB1234', violation: 'Red Light Jump', amount: 5000, status: 'resolved', date: '2024-01-15T11:00:00Z' },
+    { id: 'MH11279200417102543', vehicleNumber: 'MH02AB1234', violation: 'No Parking', amount: 1500, status: 'pending', date: '2024-02-20T14:45:00Z' },
+    { id: 'MH11279200417102544', vehicleNumber: 'MH02CD5678', violation: 'Overloading', amount: 10000, status: 'pending', date: '2024-02-05T09:15:00Z' },
+    { id: 'MH11279200417102545', vehicleNumber: 'MH02CD5678', violation: 'Lane Violation', amount: 3000, status: 'resolved', date: '2023-12-28T16:30:00Z' },
+    { id: 'MH11279200417102546', vehicleNumber: 'MH04EF9012', violation: 'Expired Permit', amount: 7500, status: 'pending', date: '2024-02-18T10:00:00Z' },
+    { id: 'MH11279200417102547', vehicleNumber: 'MH04EF9012', violation: 'No Helmet', amount: 1000, status: 'resolved', date: '2024-01-05T13:20:00Z' },
+  ] : []
+
+  // Sample team members
+  const teamMembers = selectedSubscriber ? users.slice(0, 3) : []
+
   // If a subscriber is selected, show detail view
   if (selectedSubscriber) {
     return (
@@ -70,13 +84,16 @@ export function SubscribersDashboard({
         subscription={selectedSubscription || null}
         assignedUser={assignedUser || null}
         incidents={incidents}
+        challans={challans}
         documents={subscriberDocuments}
         vehicles={subscriberVehicles}
+        teamMembers={teamMembers}
         onBack={() => setSelectedSubscriberId(null)}
         onEdit={(id) => console.log('Edit subscriber:', id)}
         onUploadDocument={(subscriberId, file) => console.log('Upload document:', subscriberId, file.name)}
         onDeleteDocument={(subscriberId, docId) => console.log('Delete document:', subscriberId, docId)}
         onViewIncident={onViewIncident}
+        onViewChallan={(challanId) => console.log('View challan:', challanId)}
       />
     )
   }

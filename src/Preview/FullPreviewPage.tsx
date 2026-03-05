@@ -10,7 +10,7 @@ import {
 } from './sectionRegistry'
 
 const FullPreviewPage: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<SectionId>('incidents')
+  const [activeSection, setActiveSection] = useState<SectionId>('team')
   const [activeSubRoute, setActiveSubRoute] = useState<string>('')
   const [isLoggedIn, setIsLoggedIn] = useState(true)
 
@@ -93,7 +93,7 @@ const FullPreviewPage: React.FC = () => {
       <LoginPage
         onLogin={() => {
           setIsLoggedIn(true)
-          setActiveSection('incidents')
+          setActiveSection('team')
           setActiveSubRoute('')
         }}
       />

@@ -36,49 +36,15 @@ export function LoginPage({ onLogin, logoUrl = '/logo.png', appName = 'Lawyered'
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950">
-      {/* Left panel - Branding */}
-      <div className="hidden lg:flex lg:w-[480px] xl:w-[540px] flex-col justify-between p-12" style={{ backgroundColor: '#212121' }}>
-        <div>
-          <img src={logoUrl} alt={appName} className="h-8 mb-2" />
-        </div>
-
-        <div className="space-y-6">
-          <h1 className="text-3xl xl:text-4xl font-semibold text-white leading-tight">
-            Manage your operations,<br />
-            all in one place.
-          </h1>
-          <p className="text-zinc-400 text-base leading-relaxed max-w-sm">
-            Track incidents, manage subscribers, coordinate with lawyers, and monitor your entire workflow from a single dashboard.
-          </p>
-          <div className="flex items-center gap-4 pt-4">
-            <div className="flex -space-x-2">
-              {['AM', 'RK', 'PS'].map((initials, i) => (
-                <div
-                  key={i}
-                  className="w-8 h-8 rounded-full border-2 border-zinc-800 flex items-center justify-center text-xs font-medium text-white"
-                  style={{ backgroundColor: ['#0891b2', '#6366f1', '#d946ef'][i] }}
-                >
-                  {initials}
-                </div>
-              ))}
-            </div>
-            <span className="text-sm text-zinc-500">Trusted by your operations team</span>
-          </div>
-        </div>
-
-        <p className="text-xs text-zinc-600">&copy; 2026 {appName}. All rights reserved.</p>
-      </div>
-
-      {/* Right panel - Login form */}
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+      {/* Login form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-8">
         <div className="w-full max-w-sm">
-          {/* Mobile logo */}
-          <div className="lg:hidden mb-10">
+          <div className="mb-10 flex justify-center">
             <img src={logoUrl} alt={appName} className="h-8" />
           </div>
 
-          <div className="mb-8">
+          <div className="mb-8 text-center">
             <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">
               Welcome back
             </h2>
@@ -171,6 +137,8 @@ export function LoginPage({ onLogin, logoUrl = '/logo.png', appName = 'Lawyered'
           </p>
         </div>
       </div>
+
+      <p className="py-6 text-center text-xs text-slate-400 dark:text-slate-500">&copy; 2026 {appName}. All rights reserved.</p>
     </div>
   )
 }

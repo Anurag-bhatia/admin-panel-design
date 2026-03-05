@@ -40,12 +40,20 @@
           "Employees": ["view", "add", "edit", "manage_permissions"]
         }
       },
+      "documents": [
+        { "id": "doc-001", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "priya_sharma_aadhaar.pdf", "fileSize": "1.2 MB", "uploadedAt": "2022-01-10T10:00:00Z", "status": "verified" },
+        { "id": "doc-002", "name": "PAN Card", "type": "pan", "fileName": "priya_sharma_pan.pdf", "fileSize": "856 KB", "uploadedAt": "2022-01-10T10:05:00Z", "status": "verified" },
+        { "id": "doc-003", "name": "Offer Letter", "type": "offer_letter", "fileName": "priya_sharma_offer.pdf", "fileSize": "2.1 MB", "uploadedAt": "2022-01-08T14:30:00Z", "status": "verified" },
+        { "id": "doc-004", "name": "Resume", "type": "resume", "fileName": "priya_sharma_resume.pdf", "fileSize": "345 KB", "uploadedAt": "2021-12-20T09:00:00Z", "status": "verified" },
+        { "id": "doc-005", "name": "Bank Account Details", "type": "bank_details", "fileName": "priya_sharma_bank.pdf", "fileSize": "512 KB", "uploadedAt": "2022-01-12T11:00:00Z", "status": "verified" }
+      ],
       "recentActivity": [
-        { "id": "act-001", "action": "Approved resolution", "target": "INC-2026-0912", "timestamp": "2026-02-28T16:45:00Z" },
-        { "id": "act-002", "action": "Reassigned incident", "target": "INC-2026-0887", "timestamp": "2026-02-27T11:20:00Z" },
-        { "id": "act-003", "action": "Assigned case to lawyer", "target": "INC-2026-0863", "timestamp": "2026-02-25T09:15:00Z" },
-        { "id": "act-004", "action": "Approved resolution", "target": "INC-2026-0841", "timestamp": "2026-02-21T14:30:00Z" },
-        { "id": "act-005", "action": "Screened incident", "target": "INC-2026-0829", "timestamp": "2026-02-18T10:05:00Z" }
+        { "id": "act-001", "action": "Completed 4 years", "target": "Operations Department", "timestamp": "2026-01-10T09:00:00Z" },
+        { "id": "act-002", "action": "Permissions updated", "target": "Added Settings module access", "timestamp": "2025-11-15T14:30:00Z" },
+        { "id": "act-003", "action": "Added to team", "target": "Escalations Team", "timestamp": "2025-06-01T10:00:00Z" },
+        { "id": "act-004", "action": "Completed 3 years", "target": "Operations Department", "timestamp": "2025-01-10T09:00:00Z" },
+        { "id": "act-005", "action": "Documents verified", "target": "All documents verified", "timestamp": "2022-01-15T11:00:00Z" },
+        { "id": "act-005b", "action": "Joined the organization", "target": "Operations Department", "timestamp": "2022-01-10T09:00:00Z" }
       ]
     },
     {
@@ -72,11 +80,17 @@
           "Reports": ["view"]
         }
       },
+      "documents": [
+        { "id": "doc-006", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "rahul_verma_aadhaar.pdf", "fileSize": "1.1 MB", "uploadedAt": "2022-06-15T10:00:00Z", "status": "verified" },
+        { "id": "doc-007", "name": "PAN Card", "type": "pan", "fileName": "rahul_verma_pan.pdf", "fileSize": "780 KB", "uploadedAt": "2022-06-15T10:10:00Z", "status": "verified" },
+        { "id": "doc-008", "name": "Resume", "type": "resume", "fileName": "rahul_verma_resume.pdf", "fileSize": "290 KB", "uploadedAt": "2022-06-01T09:00:00Z", "status": "verified" }
+      ],
       "recentActivity": [
-        { "id": "act-006", "action": "Screened incident", "target": "INC-2026-0915", "timestamp": "2026-02-28T15:10:00Z" },
-        { "id": "act-007", "action": "Assigned case to lawyer", "target": "INC-2026-0903", "timestamp": "2026-02-27T09:40:00Z" },
-        { "id": "act-008", "action": "Screened incident", "target": "INC-2026-0891", "timestamp": "2026-02-24T13:25:00Z" },
-        { "id": "act-009", "action": "Assigned case to lawyer", "target": "INC-2026-0874", "timestamp": "2026-02-20T11:50:00Z" }
+        { "id": "act-006", "action": "Completed 3 years", "target": "Operations Department", "timestamp": "2025-06-15T09:00:00Z" },
+        { "id": "act-007", "action": "Promoted", "target": "Senior Operations Executive", "timestamp": "2024-12-01T10:00:00Z" },
+        { "id": "act-008", "action": "Added to team", "target": "Screening Team", "timestamp": "2022-08-10T11:00:00Z" },
+        { "id": "act-009", "action": "Documents uploaded", "target": "3 documents submitted", "timestamp": "2022-06-16T10:30:00Z" },
+        { "id": "act-009b", "action": "Joined the organization", "target": "Operations Department", "timestamp": "2022-06-15T09:00:00Z" }
       ]
     },
     {
@@ -102,10 +116,18 @@
           "Lawyers": ["view"]
         }
       },
+      "documents": [
+        { "id": "doc-009", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "anjali_desai_aadhaar.pdf", "fileSize": "1.3 MB", "uploadedAt": "2023-02-20T10:00:00Z", "status": "verified" },
+        { "id": "doc-010", "name": "PAN Card", "type": "pan", "fileName": "anjali_desai_pan.pdf", "fileSize": "900 KB", "uploadedAt": "2023-02-20T10:15:00Z", "status": "pending" },
+        { "id": "doc-011", "name": "Education Certificate", "type": "education", "fileName": "anjali_desai_degree.pdf", "fileSize": "3.4 MB", "uploadedAt": "2023-02-22T11:00:00Z", "status": "verified" },
+        { "id": "doc-012", "name": "Resume", "type": "resume", "fileName": "anjali_desai_resume.pdf", "fileSize": "415 KB", "uploadedAt": "2023-02-15T09:00:00Z", "status": "verified" }
+      ],
       "recentActivity": [
-        { "id": "act-010", "action": "Screened incident", "target": "INC-2026-0918", "timestamp": "2026-02-28T14:30:00Z" },
-        { "id": "act-011", "action": "Screened incident", "target": "INC-2026-0905", "timestamp": "2026-02-26T10:15:00Z" },
-        { "id": "act-012", "action": "Screened incident", "target": "INC-2026-0882", "timestamp": "2026-02-22T16:00:00Z" }
+        { "id": "act-010", "action": "Completed 2 years", "target": "Operations Department", "timestamp": "2025-02-20T09:00:00Z" },
+        { "id": "act-011", "action": "Added to team", "target": "Screening Team", "timestamp": "2023-06-15T11:00:00Z" },
+        { "id": "act-012", "action": "Completed 1 year", "target": "Operations Department", "timestamp": "2024-02-20T09:00:00Z" },
+        { "id": "act-012b", "action": "Documents uploaded", "target": "4 documents submitted", "timestamp": "2023-02-22T14:00:00Z" },
+        { "id": "act-012c", "action": "Joined the organization", "target": "Operations Department", "timestamp": "2023-02-20T09:00:00Z" }
       ]
     },
     {
@@ -131,11 +153,17 @@
           "Lawyers": ["view"]
         }
       },
+      "documents": [
+        { "id": "doc-013", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "vikram_singh_aadhaar.pdf", "fileSize": "1.0 MB", "uploadedAt": "2023-04-10T10:00:00Z", "status": "verified" },
+        { "id": "doc-014", "name": "PAN Card", "type": "pan", "fileName": "vikram_singh_pan.pdf", "fileSize": "820 KB", "uploadedAt": "2023-04-10T10:20:00Z", "status": "verified" },
+        { "id": "doc-015", "name": "Address Proof", "type": "address_proof", "fileName": "vikram_singh_address.pdf", "fileSize": "1.5 MB", "uploadedAt": "2023-04-12T14:00:00Z", "status": "rejected" }
+      ],
       "recentActivity": [
-        { "id": "act-013", "action": "Assigned case to lawyer", "target": "INC-2026-0910", "timestamp": "2026-02-28T12:00:00Z" },
-        { "id": "act-014", "action": "Screened incident", "target": "INC-2026-0898", "timestamp": "2026-02-26T08:45:00Z" },
-        { "id": "act-015", "action": "Screened incident", "target": "INC-2026-0876", "timestamp": "2026-02-23T15:30:00Z" },
-        { "id": "act-016", "action": "Assigned case to lawyer", "target": "INC-2026-0852", "timestamp": "2026-02-19T10:20:00Z" }
+        { "id": "act-013", "action": "Completed 2 years", "target": "Operations Department", "timestamp": "2025-04-10T09:00:00Z" },
+        { "id": "act-014", "action": "Added to team", "target": "Resolution Team", "timestamp": "2024-03-01T10:00:00Z" },
+        { "id": "act-015", "action": "Completed 1 year", "target": "Operations Department", "timestamp": "2024-04-10T09:00:00Z" },
+        { "id": "act-016", "action": "Address proof re-uploaded", "target": "Document resubmitted for verification", "timestamp": "2023-04-20T14:00:00Z" },
+        { "id": "act-016b", "action": "Joined the organization", "target": "Operations Department", "timestamp": "2023-04-10T09:00:00Z" }
       ]
     },
     {
@@ -162,12 +190,19 @@
           "Incidents": ["view"]
         }
       },
+      "documents": [
+        { "id": "doc-016", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "kavita_patel_aadhaar.pdf", "fileSize": "1.1 MB", "uploadedAt": "2022-03-01T10:00:00Z", "status": "verified" },
+        { "id": "doc-017", "name": "PAN Card", "type": "pan", "fileName": "kavita_patel_pan.pdf", "fileSize": "750 KB", "uploadedAt": "2022-03-01T10:10:00Z", "status": "verified" },
+        { "id": "doc-018", "name": "Offer Letter", "type": "offer_letter", "fileName": "kavita_patel_offer.pdf", "fileSize": "1.8 MB", "uploadedAt": "2022-02-25T14:00:00Z", "status": "verified" },
+        { "id": "doc-019", "name": "Education Certificate", "type": "education", "fileName": "kavita_patel_mba.pdf", "fileSize": "2.8 MB", "uploadedAt": "2022-03-05T11:00:00Z", "status": "verified" }
+      ],
       "recentActivity": [
-        { "id": "act-017", "action": "Approved refund", "target": "REF-2026-0156", "timestamp": "2026-02-28T17:00:00Z" },
-        { "id": "act-018", "action": "Released payout", "target": "PAY-2026-0089", "timestamp": "2026-02-27T14:15:00Z" },
-        { "id": "act-019", "action": "Approved refund", "target": "REF-2026-0148", "timestamp": "2026-02-25T10:30:00Z" },
-        { "id": "act-020", "action": "Released payout", "target": "PAY-2026-0075", "timestamp": "2026-02-21T16:45:00Z" },
-        { "id": "act-021", "action": "Reconciled payment", "target": "PAY-2026-0062", "timestamp": "2026-02-17T09:00:00Z" }
+        { "id": "act-017", "action": "Completed 3 years", "target": "Finance Department", "timestamp": "2025-03-01T09:00:00Z" },
+        { "id": "act-018", "action": "Profile updated", "target": "Phone number changed", "timestamp": "2024-09-12T14:30:00Z" },
+        { "id": "act-019", "action": "Completed 2 years", "target": "Finance Department", "timestamp": "2024-03-01T09:00:00Z" },
+        { "id": "act-020", "action": "Added to team", "target": "Finance Operations", "timestamp": "2022-04-15T10:00:00Z" },
+        { "id": "act-021", "action": "Documents verified", "target": "All documents verified", "timestamp": "2022-03-08T11:00:00Z" },
+        { "id": "act-021b", "action": "Joined the organization", "target": "Finance Department", "timestamp": "2022-03-01T09:00:00Z" }
       ]
     },
     {
@@ -193,10 +228,16 @@
           "Reports": ["view"]
         }
       },
+      "documents": [
+        { "id": "doc-020", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "amit_joshi_aadhaar.pdf", "fileSize": "1.2 MB", "uploadedAt": "2023-01-15T10:00:00Z", "status": "verified" },
+        { "id": "doc-021", "name": "Resume", "type": "resume", "fileName": "amit_joshi_resume.pdf", "fileSize": "310 KB", "uploadedAt": "2023-01-05T09:00:00Z", "status": "verified" }
+      ],
       "recentActivity": [
-        { "id": "act-022", "action": "Reconciled payment", "target": "PAY-2026-0091", "timestamp": "2026-02-28T11:30:00Z" },
-        { "id": "act-023", "action": "Reconciled payment", "target": "PAY-2026-0083", "timestamp": "2026-02-26T14:00:00Z" },
-        { "id": "act-024", "action": "Reviewed commission", "target": "PAY-2026-0071", "timestamp": "2026-02-23T09:45:00Z" }
+        { "id": "act-022", "action": "Completed 2 years", "target": "Finance Department", "timestamp": "2025-01-15T09:00:00Z" },
+        { "id": "act-023", "action": "Completed 1 year", "target": "Finance Department", "timestamp": "2024-01-15T09:00:00Z" },
+        { "id": "act-024", "action": "Added to team", "target": "Finance Operations", "timestamp": "2023-03-01T10:00:00Z" },
+        { "id": "act-024b", "action": "Documents uploaded", "target": "2 documents submitted", "timestamp": "2023-01-16T10:30:00Z" },
+        { "id": "act-024c", "action": "Joined the organization", "target": "Finance Department", "timestamp": "2023-01-15T09:00:00Z" }
       ]
     },
     {
@@ -224,12 +265,19 @@
           "Incidents": ["view"]
         }
       },
+      "documents": [
+        { "id": "doc-022", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "sneha_reddy_aadhaar.pdf", "fileSize": "1.0 MB", "uploadedAt": "2022-08-20T10:00:00Z", "status": "verified" },
+        { "id": "doc-023", "name": "PAN Card", "type": "pan", "fileName": "sneha_reddy_pan.pdf", "fileSize": "890 KB", "uploadedAt": "2022-08-20T10:15:00Z", "status": "verified" },
+        { "id": "doc-024", "name": "Offer Letter", "type": "offer_letter", "fileName": "sneha_reddy_offer.pdf", "fileSize": "2.0 MB", "uploadedAt": "2022-08-15T14:00:00Z", "status": "verified" },
+        { "id": "doc-025", "name": "Bank Account Details", "type": "bank_details", "fileName": "sneha_reddy_bank.pdf", "fileSize": "480 KB", "uploadedAt": "2022-08-22T11:00:00Z", "status": "pending" }
+      ],
       "recentActivity": [
-        { "id": "act-026", "action": "Resolved dispute", "target": "DSP-2026-0047", "timestamp": "2026-02-28T13:20:00Z" },
-        { "id": "act-027", "action": "Escalated dispute", "target": "DSP-2026-0044", "timestamp": "2026-02-27T10:50:00Z" },
-        { "id": "act-028", "action": "Closed support ticket", "target": "TKT-2026-0234", "timestamp": "2026-02-25T15:40:00Z" },
-        { "id": "act-029", "action": "Responded to ticket", "target": "TKT-2026-0221", "timestamp": "2026-02-22T09:10:00Z" },
-        { "id": "act-030", "action": "Resolved dispute", "target": "DSP-2026-0038", "timestamp": "2026-02-18T14:55:00Z" }
+        { "id": "act-026", "action": "Completed 3 years", "target": "Customer Success Department", "timestamp": "2025-08-20T09:00:00Z" },
+        { "id": "act-027", "action": "Permissions updated", "target": "Added Disputes module access", "timestamp": "2024-06-10T14:00:00Z" },
+        { "id": "act-028", "action": "Completed 2 years", "target": "Customer Success Department", "timestamp": "2024-08-20T09:00:00Z" },
+        { "id": "act-029", "action": "Added to team", "target": "Customer Support", "timestamp": "2022-09-15T10:00:00Z" },
+        { "id": "act-030", "action": "Documents verified", "target": "All documents verified", "timestamp": "2022-08-25T11:00:00Z" },
+        { "id": "act-030b", "action": "Joined the organization", "target": "Customer Success Department", "timestamp": "2022-08-20T09:00:00Z" }
       ]
     },
     {
@@ -255,10 +303,17 @@
           "Subscribers": ["view"]
         }
       },
+      "documents": [
+        { "id": "doc-026", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "rohan_mehta_aadhaar.pdf", "fileSize": "1.1 MB", "uploadedAt": "2023-05-10T10:00:00Z", "status": "verified" },
+        { "id": "doc-027", "name": "Resume", "type": "resume", "fileName": "rohan_mehta_resume.pdf", "fileSize": "275 KB", "uploadedAt": "2023-05-01T09:00:00Z", "status": "verified" },
+        { "id": "doc-028", "name": "Education Certificate", "type": "education", "fileName": "rohan_mehta_btech.pdf", "fileSize": "2.5 MB", "uploadedAt": "2023-05-12T11:00:00Z", "status": "pending" }
+      ],
       "recentActivity": [
-        { "id": "act-031", "action": "Responded to ticket", "target": "TKT-2026-0241", "timestamp": "2026-02-28T10:15:00Z" },
-        { "id": "act-032", "action": "Responded to ticket", "target": "TKT-2026-0237", "timestamp": "2026-02-27T16:30:00Z" },
-        { "id": "act-033", "action": "Responded to ticket", "target": "TKT-2026-0225", "timestamp": "2026-02-24T11:45:00Z" }
+        { "id": "act-031", "action": "Completed 2 years", "target": "Customer Success Department", "timestamp": "2025-05-10T09:00:00Z" },
+        { "id": "act-032", "action": "Completed 1 year", "target": "Customer Success Department", "timestamp": "2024-05-10T09:00:00Z" },
+        { "id": "act-033", "action": "Added to team", "target": "Customer Support", "timestamp": "2023-06-01T10:00:00Z" },
+        { "id": "act-033b", "action": "Documents uploaded", "target": "3 documents submitted", "timestamp": "2023-05-12T14:00:00Z" },
+        { "id": "act-033c", "action": "Joined the organization", "target": "Customer Success Department", "timestamp": "2023-05-10T09:00:00Z" }
       ]
     },
     {
@@ -281,7 +336,16 @@
         "moduleAccess": [],
         "flowAccess": {}
       },
-      "recentActivity": []
+      "documents": [
+        { "id": "doc-029", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "deepak_kumar_aadhaar.pdf", "fileSize": "1.0 MB", "uploadedAt": "2022-11-05T10:00:00Z", "status": "verified" },
+        { "id": "doc-030", "name": "PAN Card", "type": "pan", "fileName": "deepak_kumar_pan.pdf", "fileSize": "810 KB", "uploadedAt": "2022-11-05T10:10:00Z", "status": "verified" }
+      ],
+      "recentActivity": [
+        { "id": "act-034", "action": "Account deactivated", "target": "Access revoked", "timestamp": "2024-08-30T17:00:00Z" },
+        { "id": "act-034b", "action": "Completed 1 year", "target": "Operations Department", "timestamp": "2023-11-05T09:00:00Z" },
+        { "id": "act-034c", "action": "Documents verified", "target": "All documents verified", "timestamp": "2022-11-10T11:00:00Z" },
+        { "id": "act-034d", "action": "Joined the organization", "target": "Operations Department", "timestamp": "2022-11-05T09:00:00Z" }
+      ]
     },
     {
       "id": "emp-010",
@@ -307,11 +371,17 @@
           "Reports": ["view"]
         }
       },
+      "documents": [
+        { "id": "doc-031", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "meera_gupta_aadhaar.pdf", "fileSize": "1.2 MB", "uploadedAt": "2023-03-15T10:00:00Z", "status": "verified" },
+        { "id": "doc-032", "name": "PAN Card", "type": "pan", "fileName": "meera_gupta_pan.pdf", "fileSize": "760 KB", "uploadedAt": "2023-03-15T10:15:00Z", "status": "verified" },
+        { "id": "doc-033", "name": "Education Certificate", "type": "education", "fileName": "meera_gupta_llb.pdf", "fileSize": "3.1 MB", "uploadedAt": "2023-03-18T11:00:00Z", "status": "verified" }
+      ],
       "recentActivity": [
-        { "id": "act-035", "action": "Added new lawyer", "target": "LAW-2026-0023", "timestamp": "2026-02-28T09:30:00Z" },
-        { "id": "act-036", "action": "Updated lawyer profile", "target": "LAW-2026-0018", "timestamp": "2026-02-26T13:15:00Z" },
-        { "id": "act-037", "action": "Reviewed performance", "target": "LAW-2026-0012", "timestamp": "2026-02-23T11:00:00Z" },
-        { "id": "act-038", "action": "Updated lawyer profile", "target": "LAW-2026-0009", "timestamp": "2026-02-19T16:40:00Z" }
+        { "id": "act-035", "action": "Completed 2 years", "target": "Legal Department", "timestamp": "2025-03-15T09:00:00Z" },
+        { "id": "act-036", "action": "Permissions updated", "target": "Added Reports module access", "timestamp": "2024-08-20T14:00:00Z" },
+        { "id": "act-037", "action": "Completed 1 year", "target": "Legal Department", "timestamp": "2024-03-15T09:00:00Z" },
+        { "id": "act-038", "action": "Documents verified", "target": "All documents verified", "timestamp": "2023-03-20T11:00:00Z" },
+        { "id": "act-038b", "action": "Joined the organization", "target": "Legal Department", "timestamp": "2023-03-15T09:00:00Z" }
       ]
     },
     {
@@ -336,10 +406,16 @@
           "Incidents": ["view", "screen"]
         }
       },
+      "documents": [
+        { "id": "doc-034", "name": "Aadhaar Card", "type": "aadhaar", "fileName": "arjun_nair_aadhaar.pdf", "fileSize": "1.1 MB", "uploadedAt": "2023-07-01T10:00:00Z", "status": "verified" },
+        { "id": "doc-035", "name": "Resume", "type": "resume", "fileName": "arjun_nair_resume.pdf", "fileSize": "320 KB", "uploadedAt": "2023-06-20T09:00:00Z", "status": "verified" }
+      ],
       "recentActivity": [
-        { "id": "act-040", "action": "Screened incident", "target": "INC-2026-0920", "timestamp": "2026-02-28T17:30:00Z" },
-        { "id": "act-041", "action": "Screened incident", "target": "INC-2026-0907", "timestamp": "2026-02-26T12:45:00Z" },
-        { "id": "act-042", "action": "Screened incident", "target": "INC-2026-0889", "timestamp": "2026-02-24T08:30:00Z" }
+        { "id": "act-040", "action": "Completed 2 years", "target": "Operations Department", "timestamp": "2025-07-01T09:00:00Z" },
+        { "id": "act-041", "action": "Completed 1 year", "target": "Operations Department", "timestamp": "2024-07-01T09:00:00Z" },
+        { "id": "act-042", "action": "Added to team", "target": "Screening Team", "timestamp": "2023-08-15T10:00:00Z" },
+        { "id": "act-042b", "action": "Documents uploaded", "target": "2 documents submitted", "timestamp": "2023-07-02T10:30:00Z" },
+        { "id": "act-042c", "action": "Joined the organization", "target": "Operations Department", "timestamp": "2023-07-01T09:00:00Z" }
       ]
     },
     {
@@ -362,7 +438,12 @@
         "moduleAccess": [],
         "flowAccess": {}
       },
-      "recentActivity": []
+      "documents": [],
+      "recentActivity": [
+        { "id": "act-043", "action": "Account deactivated", "target": "Access revoked", "timestamp": "2024-06-15T17:00:00Z" },
+        { "id": "act-043b", "action": "Completed 1 year", "target": "Finance Department", "timestamp": "2023-09-12T09:00:00Z" },
+        { "id": "act-043c", "action": "Joined the organization", "target": "Finance Department", "timestamp": "2022-09-12T09:00:00Z" }
+      ]
     }
   ],
   "teams": [

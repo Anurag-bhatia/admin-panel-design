@@ -1,6 +1,8 @@
-import { useState, useRef, useEffect } from 'react'
-import { MoreVertical, Edit, Shield, UserX, User } from 'lucide-react'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { MoreVertical, Edit, Shield, UserX, User, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Employee } from '@/../product/sections/team/types'
+
+const ROWS_PER_PAGE = 10
 
 interface EmployeeTableProps {
   employees: Employee[]
@@ -89,6 +91,20 @@ export function EmployeeTable({
   onManagePermissions,
   onDeactivateEmployee,
 }: EmployeeTableProps) {
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const totalPages = Math.max(1, Math.ceil(employees.length / ROWS_PER_PAGE))
+  const startIndex = (currentPage - 1) * ROWS_PER_PAGE
+  const paginatedEmployees = useMemo(
+    () => employees.slice(startIndex, startIndex + ROWS_PER_PAGE),
+    [employees, startIndex]
+  )
+
+  // Reset to page 1 if employees list changes (e.g. filtering)
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(1)
+  }, [employees.length, totalPages, currentPage])
+
   // Helper function to get manager name
   const getManagerName = (managerId: string | null) => {
     if (!managerId) return 'N/A'
@@ -124,7 +140,7 @@ export function EmployeeTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-            {employees.map((employee) => (
+            {paginatedEmployees.map((employee) => (
               <tr
                 key={employee.id}
                 onClick={() => onViewEmployee?.(employee.id)}
@@ -243,6 +259,44 @@ export function EmployeeTable({
           </div>
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Showing {startIndex + 1}–{Math.min(startIndex + ROWS_PER_PAGE, employees.length)} of {employees.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`min-w-[36px] h-9 rounded-lg text-sm font-medium transition-colors ${
+                  page === currentPage
+                    ? 'bg-cyan-600 text-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

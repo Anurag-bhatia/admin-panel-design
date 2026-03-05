@@ -86,6 +86,7 @@ export default function SubscriberDetailPreview() {
     const teamMembers = data.users.slice(0, 3).map((user) => user);
     // Sample documents data
     const documents = data.documents.filter((doc) => doc.subscriberId === subscriber.id);
+    // Vehicles linked to this subscriber
     const vehicles = [
         { id: 'VEH-001', subscriberId: 'LWD-1160523', vehicleNumber: 'MH02AB1234', vehicleType: 'truck', make: 'Tata', model: 'Prima', registrationDate: '2022-03-15', status: 'active' },
         { id: 'VEH-002', subscriberId: 'LWD-1160523', vehicleNumber: 'MH02CD5678', vehicleType: 'truck', make: 'Ashok Leyland', model: 'Captain', registrationDate: '2021-08-20', status: 'active' }

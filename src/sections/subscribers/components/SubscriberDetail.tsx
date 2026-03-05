@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Wallet, Users, AlertTriangle, Truck } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Wallet, Users, AlertTriangle, Truck, ChevronDown, Calendar } from 'lucide-react'
 import type { Subscriber, Subscription, User as UserType, Vehicle } from '@/../product/sections/subscribers/types'
 
 type TabType = 'details' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'wallet' | 'team'
@@ -47,6 +47,19 @@ export function SubscriberDetail({
 }: SubscriberDetailProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
   const [showDocumentUpload, setShowDocumentUpload] = useState(false)
+  const [expandedVehicle, setExpandedVehicle] = useState<string | null>(null)
+  const [challanSubTab, setChallanSubTab] = useState<Record<string, 'pending' | 'paid'>>({})
+
+  // Group challans by vehicle number
+  const challansByVehicle = useMemo(() => {
+    const grouped: Record<string, any[]> = {}
+    challans.forEach((challan) => {
+      const key = challan.vehicleNumber || 'Unknown'
+      if (!grouped[key]) grouped[key] = []
+      grouped[key].push(challan)
+    })
+    return grouped
+  }, [challans])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
@@ -104,7 +117,7 @@ export function SubscriberDetail({
         {/* Tabs */}
         <div className="mb-6 -mx-6 lg:-mx-8 px-6 lg:px-8 overflow-x-auto">
           <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit min-w-full">
-            {(['details', 'challans', 'incidents', 'documents', 'vehicles', 'wallet', 'team'] as TabType[]).map((tab) => (
+            {(['details', 'vehicles', 'incidents', 'challans', 'wallet', 'documents', 'team'] as TabType[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -121,117 +134,125 @@ export function SubscriberDetail({
           </div>
         </div>
 
-        {/* Tab Content */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
-          {/* Details Tab */}
-          {activeTab === 'details' && (
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Subscriber Information</h2>
-              <div className="space-y-8">
-                {/* Classification */}
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Classification</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <InfoField label="Subscriber Name" value={subscriber.subscriberName} />
-                    <InfoField label="Source" value={subscriber.source} />
-                    <InfoField label="Type" value={subscriber.type} />
-                    <InfoField label="Sub Type" value={subscriber.subType} />
-                    <InfoField label="Service Type" value={subscriber.serviceType || '—'} />
-                    <InfoField label="Number of Vehicles" value={`${subscriber.numberOfTrucks}`} />
-                  </div>
-                  {(subscriber.companyAlias || subscriber.gstNumber) && (
-                    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wide">Company Details</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <InfoField label="Company Alias" value={subscriber.companyAlias} />
-                        <InfoField label="GST Number" value={subscriber.gstNumber} />
-                      </div>
-                    </div>
-                  )}
-                </div>
+        {/* Details Tab - flex layout outside the card */}
+        {activeTab === 'details' && (
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left: Subscriber Information Card */}
+            <div className="flex-1 min-w-0 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-8">Subscriber Information</h2>
 
-                {/* POC Information */}
-                <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">POC Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <InfoField label="Contact Person" value={subscriber.contactPerson} />
-                    <InfoField label="Phone" value={subscriber.phoneNumber} />
-                    <InfoField label="Email" value={subscriber.emailId} />
+              {/* Classification */}
+              <div className="mb-8">
+                <SectionHeader>Classification</SectionHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+                  <InfoField label="Subscriber Name" value={subscriber.subscriberName} />
+                  <InfoField label="Source" value={subscriber.source} />
+                  <InfoField label="Type" value={subscriber.type} />
+                  <InfoField label="Sub Type" value={subscriber.subType} />
+                  {subscriber.serviceType && <InfoField label="Service Type" value={subscriber.serviceType} />}
+                  <InfoField label="Number of Vehicles" value={`${subscriber.numberOfTrucks}`} />
+                </div>
+              </div>
+
+              {(subscriber.companyAlias || subscriber.gstNumber) && (
+                <div className="mb-8">
+                  <div className="border-t border-slate-200/60 dark:border-slate-700/60 mb-8" />
+                  <SectionHeader>Company Details</SectionHeader>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+                    <InfoField label="Company Alias" value={subscriber.companyAlias} />
+                    <InfoField label="GST Number" value={subscriber.gstNumber} />
                   </div>
                 </div>
+              )}
 
-                {/* Location */}
-                <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Location</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <InfoField label="Country" value={subscriber.country} />
-                    <InfoField label="State" value={subscriber.state} />
-                    <InfoField label="City" value={subscriber.city} />
-                    <InfoField label="Area" value={subscriber.area} />
-                    <InfoField label="Address Lane" value={subscriber.addressLane} />
-                    <InfoField label="Pin Code" value={subscriber.pinCode} />
-                  </div>
+              <div className="border-t border-slate-200/60 dark:border-slate-700/60 mb-8" />
+
+              {/* POC Information */}
+              <div className="mb-8">
+                <SectionHeader>POC Information</SectionHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+                  <InfoField label="Contact Person" value={subscriber.contactPerson} />
+                  <InfoField label="Phone" value={subscriber.phoneNumber} />
+                  <InfoField label="Email" value={subscriber.emailId} />
                 </div>
+              </div>
 
-                {/* Assignment */}
-                <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Assignment</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <InfoField label="SPOC" value={assignedUser ? assignedUser.fullName : 'Unassigned'} />
-                  </div>
+              <div className="border-t border-slate-200/60 dark:border-slate-700/60 mb-8" />
+
+              {/* Address */}
+              <div className="mb-8">
+                <SectionHeader>Address</SectionHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+                  <InfoField label="Country" value={subscriber.country} />
+                  <InfoField label="State" value={subscriber.state} />
+                  <InfoField label="City" value={subscriber.city} />
+                  <InfoField label="Area" value={subscriber.area} />
+                  <InfoField label="Address Lane" value={subscriber.addressLane} />
+                  <InfoField label="Pin Code" value={subscriber.pinCode} />
                 </div>
+              </div>
 
-                {/* Metadata */}
-                <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Metadata</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <InfoField label="Created" value={formatDate(subscriber.createdDate)} />
-                    <InfoField label="Last Updated" value={formatDate(subscriber.lastUpdated)} />
-                    <InfoField label="Last Login" value={formatDate(subscriber.lastLogin)} />
-                  </div>
+              <div className="border-t border-slate-200/60 dark:border-slate-700/60 mb-8" />
+
+              {/* Metadata */}
+              <div className="mb-8">
+                <SectionHeader>Metadata</SectionHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+                  <InfoField label="Created" value={formatDate(subscriber.createdDate)} />
+                  <InfoField label="Last Updated" value={formatDate(subscriber.lastUpdated)} />
+                  <InfoField label="Last Login" value={formatDate(subscriber.lastLogin)} />
                 </div>
+              </div>
 
-                {/* Subscription Details */}
-                <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Subscription Details</h3>
-                  {subscription ? (
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Plan Information</h4>
-                          <div className="space-y-4">
-                            <InfoField label="Subscription Name" value={subscription.subscriptionName} />
-                            <InfoField label="Plan Type" value={subscription.planType} />
-                            <InfoField label="Vehicles Covered" value={subscription.vehiclesCount.toString()} />
-                            <InfoField label="Status" value={subscription.subscriptionEnabled ? 'Active' : 'Inactive'} />
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Billing Period</h4>
-                          <div className="space-y-4">
-                            <InfoField label="Start Date" value={formatDate(subscription.startDate)} />
-                            <InfoField label="End Date" value={formatDate(subscription.endDate)} />
-                            {subscription.collectionDate && (
-                              <InfoField label="Collection Date" value={formatDate(subscription.collectionDate)} />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
-                        <InfoField label="Subscription ID" value={subscription.id} />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <CreditCard className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                      <p className="text-slate-500 dark:text-slate-400 text-sm">No active subscription</p>
-                    </div>
-                  )}
+              <div className="border-t border-slate-200/60 dark:border-slate-700/60 mb-8" />
+
+              {/* Subscription Details */}
+              <div>
+                <SectionHeader>Subscription Details</SectionHeader>
+                {subscription ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <InfoField label="Subscription Name" value={subscription.subscriptionName} />
+                    <InfoField label="Plan Type" value={subscription.planType} />
+                    <InfoField label="Start Date" value={formatDate(subscription.startDate)} />
+                    <InfoField label="End Date" value={formatDate(subscription.endDate)} />
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <CreditCard className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">No active subscription</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right: Timeline */}
+            <div className="lg:w-72 xl:w-80 flex-shrink-0">
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6 sticky top-6">
+                <div className="flex items-center gap-2.5 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <AlertCircle className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">Timeline</h3>
+                </div>
+                <div className="relative">
+                  {/* Vertical line */}
+                  <div className="absolute left-[5px] top-2 bottom-2 w-px bg-slate-200 dark:bg-slate-700" />
+                  <div className="space-y-6">
+                    <TimelineItem title="New challan received" date="Jan 10, 2026" />
+                    <TimelineItem title="Payment received" date="Nov 15, 2025" />
+                    <TimelineItem title="Document uploaded" date="Jun 1, 2025" />
+                    <TimelineItem title="Vehicle added" date="Jan 10, 2025" />
+                    <TimelineItem title="Incident reported" date="Jan 15, 2024" />
+                    <TimelineItem title="Subscriber created" date="Jan 10, 2024" />
+                  </div>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
+        {/* Tab Content */}
+        <div className={`bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 ${activeTab === 'details' ? 'hidden' : ''}`}>
           {/* Challans Tab */}
           {activeTab === 'challans' && (
             <div>
@@ -242,50 +263,93 @@ export function SubscriberDetail({
                   <p className="text-slate-500 dark:text-slate-400">No challans linked to this subscriber yet</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Challan ID</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Violation</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Amount</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {challans.map((challan) => (
-                        <tr key={challan.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{challan.id}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{challan.vehicleNumber}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{challan.violation}</td>
-                          <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">₹{challan.amount?.toLocaleString('en-IN')}</td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
-                              challan.status === 'resolved'
-                                ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                                : challan.status === 'pending'
-                                ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                            }`}>
-                              {challan.status}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(challan.date)}</td>
-                          <td className="px-4 py-3">
-                            <button
-                              onClick={() => onViewChallan?.(challan.id)}
-                              className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
-                            >
-                              View Details
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="space-y-3">
+                  {Object.entries(challansByVehicle).map(([vehicleNumber, vehicleChallans]) => {
+                    const isExpanded = expandedVehicle === vehicleNumber
+                    const currentSubTab = challanSubTab[vehicleNumber] || 'pending'
+                    const pendingChallans = vehicleChallans.filter((c) => c.status === 'pending')
+                    const paidChallans = vehicleChallans.filter((c) => c.status !== 'pending')
+
+                    return (
+                      <div key={vehicleNumber} className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                        {/* Vehicle Card Header */}
+                        <button
+                          onClick={() => setExpandedVehicle(isExpanded ? null : vehicleNumber)}
+                          className="w-full flex items-center justify-between px-4 py-3.5 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Truck className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                            <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">{vehicleNumber}</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">({vehicleChallans.length} challan{vehicleChallans.length !== 1 ? 's' : ''})</span>
+                          </div>
+                          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {/* Expanded Content */}
+                        {isExpanded && (
+                          <div className="border-t border-slate-200 dark:border-slate-700">
+                            {/* Pending / Paid Tabs */}
+                            <div className="flex gap-0 border-b border-slate-200 dark:border-slate-700">
+                              <button
+                                onClick={() => setChallanSubTab({ ...challanSubTab, [vehicleNumber]: 'pending' })}
+                                className={`px-4 py-2.5 text-xs font-medium transition-colors ${
+                                  currentSubTab === 'pending'
+                                    ? 'text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400'
+                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                                }`}
+                              >
+                                Pending ({pendingChallans.length})
+                              </button>
+                              <button
+                                onClick={() => setChallanSubTab({ ...challanSubTab, [vehicleNumber]: 'paid' })}
+                                className={`px-4 py-2.5 text-xs font-medium transition-colors ${
+                                  currentSubTab === 'paid'
+                                    ? 'text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400'
+                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                                }`}
+                              >
+                                Paid ({paidChallans.length})
+                              </button>
+                            </div>
+
+                            {/* Challan List */}
+                            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                              {(currentSubTab === 'pending' ? pendingChallans : paidChallans).length === 0 ? (
+                                <div className="py-8 text-center text-sm text-slate-400">
+                                  No {currentSubTab} challans for this vehicle
+                                </div>
+                              ) : (
+                                (currentSubTab === 'pending' ? pendingChallans : paidChallans).map((challan) => (
+                                  <div key={challan.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2">
+                                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{challan.violation}</p>
+                                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+                                          challan.status === 'pending'
+                                            ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                                            : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                                        }`}>
+                                          {challan.status}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-3 mt-1">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">{challan.id}</span>
+                                        <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                                          <Calendar className="w-3 h-3" />
+                                          {formatDate(challan.date)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">₹{challan.amount?.toLocaleString('en-IN')}</p>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -542,9 +606,7 @@ export function SubscriberDetail({
           {/* Team Tab */}
           {activeTab === 'team' && (
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Team Members ({teamMembers.length})</h2>
-              </div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Team Members ({teamMembers.length})</h2>
 
               {teamMembers.length === 0 ? (
                 <div className="text-center py-12">
@@ -552,24 +614,13 @@ export function SubscriberDetail({
                   <p className="text-slate-500 dark:text-slate-400">No team members assigned yet</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-wrap gap-2">
                   {teamMembers.map((member) => (
-                    <div key={member.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white font-semibold">
-                          {member.fullName.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium text-slate-900 dark:text-slate-50">{member.fullName}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">{member.role} • {member.team}</p>
-                        </div>
+                    <div key={member.id} className="inline-flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-xs font-semibold">
+                        {member.fullName.charAt(0).toUpperCase()}
                       </div>
-                      <button
-                        onClick={() => onRemoveTeamMember?.(member.id)}
-                        className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <span className="text-sm font-medium text-slate-900 dark:text-slate-50">{member.fullName}</span>
                     </div>
                   ))}
                 </div>
@@ -582,11 +633,29 @@ export function SubscriberDetail({
   )
 }
 
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest mb-5">{children}</h3>
+  )
+}
+
 function InfoField({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">{label}</p>
-      <p className="text-sm text-slate-900 dark:text-slate-50">{value}</p>
+      <p className="text-xs text-slate-400 dark:text-slate-500 mb-1.5">{label}</p>
+      <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{value}</p>
+    </div>
+  )
+}
+
+function TimelineItem({ title, date }: { title: string; date: string }) {
+  return (
+    <div className="flex gap-3.5 relative">
+      <div className="relative z-10 w-[11px] h-[11px] rounded-full bg-cyan-400 dark:bg-cyan-500 mt-1 flex-shrink-0 ring-2 ring-white dark:ring-slate-900" />
+      <div>
+        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{title}</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{date}</p>
+      </div>
     </div>
   )
 }

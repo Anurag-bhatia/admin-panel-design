@@ -45,7 +45,7 @@ export const SECTION_DATA = {
         icon: Handshake,
     },
     payments: {
-        label: 'Payments',
+        label: 'Accounts',
         description: 'Commission and refund payment processing with automated calculations and financial tracking.',
         icon: CreditCard,
     },
@@ -86,17 +86,17 @@ export const SECTION_COMPONENTS = {
 };
 // Ordered list of section IDs for consistent navigation
 export const SECTION_IDS = [
-    'incidents',
+    'team',
     'leads',
+    'payments',
+    'incidents',
     'subscribers',
+    'disputes',
+    'partners',
+    'reports',
+    'support',
     'customers',
     'lawyers',
-    'partners',
-    'payments',
-    'disputes',
-    'support',
-    'reports',
-    'team',
 ];
 export function isSectionId(value) {
     return typeof value === 'string' && SECTION_IDS.includes(value);

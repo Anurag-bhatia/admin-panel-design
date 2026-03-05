@@ -186,6 +186,10 @@ export function SubscriberList({
   const [planTypeFilter, setPlanTypeFilter] = useState<string>('')
   const [locationFilter, setLocationFilter] = useState<string>('')
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
+
   // Modal state
   const [showAddModal, setShowAddModal] = useState(false)
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false)
@@ -241,6 +245,19 @@ export function SubscriberList({
     })
   }, [subscribers, subscriptionMap, searchQuery, statusFilter, sourceFilter, ownerFilter, planTypeFilter, locationFilter])
 
+  // Pagination
+  const totalPages = Math.ceil(filteredSubscribers.length / pageSize)
+  const paginatedSubscribers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredSubscribers.slice(start, start + pageSize)
+  }, [filteredSubscribers, currentPage, pageSize])
+
+  const startIndex = (currentPage - 1) * pageSize + 1
+  const endIndex = Math.min(currentPage * pageSize, filteredSubscribers.length)
+
+  // Reset to page 1 when filters change
+  const resetPage = () => setCurrentPage(1)
+
   // Active filter count
   const activeFilterCount = [statusFilter, sourceFilter, ownerFilter, planTypeFilter, locationFilter].filter(Boolean).length
 
@@ -252,6 +269,7 @@ export function SubscriberList({
     setPlanTypeFilter('')
     setLocationFilter('')
     setSearchQuery('')
+    resetPage()
   }
 
   // Modal handlers
@@ -331,6 +349,7 @@ export function SubscriberList({
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value)
+                  setCurrentPage(1)
                   onSearch?.(e.target.value)
                 }}
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-600"
@@ -384,21 +403,6 @@ export function SubscriberList({
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">SPOC</label>
-                  <select
-                    value={ownerFilter}
-                    onChange={(e) => setOwnerFilter(e.target.value)}
-                    className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
-                  >
-                    <option value="">All SPOCs</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.fullName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Location</label>
@@ -453,9 +457,6 @@ export function SubscriberList({
                     POC
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
-                    SPOC
-                  </th>
-                  <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
                     Subscription
                   </th>
                   <th className="text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
@@ -470,9 +471,8 @@ export function SubscriberList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                {filteredSubscribers.map((subscriber) => {
+                {paginatedSubscribers.map((subscriber) => {
                   const subscription = subscriptionMap.get(subscriber.id)
-                  const owner = userMap.get(subscriber.assignedOwner)
 
                   return (
                     <tr
@@ -502,16 +502,6 @@ export function SubscriberList({
                         </p>
                       </td>
 
-                      {/* Owner */}
-                      <td className="px-4 py-4">
-                        {owner ? (
-                          <span className="text-sm text-slate-900 dark:text-white">
-                            {owner.fullName}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-slate-400">Unassigned</span>
-                        )}
-                      </td>
 
                       {/* Subscription */}
                       <td className="px-4 py-4">
@@ -596,13 +586,41 @@ export function SubscriberList({
           )}
         </div>
 
-        {/* Footer Info */}
+        {/* Pagination */}
         {filteredSubscribers.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Showing {filteredSubscribers.length} subscriber{filteredSubscribers.length !== 1 ? 's' : ''}
-              {activeFilterCount > 0 && ` (filtered from ${subscribers.length})`}
+          <div className="mt-4 flex items-center justify-between px-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Showing <span className="font-semibold text-slate-700 dark:text-slate-300">{startIndex}</span> to <span className="font-semibold text-slate-700 dark:text-slate-300">{endIndex}</span> of <span className="font-semibold text-slate-700 dark:text-slate-300">{filteredSubscribers.length}</span> results
             </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === page
+                      ? 'bg-cyan-600 text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
           </div>
         )}
       </div>

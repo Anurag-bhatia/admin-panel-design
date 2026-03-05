@@ -1,6 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
-import { X, Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Upload, FileText, CheckCircle } from 'lucide-react';
 export function UploadDocumentModal({ leadId, leadName, documentCategories, onUpload, onClose }) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [category, setCategory] = useState('');

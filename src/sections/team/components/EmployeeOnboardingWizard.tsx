@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight, Check, Upload, X, Shield } from 'lucide-react'
-import type { Employee, EmployeeFormData, Permissions } from '@/../product/sections/team/types'
+import { ArrowLeft, ArrowRight, Check, Upload, X, Shield, FileText, Trash2, Plus } from 'lucide-react'
+import type { Employee, EmployeeFormData, EmployeeDocument, Permissions } from '@/../product/sections/team/types'
 
 interface EmployeeOnboardingWizardProps {
   departments: string[]
@@ -111,6 +111,7 @@ export function EmployeeOnboardingWizard({
     flowAccess: {},
   })
   const [expandedModule, setExpandedModule] = useState<string | null>(null)
+  const [stepDocumentsData, setStepDocumentsData] = useState<Array<{ id: string; name: string; type: EmployeeDocument['type']; fileName: string }>>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const activeManagers = employees.filter(emp => emp.status === 'active')
@@ -156,9 +157,28 @@ export function EmployeeOnboardingWizard({
       setCurrentStep(2)
     } else if (currentStep === 2 && validateStepAddress()) {
       setCurrentStep(3)
-    } else if (currentStep === 3 && validateStepCredentials()) {
+    } else if (currentStep === 3) {
       setCurrentStep(4)
+    } else if (currentStep === 4 && validateStepCredentials()) {
+      setCurrentStep(5)
     }
+  }
+
+  const addDocumentRow = () => {
+    setStepDocumentsData([
+      ...stepDocumentsData,
+      { id: `temp-doc-${Date.now()}`, name: '', type: 'other', fileName: '' },
+    ])
+  }
+
+  const updateDocumentRow = (index: number, field: string, value: string) => {
+    const updated = [...stepDocumentsData]
+    updated[index] = { ...updated[index], [field]: value }
+    setStepDocumentsData(updated)
+  }
+
+  const removeDocumentRow = (index: number) => {
+    setStepDocumentsData(stepDocumentsData.filter((_, i) => i !== index))
   }
 
   const updateCurrentAddress = (field: keyof AddressFields, value: string) => {
@@ -266,7 +286,7 @@ export function EmployeeOnboardingWizard({
                   Add New Employee
                 </h1>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Step {currentStep} of 4
+                  Step {currentStep} of 5
                 </p>
               </div>
             </div>
@@ -276,8 +296,9 @@ export function EmployeeOnboardingWizard({
               {[
                 { num: 1, label: 'Profile' },
                 { num: 2, label: 'Address' },
-                { num: 3, label: 'Credentials' },
-                { num: 4, label: 'Permissions' },
+                { num: 3, label: 'Documents' },
+                { num: 4, label: 'Credentials' },
+                { num: 5, label: 'Permissions' },
               ].map((step, idx) => (
                 <div key={step.num} className="flex items-center gap-2">
                   <div className={`flex items-center gap-2 ${currentStep >= step.num ? 'text-cyan-600' : 'text-slate-400'}`}>
@@ -288,7 +309,7 @@ export function EmployeeOnboardingWizard({
                     </div>
                     <span className="text-sm font-medium">{step.label}</span>
                   </div>
-                  {idx < 3 && (
+                  {idx < 4 && (
                     <div className={`w-8 h-0.5 ${currentStep > step.num ? 'bg-cyan-600' : 'bg-slate-200 dark:bg-slate-700'}`} />
                   )}
                 </div>
@@ -710,7 +731,7 @@ export function EmployeeOnboardingWizard({
           </div>
         )}
 
-        {currentStep === 3 && (
+        {currentStep === 4 && (
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 lg:p-8">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
               Create Credentials
@@ -775,7 +796,7 @@ export function EmployeeOnboardingWizard({
           </div>
         )}
 
-        {currentStep === 4 && (
+        {currentStep === 5 && (
           <div className="space-y-6">
             {/* Module Access */}
             <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -892,6 +913,111 @@ export function EmployeeOnboardingWizard({
           </div>
         )}
 
+        {currentStep === 3 && (
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-cyan-600" />
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Documents</h2>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">Upload identity, address, and other documents for {stepOneData.firstName}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={addDocumentRow}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors text-sm shadow-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Document
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6">
+                {stepDocumentsData.length === 0 ? (
+                  <div className="text-center py-12">
+                    <FileText className="w-12 h-12 text-slate-200 dark:text-slate-700 mx-auto mb-4" />
+                    <p className="text-base font-medium text-slate-500 dark:text-slate-400 mb-1">No documents added yet</p>
+                    <p className="text-sm text-slate-400 dark:text-slate-500 mb-4">Add documents like Aadhaar card, PAN card, offer letter, etc.</p>
+                    <button
+                      onClick={addDocumentRow}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-medium transition-colors text-sm"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add First Document
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {stepDocumentsData.map((doc, index) => (
+                      <div key={doc.id} className="flex items-start gap-4 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                        <div className="w-10 h-10 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <FileText className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                        </div>
+                        <div className="flex-1 min-w-0 space-y-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Document Name *</label>
+                              <input
+                                type="text"
+                                value={doc.name}
+                                onChange={(e) => updateDocumentRow(index, 'name', e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                                placeholder="e.g. Aadhaar Card"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Document Type *</label>
+                              <select
+                                value={doc.type}
+                                onChange={(e) => updateDocumentRow(index, 'type', e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                              >
+                                <option value="aadhaar">Aadhaar Card</option>
+                                <option value="pan">PAN Card</option>
+                                <option value="offer_letter">Offer Letter</option>
+                                <option value="resume">Resume / CV</option>
+                                <option value="address_proof">Address Proof</option>
+                                <option value="bank_details">Bank Details</option>
+                                <option value="education">Education Certificate</option>
+                                <option value="other">Other</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Upload File</label>
+                            <div className="flex items-center gap-3">
+                              <label className="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-cyan-400 dark:hover:border-cyan-600 cursor-pointer transition-colors">
+                                <Upload className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                                <span className="text-sm text-slate-500 dark:text-slate-400">
+                                  {doc.fileName || 'Choose file or drag and drop'}
+                                </span>
+                                <input type="file" className="hidden" onChange={(e) => {
+                                  const file = e.target.files?.[0]
+                                  if (file) updateDocumentRow(index, 'fileName', file.name)
+                                }} />
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removeDocumentRow(index)}
+                          className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex-shrink-0 mt-0.5"
+                          title="Remove document"
+                        >
+                          <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Footer Actions */}
         <div className="flex items-center justify-between mt-6">
           <button
@@ -902,7 +1028,7 @@ export function EmployeeOnboardingWizard({
             <span>{currentStep === 1 ? 'Cancel' : 'Back'}</span>
           </button>
 
-          {currentStep < 4 ? (
+          {currentStep < 5 ? (
             <button
               onClick={handleNext}
               className="flex items-center gap-2 px-6 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors"

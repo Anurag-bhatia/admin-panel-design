@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { LawyerTable } from './LawyerTable';
 import { LawyerProfile } from './LawyerProfile';
 import { LawyerForm } from './LawyerForm';
-
 // Sample data for the new tabs
 const sampleIncidents = [
     {
@@ -51,7 +50,6 @@ const sampleIncidents = [
         resolutionDate: '2024-01-18',
     },
 ];
-
 const samplePendingInvoices = [
     {
         id: '1',
@@ -75,7 +73,6 @@ const samplePendingInvoices = [
         status: 'Refund',
     },
 ];
-
 const sampleTransactions = [
     {
         id: '1',
@@ -105,7 +102,6 @@ const sampleTransactions = [
         status: 'Paid',
     },
 ];
-
 export function Lawyers({ lawyers: initialLawyers }) {
     const [lawyers, setLawyers] = useState(initialLawyers);
     const [currentView, setCurrentView] = useState('list');
@@ -149,24 +145,13 @@ export function Lawyers({ lawyers: initialLawyers }) {
         setSelectedLawyer(null);
     };
     if (currentView === 'profile' && selectedLawyer) {
-        return (_jsx(LawyerProfile, {
-            lawyer: selectedLawyer,
-            incidents: sampleIncidents,
-            pendingInvoices: samplePendingInvoices,
-            transactions: sampleTransactions,
-            onBack: handleBack,
-            onEdit: () => setCurrentView('edit'),
-            onDeactivate: () => {
+        return (_jsx(LawyerProfile, { lawyer: selectedLawyer, incidents: sampleIncidents, pendingInvoices: samplePendingInvoices, transactions: sampleTransactions, onBack: handleBack, onEdit: () => setCurrentView('edit'), onDeactivate: () => {
                 handleDeactivate(selectedLawyer.id);
                 setSelectedLawyer({ ...selectedLawyer, activityState: 'Inactive' });
-            },
-            onReactivate: () => {
+            }, onReactivate: () => {
                 handleReactivate(selectedLawyer.id);
                 setSelectedLawyer({ ...selectedLawyer, activityState: 'Active' });
-            },
-            onViewIncident: (id) => console.log('View incident:', id),
-            onViewTransaction: (id) => console.log('View transaction:', id)
-        }));
+            }, onViewIncident: (id) => console.log('View incident:', id), onViewTransaction: (id) => console.log('View transaction:', id) }));
     }
     if (currentView === 'add' || (currentView === 'edit' && selectedLawyer)) {
         return (_jsx(LawyerForm, { lawyer: selectedLawyer, onBack: handleBack, onSave: handleSave, isEdit: currentView === 'edit' }));

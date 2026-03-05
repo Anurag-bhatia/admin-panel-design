@@ -81,7 +81,7 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     icon: Handshake,
   },
   payments: {
-    label: 'Payments',
+    label: 'Accounts',
     description: 'Commission and refund payment processing with automated calculations and financial tracking.',
     icon: CreditCard,
   },
@@ -124,17 +124,17 @@ export const SECTION_COMPONENTS: Record<string, React.ComponentType<any> | null>
 
 // Ordered list of section IDs for consistent navigation
 export const SECTION_IDS = [
-  'incidents',
+  'team',
   'leads',
+  'payments',
+  'incidents',
   'subscribers',
+  'disputes',
+  'partners',
+  'reports',
+  'support',
   'customers',
   'lawyers',
-  'partners',
-  'payments',
-  'disputes',
-  'support',
-  'reports',
-  'team',
 ] as const
 
 export type SectionId = (typeof SECTION_IDS)[number]

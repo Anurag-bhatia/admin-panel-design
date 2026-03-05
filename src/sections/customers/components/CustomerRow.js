@@ -1,8 +1,9 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Car, AlertCircle } from 'lucide-react';
 export function CustomerRow({ customer, isSelected, onSelect }) {
+    // Mock data for pending challans - in real app, this would come from the customer object
     const pendingChallans = customer.totalIncidents || 0;
-    const pendingChallanAmount = (customer.totalIncidents || 0) * 1500;
+    const pendingChallanAmount = (customer.totalIncidents || 0) * 1500; // Mock calculation
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
