@@ -57,7 +57,6 @@ export function SubscriberDetail({
   subscriberSubTypes = {}
 }: SubscriberDetailProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
-  const [showDocumentUpload, setShowDocumentUpload] = useState(false)
   const [expandedVehicle, setExpandedVehicle] = useState<string | null>(null)
   const [challanSubTab, setChallanSubTab] = useState<Record<string, 'pending' | 'paid'>>({})
   const [showAddVehicleModal, setShowAddVehicleModal] = useState(false)
@@ -71,7 +70,11 @@ export function SubscriberDetail({
   const [showAddTeamModal, setShowAddTeamModal] = useState(false)
   const [newTeamName, setNewTeamName] = useState('')
   const [newTeamEmail, setNewTeamEmail] = useState('')
+  const [newTeamDesignation, setNewTeamDesignation] = useState('')
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showUploadDocModal, setShowUploadDocModal] = useState(false)
+  const [uploadDocCategory, setUploadDocCategory] = useState('')
+  const [uploadDocFile, setUploadDocFile] = useState<File | null>(null)
 
   // Group challans by vehicle number
   const challansByVehicle = useMemo(() => {
@@ -475,38 +478,14 @@ export function SubscriberDetail({
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Documents</h2>
-                {!showDocumentUpload && (
-                  <button
-                    onClick={() => setShowDocumentUpload(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
-                  >
-                    <Upload className="w-4 h-4" />
-                    Upload Document
-                  </button>
-                )}
+                <button
+                  onClick={() => setShowUploadDocModal(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <Upload className="w-4 h-4" />
+                  Upload Document
+                </button>
               </div>
-
-              {showDocumentUpload && (
-                <div className="mb-6 p-4 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                  <input
-                    type="file"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        onUploadDocument?.(subscriber.id, file)
-                        setShowDocumentUpload(false)
-                      }
-                    }}
-                    className="hidden"
-                    id="document-upload"
-                  />
-                  <label htmlFor="document-upload" className="flex flex-col items-center cursor-pointer">
-                    <Upload className="w-8 h-8 text-slate-400 mb-2" />
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-50">Click to upload a document</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">PDF, JPG, PNG up to 10MB</p>
-                  </label>
-                </div>
-              )}
 
               <div className="space-y-2">
                 {documents.length === 0 ? (
@@ -516,15 +495,40 @@ export function SubscriberDetail({
                   </div>
                 ) : (
                   documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <FileText className="w-5 h-5 text-slate-400" />
-                        <div>
+                    <div key={doc.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FileText className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                        <div className="min-w-0">
                           <p className="font-medium text-slate-900 dark:text-slate-50">{doc.fileName}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">Uploaded {formatDate(doc.uploadedDate)}</p>
+                          <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                            {doc.category && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400">
+                                {doc.category}
+                              </span>
+                            )}
+                            {doc.vehicleNumber && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                <Truck className="w-3 h-3" />
+                                {doc.vehicleNumber}
+                              </span>
+                            )}
+                            {doc.companyName && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                <Building2 className="w-3 h-3" />
+                                {doc.companyName}
+                              </span>
+                            )}
+                            {doc.driverName && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                <Users className="w-3 h-3" />
+                                {doc.driverName}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Uploaded {formatDate(doc.uploadedDate)}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <button
                           onClick={() => console.log('View document:', doc.id)}
                           className="p-2 rounded-lg text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
@@ -824,13 +828,17 @@ export function SubscriberDetail({
                   <p className="text-slate-500 dark:text-slate-400">No team members assigned yet</p>
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {teamMembers.map((member) => (
-                    <div key={member.id} className="inline-flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-xs font-semibold">
+                    <div key={member.id} className="inline-flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                         {member.fullName.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-sm font-medium text-slate-900 dark:text-slate-50">{member.fullName}</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{member.fullName}</p>
+                        {member.email && <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{member.email}</p>}
+                        {member.role && <p className="text-xs text-slate-400 dark:text-slate-500">{member.role}</p>}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -866,7 +874,7 @@ export function SubscriberDetail({
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Add Team Member</h3>
               <button
-                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail('') }}
+                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail(''); setNewTeamDesignation('') }}
                 className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
               >
                 <X className="w-5 h-5 text-slate-500" />
@@ -898,10 +906,22 @@ export function SubscriberDetail({
                   className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Designation
+                </label>
+                <input
+                  type="text"
+                  value={newTeamDesignation}
+                  onChange={e => setNewTeamDesignation(e.target.value)}
+                  placeholder="e.g., Account Manager"
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
               <button
-                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail('') }}
+                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail(''); setNewTeamDesignation('') }}
                 className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
               >
                 Cancel
@@ -909,16 +929,106 @@ export function SubscriberDetail({
               <button
                 onClick={() => {
                   if (newTeamName.trim() && newTeamEmail.trim()) {
-                    console.log('Add team member:', newTeamName.trim(), newTeamEmail.trim(), 'for subscriber:', subscriber.id)
+                    console.log('Add team member:', newTeamName.trim(), newTeamEmail.trim(), newTeamDesignation.trim(), 'for subscriber:', subscriber.id)
                     setShowAddTeamModal(false)
                     setNewTeamName('')
                     setNewTeamEmail('')
+                    setNewTeamDesignation('')
                   }
                 }}
                 disabled={!newTeamName.trim() || !newTeamEmail.trim()}
                 className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add Member
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upload Document Modal */}
+      {showUploadDocModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Upload Document</h3>
+              <button
+                onClick={() => { setShowUploadDocModal(false); setUploadDocCategory(''); setUploadDocFile(null) }}
+                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Document Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={uploadDocCategory}
+                  onChange={e => setUploadDocCategory(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                >
+                  <option value="">Select document type</option>
+                  <option value="Vehicle">Vehicle</option>
+                  <option value="Company">Company</option>
+                  <option value="Driver">Driver</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  File <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    onChange={(e) => setUploadDocFile(e.target.files?.[0] || null)}
+                    className="hidden"
+                    id="upload-doc-modal-input"
+                    accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.doc,.docx"
+                  />
+                  <label
+                    htmlFor="upload-doc-modal-input"
+                    className="flex flex-col items-center gap-2 p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer hover:border-cyan-400 dark:hover:border-cyan-600 transition-colors"
+                  >
+                    {uploadDocFile ? (
+                      <>
+                        <FileText className="w-8 h-8 text-cyan-500" />
+                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{uploadDocFile.name}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{(uploadDocFile.size / 1024).toFixed(1)} KB — Click to change</p>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-8 h-8 text-slate-400" />
+                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">Click to select a file</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">PDF, JPG, PNG, Excel, Word up to 10MB</p>
+                      </>
+                    )}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => { setShowUploadDocModal(false); setUploadDocCategory(''); setUploadDocFile(null) }}
+                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (uploadDocCategory && uploadDocFile) {
+                    console.log('Upload document:', uploadDocCategory, uploadDocFile.name, 'for subscriber:', subscriber.id)
+                    onUploadDocument?.(subscriber.id, uploadDocFile)
+                    setShowUploadDocModal(false)
+                    setUploadDocCategory('')
+                    setUploadDocFile(null)
+                  }
+                }}
+                disabled={!uploadDocCategory || !uploadDocFile}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Upload
               </button>
             </div>
           </div>

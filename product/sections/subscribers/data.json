@@ -658,6 +658,7 @@
       "fileType": "application/pdf",
       "fileSize": 524288,
       "category": "Contract",
+      "companyName": "Fastlane Logistics Pvt. Ltd.",
       "uploadedBy": "USR-001",
       "uploadedByName": "Priya Sharma",
       "uploadedDate": "2024-01-15T10:00:00Z"
@@ -669,6 +670,9 @@
       "fileType": "application/pdf",
       "fileSize": 156789,
       "category": "KYC",
+      "vehicleNumber": "MH02AB1234",
+      "companyName": "Fastlane Logistics Pvt. Ltd.",
+      "driverName": "Suresh Yadav",
       "uploadedBy": "USR-001",
       "uploadedByName": "Priya Sharma",
       "uploadedDate": "2024-01-15T10:05:00Z"
