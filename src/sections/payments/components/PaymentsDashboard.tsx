@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react'
-import type { PaymentsProps, Refund, LawyerFee } from '@/../product/sections/payments/types'
+import type { PaymentsProps, Refund, LawyerFee, PartnerPayout } from '@/../product/sections/payments/types'
 import type { Lead } from '@/../product/sections/sales-crm/types'
 import { PaymentsSidebar } from './PaymentsSidebar'
 import { PaymentsStageTabs } from './PaymentsStageTabs'
 import { PaymentsTableHeader, type PaymentFilters } from './PaymentsTableHeader'
 import { RefundRow } from './RefundRow'
 import { LawyerFeeRow } from './LawyerFeeRow'
+import { PartnerPayoutRow } from './PartnerPayoutRow'
 import { RefundBulkActionsBar } from './RefundBulkActionsBar'
 import { Pagination } from './Pagination'
 import { LeadsTable } from '@/sections/sales-crm/components/LeadsTable'
@@ -26,6 +27,11 @@ const LEADS_TABS = [
   { key: 'converted', label: 'Converted' },
 ]
 
+const PARTNER_TABS = [
+  { key: 'to_pay', label: 'To Pay' },
+  { key: 'completed', label: 'Completed' },
+]
+
 const REFUND_STATUS_OPTIONS = [
   { value: 'Initiated', label: 'Initiated' },
   { value: 'Approved', label: 'Approved' },
@@ -33,6 +39,11 @@ const REFUND_STATUS_OPTIONS = [
 ]
 
 const LAWYER_FEE_STATUS_OPTIONS = [
+  { value: 'To Pay', label: 'To Pay' },
+  { value: 'Completed', label: 'Completed' },
+]
+
+const PARTNER_STATUS_OPTIONS = [
   { value: 'To Pay', label: 'To Pay' },
   { value: 'Completed', label: 'Completed' },
 ]
@@ -49,11 +60,18 @@ function isLawyerFeeInStage(fee: LawyerFee, stage: string): boolean {
   return true
 }
 
+function isPartnerPayoutInStage(payout: PartnerPayout, stage: string): boolean {
+  if (stage === 'to_pay') return payout.status === 'To Pay'
+  if (stage === 'completed') return payout.status === 'Completed'
+  return true
+}
+
 export function PaymentsDashboard({
   refunds,
   lawyerFees,
   leads = [],
   users = [],
+  partnerPayouts = [],
   onApproveRefund,
   onProcessRefund,
   onBulkApproveRefunds,
@@ -63,14 +81,17 @@ export function PaymentsDashboard({
   onExportLawyerFees,
   onViewLead,
   onAssignLead,
+  onViewPartnerProfile,
+  onExportPartnerPayouts,
 }: PaymentsProps) {
   // Sidebar state
-  const [sidebarView, setSidebarView] = useState<'refunds' | 'lawyer-fees' | 'leads'>('refunds')
+  const [sidebarView, setSidebarView] = useState<'refunds' | 'lawyer-fees' | 'leads' | 'partners'>('refunds')
 
   // Active stage tab
   const [refundStage, setRefundStage] = useState('to_refund')
   const [feeStage, setFeeStage] = useState('to_pay')
   const [leadsStage, setLeadsStage] = useState('ready_to_invoice')
+  const [partnerStage, setPartnerStage] = useState('to_pay')
 
   // Search
   const [searchQuery, setSearchQuery] = useState('')
@@ -102,6 +123,12 @@ export function PaymentsDashboard({
     ready_to_invoice: leads.filter((l) => l.status === 'invoiced').length,
     converted: leads.filter((l) => l.status === 'sales').length,
   }), [leads])
+
+  // Partner payout stage counts
+  const partnerStageCounts = useMemo(() => ({
+    to_pay: partnerPayouts.filter((p) => p.status === 'To Pay').length,
+    completed: partnerPayouts.filter((p) => p.status === 'Completed').length,
+  }), [partnerPayouts])
 
   // Filtered leads
   const filteredLeads = useMemo(() => {
@@ -155,6 +182,23 @@ export function PaymentsDashboard({
     return filtered
   }, [lawyerFees, feeStage, searchQuery])
 
+  // Filtered partner payouts
+  const filteredPartnerPayouts = useMemo(() => {
+    let filtered = partnerPayouts.filter((p) => isPartnerPayoutInStage(p, partnerStage))
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (p) =>
+          p.partnerId.toLowerCase().includes(query) ||
+          p.partnerName.toLowerCase().includes(query) ||
+          p.companyName.toLowerCase().includes(query)
+      )
+    }
+
+    return filtered
+  }, [partnerPayouts, partnerStage, searchQuery])
+
   // Selection handlers (refunds only)
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -181,7 +225,7 @@ export function PaymentsDashboard({
   const someSelected = selectedIds.size > 0 && !allSelected
 
   // Clear selection on view/stage change
-  const handleSidebarChange = (view: 'refunds' | 'lawyer-fees' | 'leads') => {
+  const handleSidebarChange = (view: 'refunds' | 'lawyer-fees' | 'leads' | 'partners') => {
     setSidebarView(view)
     setSelectedIds(new Set())
     setSelectedLeadIds(new Set())
@@ -217,6 +261,49 @@ export function PaymentsDashboard({
     )
   }
 
+  // Determine current stage tabs, counts, and active tab
+  const currentTabs = sidebarView === 'refunds' ? REFUND_TABS
+    : sidebarView === 'lawyer-fees' ? LAWYER_FEE_TABS
+    : sidebarView === 'leads' ? LEADS_TABS
+    : PARTNER_TABS
+
+  const currentCounts = sidebarView === 'refunds' ? refundStageCounts
+    : sidebarView === 'lawyer-fees' ? feeStageCounts
+    : sidebarView === 'leads' ? leadsStageCounts
+    : partnerStageCounts
+
+  const currentActiveTab = sidebarView === 'refunds' ? refundStage
+    : sidebarView === 'lawyer-fees' ? feeStage
+    : sidebarView === 'leads' ? leadsStage
+    : partnerStage
+
+  const currentTabChange = sidebarView === 'refunds' ? handleRefundStageChange
+    : sidebarView === 'lawyer-fees' ? setFeeStage
+    : sidebarView === 'leads' ? setLeadsStage
+    : setPartnerStage
+
+  const currentSearchPlaceholder = sidebarView === 'refunds'
+    ? 'Search by Refund ID, incident, customer...'
+    : sidebarView === 'lawyer-fees'
+    ? 'Search by Lawyer ID, name, incident...'
+    : sidebarView === 'leads'
+    ? 'Search by Lead ID, company, contact...'
+    : 'Search by Partner ID, name, company...'
+
+  const currentStatusOptions = sidebarView === 'refunds' ? REFUND_STATUS_OPTIONS
+    : sidebarView === 'lawyer-fees' ? LAWYER_FEE_STATUS_OPTIONS
+    : sidebarView === 'partners' ? PARTNER_STATUS_OPTIONS
+    : LAWYER_FEE_STATUS_OPTIONS
+
+  const currentExport = sidebarView === 'refunds' ? onExportRefunds
+    : sidebarView === 'partners' ? onExportPartnerPayouts
+    : onExportLawyerFees
+
+  const currentTotalItems = sidebarView === 'refunds' ? filteredRefunds.length
+    : sidebarView === 'lawyer-fees' ? filteredFees.length
+    : sidebarView === 'leads' ? filteredLeads.length
+    : filteredPartnerPayouts.length
+
   return (
     <div className="flex h-full bg-slate-100 dark:bg-slate-950">
       {/* Sidebar */}
@@ -228,44 +315,20 @@ export function PaymentsDashboard({
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Stage Tabs */}
-        {sidebarView === 'refunds' ? (
-          <PaymentsStageTabs
-            tabs={REFUND_TABS}
-            activeTab={refundStage}
-            counts={refundStageCounts}
-            onTabChange={handleRefundStageChange}
-          />
-        ) : sidebarView === 'lawyer-fees' ? (
-          <PaymentsStageTabs
-            tabs={LAWYER_FEE_TABS}
-            activeTab={feeStage}
-            counts={feeStageCounts}
-            onTabChange={setFeeStage}
-          />
-        ) : (
-          <PaymentsStageTabs
-            tabs={LEADS_TABS}
-            activeTab={leadsStage}
-            counts={leadsStageCounts}
-            onTabChange={setLeadsStage}
-          />
-        )}
+        <PaymentsStageTabs
+          tabs={currentTabs}
+          activeTab={currentActiveTab}
+          counts={currentCounts}
+          onTabChange={currentTabChange}
+        />
 
         {/* Table Header */}
         <PaymentsTableHeader
-          searchPlaceholder={
-            sidebarView === 'refunds'
-              ? 'Search by Refund ID, incident, customer...'
-              : sidebarView === 'lawyer-fees'
-              ? 'Search by Lawyer ID, name, incident...'
-              : 'Search by Lead ID, company, contact...'
-          }
+          searchPlaceholder={currentSearchPlaceholder}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onExport={sidebarView === 'refunds' ? onExportRefunds : onExportLawyerFees}
-          statusOptions={
-            sidebarView === 'refunds' ? REFUND_STATUS_OPTIONS : LAWYER_FEE_STATUS_OPTIONS
-          }
+          onExport={currentExport}
+          statusOptions={currentStatusOptions}
         />
 
         {/* Table */}
@@ -433,6 +496,83 @@ export function PaymentsDashboard({
                 )}
               </tbody>
             </table>
+          ) : sidebarView === 'partners' ? (
+            <table className="w-full">
+              <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Partner ID
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Partner
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Subscribers
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Total Earnings
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Payout Amount
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Due Date
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Paid Date
+                  </th>
+                  <th className="px-4 py-3 text-left">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPartnerPayouts.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={9}
+                      className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                          <svg
+                            className="w-6 h-6 text-slate-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.5}
+                              d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-medium">No partner payouts found</p>
+                        <p className="text-sm">
+                          {searchQuery
+                            ? 'Try adjusting your search query'
+                            : 'No payouts in this stage yet'}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredPartnerPayouts.map((payout, index) => (
+                    <PartnerPayoutRow
+                      key={`${payout.partnerId}-${index}`}
+                      payout={payout}
+                      onViewPartnerProfile={() => onViewPartnerProfile?.(payout.partnerId)}
+                      onMarkComplete={() => console.log('Mark as paid:', payout.partnerId)}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
           ) : (
             <div className="p-4">
               <LeadsTable
@@ -463,13 +603,7 @@ export function PaymentsDashboard({
         <Pagination
           currentPage={1}
           totalPages={1}
-          totalItems={
-            sidebarView === 'refunds'
-              ? filteredRefunds.length
-              : sidebarView === 'lawyer-fees'
-              ? filteredFees.length
-              : filteredLeads.length
-          }
+          totalItems={currentTotalItems}
           itemsPerPage={25}
         />
       </div>

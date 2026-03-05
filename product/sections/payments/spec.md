@@ -1,7 +1,7 @@
 # Payments Specification
 
 ## Overview
-The Payments module handles refund processing and lawyer fee management through a unified workspace mirroring the Disputes layout. It provides a collapsible sidebar to switch between Refunds (customer/subscriber refund processing) and Lawyer Fees (commission and expense tracking linked to incidents and lawyers).
+The Payments module handles refund processing, lawyer fee management, and partner payouts through a unified workspace mirroring the Disputes layout. It provides a collapsible sidebar to switch between Refunds (customer/subscriber refund processing), Lawyer Fees (commission and expense tracking linked to incidents and lawyers), Leads (invoiced and converted leads), and Partners (partner commission payouts).
 
 ## User Flows
 - **Navigate to Payments** — Opens workspace with collapsible sidebar; click Refunds or Lawyer Fees to switch views
@@ -16,12 +16,17 @@ The Payments module handles refund processing and lawyer fee management through 
 - **Search and filter lawyer fees** — Search by Lawyer ID, lawyer name, incident ID; filter by status, date range
 - **Open lawyer profile** — Clicking a row navigates to the lawyer's profile page in the Lawyers section
 - **Export lawyer fees** — Export filtered/selected lawyer fees to Excel/CSV
+- **View partner payout stages** — Table view with horizontal stage tabs: To Pay, Completed
+- **Scan partner payouts** — Table displays Partner ID, Partner Name, Company, Subscribers, Total Earnings, Payout Amount, Status, Due Date, Paid Date
+- **Search and filter partner payouts** — Search by Partner ID, partner name, company; filter by status, date range
+- **Open partner profile** — Clicking a row navigates to the partner's profile page in the Partners section
+- **Export partner payouts** — Export filtered/selected partner payouts to Excel/CSV
 
 ## UI Requirements
 
 ### Sidebar Navigation
 - Collapsible sidebar (toggle open/closed, remembers state)
-- Two clickable items: Refunds, Lawyer Fees (no sub-items)
+- Four clickable items: Refunds, Lawyer Fees, Leads, Partners (no sub-items)
 
 ### Refunds View
 
@@ -60,6 +65,24 @@ The Payments module handles refund processing and lawyer fee management through 
 - Columns: Lawyer ID, Lawyer Name, Incident ID, Challan No, Total Amount (from incident expense), Commission Amount (from lawyer invoicing), Status, Due Date, Paid Date
 - Clicking a row navigates to the lawyer's profile page in the Lawyers section
 - Row-level action menu for individual fee operations
+- Pagination at bottom with page numbers, items per page selector, and total count
+- No bulk actions
+
+### Partners View
+
+#### Stage Tabs
+- Horizontal tabs above table: To Pay | Completed
+- Each tab shows count of partner payouts in that stage
+
+#### Table Header
+- Search bar (Partner ID, partner name, company)
+- Filter controls: Status, Date Range
+- Export button
+
+#### Partners Table
+- Columns: Partner ID, Partner (name + company), Subscribers, Total Earnings, Payout Amount, Status, Due Date, Paid Date
+- Clicking a row navigates to the partner's profile page in the Partners section
+- Row-level action menu for individual payout operations (Mark as Paid)
 - Pagination at bottom with page numbers, items per page selector, and total count
 - No bulk actions
 

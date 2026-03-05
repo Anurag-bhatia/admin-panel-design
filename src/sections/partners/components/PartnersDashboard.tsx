@@ -3,6 +3,7 @@ import type { Partner } from '@/../product/sections/partners/types'
 import { PartnerList } from './PartnerList'
 import { PartnerDetail } from './PartnerDetail'
 import { AddPartner } from './AddPartner'
+import { AddPartnerChallanPay } from './AddPartnerChallanPay'
 import { EditPartner } from './EditPartner'
 import { PartnersListHeader } from './PartnersListHeader'
 
@@ -13,11 +14,16 @@ interface PartnersDashboardProps {
 
 export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboardProps) {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null)
-  const [showAddModal, setShowAddModal] = useState(false)
+  const [showAddModal, setShowAddModal] = useState<null | 'challanPay' | 'lots247'>(null)
   const [editingPartnerId, setEditingPartnerId] = useState<string | null>(null)
+  const [activePartnerType, setActivePartnerType] = useState<'challanPay' | 'lots247'>('challanPay')
 
   const selectedPartner = selectedPartnerId ? partners.find(p => p.id === selectedPartnerId) : null
   const editingPartner = editingPartnerId ? partners.find(p => p.id === editingPartnerId) : null
+
+  const challanPayCount = partners.filter(p => p.partnerType === 'challanPay').length
+  const lots247Count = partners.filter(p => p.partnerType === 'lots247').length
+  const filteredPartners = partners.filter(p => p.partnerType === activePartnerType)
 
   // If a partner is selected, show detail view
   if (selectedPartner) {
@@ -51,25 +57,62 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        <PartnersListHeader onCreatePartner={() => setShowAddModal(true)} />
+        <PartnersListHeader
+          onCreateChallanPay={() => setShowAddModal('challanPay')}
+          onCreateLots247={() => setShowAddModal('lots247')}
+        />
+
+        {/* Partner Type Tabs */}
+        <div className="mt-6">
+          <div className="inline-flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+            {([
+              { key: 'challanPay' as const, label: 'ChallanPay', count: challanPayCount },
+              { key: 'lots247' as const, label: 'LOTS247', count: lots247Count },
+            ]).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActivePartnerType(tab.key)}
+                className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activePartnerType === tab.key
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                {tab.label} ({tab.count})
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="mt-6">
           <PartnerList
-            partners={partners}
+            partners={filteredPartners}
+            partnerType={activePartnerType}
             onView={(id) => setSelectedPartnerId(id)}
             onToggleStatus={(id, status) => console.log('Toggle status:', id, status)}
           />
         </div>
       </div>
 
-      {/* Add Partner Modal */}
-      {showAddModal && (
+      {/* Add ChallanPay Partner Modal */}
+      {showAddModal === 'challanPay' && (
+        <AddPartnerChallanPay
+          onSubmit={(data) => {
+            console.log('Create ChallanPay partner:', data)
+            setShowAddModal(null)
+          }}
+          onCancel={() => setShowAddModal(null)}
+        />
+      )}
+
+      {/* Add LOTS247 Partner Modal */}
+      {showAddModal === 'lots247' && (
         <AddPartner
           onSubmit={(partnerData) => {
             console.log('Create partner:', partnerData)
-            setShowAddModal(false)
+            setShowAddModal(null)
           }}
-          onCancel={() => setShowAddModal(false)}
+          onCancel={() => setShowAddModal(null)}
         />
       )}
     </div>

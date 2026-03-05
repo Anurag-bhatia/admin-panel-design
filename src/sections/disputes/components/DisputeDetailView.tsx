@@ -14,13 +14,14 @@ import { SummaryTab } from './SummaryTab'
 import { LinkedIncidentTab } from './LinkedIncidentTab'
 import { InvestigationTab } from './InvestigationTab'
 import { EvidenceTab } from './EvidenceTab'
-import { DisputeActivityTab } from './DisputeActivityTab'
+import { DisputeActivityTab, type DisputeFollowUp } from './DisputeActivityTab'
 
 type TabType = 'summary' | 'linkedIncident' | 'investigation' | 'evidence' | 'activity'
 
 export interface DisputeDetailViewProps {
   dispute: Dispute
   reviewers: Reviewer[]
+  followUps: DisputeFollowUp[]
   onBack?: () => void
   onAssignReviewer?: (disputeId: string, reviewerId: string) => void
   onEscalate?: (disputeId: string) => void
@@ -28,7 +29,10 @@ export interface DisputeDetailViewProps {
   onRejectDispute?: (disputeId: string) => void
   onCloseDispute?: (disputeId: string) => void
   onAddInvestigationNote?: (disputeId: string, content: string) => void
-  onUploadEvidence?: (disputeId: string, file: File) => void
+  onUploadEvidence?: (disputeId: string, file: File, type: string) => void
+  onViewDocument?: (documentId: string) => void
+  onDeleteDocument?: (documentId: string) => void
+  onAddFollowUp?: (disputeId: string, followUp: { outcome: string; activity: string }) => void
 }
 
 const PRIORITY_LABELS: Record<string, { label: string; className: string }> = {
@@ -53,6 +57,7 @@ const PRIORITY_LABELS: Record<string, { label: string; className: string }> = {
 export function DisputeDetailView({
   dispute,
   reviewers,
+  followUps,
   onBack,
   onAssignReviewer,
   onEscalate,
@@ -61,8 +66,11 @@ export function DisputeDetailView({
   onCloseDispute,
   onAddInvestigationNote,
   onUploadEvidence,
+  onViewDocument,
+  onDeleteDocument,
+  onAddFollowUp,
 }: DisputeDetailViewProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('summary')
+  const [activeTab, setActiveTab] = useState<TabType>('activity')
   const [showReviewerDropdown, setShowReviewerDropdown] = useState(false)
 
   const getSlaInfo = () => {
@@ -90,11 +98,11 @@ export function DisputeDetailView({
   const isTerminal = dispute.status === 'resolved' || dispute.status === 'rejected'
 
   const tabs: { key: TabType; label: string }[] = [
+    { key: 'activity', label: `Activity (${dispute.activityLog.length})` },
     { key: 'summary', label: 'Summary' },
     { key: 'linkedIncident', label: 'Linked Entity' },
-    { key: 'investigation', label: 'Investigation' },
-    { key: 'evidence', label: `Evidence (${dispute.evidence.length})` },
-    { key: 'activity', label: `Activity (${dispute.activityLog.length})` },
+    { key: 'investigation', label: 'Notes' },
+    { key: 'evidence', label: `Documents (${dispute.evidence.length})` },
   ]
 
   return (
@@ -145,7 +153,7 @@ export function DisputeDetailView({
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
               >
                 <CheckCircle className="h-4 w-4" />
-                Resolved
+                Send to Refund
               </button>
             </div>
           )}
@@ -256,10 +264,7 @@ export function DisputeDetailView({
                           <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs">
                             {reviewer.name.charAt(0)}
                           </div>
-                          <div className="text-left">
-                            <p>{reviewer.name}</p>
-                            <p className="text-xs text-slate-400">{reviewer.role}</p>
-                          </div>
+                          <span>{reviewer.name}</span>
                         </button>
                       ))}
                     </div>
@@ -308,11 +313,17 @@ export function DisputeDetailView({
                 {activeTab === 'evidence' && (
                   <EvidenceTab
                     evidence={dispute.evidence}
-                    onUploadEvidence={(file) => onUploadEvidence?.(dispute.id, file)}
+                    onUploadEvidence={(file, type) => onUploadEvidence?.(dispute.id, file, type)}
+                    onViewDocument={onViewDocument}
+                    onDeleteDocument={onDeleteDocument}
                   />
                 )}
                 {activeTab === 'activity' && (
-                  <DisputeActivityTab activities={dispute.activityLog} />
+                  <DisputeActivityTab
+                    followUps={followUps}
+                    activities={dispute.activityLog}
+                    onAddFollowUp={(followUp) => onAddFollowUp?.(dispute.id, followUp)}
+                  />
                 )}
               </div>
             </div>

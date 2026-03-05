@@ -30,6 +30,7 @@ export default function SubscriberDetailPreview() {
       violation: 'Over Speeding',
       amount: 2000,
       status: 'resolved',
+      challanType: 'online',
       date: '2024-01-15T09:30:00Z'
     },
     {
@@ -38,6 +39,7 @@ export default function SubscriberDetailPreview() {
       violation: 'Red Light Violation',
       amount: 1500,
       status: 'pending',
+      challanType: 'court',
       date: '2024-01-28T16:45:00Z'
     },
     {
@@ -46,6 +48,7 @@ export default function SubscriberDetailPreview() {
       violation: 'No Helmet',
       amount: 500,
       status: 'resolved',
+      challanType: 'online',
       date: '2024-02-02T11:20:00Z'
     }
   ]

@@ -34,6 +34,36 @@ export interface ActivityLogEntry {
   details: string
 }
 
+export interface Vehicle {
+  id: string
+  registrationNumber: string
+  ownerName: string
+  vehicleType: 'truck' | 'bus' | 'car' | 'van' | 'auto' | 'two-wheeler'
+  make: string
+  model: string
+  year: number
+  status: 'active' | 'inactive' | 'blacklisted'
+  incidentCount: number
+  lastIncidentDate: string | null
+  subscriberId: string
+  subscriberName: string
+}
+
+export interface Outlet {
+  id: string
+  name: string
+  address: string
+  city: string
+  state: string
+  pinCode: string
+  contactPerson: string
+  contactPhone: string
+  status: 'active' | 'inactive'
+  subscriberCount: number
+  vehicleCount: number
+  openedDate: string
+}
+
 export interface Partner {
   id: string
   partnerId: string
@@ -54,6 +84,11 @@ export interface Partner {
   subscriberTypesAllowed: string[]
   bankAccountNumber: string
   bankName: string
+  partnerType: 'challanPay' | 'lots247'
+  outlets?: number
+  linkedOutlets?: Outlet[]
+  vehicles?: number
+  linkedVehicles: Vehicle[]
   status: 'active' | 'inactive'
   dateOnboarded: string
   linkedSubscribers: LinkedSubscriber[]
@@ -120,4 +155,23 @@ export interface AddPartnerProps {
 
   /** Current step in the stepper (1-4) */
   currentStep?: number
+}
+
+export interface AddPartnerChallanPayProps {
+  /** Called when user submits the 3-step ChallanPay partner form */
+  onSubmit?: (data: {
+    primaryContact: string
+    entityType: 'business' | 'individual' | ''
+    businessType: string
+    state: string
+    pincode: string
+    email: string
+    permissions: string[]
+    dashboardPermissions: string[]
+    bankName: string
+    bankAccountNumber: string
+  }) => void
+
+  /** Called when user cancels the form */
+  onCancel?: () => void
 }

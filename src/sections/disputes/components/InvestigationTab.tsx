@@ -46,14 +46,9 @@ export function InvestigationTab({ notes, onAddNote }: InvestigationTabProps) {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Investigation Notes
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Internal review logs, decision reasoning, and reviewer comments
-            </p>
-          </div>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+            Notes
+          </h2>
           <button
             onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
@@ -124,13 +119,6 @@ export function InvestigationTab({ notes, onAddNote }: InvestigationTabProps) {
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
               Start documenting your review findings and reasoning
             </p>
-            <button
-              onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              Add First Note
-            </button>
           </div>
         ) : (
           <div className="space-y-4">

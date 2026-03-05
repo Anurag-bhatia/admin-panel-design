@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { ArrowLeft, Upload, Trash2, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock } from 'lucide-react'
+import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck } from 'lucide-react'
 import type { PartnerDetailProps } from '@/../product/sections/partners/types'
 
-type TabType = 'profile' | 'subscribers' | 'financial' | 'documents' | 'activity'
+type TabType = 'profile' | 'subscribers' | 'vehicles' | 'financial' | 'documents' | 'activity'
 
 export function PartnerDetail({
   partner,
@@ -38,6 +38,7 @@ export function PartnerDetail({
     const icons = {
       profile: <Building2 className="w-4 h-4" />,
       subscribers: <Users className="w-4 h-4" />,
+      vehicles: <Truck className="w-4 h-4" />,
       financial: <BarChart3 className="w-4 h-4" />,
       documents: <FileCheck className="w-4 h-4" />,
       activity: <Clock className="w-4 h-4" />
@@ -92,7 +93,7 @@ export function PartnerDetail({
 
         {/* Tabs */}
         <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit mb-6">
-          {(['profile', 'subscribers', 'financial', 'documents', 'activity'] as TabType[]).map((tab) => (
+          {(['profile', 'subscribers', 'vehicles', 'financial', 'documents', 'activity'] as TabType[]).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -199,6 +200,66 @@ export function PartnerDetail({
             </div>
           )}
 
+          {/* Vehicles Tab */}
+          {activeTab === 'vehicles' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Linked Vehicles ({partner.linkedVehicles?.length || 0})</h2>
+              {!partner.linkedVehicles || partner.linkedVehicles.length === 0 ? (
+                <p className="text-slate-500 dark:text-slate-400">No linked vehicles yet</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-800">
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Registration</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Owner</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Type</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incidents</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Last Incident</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscriber</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                      {partner.linkedVehicles.map((vehicle) => (
+                        <tr key={vehicle.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                          <td className="px-4 py-3">
+                            <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{vehicle.registrationNumber}</span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div>
+                              <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{vehicle.make} {vehicle.model}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">{vehicle.year}</p>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicle.ownerName}</td>
+                          <td className="px-4 py-3">
+                            <span className="inline-block px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-xs font-medium capitalize">
+                              {vehicle.vehicleType}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <VehicleStatusBadge status={vehicle.status} />
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                              {vehicle.incidentCount}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                            {vehicle.lastIncidentDate ? formatDate(vehicle.lastIncidentDate) : '—'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicle.subscriberName}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Financial Tab */}
           {activeTab === 'financial' && (
             <div>
@@ -257,7 +318,16 @@ export function PartnerDetail({
           {/* Documents Tab */}
           {activeTab === 'documents' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Documents</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Documents</h2>
+                <button
+                  onClick={() => setShowDocumentUpload(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  <Upload className="w-4 h-4" />
+                  Upload Document
+                </button>
+              </div>
 
               {showDocumentUpload && (
                 <div className="mb-6 p-4 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50">
@@ -281,35 +351,19 @@ export function PartnerDetail({
                 </div>
               )}
 
-              {!showDocumentUpload && (
-                <button
-                  onClick={() => setShowDocumentUpload(true)}
-                  className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors"
-                >
-                  <Upload className="w-4 h-4" />
-                  Upload Document
-                </button>
-              )}
-
               <div className="space-y-2">
                 {partner.documents.length === 0 ? (
                   <p className="text-sm text-slate-500 dark:text-slate-400">No documents uploaded yet</p>
                 ) : (
                   partner.documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div key={doc.id} className="flex items-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                       <div className="flex items-center gap-3">
                         <FileText className="w-5 h-5 text-slate-400" />
                         <div>
                           <p className="font-medium text-slate-900 dark:text-slate-50">{doc.name}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">{doc.type} • Uploaded {formatDate(doc.uploadedDate)}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Uploaded {formatDate(doc.uploadedDate)}</p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => onDeleteDocument?.(partner.id, doc.id)}
-                        className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
                     </div>
                   ))
                 )}
@@ -345,6 +399,19 @@ export function PartnerDetail({
         </div>
       </div>
     </div>
+  )
+}
+
+function VehicleStatusBadge({ status }: { status: 'active' | 'inactive' | 'blacklisted' }) {
+  const styles = {
+    active: 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300',
+    inactive: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
+    blacklisted: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+  }
+  return (
+    <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${styles[status]}`}>
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>
   )
 }
 

@@ -1,24 +1,65 @@
 import { useState } from 'react'
-import { MoreVertical, Search } from 'lucide-react'
+import { MoreVertical, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { PartnerListProps } from '@/../product/sections/partners/types'
+
+interface ExtendedPartnerListProps extends PartnerListProps {
+  partnerType?: 'challanPay' | 'lots247'
+}
 
 export function PartnerList({
   partners,
   onView,
-  onToggleStatus
-}: PartnerListProps) {
+  onToggleStatus,
+  partnerType
+}: ExtendedPartnerListProps) {
+  const isChallanPay = partnerType === 'challanPay'
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'active' | 'inactive' | 'all'>('all')
+  const [statusFilter, setStatusFilter] = useState<string>('')
+  const [showFilters, setShowFilters] = useState(false)
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   // Filter partners based on search and status
   let filtered = partners.filter(partner => {
     const matchesSearch = partner.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          partner.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          partner.lastName.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || partner.status === statusFilter
+    const matchesStatus = !statusFilter || partner.status === statusFilter
     return matchesSearch && matchesStatus
   })
+
+  // Pagination
+  const totalItems = filtered.length
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage))
+  const safeCurrentPage = Math.min(currentPage, totalPages)
+  const startIndex = (safeCurrentPage - 1) * itemsPerPage
+  const paginatedPartners = filtered.slice(startIndex, startIndex + itemsPerPage)
+  const startItem = totalItems === 0 ? 0 : startIndex + 1
+  const endItem = Math.min(startIndex + itemsPerPage, totalItems)
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
+  const getPageNumbers = () => {
+    const pages: (number | 'ellipsis')[] = []
+    const maxVisible = 5
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i)
+    } else {
+      pages.push(1)
+      if (safeCurrentPage > 3) pages.push('ellipsis')
+      const start = Math.max(2, safeCurrentPage - 1)
+      const end = Math.min(totalPages - 1, safeCurrentPage + 1)
+      for (let i = start; i <= end; i++) pages.push(i)
+      if (safeCurrentPage < totalPages - 2) pages.push('ellipsis')
+      if (totalPages > 1) pages.push(totalPages)
+    }
+    return pages
+  }
 
   const StatusBadge = ({ status }: { status: 'active' | 'inactive' }) => {
     const isActive = status === 'active'
@@ -51,44 +92,73 @@ export function PartnerList({
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      {/* Controls Bar */}
-      <div className="border-b border-slate-200 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/50">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+    <div>
+      {/* Search and Filters */}
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row gap-3">
           {/* Search */}
-          <div className="flex-1 min-w-0">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search partners..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400 text-sm"
-              />
-            </div>
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search by name, company, or contact..."
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
+              className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-600"
+            />
           </div>
 
-          {/* Status Filter */}
-          <div className="flex gap-1.5">
-            {(['all', 'active', 'inactive'] as const).map((status) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={`px-3 py-1.5 rounded-lg font-medium text-xs transition-colors ${
-                  statusFilter === status
-                    ? 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300'
-                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-                }`}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
-          </div>
+          {/* Filter Toggle */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+              showFilters
+                ? 'bg-cyan-600 text-white'
+                : 'bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Filter className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">Filters</span>
+            {statusFilter && (
+              <span className="w-5 h-5 flex items-center justify-center bg-cyan-100 dark:bg-cyan-800 text-cyan-700 dark:text-cyan-200 rounded-full text-xs font-bold">
+                1
+              </span>
+            )}
+          </button>
         </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="mt-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Status</label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1) }}
+                  className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                >
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setStatusFilter('')}
+                className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              >
+                Clear all filters
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Table */}
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
       <div className="hidden lg:block overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -97,12 +167,14 @@ export function PartnerList({
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Partner ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Contact</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Subscribers</th>
+              {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Outlets</th>}
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Vehicles</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-            {filtered.map((partner) => (
+            {paginatedPartners.map((partner) => (
               <tr
                 key={partner.id}
                 className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
@@ -136,6 +208,20 @@ export function PartnerList({
                   onClick={() => onView?.(partner.id)}
                 >
                   <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.linkedSubscribers.length}</p>
+                </td>
+                {isChallanPay && (
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onView?.(partner.id)}
+                  >
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.outlets ?? '—'}</p>
+                  </td>
+                )}
+                <td
+                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                  onClick={() => onView?.(partner.id)}
+                >
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.vehicles ?? '—'}</p>
                 </td>
                 <td
                   className="px-6 py-4 whitespace-nowrap cursor-pointer"
@@ -186,7 +272,7 @@ export function PartnerList({
 
       {/* Mobile Cards */}
       <div className="lg:hidden divide-y divide-slate-200 dark:divide-slate-800">
-        {filtered.map(partner => (
+        {paginatedPartners.map(partner => (
           <div
             key={partner.id}
             onClick={() => onView?.(partner.id)}
@@ -210,9 +296,78 @@ export function PartnerList({
               <div className="text-slate-600 dark:text-slate-400">
                 {partner.linkedSubscribers.length} subscribers
               </div>
+              <div className="flex gap-4 text-slate-600 dark:text-slate-400">
+                {isChallanPay && <span>{partner.outlets ?? 0} outlets</span>}
+                <span>{partner.vehicles ?? 0} vehicles</span>
+              </div>
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Pagination */}
+      {totalItems > 0 && (
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-t border-slate-200 dark:border-slate-800">
+          <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Showing{' '}
+            <span className="font-medium text-slate-700 dark:text-slate-300">{startItem}</span>
+            {' '}to{' '}
+            <span className="font-medium text-slate-700 dark:text-slate-300">{endItem}</span>
+            {' '}of{' '}
+            <span className="font-medium text-slate-700 dark:text-slate-300">{totalItems}</span>
+            {' '}results
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => handlePageChange(safeCurrentPage - 1)}
+              disabled={safeCurrentPage === 1}
+              className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+                safeCurrentPage === 1
+                  ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+
+            {getPageNumbers().map((page, index) =>
+              page === 'ellipsis' ? (
+                <span
+                  key={`ellipsis-${index}`}
+                  className="w-8 h-8 flex items-center justify-center text-slate-400"
+                >
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`inline-flex items-center justify-center min-w-[32px] h-8 px-2 rounded-md text-sm font-medium transition-colors ${
+                    page === safeCurrentPage
+                      ? 'bg-cyan-500 text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
+
+            <button
+              onClick={() => handlePageChange(safeCurrentPage + 1)}
+              disabled={safeCurrentPage === totalPages}
+              className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+                safeCurrentPage === totalPages
+                  ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   )

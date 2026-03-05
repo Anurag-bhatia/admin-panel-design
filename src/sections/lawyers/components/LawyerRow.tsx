@@ -175,8 +175,6 @@ export function LawyerRow({
           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
             lawyer.kycStatus === 'Verified'
               ? 'bg-cyan-100 dark:bg-cyan-950/30 text-cyan-700 dark:text-cyan-400 ring-1 ring-cyan-600/20'
-              : lawyer.kycStatus === 'Pending'
-              ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 ring-1 ring-amber-600/20'
               : 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 ring-1 ring-red-600/20'
           }`}
         >

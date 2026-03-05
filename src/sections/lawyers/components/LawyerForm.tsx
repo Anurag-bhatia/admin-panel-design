@@ -10,13 +10,12 @@ interface LawyerFormProps {
 }
 
 const STEPS = [
-  'Basic Information',
+  'Basic Info',
   'Address',
-  'Qualifications & Experience',
-  'KYC Documents',
+  'Qualifications',
+  'KYC',
   'Bank Details',
-  'Expertise',
-  'Company Details',
+  'Company',
 ]
 
 const CATEGORIES = [
@@ -101,9 +100,6 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
     company: lawyer?.company || null,
   })
 
-  const [languageInput, setLanguageInput] = useState('')
-  const [locationInput, setLocationInput] = useState('')
-  const [caseTypeInput, setCaseTypeInput] = useState('')
 
   const updateField = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -124,7 +120,7 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
   const handleSubmit = () => {
     const newLawyer: Lawyer = {
       id: lawyer?.id || `lwr-${Date.now()}`,
-      lawyerId: lawyer?.lawyerId || `LWR-${new Date().getFullYear()}-${String(Date.now()).slice(-3)}`,
+      lawyerId: lawyer?.lawyerId || `LAW-${String(Date.now()).slice(-4)}`,
       photo: lawyer?.photo || `https://i.pravatar.cc/150?u=${formData.email}`,
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -142,8 +138,9 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
       bankDetails: formData.bankDetails,
       expertise: formData.expertise,
       company: hasCompany ? formData.company : null,
+      activity: lawyer?.activity || [{ label: 'Joined the platform', date: new Date().toISOString().split('T')[0] }],
       onboardingStatus: 'Complete',
-      kycStatus: 'Pending',
+      kycStatus: 'Unverified',
       activityState: 'Active',
       source: lawyer?.source || 'Website',
       createdAt: lawyer?.createdAt || new Date().toISOString(),
@@ -169,27 +166,38 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
 
       {/* Progress Steps */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-start">
           {STEPS.map((step, index) => (
             <div
               key={step}
-              className={`flex items-center ${index < STEPS.length - 1 ? 'flex-1' : ''}`}
+              className={`flex items-start ${index < STEPS.length - 1 ? 'flex-1' : ''}`}
             >
-              <button
-                onClick={() => setCurrentStep(index)}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                  index < currentStep
-                    ? 'bg-cyan-600 text-white'
-                    : index === currentStep
-                    ? 'bg-cyan-600 text-white ring-4 ring-cyan-100 dark:ring-cyan-900'
-                    : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                }`}
-              >
-                {index < currentStep ? <Check className="w-4 h-4" /> : index + 1}
-              </button>
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => setCurrentStep(index)}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors flex-shrink-0 ${
+                    index < currentStep
+                      ? 'bg-cyan-600 text-white'
+                      : index === currentStep
+                      ? 'bg-cyan-600 text-white ring-4 ring-cyan-100 dark:ring-cyan-900'
+                      : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                  }`}
+                >
+                  {index < currentStep ? <Check className="w-4 h-4" /> : index + 1}
+                </button>
+                <span
+                  className={`mt-1.5 text-[11px] font-medium text-center leading-tight w-16 ${
+                    index === currentStep
+                      ? 'text-cyan-700 dark:text-cyan-400'
+                      : 'text-slate-500 dark:text-slate-400'
+                  }`}
+                >
+                  {step}
+                </span>
+              </div>
               {index < STEPS.length - 1 && (
                 <div
-                  className={`flex-1 h-0.5 mx-2 ${
+                  className={`flex-1 h-0.5 mx-2 mt-4 ${
                     index < currentStep
                       ? 'bg-cyan-600'
                       : 'bg-slate-200 dark:bg-slate-700'
@@ -199,9 +207,6 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
             </div>
           ))}
         </div>
-        <p className="text-center text-sm font-medium text-slate-900 dark:text-white">
-          {STEPS[currentStep]}
-        </p>
       </div>
 
       {/* Form Content */}
@@ -664,97 +669,8 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
           </div>
         )}
 
-        {/* Step 6: Expertise */}
+        {/* Step 6: Company Details */}
         {currentStep === 5 && (
-          <div className="space-y-6">
-            <FormField label="Years of Experience" required>
-              <input
-                type="number"
-                value={formData.expertise.yearsOfExperience}
-                onChange={(e) =>
-                  updateField('expertise', {
-                    ...formData.expertise,
-                    yearsOfExperience: parseInt(e.target.value) || 0,
-                  })
-                }
-                min="0"
-                className="form-input max-w-[200px]"
-              />
-            </FormField>
-
-            <TagInput
-              label="Preferred Languages"
-              tags={formData.expertise.preferredLanguages}
-              inputValue={languageInput}
-              onInputChange={setLanguageInput}
-              onAdd={() => {
-                if (languageInput.trim()) {
-                  updateField('expertise', {
-                    ...formData.expertise,
-                    preferredLanguages: [...formData.expertise.preferredLanguages, languageInput.trim()],
-                  })
-                  setLanguageInput('')
-                }
-              }}
-              onRemove={(index) =>
-                updateField('expertise', {
-                  ...formData.expertise,
-                  preferredLanguages: formData.expertise.preferredLanguages.filter((_, i) => i !== index),
-                })
-              }
-              placeholder="e.g., Hindi, English"
-            />
-
-            <TagInput
-              label="Preferred Locations"
-              tags={formData.expertise.preferredLocations}
-              inputValue={locationInput}
-              onInputChange={setLocationInput}
-              onAdd={() => {
-                if (locationInput.trim()) {
-                  updateField('expertise', {
-                    ...formData.expertise,
-                    preferredLocations: [...formData.expertise.preferredLocations, locationInput.trim()],
-                  })
-                  setLocationInput('')
-                }
-              }}
-              onRemove={(index) =>
-                updateField('expertise', {
-                  ...formData.expertise,
-                  preferredLocations: formData.expertise.preferredLocations.filter((_, i) => i !== index),
-                })
-              }
-              placeholder="e.g., Delhi, Mumbai"
-            />
-
-            <TagInput
-              label="Case Types"
-              tags={formData.expertise.caseTypes}
-              inputValue={caseTypeInput}
-              onInputChange={setCaseTypeInput}
-              onAdd={() => {
-                if (caseTypeInput.trim()) {
-                  updateField('expertise', {
-                    ...formData.expertise,
-                    caseTypes: [...formData.expertise.caseTypes, caseTypeInput.trim()],
-                  })
-                  setCaseTypeInput('')
-                }
-              }}
-              onRemove={(index) =>
-                updateField('expertise', {
-                  ...formData.expertise,
-                  caseTypes: formData.expertise.caseTypes.filter((_, i) => i !== index),
-                })
-              }
-              placeholder="e.g., Traffic Challans, MVA Claims"
-            />
-          </div>
-        )}
-
-        {/* Step 7: Company Details */}
-        {currentStep === 6 && (
           <div className="space-y-6">
             <label className="flex items-center gap-2 mb-4">
               <input
@@ -870,22 +786,6 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
                     className="form-input"
                   />
                 </FormField>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <FormField label="Main Office Location">
-                    <input
-                      type="text"
-                      value={formData.company?.mainOffice || ''}
-                      onChange={(e) =>
-                        updateField('company', {
-                          ...formData.company,
-                          mainOffice: e.target.value,
-                        })
-                      }
-                      placeholder="e.g., Mumbai"
-                      className="form-input"
-                    />
-                  </FormField>
-                </div>
               </div>
             )}
           </div>
@@ -1098,69 +998,3 @@ function DocumentUpload({
   )
 }
 
-function TagInput({
-  label,
-  tags,
-  inputValue,
-  onInputChange,
-  onAdd,
-  onRemove,
-  placeholder,
-}: {
-  label: string
-  tags: string[]
-  inputValue: string
-  onInputChange: (value: string) => void
-  onAdd: () => void
-  onRemove: (index: number) => void
-  placeholder: string
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-        {label}
-      </label>
-      <div className="flex gap-2 mb-2">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => onInputChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              onAdd()
-            }
-          }}
-          placeholder={placeholder}
-          className="form-input flex-1"
-        />
-        <button
-          onClick={onAdd}
-          className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-        >
-          Add
-        </button>
-      </div>
-      {tags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {tags.map((tag, index) => (
-            <span
-              key={index}
-              className="inline-flex items-center gap-1 px-2.5 py-1 bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 text-sm rounded-full"
-            >
-              {tag}
-              <button
-                onClick={() => onRemove(index)}
-                className="p-0.5 hover:bg-cyan-100 dark:hover:bg-cyan-800 rounded-full"
-              >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}

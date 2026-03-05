@@ -1,6 +1,7 @@
 export { PartnerList } from './PartnerList'
 export { PartnerDetail } from './PartnerDetail'
 export { AddPartner } from './AddPartner'
+export { AddPartnerChallanPay } from './AddPartnerChallanPay'
 export { EditPartner } from './EditPartner'
 export { PartnersDashboard } from './PartnersDashboard'
 export { PartnersListHeader } from './PartnersListHeader'

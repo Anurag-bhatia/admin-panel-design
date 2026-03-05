@@ -184,5 +184,128 @@
       "dueDate": "2026-02-01",
       "paidDate": "2026-01-30"
     }
+  ],
+  "partnerPayouts": [
+    {
+      "partnerId": "RSP-1213401",
+      "partnerName": "Rajesh Kumar",
+      "companyName": "FleetPro Solutions",
+      "subscriberCount": 3,
+      "totalEarnings": 45000,
+      "payoutAmount": 5000,
+      "status": "To Pay",
+      "dueDate": "2026-03-15",
+      "paidDate": null
+    },
+    {
+      "partnerId": "RSP-1213402",
+      "partnerName": "Priya Singh",
+      "companyName": "TransportNet India",
+      "subscriberCount": 2,
+      "totalEarnings": 32500,
+      "payoutAmount": 7500,
+      "status": "To Pay",
+      "dueDate": "2026-03-20",
+      "paidDate": null
+    },
+    {
+      "partnerId": "LWD-1213403",
+      "partnerName": "Vikram Patel",
+      "companyName": "Road Safety Consultants",
+      "subscriberCount": 1,
+      "totalEarnings": 12000,
+      "payoutAmount": 2000,
+      "status": "To Pay",
+      "dueDate": "2026-03-25",
+      "paidDate": null
+    },
+    {
+      "partnerId": "RSP-1213405",
+      "partnerName": "Sneha Chopra",
+      "companyName": "Commerce Hub India",
+      "subscriberCount": 2,
+      "totalEarnings": 8500,
+      "payoutAmount": 8500,
+      "status": "To Pay",
+      "dueDate": "2026-03-10",
+      "paidDate": null
+    },
+    {
+      "partnerId": "RSP-1213406",
+      "partnerName": "Rohit Mishra",
+      "companyName": "SpeedWay Transport",
+      "subscriberCount": 3,
+      "totalEarnings": 38000,
+      "payoutAmount": 8000,
+      "status": "To Pay",
+      "dueDate": "2026-03-18",
+      "paidDate": null
+    },
+    {
+      "partnerId": "LWD-1213407",
+      "partnerName": "Anjali Verma",
+      "companyName": "Corporate Fleet Management",
+      "subscriberCount": 1,
+      "totalEarnings": 6000,
+      "payoutAmount": 6000,
+      "status": "To Pay",
+      "dueDate": "2026-03-22",
+      "paidDate": null
+    },
+    {
+      "partnerId": "RSP-1213408",
+      "partnerName": "Suresh Reddy",
+      "companyName": "Innovate Fleet Solutions",
+      "subscriberCount": 2,
+      "totalEarnings": 28500,
+      "payoutAmount": 8500,
+      "status": "To Pay",
+      "dueDate": "2026-03-12",
+      "paidDate": null
+    },
+    {
+      "partnerId": "RSP-1213401",
+      "partnerName": "Rajesh Kumar",
+      "companyName": "FleetPro Solutions",
+      "subscriberCount": 3,
+      "totalEarnings": 45000,
+      "payoutAmount": 20000,
+      "status": "Completed",
+      "dueDate": "2026-01-15",
+      "paidDate": "2026-01-15"
+    },
+    {
+      "partnerId": "RSP-1213402",
+      "partnerName": "Priya Singh",
+      "companyName": "TransportNet India",
+      "subscriberCount": 2,
+      "totalEarnings": 32500,
+      "payoutAmount": 25000,
+      "status": "Completed",
+      "dueDate": "2026-02-10",
+      "paidDate": "2026-02-10"
+    },
+    {
+      "partnerId": "RSP-1213406",
+      "partnerName": "Rohit Mishra",
+      "companyName": "SpeedWay Transport",
+      "subscriberCount": 3,
+      "totalEarnings": 38000,
+      "payoutAmount": 30000,
+      "status": "Completed",
+      "dueDate": "2026-02-10",
+      "paidDate": "2026-02-10"
+    },
+    {
+      "partnerId": "LWD-1213404",
+      "partnerName": "Amit Desai",
+      "companyName": "Legal Solutions Group",
+      "subscriberCount": 1,
+      "totalEarnings": 5000,
+      "payoutAmount": 5000,
+      "status": "Completed",
+      "dueDate": "2023-12-15",
+      "paidDate": "2023-12-15"
+    }
   ]
 }

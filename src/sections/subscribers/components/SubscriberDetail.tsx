@@ -375,7 +375,12 @@ export function SubscriberDetail({
                                   <div key={challan.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30">
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center gap-2">
-                                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{challan.violation}</p>
+                                        <span className="relative group">
+                                          <p className="text-sm font-medium text-slate-900 dark:text-slate-50 truncate max-w-[150px] cursor-default">{challan.violation}</p>
+                                          <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 z-50 hidden group-hover:block w-max max-w-xs px-2.5 py-1.5 rounded-md bg-slate-900 dark:bg-slate-100 text-xs text-white dark:text-slate-900 shadow-lg">
+                                            {challan.violation}
+                                          </span>
+                                        </span>
                                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
                                           challan.status === 'pending'
                                             ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
@@ -383,6 +388,15 @@ export function SubscriberDetail({
                                         }`}>
                                           {challan.status}
                                         </span>
+                                        {challan.challanType && (
+                                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+                                            challan.challanType === 'online'
+                                              ? 'bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400'
+                                              : 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400'
+                                          }`}>
+                                            {challan.challanType === 'online' ? 'Online' : 'Court'}
+                                          </span>
+                                        )}
                                       </div>
                                       <div className="flex items-center gap-3 mt-1">
                                         <span className="text-xs text-slate-500 dark:text-slate-400">{challan.id}</span>

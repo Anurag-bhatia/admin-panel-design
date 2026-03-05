@@ -10,7 +10,7 @@ const STAGE_CONFIG: { key: DisputeStatus; label: string }[] = [
   { key: 'open', label: 'Open' },
   { key: 'under_review', label: 'Under Review' },
   { key: 'escalated', label: 'In Progress' },
-  { key: 'resolved', label: 'Resolved' },
+  { key: 'resolved', label: 'Completed' },
   { key: 'rejected', label: 'Rejected' },
 ]
 

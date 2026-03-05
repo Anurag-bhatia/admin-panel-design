@@ -25,6 +25,18 @@ export interface LawyerFee {
   paidDate: string | null
 }
 
+export interface PartnerPayout {
+  partnerId: string
+  partnerName: string
+  companyName: string
+  subscriberCount: number
+  totalEarnings: number
+  payoutAmount: number
+  status: 'To Pay' | 'Completed'
+  dueDate: string
+  paidDate: string | null
+}
+
 // =============================================================================
 // Component Props
 // =============================================================================
@@ -56,4 +68,10 @@ export interface PaymentsProps {
   onViewLead?: (id: string) => void
   /** Called when user wants to assign a lead */
   onAssignLead?: (id: string) => void
+  /** List of partner payout records */
+  partnerPayouts?: PartnerPayout[]
+  /** Called when user clicks a partner payout row to navigate to partner profile */
+  onViewPartnerProfile?: (partnerId: string) => void
+  /** Called when user exports partner payouts */
+  onExportPartnerPayouts?: () => void
 }
