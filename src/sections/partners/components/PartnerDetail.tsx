@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight } from 'lucide-react'
-import type { PartnerDetailProps } from '@/../product/sections/partners/types'
+import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight, UserCheck, Store, QrCode, MoreVertical, Ban, X, Download } from 'lucide-react'
+import type { PartnerDetailProps, OutletQR } from '@/../product/sections/partners/types'
 
-type TabType = 'profile' | 'subscribers' | 'vehicles' | 'financial' | 'documents'
+type TabType = 'profile' | 'subscribers' | 'vehicles' | 'visitors' | 'outlets' | 'qrs' | 'financial' | 'documents'
 
 export function PartnerDetail({
   partner,
@@ -15,11 +15,33 @@ export function PartnerDetail({
   const [activeTab, setActiveTab] = useState<TabType>('profile')
   const [showDocumentUpload, setShowDocumentUpload] = useState(false)
   const [vehiclePage, setVehiclePage] = useState(1)
+  const [vehicleActionMenu, setVehicleActionMenu] = useState<string | null>(null)
+  const [qrActionMenu, setQrActionMenu] = useState<string | null>(null)
+  const [viewQr, setViewQr] = useState<OutletQR | null>(null)
+  const [visitorPage, setVisitorPage] = useState(1)
+  const [outletPage, setOutletPage] = useState(1)
+  const [qrPage, setQrPage] = useState(1)
   const vehiclesPerPage = 5
   const totalVehicles = partner.linkedVehicles?.length || 0
   const totalVehiclePages = Math.max(1, Math.ceil(totalVehicles / vehiclesPerPage))
   const safeVehiclePage = Math.min(vehiclePage, totalVehiclePages)
   const paginatedVehicles = partner.linkedVehicles?.slice((safeVehiclePage - 1) * vehiclesPerPage, safeVehiclePage * vehiclesPerPage) || []
+
+  const perPage = 5
+  const totalVisitors = partner.registeredVisitors?.length || 0
+  const totalVisitorPages = Math.max(1, Math.ceil(totalVisitors / perPage))
+  const safeVisitorPage = Math.min(visitorPage, totalVisitorPages)
+  const paginatedVisitors = partner.registeredVisitors?.slice((safeVisitorPage - 1) * perPage, safeVisitorPage * perPage) || []
+
+  const totalOutlets = partner.linkedOutlets?.length || 0
+  const totalOutletPages = Math.max(1, Math.ceil(totalOutlets / perPage))
+  const safeOutletPage = Math.min(outletPage, totalOutletPages)
+  const paginatedOutlets = partner.linkedOutlets?.slice((safeOutletPage - 1) * perPage, safeOutletPage * perPage) || []
+
+  const totalQRs = partner.outletQRs?.length || 0
+  const totalQRPages = Math.max(1, Math.ceil(totalQRs / perPage))
+  const safeQRPage = Math.min(qrPage, totalQRPages)
+  const paginatedQRs = partner.outletQRs?.slice((safeQRPage - 1) * perPage, safeQRPage * perPage) || []
 
   const handleEditClick = () => {
     onEditPartner?.(partner.id)
@@ -41,14 +63,31 @@ export function PartnerDetail({
   }
 
   const getTabIcon = (tab: TabType) => {
-    const icons = {
+    const icons: Record<TabType, React.ReactNode> = {
       profile: <Building2 className="w-4 h-4" />,
       subscribers: <Users className="w-4 h-4" />,
       vehicles: <Truck className="w-4 h-4" />,
+      visitors: <UserCheck className="w-4 h-4" />,
+      outlets: <Store className="w-4 h-4" />,
+      qrs: <QrCode className="w-4 h-4" />,
       financial: <BarChart3 className="w-4 h-4" />,
       documents: <FileCheck className="w-4 h-4" />
     }
     return icons[tab]
+  }
+
+  const getTabLabel = (tab: TabType) => {
+    const labels: Record<TabType, string> = {
+      profile: 'Profile',
+      subscribers: 'Subscribers',
+      vehicles: 'Vehicles',
+      visitors: 'Visitors',
+      outlets: 'Outlets',
+      qrs: 'QRs',
+      financial: 'Financial',
+      documents: 'Documents'
+    }
+    return labels[tab]
   }
 
   const isChallanPay = partner.partnerType === 'challanPay'
@@ -104,8 +143,11 @@ export function PartnerDetail({
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit mb-6">
-          {(['profile', 'subscribers', 'vehicles', 'financial', 'documents'] as TabType[]).map((tab) => (
+        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit mb-6 flex-wrap">
+          {(isChallanPay
+            ? ['profile', 'subscribers', 'vehicles', 'visitors', 'outlets', 'qrs', 'financial', 'documents'] as TabType[]
+            : ['profile', 'subscribers', 'vehicles', 'financial', 'documents'] as TabType[]
+          ).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -116,7 +158,7 @@ export function PartnerDetail({
               }`}
             >
               {getTabIcon(tab)}
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {getTabLabel(tab)}
             </button>
           ))}
         </div>
@@ -419,6 +461,7 @@ export function PartnerDetail({
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incidents</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscriber</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -448,6 +491,30 @@ export function PartnerDetail({
                               </span>
                             </td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicle.subscriberName}</td>
+                            <td className="px-4 py-3">
+                              <div className="relative">
+                                <button
+                                  onClick={() => setVehicleActionMenu(vehicleActionMenu === vehicle.id ? null : vehicle.id)}
+                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                  <MoreVertical className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                                </button>
+                                {vehicleActionMenu === vehicle.id && (
+                                  <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg z-20">
+                                    <button
+                                      onClick={() => {
+                                        console.log('Deactivate vehicle:', vehicle.id)
+                                        setVehicleActionMenu(null)
+                                      }}
+                                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                    >
+                                      <Ban className="w-3.5 h-3.5" />
+                                      Deactivate
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -496,6 +563,204 @@ export function PartnerDetail({
                         </button>
                       </div>
                     </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Registered Visitors Tab */}
+          {activeTab === 'visitors' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Registered Visitors ({partner.registeredVisitors?.length || 0})</h2>
+              {!partner.registeredVisitors || partner.registeredVisitors.length === 0 ? (
+                <p className="text-slate-500 dark:text-slate-400">No registered visitors yet</p>
+              ) : (
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitor ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitors</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Date & Time</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {paginatedVisitors.map((visitor) => (
+                          <tr key={visitor.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3">
+                              <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{visitor.visitorId}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                {visitor.visitors}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                              {new Date(visitor.visitDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
+                              {' '}
+                              <span className="text-slate-400 dark:text-slate-500">
+                                {new Date(visitor.visitDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <PaginationBar current={safeVisitorPage} total={totalVisitorPages} count={totalVisitors} perPage={perPage} onChange={setVisitorPage} />
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Outlets Tab */}
+          {activeTab === 'outlets' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Outlets ({partner.linkedOutlets?.length || 0})</h2>
+              {!partner.linkedOutlets || partner.linkedOutlets.length === 0 ? (
+                <p className="text-slate-500 dark:text-slate-400">No outlets yet</p>
+              ) : (
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Location</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pincode</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscribers</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicles</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Opened</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {paginatedOutlets.map((outlet) => (
+                          <tr key={outlet.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3">
+                              <p className="font-medium text-slate-900 dark:text-slate-50">{outlet.name}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">{outlet.address}</p>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                              {outlet.state}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                              {outlet.pinCode}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                {outlet.subscriberCount}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                {outlet.vehicleCount}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                outlet.status === 'active'
+                                  ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                              }`}>
+                                {outlet.status.charAt(0).toUpperCase() + outlet.status.slice(1)}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(outlet.openedDate)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <PaginationBar current={safeOutletPage} total={totalOutletPages} count={totalOutlets} perPage={perPage} onChange={setOutletPage} />
+                </>
+              )}
+            </div>
+          )}
+
+          {/* QRs Tab */}
+          {activeTab === 'qrs' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">QR Codes ({partner.outletQRs?.length || 0})</h2>
+              {!partner.outletQRs || partner.outletQRs.length === 0 ? (
+                <p className="text-slate-500 dark:text-slate-400">No QR codes generated yet</p>
+              ) : (
+                <>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-800">
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">QR ID</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Scans</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Created</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                      {paginatedQRs.map((qr) => (
+                        <tr key={qr.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                          <td className="px-4 py-3">
+                            <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{qr.qrId}</span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{qr.outletName}</td>
+                          <td className="px-4 py-3">
+                            <span className="inline-block px-2.5 py-1 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 rounded text-xs font-medium">
+                              {qr.totalScans.toLocaleString()}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                              qr.status === 'active'
+                                ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}>
+                              {qr.status.charAt(0).toUpperCase() + qr.status.slice(1)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(qr.createdDate)}</td>
+                          <td className="px-4 py-3">
+                            <div className="relative">
+                              <button
+                                onClick={() => setQrActionMenu(qrActionMenu === qr.id ? null : qr.id)}
+                                className="inline-flex items-center justify-center w-8 h-8 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                              >
+                                <MoreVertical className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                              </button>
+                              {qrActionMenu === qr.id && (
+                                <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg z-20 py-1">
+                                  <button
+                                    onClick={() => {
+                                      setViewQr(qr)
+                                      setQrActionMenu(null)
+                                    }}
+                                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                    View QR
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      console.log('Deactivate QR:', qr.id)
+                                      setQrActionMenu(null)
+                                    }}
+                                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                  >
+                                    <Ban className="w-3.5 h-3.5" />
+                                    Deactivate
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <PaginationBar current={safeQRPage} total={totalQRPages} count={totalQRs} perPage={perPage} onChange={setQrPage} />
                 </>
               )}
             </div>
@@ -563,57 +828,162 @@ export function PartnerDetail({
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Documents</h2>
                 <button
                   onClick={() => setShowDocumentUpload(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 border border-cyan-600 dark:border-cyan-500 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg text-sm font-medium transition-colors"
                 >
                   <Upload className="w-4 h-4" />
                   Upload Document
                 </button>
               </div>
 
-              {showDocumentUpload && (
-                <div className="mb-6 p-4 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                  <input
-                    type="file"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        onUploadDocument?.(partner.id, file)
-                        setShowDocumentUpload(false)
-                      }
-                    }}
-                    className="hidden"
-                    id="document-upload"
-                  />
-                  <label htmlFor="document-upload" className="flex flex-col items-center cursor-pointer">
-                    <Upload className="w-8 h-8 text-slate-400 mb-2" />
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-50">Click to upload a document</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">PDF, JPG, PNG up to 10MB</p>
-                  </label>
-                </div>
-              )}
-
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {partner.documents.length === 0 ? (
                   <p className="text-sm text-slate-500 dark:text-slate-400">No documents uploaded yet</p>
                 ) : (
                   partner.documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div key={doc.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <FileText className="w-5 h-5 text-slate-400" />
+                        <div className="w-10 h-10 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                        </div>
                         <div>
-                          <p className="font-medium text-slate-900 dark:text-slate-50">{doc.name}</p>
+                          <p className="font-medium text-sm text-slate-900 dark:text-slate-50">{doc.name}</p>
                           <p className="text-xs text-slate-500 dark:text-slate-400">Uploaded {formatDate(doc.uploadedDate)}</p>
                         </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button className="inline-flex items-center justify-center w-8 h-8 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                          <Eye className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                        </button>
+                        <button className="inline-flex items-center justify-center w-8 h-8 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                          <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                        </button>
                       </div>
                     </div>
                   ))
                 )}
               </div>
+
+              {/* Upload Document Modal */}
+              {showDocumentUpload && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowDocumentUpload(false)}>
+                  <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-xl" onClick={(e) => e.stopPropagation()}>
+                    {/* Modal Header */}
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Upload Document</h3>
+                      <button
+                        onClick={() => setShowDocumentUpload(false)}
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      >
+                        <X className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                      </button>
+                    </div>
+
+                    {/* Modal Body */}
+                    <div className="px-6 py-5 space-y-5">
+                      {/* Document Type */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-900 dark:text-slate-50 mb-1.5">
+                          Document Type <span className="text-red-500">*</span>
+                        </label>
+                        <select className="w-full px-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                          <option value="">Select document type</option>
+                          <option value="pan">PAN Card</option>
+                          <option value="aadhaar">Aadhaar Card</option>
+                          <option value="gst">GST Certificate</option>
+                          <option value="agreement">Partnership Agreement</option>
+                          <option value="bank">Bank Statement</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+
+                      {/* File Upload */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-900 dark:text-slate-50 mb-1.5">
+                          File <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="file"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                              onUploadDocument?.(partner.id, file)
+                              setShowDocumentUpload(false)
+                            }
+                          }}
+                          className="hidden"
+                          id="document-upload"
+                        />
+                        <label
+                          htmlFor="document-upload"
+                          className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer hover:border-cyan-400 dark:hover:border-cyan-600 transition-colors"
+                        >
+                          <Upload className="w-8 h-8 text-slate-400 dark:text-slate-500 mb-2" />
+                          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Click to select a file</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">PDF, JPG, PNG, Excel, Word up to 10MB</p>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Modal Footer */}
+                    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+                      <button
+                        onClick={() => setShowDocumentUpload(false)}
+                        className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
+                        Upload
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
         </div>
         )}
+
+        {/* QR Card Modal */}
+        {viewQr && (
+          <QRCardModal
+            qr={viewQr}
+            onClose={() => setViewQr(null)}
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function QRCardModal({ qr, onClose }: { qr: OutletQR; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50" onClick={onClose}>
+      <div className="relative" onClick={(e) => e.stopPropagation()}>
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute -top-3 -right-3 z-10 w-8 h-8 bg-white dark:bg-slate-800 rounded-full shadow-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+        >
+          <X className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+        </button>
+
+        <div className="w-[380px] bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <img
+            src="/qr-card.png"
+            alt="QR Code Card"
+            className="w-full h-auto"
+          />
+          {/* Footer with QR ID and download */}
+          <div className="px-6 py-3 bg-slate-100 flex items-center justify-between">
+            <span className="text-xs font-mono text-slate-500">{qr.qrId}</span>
+            <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-600 hover:bg-cyan-50 rounded-md transition-colors">
+              <Download className="w-3.5 h-3.5" />
+              Download
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -626,6 +996,54 @@ function TimelineItem({ title, date }: { title: string; date: string }) {
       <div>
         <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{title}</p>
         <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{date}</p>
+      </div>
+    </div>
+  )
+}
+
+function PaginationBar({ current, total, count, perPage, onChange }: { current: number; total: number; count: number; perPage: number; onChange: (page: number) => void }) {
+  if (total <= 1) return null
+  return (
+    <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+      <p className="text-sm text-slate-500 dark:text-slate-400">
+        Showing {(current - 1) * perPage + 1}–{Math.min(current * perPage, count)} of {count}
+      </p>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => onChange(current - 1)}
+          disabled={current === 1}
+          className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+            current === 1
+              ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        {Array.from({ length: total }, (_, i) => i + 1).map((page) => (
+          <button
+            key={page}
+            onClick={() => onChange(page)}
+            className={`inline-flex items-center justify-center min-w-[32px] h-8 px-2 rounded-md text-sm font-medium transition-colors ${
+              page === current
+                ? 'bg-cyan-500 text-white'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+        <button
+          onClick={() => onChange(current + 1)}
+          disabled={current === total}
+          className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+            current === total
+              ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
     </div>
   )

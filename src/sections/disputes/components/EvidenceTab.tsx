@@ -62,6 +62,7 @@ export function EvidenceTab({ evidence, onUploadEvidence, onViewDocument }: Evid
   const [documentName, setDocumentName] = useState('')
   const [documentType, setDocumentType] = useState('')
   const [isDragging, setIsDragging] = useState(false)
+  const [typeFilter, setTypeFilter] = useState<string>('all')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +112,13 @@ export function EvidenceTab({ evidence, onUploadEvidence, onViewDocument }: Evid
     setIsDragging(false)
   }
 
-  const sortedEvidence = [...evidence].sort(
+  const uniqueTypes = Array.from(new Set(evidence.map((e) => e.type)))
+
+  const filteredEvidence = typeFilter === 'all'
+    ? evidence
+    : evidence.filter((e) => e.type === typeFilter)
+
+  const sortedEvidence = [...filteredEvidence].sort(
     (a, b) => new Date(b.uploadedOn).getTime() - new Date(a.uploadedOn).getTime()
   )
 
@@ -129,6 +136,35 @@ export function EvidenceTab({ evidence, onUploadEvidence, onViewDocument }: Evid
             Upload Document
           </button>
         </div>
+
+        {/* Type Filter */}
+        {uniqueTypes.length > 0 && (
+          <div className="flex items-center gap-2 mb-4">
+            <button
+              onClick={() => setTypeFilter('all')}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                typeFilter === 'all'
+                  ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              All ({evidence.length})
+            </button>
+            {uniqueTypes.map((type) => (
+              <button
+                key={type}
+                onClick={() => setTypeFilter(type)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                  typeFilter === type
+                    ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                {type} ({evidence.filter((e) => e.type === type).length})
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Documents List */}
         {sortedEvidence.length === 0 ? (

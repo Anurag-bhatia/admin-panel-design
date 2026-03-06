@@ -49,6 +49,23 @@ export interface Vehicle {
   subscriberName: string
 }
 
+export interface RegisteredVisitor {
+  id: string
+  visitorId: string
+  visitDate: string
+  visitors: number
+}
+
+export interface OutletQR {
+  id: string
+  qrId: string
+  outletId: string
+  outletName: string
+  totalScans: number
+  status: 'active' | 'inactive'
+  createdDate: string
+}
+
 export interface Outlet {
   id: string
   name: string
@@ -87,6 +104,8 @@ export interface Partner {
   partnerType: 'challanPay' | 'lots247'
   outlets?: number
   linkedOutlets?: Outlet[]
+  registeredVisitors?: RegisteredVisitor[]
+  outletQRs?: OutletQR[]
   vehicles?: number
   linkedVehicles: Vehicle[]
   status: 'active' | 'inactive'

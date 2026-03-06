@@ -95,6 +95,20 @@
           "openedDate": "2024-01-05"
         }
       ],
+      "registeredVisitors": [
+        { "id": "vis-001", "visitorId": "1212131221", "visitDate": "2026-01-15T10:30:00Z", "visitors": 3 },
+        { "id": "vis-002", "visitorId": "3847291056", "visitDate": "2026-01-20T14:15:00Z", "visitors": 1 },
+        { "id": "vis-003", "visitorId": "7593014682", "visitDate": "2026-02-05T09:45:00Z", "visitors": 5 },
+        { "id": "vis-004", "visitorId": "4028163975", "visitDate": "2026-02-18T16:00:00Z", "visitors": 2 },
+        { "id": "vis-005", "visitorId": "6184729310", "visitDate": "2026-03-01T11:20:00Z", "visitors": 4 },
+        { "id": "vis-006", "visitorId": "9371504826", "visitDate": "2026-03-03T13:50:00Z", "visitors": 1 }
+      ],
+      "outletQRs": [
+        { "id": "qr-001", "qrId": "QR - 3e93c4bc72", "outletId": "outlet-001", "outletName": "FleetPro Karol Bagh", "totalScans": 342, "status": "active", "createdDate": "2023-05-22" },
+        { "id": "qr-002", "qrId": "QR - a7f1d8e504", "outletId": "outlet-002", "outletName": "FleetPro Dwarka", "totalScans": 218, "status": "active", "createdDate": "2023-07-12" },
+        { "id": "qr-003", "qrId": "QR - 5b2c9f1a38", "outletId": "outlet-003", "outletName": "FleetPro Noida", "totalScans": 156, "status": "active", "createdDate": "2023-09-17" },
+        { "id": "qr-004", "qrId": "QR - d4e6b7c091", "outletId": "outlet-004", "outletName": "FleetPro Ghaziabad", "totalScans": 89, "status": "inactive", "createdDate": "2024-01-07" }
+      ],
       "vehicles": 126,
       "linkedVehicles": [
         {
@@ -289,6 +303,16 @@
           "vehicleCount": 32,
           "openedDate": "2023-11-15"
         }
+      ],
+      "registeredVisitors": [
+        { "id": "vis-007", "visitorId": "2058374916", "visitDate": "2026-02-01T10:00:00Z", "visitors": 2 },
+        { "id": "vis-008", "visitorId": "8463019275", "visitDate": "2026-02-10T15:30:00Z", "visitors": 6 },
+        { "id": "vis-009", "visitorId": "5129748063", "visitDate": "2026-02-22T11:45:00Z", "visitors": 1 },
+        { "id": "vis-010", "visitorId": "3706185294", "visitDate": "2026-03-04T09:15:00Z", "visitors": 3 }
+      ],
+      "outletQRs": [
+        { "id": "qr-005", "qrId": "QR - 8c12ef4a67", "outletId": "outlet-005", "outletName": "TransportNet Andheri", "totalScans": 485, "status": "active", "createdDate": "2023-08-30" },
+        { "id": "qr-006", "qrId": "QR - f0a3b59d21", "outletId": "outlet-006", "outletName": "TransportNet Thane", "totalScans": 210, "status": "active", "createdDate": "2023-11-17" }
       ],
       "vehicles": 84,
       "linkedVehicles": [
@@ -600,6 +624,13 @@
           "openedDate": "2024-01-10"
         }
       ],
+      "registeredVisitors": [
+        { "id": "vis-011", "visitorId": "6947201358", "visitDate": "2026-03-01T10:30:00Z", "visitors": 2 },
+        { "id": "vis-012", "visitorId": "1835062749", "visitDate": "2026-03-05T14:00:00Z", "visitors": 4 }
+      ],
+      "outletQRs": [
+        { "id": "qr-007", "qrId": "QR - 1d7e0c3b95", "outletId": "outlet-007", "outletName": "Commerce Hub NH-8", "totalScans": 127, "status": "active", "createdDate": "2024-01-12" }
+      ],
       "vehicles": 42,
       "linkedVehicles": [
         {
@@ -701,6 +732,14 @@
       "bankName": "Yes Bank",
       "partnerType": "challanPay",
       "outlets": 6,
+      "registeredVisitors": [
+        { "id": "vis-013", "visitorId": "4291657083", "visitDate": "2026-01-10T09:00:00Z", "visitors": 7 },
+        { "id": "vis-014", "visitorId": "7530184926", "visitDate": "2026-01-15T12:30:00Z", "visitors": 1 },
+        { "id": "vis-015", "visitorId": "0862493175", "visitDate": "2026-01-20T16:45:00Z", "visitors": 3 },
+        { "id": "vis-016", "visitorId": "3148072659", "visitDate": "2026-02-05T10:15:00Z", "visitors": 2 },
+        { "id": "vis-017", "visitorId": "5970316482", "visitDate": "2026-02-20T14:30:00Z", "visitors": 5 }
+      ],
+      "outletQRs": [],
       "vehicles": 210,
       "linkedVehicles": [
         {
@@ -936,6 +975,12 @@
       "bankName": "SBI",
       "partnerType": "challanPay",
       "outlets": 3,
+      "registeredVisitors": [
+        { "id": "vis-018", "visitorId": "8214630597", "visitDate": "2026-01-15T11:00:00Z", "visitors": 2 },
+        { "id": "vis-019", "visitorId": "2679051348", "visitDate": "2026-02-01T13:20:00Z", "visitors": 4 },
+        { "id": "vis-020", "visitorId": "4053892716", "visitDate": "2026-02-15T10:45:00Z", "visitors": 1 }
+      ],
+      "outletQRs": [],
       "vehicles": 97,
       "linkedVehicles": [
         {

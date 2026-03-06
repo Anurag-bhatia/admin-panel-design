@@ -151,53 +151,6 @@ export function LinkedIncidentTab({ snapshot }: LinkedIncidentTabProps) {
           </div>
         </div>
 
-        {/* Financial Outcome */}
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-            Financial Outcome
-          </h2>
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4">
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  Challan Amount
-                </p>
-                <p className="text-lg font-semibold text-slate-900 dark:text-white">
-                  {formatCurrency(snapshot.financialOutcome.challanAmount)}
-                </p>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4">
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  Amount Paid
-                </p>
-                <p className="text-lg font-semibold text-slate-900 dark:text-white">
-                  {formatCurrency(snapshot.financialOutcome.amountPaid)}
-                </p>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4">
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  Refund Due
-                </p>
-                <p className={`text-lg font-semibold ${
-                  snapshot.financialOutcome.refundDue > 0
-                    ? 'text-red-600 dark:text-red-400'
-                    : 'text-slate-900 dark:text-white'
-                }`}>
-                  {formatCurrency(snapshot.financialOutcome.refundDue)}
-                </p>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4">
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  Refund Status
-                </p>
-                <p className="text-sm font-medium text-slate-900 dark:text-white">
-                  {snapshot.financialOutcome.refundStatus}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Timeline Summary */}
         <div>
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
