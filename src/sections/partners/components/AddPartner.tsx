@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, ChevronRight, ChevronLeft } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft, Upload, FileText, Trash2 } from 'lucide-react'
 import type { AddPartnerProps } from '@/../product/sections/partners/types'
 
 export function AddPartner({ onSubmit, onCancel, currentStep = 1 }: AddPartnerProps) {
@@ -40,18 +40,31 @@ export function AddPartner({ onSubmit, onCancel, currentStep = 1 }: AddPartnerPr
     }))
   }
 
-  const handleNext = () => { if (step < 4) setStep(step + 1) }
+  const [documents, setDocuments] = useState<{ id: string; category: string; fileName: string }[]>([])
+  const [docCategory, setDocCategory] = useState('')
+
+  const handleNext = () => { if (step < 5) setStep(step + 1) }
   const handlePrev = () => { if (step > 1) setStep(step - 1) }
   const handleSubmit = () => { onSubmit?.(formData) }
 
   const permissionsList = ['Subscribers', 'Incidents', 'Vehicles', 'Challans', 'Drivers', 'Partners', 'Wallet', 'Team', 'Allow Offline Payment', 'View Challans', 'Locations & QRs']
   const dashboardPermissionsList = ['Subscribers', 'Vehicles', 'Sales', 'Sales Current Month', 'Sales Today', 'Total Incidents', 'L1 Incidents', 'L2 Incidents', 'L3 Incidents', 'Win Incidents', 'Hold Incidents']
   const banks = ['HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Kotak Mahindra Bank', 'SBI', 'Yes Bank', 'Federal Bank']
+  const docCategories = ['PAN Card', 'Aadhaar Card', 'GST Certificate', 'Partnership Agreement', 'Bank Statement', 'Address Proof', 'Other']
 
   const isStep1Valid = formData.firstName && formData.lastName && formData.email && formData.mobile && formData.password
   const isStep2Valid = formData.companyName && formData.officialEmail && formData.phone && formData.address && formData.state && formData.city && formData.pinCode
   const isStep3Valid = formData.permissions.length > 0 && formData.dashboardPermissions.length > 0
   const isStep4Valid = formData.bankAccountNumber && formData.bankName
+
+  const handleDocUpload = (file: File) => {
+    setDocuments(prev => [...prev, { id: `doc-${Date.now()}`, category: docCategory, fileName: file.name }])
+    setDocCategory('')
+  }
+
+  const handleRemoveDoc = (id: string) => {
+    setDocuments(prev => prev.filter(d => d.id !== id))
+  }
 
   const inputCls = "w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-cyan-500"
   const selectCls = `${inputCls} appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat`
@@ -70,7 +83,7 @@ export function AddPartner({ onSubmit, onCancel, currentStep = 1 }: AddPartnerPr
         {/* Stepper */}
         <div className="px-6 pt-6">
           <div className="flex justify-between items-start mb-8 relative">
-            {[1, 2, 3, 4].map((s) => (
+            {[1, 2, 3, 4, 5].map((s) => (
               <div key={s} className="flex flex-col items-center z-10" style={{ flex: '0 0 auto' }}>
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm mb-2 transition-colors ${
                   step >= s ? 'bg-cyan-600 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
@@ -78,14 +91,14 @@ export function AddPartner({ onSubmit, onCancel, currentStep = 1 }: AddPartnerPr
                   {s}
                 </div>
                 <p className="text-xs font-medium text-slate-600 dark:text-slate-400 text-center whitespace-nowrap">
-                  {['Personal', 'Company', 'Permissions', 'Bank'][s - 1]}
+                  {['Personal', 'Company', 'Permissions', 'Bank', 'Documents'][s - 1]}
                 </p>
               </div>
             ))}
             <div className="absolute top-5 left-0 right-0 flex items-center justify-between px-5" style={{ zIndex: 0 }}>
-              {[1, 2, 3].map((s) => (
+              {[1, 2, 3, 4].map((s) => (
                 <div key={s} className={`h-0.5 transition-colors ${step > s ? 'bg-cyan-600' : 'bg-slate-200 dark:bg-slate-700'}`}
-                  style={{ width: 'calc(33.333% - 20px)', marginLeft: s === 1 ? '20px' : '10px', marginRight: '10px' }} />
+                  style={{ width: 'calc(25% - 20px)', marginLeft: s === 1 ? '20px' : '10px', marginRight: '10px' }} />
               ))}
             </div>
           </div>
@@ -256,6 +269,68 @@ export function AddPartner({ onSubmit, onCancel, currentStep = 1 }: AddPartnerPr
               </div>
             </div>
           )}
+
+          {/* Step 5: Documents */}
+          {step === 5 && (
+            <div className="space-y-5">
+              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Upload Documents</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5">Document Category</label>
+                  <select value={docCategory} onChange={(e) => setDocCategory(e.target.value)} className={selectCls}>
+                    <option value="">Select category</option>
+                    {docCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5">File</label>
+                  <input type="file" id="lots-doc-upload" className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleDocUpload(f); e.target.value = '' }}
+                    disabled={!docCategory} />
+                  <label htmlFor="lots-doc-upload"
+                    className={`flex items-center gap-2 w-full px-3 py-2 border border-dashed rounded-lg text-sm transition-colors ${
+                      docCategory
+                        ? 'border-cyan-400 dark:border-cyan-600 text-cyan-600 dark:text-cyan-400 cursor-pointer hover:bg-cyan-50 dark:hover:bg-cyan-900/20'
+                        : 'border-slate-300 dark:border-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                    }`}>
+                    <Upload className="w-4 h-4" />
+                    {docCategory ? 'Click to upload' : 'Select category first'}
+                  </label>
+                </div>
+              </div>
+
+              {/* Documents list / empty state */}
+              <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg p-6 min-h-[180px]">
+                {documents.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full py-6 text-center">
+                    <FileText className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-3" />
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No documents added yet</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Select a category and upload a file above</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {documents.map((doc) => (
+                      <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 flex items-center justify-center">
+                            <FileText className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{doc.fileName}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{doc.category}</p>
+                          </div>
+                        </div>
+                        <button onClick={() => handleRemoveDoc(doc.id)}
+                          className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
+                          <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -264,16 +339,16 @@ export function AddPartner({ onSubmit, onCancel, currentStep = 1 }: AddPartnerPr
             className="flex items-center gap-2 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors">
             <ChevronLeft className="w-4 h-4" /> Previous
           </button>
-          <div className="text-sm text-slate-500 dark:text-slate-400">Step {step} of 4</div>
-          {step < 4 ? (
+          <div className="text-sm text-slate-500 dark:text-slate-400">Step {step} of 5</div>
+          {step < 5 ? (
             <button onClick={handleNext}
-              disabled={step === 1 ? !isStep1Valid : step === 2 ? !isStep2Valid : step === 3 ? !isStep3Valid : false}
+              disabled={step === 1 ? !isStep1Valid : step === 2 ? !isStep2Valid : step === 3 ? !isStep3Valid : step === 4 ? !isStep4Valid : false}
               className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors">
               Next <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
-            <button onClick={handleSubmit} disabled={!isStep4Valid}
-              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors">
+            <button onClick={handleSubmit}
+              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors">
               Create Partner
             </button>
           )}

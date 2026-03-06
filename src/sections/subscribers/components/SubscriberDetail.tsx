@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
-import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3 } from 'lucide-react'
-import type { Subscriber, Subscription, User as UserType, Vehicle } from '@/../product/sections/subscribers/types'
+import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3, RefreshCw, Loader2 } from 'lucide-react'
+import type { Subscriber, Subscription, User as UserType, Vehicle, SubscriberReport } from '@/../product/sections/subscribers/types'
 import { AddSubscriberModal } from './AddSubscriberModal'
 
 type TabType = 'details' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'team' | 'api-catalogue' | 'report'
@@ -24,6 +24,11 @@ interface SubscriberDetailProps {
   onDeactivateVehicle?: (vehicleId: string) => void
   onBulkUpdateVehicles?: (subscriberId: string, file: File) => void
   onDownloadVehicleTemplate?: () => void
+  apiCatalogue?: { id: string; name: string; enabled: boolean; credits: number; creditPerHit: number; usedCredits: number; transactions: { id: string; description: string; creditsUsed: number; date: string }[] }[]
+  onSaveApiCatalogue?: (subscriberId: string, config: { id: string; enabled: boolean; credits: number; creditPerHit: number }[]) => void
+  reports?: SubscriberReport[]
+  onDownloadReport?: (reportId: string) => void
+  onRetryReport?: (reportId: string) => void
   onAssignTeamMember?: () => void
   onRemoveTeamMember?: (userId: string) => void
   users?: UserType[]
@@ -52,6 +57,11 @@ export function SubscriberDetail({
   onDeactivateVehicle,
   onBulkUpdateVehicles,
   onDownloadVehicleTemplate,
+  apiCatalogue: apiCatalogueProp,
+  onSaveApiCatalogue,
+  reports = [],
+  onDownloadReport,
+  onRetryReport,
   onAssignTeamMember,
   onRemoveTeamMember,
   users = [],
@@ -83,6 +93,20 @@ export function SubscriberDetail({
   const [showUploadDocModal, setShowUploadDocModal] = useState(false)
   const [uploadDocCategory, setUploadDocCategory] = useState('')
   const [uploadDocFile, setUploadDocFile] = useState<File | null>(null)
+
+  // API Catalogue state
+  const defaultApis = [
+    { id: 'challan-api', name: 'Challan API', enabled: false, credits: 0, creditPerHit: 0, usedCredits: 0, transactions: [] as { id: string; description: string; creditsUsed: number; date: string }[] },
+    { id: 'rc-api', name: 'RC API', enabled: false, credits: 0, creditPerHit: 0, usedCredits: 0, transactions: [] as { id: string; description: string; creditsUsed: number; date: string }[] },
+    { id: 'dl-api', name: 'DL API', enabled: false, credits: 0, creditPerHit: 0, usedCredits: 0, transactions: [] as { id: string; description: string; creditsUsed: number; date: string }[] },
+  ]
+  const [apiConfig, setApiConfig] = useState(
+    (apiCatalogueProp && apiCatalogueProp.length > 0) ? apiCatalogueProp : defaultApis
+  )
+
+  const updateApiField = (id: string, field: 'enabled' | 'credits' | 'creditPerHit', value: boolean | number) => {
+    setApiConfig(prev => prev.map(api => api.id === id ? { ...api, [field]: value } : api))
+  }
 
   // Group challans by vehicle number
   const challansByVehicle = useMemo(() => {
@@ -121,6 +145,18 @@ export function SubscriberDetail({
     const types = new Set(vehicles.map(v => v.vehicleType).filter(Boolean))
     return Array.from(types)
   }, [vehicles])
+
+  const monthlyReports = useMemo(() => {
+    return reports
+      .filter(r => r.category === 'monthly')
+      .sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime())
+  }, [reports])
+
+  const incidentReports = useMemo(() => {
+    return reports
+      .filter(r => r.category === 'incident')
+      .sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime())
+  }, [reports])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
@@ -794,10 +830,107 @@ export function SubscriberDetail({
           {/* API Catalogue Tab */}
           {activeTab === 'api-catalogue' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">API Catalogue</h2>
-              <div className="text-center py-12">
-                <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-500 dark:text-slate-400">No API integrations configured yet</p>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">API Catalogue</h2>
+                <button
+                  onClick={() => onSaveApiCatalogue?.(subscriber.id, apiConfig.map(({ id, enabled, credits, creditPerHit }) => ({ id, enabled, credits, creditPerHit })))}
+                  className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
+
+              {/* Config Table */}
+              <div className="overflow-x-auto mb-8">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800">
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">API</th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase w-20">Access</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase w-28">Credits</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase w-28">Per Hit</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Usage</th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase w-28"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    {apiConfig.map((api) => (
+                      <tr key={api.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                        <td className="px-4 py-3.5">
+                          <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{api.name}</p>
+                        </td>
+                        <td className="px-4 py-3.5 text-center">
+                          <button
+                            type="button"
+                            onClick={() => updateApiField(api.id, 'enabled', !api.enabled)}
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                              api.enabled ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-600'
+                            }`}
+                          >
+                            <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform ${
+                              api.enabled ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                            }`} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <input
+                            type="number"
+                            min="0"
+                            value={api.credits}
+                            onChange={e => updateApiField(api.id, 'credits', parseInt(e.target.value) || 0)}
+                            disabled={!api.enabled}
+                            className="w-24 px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                          />
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <input
+                            type="number"
+                            min="0"
+                            value={api.creditPerHit}
+                            onChange={e => updateApiField(api.id, 'creditPerHit', parseInt(e.target.value) || 0)}
+                            disabled={!api.enabled}
+                            className="w-24 px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                          />
+                        </td>
+                        <td className="px-4 py-3.5">
+                          {api.enabled && api.credits > 0 ? (
+                            <div className="flex items-center gap-3 min-w-[180px]">
+                              <div className="flex-1">
+                                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full ${
+                                      (api.usedCredits / api.credits) >= 0.9
+                                        ? 'bg-red-500'
+                                        : (api.usedCredits / api.credits) >= 0.7
+                                        ? 'bg-amber-500'
+                                        : 'bg-cyan-500'
+                                    }`}
+                                    style={{ width: `${Math.min((api.usedCredits / api.credits) * 100, 100)}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                {api.usedCredits}/{api.credits}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3.5 text-right">
+                          {api.enabled && api.transactions.length > 0 ? (
+                            <button
+                              onClick={() => console.log('View request log:', api.id)}
+                              className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline whitespace-nowrap"
+                            >
+                              Request Log
+                            </button>
+                          ) : null}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
@@ -805,10 +938,95 @@ export function SubscriberDetail({
           {/* Report Tab */}
           {activeTab === 'report' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Reports</h2>
-              <div className="text-center py-12">
-                <BarChart3 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-500 dark:text-slate-400">No reports available yet</p>
+              {/* Monthly Closure Reports */}
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Monthly Closure Reports</h2>
+                {monthlyReports.length === 0 ? (
+                  <div className="text-center py-10">
+                    <BarChart3 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500 dark:text-slate-400">No monthly reports generated yet</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Period</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Report Type</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Format</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Generated</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Size</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {monthlyReports.map((report) => (
+                          <tr key={report.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{report.period || '—'}</td>
+                            <td className="px-4 py-3"><ReportTypeBadge type={report.reportType} /></td>
+                            <td className="px-4 py-3"><FormatBadge format={report.format} /></td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(report.generatedAt)}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{report.fileSize ? formatFileSize(report.fileSize) : '—'}</td>
+                            <td className="px-4 py-3"><ReportStatusBadge status={report.status} /></td>
+                            <td className="px-4 py-3 text-right"><ReportAction report={report} onDownload={onDownloadReport} onRetry={onRetryReport} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-slate-200 dark:border-slate-800 my-8" />
+
+              {/* Incident Reports */}
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Incident Reports</h2>
+                {incidentReports.length === 0 ? (
+                  <div className="text-center py-10">
+                    <BarChart3 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500 dark:text-slate-400">No incident reports generated yet</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Report Type</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Format</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Generated</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {incidentReports.map((report) => (
+                          <tr key={report.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{report.incidentId || '—'}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{report.incidentVehicle || '—'}</td>
+                            <td className="px-4 py-3"><ReportTypeBadge type={report.reportType} /></td>
+                            <td className="px-4 py-3"><FormatBadge format={report.format} /></td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(report.generatedAt)}</td>
+                            <td className="px-4 py-3">
+                              {report.incidentStatus ? (
+                                <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                  {report.incidentStatus}
+                                </span>
+                              ) : '—'}
+                            </td>
+                            <td className="px-4 py-3"><ReportStatusBadge status={report.status} /></td>
+                            <td className="px-4 py-3 text-right"><ReportAction report={report} onDownload={onDownloadReport} onRetry={onRetryReport} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1187,4 +1405,92 @@ function TimelineItem({ title, date }: { title: string; date: string }) {
       </div>
     </div>
   )
+}
+
+function ReportTypeBadge({ type }: { type: string }) {
+  const styles: Record<string, string> = {
+    'MIS': 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+    'MIS-Challan': 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+    'ICR': 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400',
+    'ISR': 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+  }
+  return (
+    <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${styles[type] || 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'}`}>
+      {type}
+    </span>
+  )
+}
+
+function FormatBadge({ format }: { format: string }) {
+  const isCSV = format === 'CSV'
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
+      isCSV
+        ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+        : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+    }`}>
+      <FileText className="w-3 h-3" />
+      {format}
+    </span>
+  )
+}
+
+function ReportStatusBadge({ status }: { status: string }) {
+  if (status === 'ready') {
+    return (
+      <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+        Ready
+      </span>
+    )
+  }
+  if (status === 'generating') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 animate-pulse">
+        <Loader2 className="w-3 h-3 animate-spin" />
+        Generating
+      </span>
+    )
+  }
+  return (
+    <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400">
+      Failed
+    </span>
+  )
+}
+
+function ReportAction({ report, onDownload, onRetry }: { report: SubscriberReport; onDownload?: (id: string) => void; onRetry?: (id: string) => void }) {
+  if (report.status === 'ready') {
+    return (
+      <button
+        onClick={() => onDownload?.(report.id)}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-md transition-colors"
+      >
+        <Download className="w-3.5 h-3.5" />
+        Download
+      </button>
+    )
+  }
+  if (report.status === 'failed') {
+    return (
+      <button
+        onClick={() => onRetry?.(report.id)}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+      >
+        <RefreshCw className="w-3.5 h-3.5" />
+        Retry
+      </button>
+    )
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-400 dark:text-slate-500">
+      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      Processing...
+    </span>
+  )
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }

@@ -103,6 +103,15 @@
         { "id": "vis-005", "visitorId": "6184729310", "visitDate": "2026-03-01T11:20:00Z", "visitors": 4 },
         { "id": "vis-006", "visitorId": "9371504826", "visitDate": "2026-03-03T13:50:00Z", "visitors": 1 }
       ],
+      "registeredVisitorDetails": [
+        { "id": "rvd-001", "visitorId": "7482019365", "visitorName": "Ramesh Kumar", "pendingChallans": 3, "pendingChallansAmount": 4500, "contactNumber": "9876543210" },
+        { "id": "rvd-002", "visitorId": "5130847629", "visitorName": "Suresh Patel", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9812345678" },
+        { "id": "rvd-003", "visitorId": "2916384057", "visitorName": "Amit Sharma", "pendingChallans": 5, "pendingChallansAmount": 7200, "contactNumber": "9988776655" },
+        { "id": "rvd-004", "visitorId": "6043127895", "visitorName": "Vikas Singh", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9871234560" },
+        { "id": "rvd-005", "visitorId": "8375920146", "visitorName": "Deepak Verma", "pendingChallans": 2, "pendingChallansAmount": 3000, "contactNumber": "9654321098" },
+        { "id": "rvd-006", "visitorId": "1094563728", "visitorName": "Manoj Tiwari", "pendingChallans": 4, "pendingChallansAmount": 6800, "contactNumber": "9765432109" },
+        { "id": "rvd-007", "visitorId": "4728061593", "visitorName": "Rajesh Gupta", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9543210987" }
+      ],
       "outletQRs": [
         { "id": "qr-001", "qrId": "QR - 3e93c4bc72", "outletId": "outlet-001", "outletName": "FleetPro Karol Bagh", "totalScans": 342, "status": "active", "createdDate": "2023-05-22" },
         { "id": "qr-002", "qrId": "QR - a7f1d8e504", "outletId": "outlet-002", "outletName": "FleetPro Dwarka", "totalScans": 218, "status": "active", "createdDate": "2023-07-12" },
@@ -309,6 +318,13 @@
         { "id": "vis-008", "visitorId": "8463019275", "visitDate": "2026-02-10T15:30:00Z", "visitors": 6 },
         { "id": "vis-009", "visitorId": "5129748063", "visitDate": "2026-02-22T11:45:00Z", "visitors": 1 },
         { "id": "vis-010", "visitorId": "3706185294", "visitDate": "2026-03-04T09:15:00Z", "visitors": 3 }
+      ],
+      "registeredVisitorDetails": [
+        { "id": "rvd-008", "visitorId": "3851209764", "visitorName": "Anil Mehta", "pendingChallans": 2, "pendingChallansAmount": 3200, "contactNumber": "9876012345" },
+        { "id": "rvd-009", "visitorId": "7294630518", "visitorName": "Sanjay Reddy", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9812098765" },
+        { "id": "rvd-010", "visitorId": "1057824396", "visitorName": "Pradeep Joshi", "pendingChallans": 6, "pendingChallansAmount": 9100, "contactNumber": "9945678901" },
+        { "id": "rvd-011", "visitorId": "6481032975", "visitorName": "Karan Malhotra", "pendingChallans": 1, "pendingChallansAmount": 1800, "contactNumber": "9734561230" },
+        { "id": "rvd-012", "visitorId": "9203571648", "visitorName": "Nitin Agarwal", "pendingChallans": 3, "pendingChallansAmount": 4200, "contactNumber": "9623456789" }
       ],
       "outletQRs": [
         { "id": "qr-005", "qrId": "QR - 8c12ef4a67", "outletId": "outlet-005", "outletName": "TransportNet Andheri", "totalScans": 485, "status": "active", "createdDate": "2023-08-30" },
@@ -628,6 +644,12 @@
         { "id": "vis-011", "visitorId": "6947201358", "visitDate": "2026-03-01T10:30:00Z", "visitors": 2 },
         { "id": "vis-012", "visitorId": "1835062749", "visitDate": "2026-03-05T14:00:00Z", "visitors": 4 }
       ],
+      "registeredVisitorDetails": [
+        { "id": "rvd-013", "visitorId": "4520891376", "visitorName": "Harish Nair", "pendingChallans": 2, "pendingChallansAmount": 2800, "contactNumber": "9876543201" },
+        { "id": "rvd-014", "visitorId": "8136094527", "visitorName": "Vivek Pandey", "pendingChallans": 4, "pendingChallansAmount": 5600, "contactNumber": "9812345097" },
+        { "id": "rvd-015", "visitorId": "6709418253", "visitorName": "Ajay Chauhan", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670123" },
+        { "id": "rvd-016", "visitorId": "2384706159", "visitorName": "Rohit Saxena", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9723456780" }
+      ],
       "outletQRs": [
         { "id": "qr-007", "qrId": "QR - 1d7e0c3b95", "outletId": "outlet-007", "outletName": "Commerce Hub NH-8", "totalScans": 127, "status": "active", "createdDate": "2024-01-12" }
       ],
@@ -738,6 +760,11 @@
         { "id": "vis-015", "visitorId": "0862493175", "visitDate": "2026-01-20T16:45:00Z", "visitors": 3 },
         { "id": "vis-016", "visitorId": "3148072659", "visitDate": "2026-02-05T10:15:00Z", "visitors": 2 },
         { "id": "vis-017", "visitorId": "5970316482", "visitDate": "2026-02-20T14:30:00Z", "visitors": 5 }
+      ],
+      "registeredVisitorDetails": [
+        { "id": "rvd-017", "visitorId": "7503184926", "visitorName": "Sunil Yadav", "pendingChallans": 3, "pendingChallansAmount": 5100, "contactNumber": "9865432107" },
+        { "id": "rvd-018", "visitorId": "2148306597", "visitorName": "Ashok Dubey", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9754321098" },
+        { "id": "rvd-019", "visitorId": "9672401835", "visitorName": "Pawan Mishra", "pendingChallans": 2, "pendingChallansAmount": 3400, "contactNumber": "9643210987" }
       ],
       "outletQRs": [],
       "vehicles": 210,
@@ -979,6 +1006,12 @@
         { "id": "vis-018", "visitorId": "8214630597", "visitDate": "2026-01-15T11:00:00Z", "visitors": 2 },
         { "id": "vis-019", "visitorId": "2679051348", "visitDate": "2026-02-01T13:20:00Z", "visitors": 4 },
         { "id": "vis-020", "visitorId": "4053892716", "visitDate": "2026-02-15T10:45:00Z", "visitors": 1 }
+      ],
+      "registeredVisitorDetails": [
+        { "id": "rvd-020", "visitorId": "5081347629", "visitorName": "Mukesh Bhatt", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9876501234" },
+        { "id": "rvd-021", "visitorId": "3729604185", "visitorName": "Dinesh Rawat", "pendingChallans": 5, "pendingChallansAmount": 7500, "contactNumber": "9812340567" },
+        { "id": "rvd-022", "visitorId": "8460152937", "visitorName": "Girish Kapoor", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670012" },
+        { "id": "rvd-023", "visitorId": "1593728046", "visitorName": "Hemant Thakur", "pendingChallans": 2, "pendingChallansAmount": 3600, "contactNumber": "9734560189" }
       ],
       "outletQRs": [],
       "vehicles": 97,

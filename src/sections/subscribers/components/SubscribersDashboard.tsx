@@ -76,6 +76,44 @@ export function SubscribersDashboard({
   // Sample team members
   const teamMembers = selectedSubscriber ? users.slice(0, 3) : []
 
+  // Sample API catalogue data
+  const apiCatalogue = selectedSubscriber ? [
+    {
+      id: 'challan-api', name: 'Challan API', enabled: true, credits: 500, creditPerHit: 2, usedCredits: 320,
+      transactions: [
+        { id: 'txn-1', description: 'Challan lookup — MH02AB1234', creditsUsed: 2, date: '2026-03-05T14:30:00Z' },
+        { id: 'txn-2', description: 'Challan lookup — UP32MM5678', creditsUsed: 2, date: '2026-03-04T11:15:00Z' },
+        { id: 'txn-3', description: 'Bulk challan fetch — 5 vehicles', creditsUsed: 10, date: '2026-03-03T09:00:00Z' },
+        { id: 'txn-4', description: 'Challan lookup — DL03EF9012', creditsUsed: 2, date: '2026-03-01T16:45:00Z' },
+      ]
+    },
+    {
+      id: 'rc-api', name: 'RC API', enabled: true, credits: 200, creditPerHit: 5, usedCredits: 185,
+      transactions: [
+        { id: 'txn-5', description: 'RC verification — MH02AB1234', creditsUsed: 5, date: '2026-03-05T10:00:00Z' },
+        { id: 'txn-6', description: 'RC verification — GJ01XY9876', creditsUsed: 5, date: '2026-03-04T08:30:00Z' },
+        { id: 'txn-7', description: 'Bulk RC fetch — 3 vehicles', creditsUsed: 15, date: '2026-03-02T13:20:00Z' },
+      ]
+    },
+    {
+      id: 'dl-api', name: 'DL API', enabled: false, credits: 0, creditPerHit: 0, usedCredits: 0,
+      transactions: []
+    },
+  ] : []
+
+  // Sample reports data
+  const reports = selectedSubscriber ? [
+    { id: 'RPT-001', subscriberId: selectedSubscriber.id, reportType: 'MIS' as const, format: 'CSV' as const, status: 'ready' as const, category: 'monthly' as const, generatedAt: '2026-03-01T06:00:00Z', fileSize: 245760, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
+    { id: 'RPT-002', subscriberId: selectedSubscriber.id, reportType: 'MIS-Challan' as const, format: 'CSV' as const, status: 'ready' as const, category: 'monthly' as const, generatedAt: '2026-03-01T06:05:00Z', fileSize: 184320, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
+    { id: 'RPT-003', subscriberId: selectedSubscriber.id, reportType: 'MIS' as const, format: 'CSV' as const, status: 'generating' as const, category: 'monthly' as const, generatedAt: '2026-03-06T06:00:00Z', fileSize: null, period: 'March 2026', periodStart: '2026-03-01', periodEnd: '2026-03-31' },
+    { id: 'RPT-004', subscriberId: selectedSubscriber.id, reportType: 'MIS-Challan' as const, format: 'CSV' as const, status: 'failed' as const, category: 'monthly' as const, generatedAt: '2026-02-01T06:00:00Z', fileSize: null, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
+    { id: 'RPT-005', subscriberId: selectedSubscriber.id, reportType: 'MIS' as const, format: 'CSV' as const, status: 'ready' as const, category: 'monthly' as const, generatedAt: '2026-02-01T06:00:00Z', fileSize: 312400, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
+    { id: 'RPT-006', subscriberId: selectedSubscriber.id, reportType: 'ICR' as const, format: 'PDF' as const, status: 'ready' as const, category: 'incident' as const, generatedAt: '2026-02-15T10:30:00Z', fileSize: 524288, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
+    { id: 'RPT-007', subscriberId: selectedSubscriber.id, reportType: 'ISR' as const, format: 'PDF' as const, status: 'ready' as const, category: 'incident' as const, generatedAt: '2026-02-15T10:35:00Z', fileSize: 412672, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
+    { id: 'RPT-008', subscriberId: selectedSubscriber.id, reportType: 'ICR' as const, format: 'PDF' as const, status: 'generating' as const, category: 'incident' as const, generatedAt: '2026-03-05T14:20:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
+    { id: 'RPT-009', subscriberId: selectedSubscriber.id, reportType: 'ISR' as const, format: 'PDF' as const, status: 'failed' as const, category: 'incident' as const, generatedAt: '2026-03-04T09:00:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
+  ] : []
+
   // If a subscriber is selected, show detail view
   if (selectedSubscriber) {
     return (
@@ -88,6 +126,11 @@ export function SubscribersDashboard({
         documents={subscriberDocuments}
         vehicles={subscriberVehicles}
         teamMembers={teamMembers}
+        apiCatalogue={apiCatalogue}
+        reports={reports}
+        onDownloadReport={(id) => console.log('Download report:', id)}
+        onRetryReport={(id) => console.log('Retry report:', id)}
+        onSaveApiCatalogue={(id, config) => console.log('Save API config:', id, config)}
         onBack={() => setSelectedSubscriberId(null)}
         onEdit={(id) => console.log('Edit subscriber:', id)}
         onUploadDocument={(subscriberId, file) => console.log('Upload document:', subscriberId, file.name)}

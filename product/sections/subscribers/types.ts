@@ -274,3 +274,34 @@ export interface BulkUploadError {
   field: string
   message: string
 }
+
+// =============================================================================
+// Report Types
+// =============================================================================
+
+export type ReportType = 'MIS' | 'MIS-Challan' | 'ICR' | 'ISR'
+
+export type ReportFormat = 'CSV' | 'PDF'
+
+export type ReportStatus = 'ready' | 'generating' | 'failed'
+
+export type ReportCategory = 'monthly' | 'incident'
+
+export interface SubscriberReport {
+  id: string
+  subscriberId: string
+  reportType: ReportType
+  format: ReportFormat
+  status: ReportStatus
+  category: ReportCategory
+  generatedAt: string
+  fileSize: number | null
+  // Monthly report fields
+  period?: string
+  periodStart?: string
+  periodEnd?: string
+  // Incident report fields
+  incidentId?: string
+  incidentVehicle?: string
+  incidentStatus?: string
+}

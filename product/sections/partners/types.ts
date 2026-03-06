@@ -56,6 +56,15 @@ export interface RegisteredVisitor {
   visitors: number
 }
 
+export interface RegisteredVisitorDetail {
+  id: string
+  visitorId: string
+  visitorName: string
+  pendingChallans: number
+  pendingChallansAmount: number
+  contactNumber: string
+}
+
 export interface OutletQR {
   id: string
   qrId: string
@@ -105,6 +114,7 @@ export interface Partner {
   outlets?: number
   linkedOutlets?: Outlet[]
   registeredVisitors?: RegisteredVisitor[]
+  registeredVisitorDetails?: RegisteredVisitorDetail[]
   outletQRs?: OutletQR[]
   vehicles?: number
   linkedVehicles: Vehicle[]

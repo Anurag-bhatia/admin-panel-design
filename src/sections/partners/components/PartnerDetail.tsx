@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight, UserCheck, Store, QrCode, MoreVertical, Ban, X, Download } from 'lucide-react'
-import type { PartnerDetailProps, OutletQR } from '@/../product/sections/partners/types'
+import type { PartnerDetailProps, OutletQR, RegisteredVisitorDetail } from '@/../product/sections/partners/types'
 
-type TabType = 'profile' | 'subscribers' | 'vehicles' | 'visitors' | 'outlets' | 'qrs' | 'financial' | 'documents'
+type TabType = 'profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'financial' | 'documents'
 
 export function PartnerDetail({
   partner,
@@ -21,6 +21,7 @@ export function PartnerDetail({
   const [visitorPage, setVisitorPage] = useState(1)
   const [outletPage, setOutletPage] = useState(1)
   const [qrPage, setQrPage] = useState(1)
+  const [regVisitorPage, setRegVisitorPage] = useState(1)
   const vehiclesPerPage = 5
   const totalVehicles = partner.linkedVehicles?.length || 0
   const totalVehiclePages = Math.max(1, Math.ceil(totalVehicles / vehiclesPerPage))
@@ -42,6 +43,11 @@ export function PartnerDetail({
   const totalQRPages = Math.max(1, Math.ceil(totalQRs / perPage))
   const safeQRPage = Math.min(qrPage, totalQRPages)
   const paginatedQRs = partner.outletQRs?.slice((safeQRPage - 1) * perPage, safeQRPage * perPage) || []
+
+  const totalRegVisitors = partner.registeredVisitorDetails?.length || 0
+  const totalRegVisitorPages = Math.max(1, Math.ceil(totalRegVisitors / perPage))
+  const safeRegVisitorPage = Math.min(regVisitorPage, totalRegVisitorPages)
+  const paginatedRegVisitors = partner.registeredVisitorDetails?.slice((safeRegVisitorPage - 1) * perPage, safeRegVisitorPage * perPage) || []
 
   const handleEditClick = () => {
     onEditPartner?.(partner.id)
@@ -65,9 +71,10 @@ export function PartnerDetail({
   const getTabIcon = (tab: TabType) => {
     const icons: Record<TabType, React.ReactNode> = {
       profile: <Building2 className="w-4 h-4" />,
-      subscribers: <Users className="w-4 h-4" />,
-      vehicles: <Truck className="w-4 h-4" />,
       visitors: <UserCheck className="w-4 h-4" />,
+      registeredVisitors: <Users className="w-4 h-4" />,
+      customers: <Users className="w-4 h-4" />,
+      vehicles: <Truck className="w-4 h-4" />,
       outlets: <Store className="w-4 h-4" />,
       qrs: <QrCode className="w-4 h-4" />,
       financial: <BarChart3 className="w-4 h-4" />,
@@ -79,9 +86,10 @@ export function PartnerDetail({
   const getTabLabel = (tab: TabType) => {
     const labels: Record<TabType, string> = {
       profile: 'Profile',
-      subscribers: 'Subscribers',
-      vehicles: 'Vehicles',
       visitors: 'Visitors',
+      registeredVisitors: 'Registered Visitors',
+      customers: 'Customers',
+      vehicles: 'Vehicles',
       outlets: 'Outlets',
       qrs: 'QRs',
       financial: 'Financial',
@@ -145,8 +153,8 @@ export function PartnerDetail({
         {/* Tabs */}
         <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit mb-6 flex-wrap">
           {(isChallanPay
-            ? ['profile', 'subscribers', 'vehicles', 'visitors', 'outlets', 'qrs', 'financial', 'documents'] as TabType[]
-            : ['profile', 'subscribers', 'vehicles', 'financial', 'documents'] as TabType[]
+            ? ['profile', 'visitors', 'registeredVisitors', 'vehicles', 'customers', 'outlets', 'qrs', 'financial', 'documents'] as TabType[]
+            : ['profile', 'customers', 'vehicles', 'financial', 'documents'] as TabType[]
           ).map((tab) => (
             <button
               key={tab}
@@ -386,18 +394,18 @@ export function PartnerDetail({
         {/* Other Tabs — in card wrapper */}
         {activeTab !== 'profile' && (
         <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
-          {/* Subscribers Tab */}
-          {activeTab === 'subscribers' && (
+          {/* Customers Tab */}
+          {activeTab === 'customers' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Linked Subscribers ({partner.linkedSubscribers.length})</h2>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Customers ({partner.linkedSubscribers.length})</h2>
               {partner.linkedSubscribers.length === 0 ? (
-                <p className="text-slate-500 dark:text-slate-400">No linked subscribers yet</p>
+                <p className="text-slate-500 dark:text-slate-400">No customers yet</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-slate-200 dark:border-slate-800">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscriber</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Customer</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Mobile</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscribed</th>
@@ -571,7 +579,7 @@ export function PartnerDetail({
           {/* Registered Visitors Tab */}
           {activeTab === 'visitors' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Registered Visitors ({partner.registeredVisitors?.length || 0})</h2>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Visitors ({partner.registeredVisitors?.length || 0})</h2>
               {!partner.registeredVisitors || partner.registeredVisitors.length === 0 ? (
                 <p className="text-slate-500 dark:text-slate-400">No registered visitors yet</p>
               ) : (
@@ -581,7 +589,6 @@ export function PartnerDetail({
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800">
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitor ID</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitors</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Date & Time</th>
                         </tr>
                       </thead>
@@ -590,11 +597,6 @@ export function PartnerDetail({
                           <tr key={visitor.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                             <td className="px-4 py-3">
                               <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{visitor.visitorId}</span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
-                                {visitor.visitors}
-                              </span>
                             </td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
                               {new Date(visitor.visitDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
@@ -609,6 +611,56 @@ export function PartnerDetail({
                     </table>
                   </div>
                   <PaginationBar current={safeVisitorPage} total={totalVisitorPages} count={totalVisitors} perPage={perPage} onChange={setVisitorPage} />
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Registered Visitors Tab */}
+          {activeTab === 'registeredVisitors' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Registered Visitors ({totalRegVisitors})</h2>
+              {totalRegVisitors === 0 ? (
+                <p className="text-slate-500 dark:text-slate-400">No registered visitors yet</p>
+              ) : (
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitor ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitor Name</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pending Challans</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pending Amount</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Contact Number</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {paginatedRegVisitors.map((rv) => (
+                          <tr key={rv.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3">
+                              <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{rv.visitorId}</span>
+                            </td>
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{rv.visitorName}</td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
+                                rv.pendingChallans > 0
+                                  ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                              }`}>
+                                {rv.pendingChallans}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                              {rv.pendingChallansAmount > 0 ? formatCurrency(rv.pendingChallansAmount) : '—'}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{rv.contactNumber}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <PaginationBar current={safeRegVisitorPage} total={totalRegVisitorPages} count={totalRegVisitors} perPage={perPage} onChange={setRegVisitorPage} />
                 </>
               )}
             </div>
@@ -770,7 +822,7 @@ export function PartnerDetail({
           {activeTab === 'financial' && (
             <div>
               <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Earnings & Payouts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="p-4 bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-900/40 rounded-lg border border-cyan-200 dark:border-cyan-800">
                   <div className="flex items-center justify-between">
                     <div>
@@ -780,22 +832,26 @@ export function PartnerDetail({
                     <IndianRupee className="w-8 h-8 text-cyan-400" />
                   </div>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/40 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium mb-1">Total Paid Out</p>
-                      <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{formatCurrency(partner.totalPayouts)}</p>
-                    </div>
-                    <IndianRupee className="w-8 h-8 text-emerald-400" />
-                  </div>
-                </div>
                 <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/40 rounded-lg border border-amber-200 dark:border-amber-800">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-1">Pending</p>
+                      <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-1">Awaiting Payout (Last 30 Days)</p>
                       <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{formatCurrency(partner.earnings - partner.totalPayouts)}</p>
                     </div>
                     <IndianRupee className="w-8 h-8 text-amber-400" />
+                  </div>
+                </div>
+                <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/40 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium mb-3">Commission Per Challan</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-emerald-700 dark:text-emerald-300">Online Challans</span>
+                      <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">{formatCurrency(50)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-emerald-700 dark:text-emerald-300">Court Challans</span>
+                      <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">{formatCurrency(50)}</span>
+                    </div>
                   </div>
                 </div>
               </div>
