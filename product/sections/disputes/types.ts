@@ -4,7 +4,7 @@
 
 export type DisputeType = 'refund' | 'service' | 'payment' | 'legal_escalation'
 
-export type DisputeStatus = 'open' | 'under_review' | 'escalated' | 'resolved' | 'rejected'
+export type DisputeStatus = 'open' | 'in_progress' | 'hold' | 'refund_raised' | 'not_settled' | 'settled'
 
 export type DisputePriority = 'low' | 'medium' | 'high' | 'critical'
 
@@ -91,10 +91,11 @@ export interface Dispute {
 
 export interface StageCounts {
   open: number
-  under_review: number
-  escalated: number
-  resolved: number
-  rejected: number
+  in_progress: number
+  hold: number
+  refund_raised: number
+  not_settled: number
+  settled: number
 }
 
 export interface Reviewer {

@@ -8,10 +8,11 @@ interface StageTabsProps {
 
 const STAGE_CONFIG: { key: DisputeStatus; label: string }[] = [
   { key: 'open', label: 'Open' },
-  { key: 'under_review', label: 'Under Review' },
-  { key: 'escalated', label: 'In Progress' },
-  { key: 'resolved', label: 'Completed' },
-  { key: 'rejected', label: 'Rejected' },
+  { key: 'in_progress', label: 'In Progress' },
+  { key: 'refund_raised', label: 'Refund Raised' },
+  { key: 'not_settled', label: 'Not Settled' },
+  { key: 'settled', label: 'Settled' },
+  { key: 'hold', label: 'Hold' },
 ]
 
 export function StageTabs({

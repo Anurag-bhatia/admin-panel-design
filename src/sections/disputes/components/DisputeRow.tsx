@@ -197,7 +197,7 @@ export function DisputeRow({
       <td className="px-4 py-3">
         {dispute.assignedTo ? (
           <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300">
+            <div className="h-6 w-6 rounded-full bg-cyan-600 flex items-center justify-center text-xs font-medium text-white">
               {dispute.assignedTo.charAt(0)}
             </div>
             <span className="text-sm text-slate-700 dark:text-slate-300">
@@ -205,7 +205,12 @@ export function DisputeRow({
             </span>
           </div>
         ) : (
-          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-400 dark:text-slate-500">
+              ?
+            </div>
+            <span className="text-sm text-slate-400 dark:text-slate-500">Unassigned</span>
+          </div>
         )}
       </td>
 

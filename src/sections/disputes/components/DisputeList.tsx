@@ -19,7 +19,6 @@ export interface DisputeListProps {
   reviewers: Reviewer[]
   onViewDispute?: (id: string) => void
   onCreateDispute?: () => void
-  onImportDisputes?: () => void
   onBulkUpdate?: () => void
   onAssignReviewer?: (disputeId: string, reviewerId: string) => void
   onEscalate?: (id: string) => void
@@ -39,7 +38,6 @@ export function DisputeList({
   reviewers,
   onViewDispute,
   onCreateDispute,
-  onImportDisputes,
   onBulkUpdate,
   onAssignReviewer,
   onEscalate,
@@ -129,10 +127,11 @@ export function DisputeList({
     const myDisputes = disputes.filter((d) => d.assignedTo === currentUserName)
     return {
       open: myDisputes.filter((d) => d.status === 'open').length,
-      under_review: myDisputes.filter((d) => d.status === 'under_review').length,
-      escalated: myDisputes.filter((d) => d.status === 'escalated').length,
-      resolved: myDisputes.filter((d) => d.status === 'resolved').length,
-      rejected: myDisputes.filter((d) => d.status === 'rejected').length,
+      in_progress: myDisputes.filter((d) => d.status === 'in_progress').length,
+      hold: myDisputes.filter((d) => d.status === 'hold').length,
+      refund_raised: myDisputes.filter((d) => d.status === 'refund_raised').length,
+      not_settled: myDisputes.filter((d) => d.status === 'not_settled').length,
+      settled: myDisputes.filter((d) => d.status === 'settled').length,
     }
   }, [sidebarView, stageCounts, disputes])
 
@@ -164,7 +163,6 @@ export function DisputeList({
             setSearchQuery(query)
             onSearch?.(query)
           }}
-          onImportDisputes={onImportDisputes}
           onBulkUpdate={onBulkUpdate}
           onCreateDispute={onCreateDispute}
           onFilter={onFilter}

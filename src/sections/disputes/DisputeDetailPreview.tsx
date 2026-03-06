@@ -9,14 +9,14 @@ import type {
 const SAMPLE_FOLLOW_UPS: DisputeFollowUp[] = [
   {
     id: 'fu-001',
-    outcome: 'Under Review',
+    outcome: 'In Progress',
     notes: 'Contacted subscriber to collect additional documentation. Subscriber confirmed the refund was not received despite system showing processed.',
     createdAt: '2026-02-20T14:30:00Z',
     createdByName: 'Neha Kapoor',
   },
   {
     id: 'fu-002',
-    outcome: 'Under Review',
+    outcome: 'In Progress',
     notes: 'Verified with payment team — refund was initiated but failed due to incorrect bank details. Re-initiated refund with updated details.',
     createdAt: '2026-02-18T11:15:00Z',
     createdByName: 'Vikram Singh',

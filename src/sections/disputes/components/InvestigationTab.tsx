@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { Plus, X, MessageSquare } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Plus, X, MessageSquare, Paperclip, FileText, Trash2 } from 'lucide-react'
 import type { InvestigationNote } from '@/../product/sections/disputes/types'
 
 interface InvestigationTabProps {
   notes: InvestigationNote[]
-  onAddNote?: (content: string) => void
+  onAddNote?: (content: string, attachments?: File[]) => void
 }
 
 function formatDate(dateString: string): string {
@@ -27,14 +27,35 @@ function formatTime(dateString: string): string {
 export function InvestigationTab({ notes, onAddNote }: InvestigationTabProps) {
   const [showForm, setShowForm] = useState(false)
   const [noteContent, setNoteContent] = useState('')
+  const [attachments, setAttachments] = useState<File[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!noteContent.trim()) return
 
-    onAddNote?.(noteContent.trim())
+    onAddNote?.(noteContent.trim(), attachments.length > 0 ? attachments : undefined)
     setNoteContent('')
+    setAttachments([])
     setShowForm(false)
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files) {
+      setAttachments((prev) => [...prev, ...Array.from(files)])
+    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const removeAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   }
 
   const sortedNotes = [...notes].sort(
@@ -63,7 +84,7 @@ export function InvestigationTab({ notes, onAddNote }: InvestigationTabProps) {
           <div className="mb-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-medium text-slate-900 dark:text-white">
-                Add Investigation Note
+                Add Note
               </h3>
               <button
                 onClick={() => setShowForm(false)}
@@ -86,6 +107,53 @@ export function InvestigationTab({ notes, onAddNote }: InvestigationTabProps) {
                   className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white resize-none"
                   required
                 />
+              </div>
+
+              {/* Attachments */}
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg transition-colors"
+                >
+                  <Paperclip className="h-4 w-4" />
+                  Add Attachment
+                </button>
+
+                {attachments.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {attachments.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText className="h-4 w-4 text-slate-400 shrink-0" />
+                          <span className="text-sm text-slate-700 dark:text-slate-300 truncate">
+                            {file.name}
+                          </span>
+                          <span className="text-xs text-slate-400 shrink-0">
+                            {formatFileSize(file.size)}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeAttachment(index)}
+                          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors shrink-0"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-slate-400 hover:text-red-500" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-3">
@@ -114,10 +182,10 @@ export function InvestigationTab({ notes, onAddNote }: InvestigationTabProps) {
               <MessageSquare className="h-6 w-6 text-slate-400" />
             </div>
             <p className="text-slate-900 dark:text-white font-medium mb-1">
-              No investigation notes yet
+              No notes yet
             </p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              Start documenting your review findings and reasoning
+              Start documenting your findings and reasoning
             </p>
           </div>
         ) : (

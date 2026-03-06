@@ -5,6 +5,8 @@ import {
   UserPlus,
   CheckCircle,
   XCircle,
+  ArrowRightLeft,
+  ChevronDown,
 } from 'lucide-react'
 import type {
   Dispute,
@@ -72,6 +74,7 @@ export function DisputeDetailView({
 }: DisputeDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('activity')
   const [showReviewerDropdown, setShowReviewerDropdown] = useState(false)
+  const [showMoveDropdown, setShowMoveDropdown] = useState(false)
 
   const getSlaInfo = () => {
     const now = new Date()
@@ -91,11 +94,11 @@ export function DisputeDetailView({
   const priorityConfig = PRIORITY_LABELS[dispute.priority] || { label: dispute.priority, className: '' }
 
   // Determine which actions are available based on stage
-  const canEscalate = dispute.status === 'open' || dispute.status === 'under_review'
-  const canApproveRefund = dispute.status === 'under_review' || dispute.status === 'escalated'
-  const canReject = dispute.status === 'open' || dispute.status === 'under_review' || dispute.status === 'escalated'
-  const canClose = dispute.status === 'under_review' || dispute.status === 'escalated'
-  const isTerminal = dispute.status === 'resolved' || dispute.status === 'rejected'
+  const canEscalate = dispute.status === 'open' || dispute.status === 'in_progress'
+  const canApproveRefund = dispute.status === 'in_progress' || dispute.status === 'refund_raised'
+  const canReject = dispute.status === 'open' || dispute.status === 'in_progress' || dispute.status === 'refund_raised'
+  const canClose = dispute.status === 'in_progress' || dispute.status === 'refund_raised'
+  const isTerminal = dispute.status === 'settled' || dispute.status === 'not_settled'
 
   const tabs: { key: TabType; label: string }[] = [
     { key: 'activity', label: `Activity (${dispute.activityLog.length})` },
@@ -127,36 +130,49 @@ export function DisputeDetailView({
             </div>
           </div>
 
-          {/* Action Buttons */}
-          {!isTerminal && (
-            <div className="flex items-center gap-2">
-              {canReject && (
-                <button
-                  onClick={() => onRejectDispute?.(dispute.id)}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                >
-                  <XCircle className="h-4 w-4" />
-                  Reject
-                </button>
-              )}
-              {canApproveRefund && dispute.disputedAmount !== null && (
-                <button
-                  onClick={() => onApproveRefund?.(dispute.id)}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  Approve Refund
-                </button>
-              )}
-              <button
-                onClick={() => onCloseDispute?.(dispute.id)}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
-              >
-                <CheckCircle className="h-4 w-4" />
-                Send to Refund
-              </button>
-            </div>
-          )}
+          {/* Move Ticket Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowMoveDropdown(!showMoveDropdown)}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+            >
+              <ArrowRightLeft className="h-4 w-4" />
+              Move Ticket
+              <ChevronDown className="h-4 w-4" />
+            </button>
+
+            {showMoveDropdown && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowMoveDropdown(false)}
+                />
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
+                  {[
+                    { key: 'open', label: 'Open' },
+                    { key: 'in_progress', label: 'In Progress' },
+                    { key: 'refund_raised', label: 'Refund Raised' },
+                    { key: 'not_settled', label: 'Not Settled' },
+                    { key: 'settled', label: 'Settled' },
+                    { key: 'hold', label: 'Hold' },
+                  ]
+                    .filter((s) => s.key !== dispute.status)
+                    .map((stage) => (
+                      <button
+                        key={stage.key}
+                        onClick={() => {
+                          onCloseDispute?.(dispute.id)
+                          setShowMoveDropdown(false)
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                      >
+                        {stage.label}
+                      </button>
+                    ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -230,8 +246,10 @@ export function DisputeDetailView({
               <div className="relative">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <UserPlus className="h-4 w-4 text-slate-400" />
-                    <span className="text-sm text-slate-700 dark:text-slate-300">
+                    <div className="h-6 w-6 rounded-full bg-cyan-600 flex items-center justify-center text-xs font-medium text-white">
+                      {dispute.assignedTo ? dispute.assignedTo.charAt(0) : '?'}
+                    </div>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                       {dispute.assignedTo || 'No reviewer assigned'}
                     </span>
                   </div>
@@ -271,6 +289,42 @@ export function DisputeDetailView({
                   </>
                 )}
               </div>
+
+              {/* Past Assignments */}
+              {(() => {
+                const assignmentLogs = dispute.activityLog.filter(
+                  (log) => log.action === 'Reviewer Assigned'
+                )
+                if (assignmentLogs.length === 0) return null
+                return (
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <div className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">
+                      Past Assignments
+                    </div>
+                    <div className="space-y-2">
+                      {assignmentLogs.map((log) => {
+                        const nameMatch = log.details.match(/(?:Assigned to |Auto-assigned to )(.+?)(?:\s+based on|$)/)
+                        const assignedName = nameMatch ? nameMatch[1] : log.details
+                        return (
+                          <div key={log.id} className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                                {assignedName.charAt(0)}
+                              </div>
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                                {assignedName}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                              {new Date(log.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })()}
             </div>
           </div>
 

@@ -60,6 +60,7 @@ export function EvidenceTab({ evidence, onUploadEvidence, onViewDocument }: Evid
   const [showModal, setShowModal] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [documentName, setDocumentName] = useState('')
+  const [documentType, setDocumentType] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -106,6 +107,7 @@ export function EvidenceTab({ evidence, onUploadEvidence, onViewDocument }: Evid
     setShowModal(false)
     setSelectedFile(null)
     setDocumentName('')
+    setDocumentType('')
     setIsDragging(false)
   }
 
@@ -167,7 +169,7 @@ export function EvidenceTab({ evidence, onUploadEvidence, onViewDocument }: Evid
                           {item.fileName}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {item.type} • {formatFileSize(item.fileSize)} • {formatDateTime(item.uploadedOn)}
+                          {formatFileSize(item.fileSize)} • {formatDateTime(item.uploadedOn)}
                         </p>
                       </div>
                     </div>
@@ -213,9 +215,6 @@ export function EvidenceTab({ evidence, onUploadEvidence, onViewDocument }: Evid
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                     Upload Document
                   </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                    Add a new document to this dispute
-                  </p>
                 </div>
                 <button
                   onClick={closeModal}
@@ -239,6 +238,23 @@ export function EvidenceTab({ evidence, onUploadEvidence, onViewDocument }: Evid
                     placeholder="e.g. Aadhaar Card – Front & Back"
                     className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
+                </div>
+
+                {/* Document Type */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                    Document Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={documentType}
+                    onChange={(e) => setDocumentType(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-slate-900 dark:text-white"
+                  >
+                    <option value="">Select document type</option>
+                    <option value="Vehicle">Vehicle</option>
+                    <option value="Company">Company</option>
+                    <option value="Driver">Driver</option>
+                  </select>
                 </div>
 
                 {/* File Drop Zone */}

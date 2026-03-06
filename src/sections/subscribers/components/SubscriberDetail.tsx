@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react'
-import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Wallet, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power } from 'lucide-react'
+import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3 } from 'lucide-react'
 import type { Subscriber, Subscription, User as UserType, Vehicle } from '@/../product/sections/subscribers/types'
 import { AddSubscriberModal } from './AddSubscriberModal'
 
-type TabType = 'details' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'wallet' | 'team'
+type TabType = 'details' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'team' | 'api-catalogue' | 'report'
 
 interface SubscriberDetailProps {
   subscriber: Subscriber
@@ -13,7 +13,6 @@ interface SubscriberDetailProps {
   challans?: any[]
   documents?: any[]
   vehicles?: Vehicle[]
-  walletTransactions?: any[]
   teamMembers?: UserType[]
   onBack?: () => void
   onEdit?: (id: string) => void
@@ -21,9 +20,10 @@ interface SubscriberDetailProps {
   onDeleteDocument?: (subscriberId: string, docId: string) => void
   onViewIncident?: (incidentId: string) => void
   onViewChallan?: (challanId: string) => void
-  onViewTransaction?: (transactionId: string) => void
   onEditVehicle?: (vehicleId: string) => void
   onDeactivateVehicle?: (vehicleId: string) => void
+  onBulkUpdateVehicles?: (subscriberId: string, file: File) => void
+  onDownloadVehicleTemplate?: () => void
   onAssignTeamMember?: () => void
   onRemoveTeamMember?: (userId: string) => void
   users?: UserType[]
@@ -41,7 +41,6 @@ export function SubscriberDetail({
   challans = [],
   documents = [],
   vehicles = [],
-  walletTransactions = [],
   teamMembers = [],
   onBack,
   onEdit,
@@ -49,9 +48,10 @@ export function SubscriberDetail({
   onDeleteDocument,
   onViewIncident,
   onViewChallan,
-  onViewTransaction,
   onEditVehicle,
   onDeactivateVehicle,
+  onBulkUpdateVehicles,
+  onDownloadVehicleTemplate,
   onAssignTeamMember,
   onRemoveTeamMember,
   users = [],
@@ -76,6 +76,9 @@ export function SubscriberDetail({
   const [newTeamName, setNewTeamName] = useState('')
   const [newTeamEmail, setNewTeamEmail] = useState('')
   const [newTeamDesignation, setNewTeamDesignation] = useState('')
+  const [showBulkUpdateVehicleModal, setShowBulkUpdateVehicleModal] = useState(false)
+  const [bulkUpdateFile, setBulkUpdateFile] = useState<File | null>(null)
+  const [isBulkUpdateDragging, setIsBulkUpdateDragging] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showUploadDocModal, setShowUploadDocModal] = useState(false)
   const [uploadDocCategory, setUploadDocCategory] = useState('')
@@ -134,8 +137,9 @@ export function SubscriberDetail({
       incidents: <AlertTriangle className="w-4 h-4" />,
       documents: <FileText className="w-4 h-4" />,
       vehicles: <Truck className="w-4 h-4" />,
-      wallet: <Wallet className="w-4 h-4" />,
-      team: <Users className="w-4 h-4" />
+      team: <Users className="w-4 h-4" />,
+      'api-catalogue': <BookOpen className="w-4 h-4" />,
+      report: <BarChart3 className="w-4 h-4" />
     }
     return icons[tab]
   }
@@ -175,7 +179,7 @@ export function SubscriberDetail({
         {/* Tabs */}
         <div className="mb-6 -mx-6 lg:-mx-8 px-6 lg:px-8 overflow-x-auto">
           <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit min-w-full">
-            {(['details', 'vehicles', 'incidents', 'challans', 'wallet', 'documents', 'team'] as TabType[]).map((tab) => (
+            {(['details', 'vehicles', 'incidents', 'challans', 'documents', 'team', 'api-catalogue', 'report'] as TabType[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -186,7 +190,7 @@ export function SubscriberDetail({
                 }`}
               >
                 {getTabIcon(tab)}
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'api-catalogue' ? 'API Catalogue' : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>
@@ -534,15 +538,24 @@ export function SubscriberDetail({
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Linked Vehicles ({vehicles.length})</h2>
-                <button
-                  onClick={() => setShowAddVehicleModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add Vehicle
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowBulkUpdateVehicleModal(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Bulk Update
+                  </button>
+                  <button
+                    onClick={() => setShowAddVehicleModal(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Vehicle
+                  </button>
+                </div>
               </div>
 
               {/* Search & Filter */}
@@ -738,91 +751,6 @@ export function SubscriberDetail({
             </div>
           )}
 
-          {/* Wallet Tab */}
-          {activeTab === 'wallet' && (
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Wallet & Transactions</h2>
-
-              {/* Wallet Summary */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/30 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium mb-1">Total Paid</p>
-                  <p className="text-2xl font-semibold text-emerald-900 dark:text-emerald-50">₹0</p>
-                </div>
-                <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/30 rounded-lg border border-amber-200 dark:border-amber-800">
-                  <p className="text-xs text-amber-700 dark:text-amber-400 font-medium mb-1">Credits</p>
-                  <p className="text-2xl font-semibold text-amber-900 dark:text-amber-50">₹0</p>
-                </div>
-                <div className="p-4 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/30 rounded-lg border border-red-200 dark:border-red-800">
-                  <p className="text-xs text-red-700 dark:text-red-400 font-medium mb-1">Outstanding</p>
-                  <p className="text-2xl font-semibold text-red-900 dark:text-red-50">₹0</p>
-                </div>
-              </div>
-
-              {/* Transaction History */}
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Transaction History</h3>
-              {walletTransactions.length === 0 ? (
-                <div className="text-center py-12">
-                  <Wallet className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-500 dark:text-slate-400">No transactions yet</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Type</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Description</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Amount</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {walletTransactions.map((transaction) => (
-                        <tr key={transaction.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(transaction.date)}</td>
-                          <td className="px-4 py-3">
-                            <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
-                              {transaction.type}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-900 dark:text-slate-50">{transaction.description}</td>
-                          <td className={`px-4 py-3 text-sm font-medium text-right ${
-                            transaction.type === 'credit'
-                              ? 'text-emerald-600 dark:text-emerald-400'
-                              : 'text-red-600 dark:text-red-400'
-                          }`}>
-                            {transaction.type === 'credit' ? '+' : '-'}₹{transaction.amount?.toLocaleString('en-IN')}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
-                              transaction.status === 'completed'
-                                ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                                : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                            }`}>
-                              {transaction.status}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <button
-                              onClick={() => onViewTransaction?.(transaction.id)}
-                              className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
-                            >
-                              View
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          )}
-
-
           {/* Team Tab */}
           {activeTab === 'team' && (
             <div>
@@ -860,6 +788,28 @@ export function SubscriberDetail({
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* API Catalogue Tab */}
+          {activeTab === 'api-catalogue' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">API Catalogue</h2>
+              <div className="text-center py-12">
+                <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-500 dark:text-slate-400">No API integrations configured yet</p>
+              </div>
+            </div>
+          )}
+
+          {/* Report Tab */}
+          {activeTab === 'report' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Reports</h2>
+              <div className="text-center py-12">
+                <BarChart3 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-500 dark:text-slate-400">No reports available yet</p>
+              </div>
             </div>
           )}
         </div>
@@ -1097,6 +1047,112 @@ export function SubscriberDetail({
                 className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add Vehicle
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Update Vehicles Modal */}
+      {showBulkUpdateVehicleModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-lg my-8">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Bulk Update Vehicles</h3>
+              <button
+                onClick={() => { setShowBulkUpdateVehicleModal(false); setBulkUpdateFile(null) }}
+                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-5">
+              {/* Download Template */}
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                  Download the CSV template, fill in the vehicle details, and upload it to update vehicles in bulk.
+                </p>
+                <button
+                  onClick={() => onDownloadVehicleTemplate?.()}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Download CSV Template
+                </button>
+              </div>
+
+              {/* Upload Area */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Upload CSV File <span className="text-red-500">*</span>
+                </label>
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsBulkUpdateDragging(true) }}
+                  onDragLeave={(e) => { e.preventDefault(); setIsBulkUpdateDragging(false) }}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    setIsBulkUpdateDragging(false)
+                    const files = e.dataTransfer.files
+                    if (files.length > 0) {
+                      const file = files[0]
+                      if (file.name.endsWith('.csv') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                        setBulkUpdateFile(file)
+                      }
+                    }
+                  }}
+                  className="relative"
+                >
+                  <input
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={(e) => setBulkUpdateFile(e.target.files?.[0] || null)}
+                    className="hidden"
+                    id="bulk-update-vehicle-input"
+                  />
+                  <label
+                    htmlFor="bulk-update-vehicle-input"
+                    className={`flex flex-col items-center gap-2 p-8 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                      isBulkUpdateDragging
+                        ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
+                        : 'border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:border-cyan-400 dark:hover:border-cyan-600'
+                    }`}
+                  >
+                    {bulkUpdateFile ? (
+                      <>
+                        <FileText className="w-10 h-10 text-cyan-500" />
+                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{bulkUpdateFile.name}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{(bulkUpdateFile.size / 1024).toFixed(1)} KB — Click to change</p>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-10 h-10 text-slate-400" />
+                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">Drop your CSV file here</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">or click to browse (.csv, .xlsx, .xls)</p>
+                      </>
+                    )}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => { setShowBulkUpdateVehicleModal(false); setBulkUpdateFile(null) }}
+                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (bulkUpdateFile) {
+                    onBulkUpdateVehicles?.(subscriber.id, bulkUpdateFile)
+                    setShowBulkUpdateVehicleModal(false)
+                    setBulkUpdateFile(null)
+                  }
+                }}
+                disabled={!bulkUpdateFile}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Upload & Update
               </button>
             </div>
           </div>

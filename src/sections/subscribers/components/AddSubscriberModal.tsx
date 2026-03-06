@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Check, ChevronRight, ChevronLeft } from 'lucide-react'
+import { X, Check, ChevronRight, ChevronLeft, Upload, FileText, Trash2 } from 'lucide-react'
 import type { Subscriber, User, Partner } from '@/../product/sections/subscribers/types'
 
 interface AddSubscriberModalProps {
@@ -14,12 +14,21 @@ interface AddSubscriberModalProps {
   initialData?: Partial<Subscriber> & Record<string, any>
 }
 
+interface UploadedDocument {
+  id: string
+  file: File
+  category: string
+}
+
 const STEPS = [
   { id: 'classification', label: 'Classification' },
   { id: 'contact', label: 'POC' },
   { id: 'location', label: 'Address' },
+  { id: 'documents', label: 'Documents' },
   { id: 'assignment', label: 'Partner' },
 ]
+
+const DOCUMENT_CATEGORIES = ['Vehicle', 'Company', 'Driver']
 
 const inputClass = (hasError: boolean) =>
   `w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
@@ -72,6 +81,8 @@ export function AddSubscriberModal({
     drivingLicenseNumber: initialData?.drivingLicenseNumber || null as string | null,
   })
 
+  const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([])
+  const [docCategory, setDocCategory] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const REQUIRED_FIELDS: Record<string, string> = {
@@ -108,6 +119,8 @@ export function AddSubscriberModal({
         return ['contactPerson', 'phoneNumber', 'emailId']
       case 'location':
         return ['country', 'state', 'city', 'area', 'addressLane', 'pinCode']
+      case 'documents':
+        return []
       case 'assignment':
         return ['assignedOwner']
       default:
@@ -567,8 +580,103 @@ export function AddSubscriberModal({
             </div>
           )}
 
-          {/* Step 4: Assignment & Additional */}
+          {/* Step 4: Documents */}
           {currentStep === 3 && (
+            <div>
+              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-4">Upload Documents</h3>
+
+              {/* Upload area */}
+              <div className="mb-5">
+                <div className="flex items-end gap-3 mb-3">
+                  <div className="flex-1">
+                    <label className={labelClass}>Document Category</label>
+                    <select
+                      value={docCategory}
+                      onChange={e => setDocCategory(e.target.value)}
+                      className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    >
+                      <option value="">Select category</option>
+                      {DOCUMENT_CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-1">
+                    <label className={labelClass}>File</label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.doc,.docx"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file && docCategory) {
+                            setUploadedDocs(prev => [...prev, {
+                              id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                              file,
+                              category: docCategory
+                            }])
+                            setDocCategory('')
+                            e.target.value = ''
+                          }
+                        }}
+                        disabled={!docCategory}
+                        className="hidden"
+                        id="add-subscriber-doc-input"
+                      />
+                      <label
+                        htmlFor="add-subscriber-doc-input"
+                        className={`flex items-center gap-2 px-3 py-2 border border-dashed rounded-lg text-xs sm:text-sm transition-colors ${
+                          docCategory
+                            ? 'border-cyan-400 dark:border-cyan-600 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 cursor-pointer hover:bg-cyan-100 dark:hover:bg-cyan-900/30'
+                            : 'border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <Upload className="w-4 h-4" />
+                        {docCategory ? 'Choose file...' : 'Select category first'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Uploaded documents list */}
+              {uploadedDocs.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">{uploadedDocs.length} document{uploadedDocs.length !== 1 ? 's' : ''} added</p>
+                  {uploadedDocs.map((doc) => (
+                    <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FileText className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-900 dark:text-slate-50 truncate">{doc.file.name}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="inline-flex px-2 py-0.5 bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 rounded text-xs font-medium">{doc.category}</span>
+                            <span className="text-xs text-slate-400">{(doc.file.size / 1024).toFixed(1)} KB</span>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setUploadedDocs(prev => prev.filter(d => d.id !== doc.id))}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex-shrink-0"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg">
+                  <FileText className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No documents added yet</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Select a category and upload a file above</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 5: Assignment & Additional */}
+          {currentStep === 4 && (
             <div>
               <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Assignment & Additional</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -14,6 +14,8 @@ interface CreateDisputeFormData {
   raisedBy: DisputeRaisedBy | ''
   priority: DisputePriority | ''
   source: string
+  reporterName: string
+  reporterNumber: string
   description: string
   disputedAmount: string
 }
@@ -30,6 +32,8 @@ const INITIAL_FORM: CreateDisputeFormData = {
   raisedBy: '',
   priority: '',
   source: '',
+  reporterName: '',
+  reporterNumber: '',
   description: '',
   disputedAmount: '',
 }
@@ -48,7 +52,6 @@ export function CreateDisputeModal({ onCreateDispute, onClose }: CreateDisputeMo
     form.linkedEntityType !== '' &&
     form.linkedEntityId.trim() !== '' &&
     form.disputeType !== '' &&
-    form.raisedBy !== '' &&
     form.priority !== '' &&
     form.source.trim() !== ''
 
@@ -67,9 +70,6 @@ export function CreateDisputeModal({ onCreateDispute, onClose }: CreateDisputeMo
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
               Create New Dispute
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Raise a dispute against an incident, subscriber, or payment
-            </p>
           </div>
           <button
             onClick={onClose}
@@ -126,8 +126,8 @@ export function CreateDisputeModal({ onCreateDispute, onClose }: CreateDisputeMo
             </div>
           </div>
 
-          {/* Type, Raised By, Priority */}
-          <div className="grid grid-cols-3 gap-4">
+          {/* Type, Priority */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                 Dispute Type <span className="text-red-500">*</span>
@@ -142,21 +142,6 @@ export function CreateDisputeModal({ onCreateDispute, onClose }: CreateDisputeMo
                 <option value="service">Service</option>
                 <option value="payment">Payment</option>
                 <option value="legal_escalation">Legal Escalation</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Raised By <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={form.raisedBy}
-                onChange={(e) => updateField('raisedBy', e.target.value as DisputeRaisedBy)}
-                className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-              >
-                <option value="">Select source</option>
-                <option value="customer">Customer</option>
-                <option value="subscriber">Subscriber</option>
-                <option value="internal">Internal</option>
               </select>
             </div>
             <div>
@@ -182,13 +167,45 @@ export function CreateDisputeModal({ onCreateDispute, onClose }: CreateDisputeMo
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
               Source <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <select
               value={form.source}
               onChange={(e) => updateField('source', e.target.value)}
-              placeholder="e.g. Support Module, Incident Detail View"
-              className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
-            />
+              className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+            >
+              <option value="">Select source</option>
+              <option value="Email">Email</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="IVR">IVR</option>
+              <option value="Internal">Internal</option>
+            </select>
+          </div>
+
+          {/* Customer Name & Number */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                Customer Name
+              </label>
+              <input
+                type="text"
+                value={form.reporterName}
+                onChange={(e) => updateField('reporterName', e.target.value)}
+                placeholder="Enter customer name"
+                className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                Customer Number
+              </label>
+              <input
+                type="text"
+                value={form.reporterNumber}
+                onChange={(e) => updateField('reporterNumber', e.target.value)}
+                placeholder="Enter phone number"
+                className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
+              />
+            </div>
           </div>
 
           {/* Reason */}
@@ -205,24 +222,6 @@ export function CreateDisputeModal({ onCreateDispute, onClose }: CreateDisputeMo
             />
           </div>
 
-          {/* Amount */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-              Disputed Amount
-            </label>
-            <div className="relative max-w-xs">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                ₹
-              </span>
-              <input
-                type="number"
-                value={form.disputedAmount}
-                onChange={(e) => updateField('disputedAmount', e.target.value)}
-                placeholder="0.00"
-                className="w-full pl-7 pr-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
-              />
-            </div>
-          </div>
         </div>
 
         {/* Actions */}

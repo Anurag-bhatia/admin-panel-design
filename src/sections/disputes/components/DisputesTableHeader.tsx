@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Upload, Filter, X, Plus, RefreshCw } from 'lucide-react'
+import { Search, Filter, X, Plus, RefreshCw } from 'lucide-react'
 import type { DisputeType, DisputePriority, Reviewer } from '@/../product/sections/disputes/types'
 
 export interface DisputeFilters {
@@ -14,7 +14,6 @@ interface DisputesTableHeaderProps {
   reviewers: Reviewer[]
   searchQuery: string
   onSearchChange: (query: string) => void
-  onImportDisputes?: () => void
   onBulkUpdate?: () => void
   onCreateDispute?: () => void
   onFilter?: (filters: DisputeFilters) => void
@@ -24,7 +23,6 @@ export function DisputesTableHeader({
   reviewers,
   searchQuery,
   onSearchChange,
-  onImportDisputes,
   onBulkUpdate,
   onCreateDispute,
   onFilter,
@@ -90,15 +88,6 @@ export function DisputesTableHeader({
           >
             <RefreshCw className="h-4 w-4" />
             <span>Bulk Update</span>
-          </button>
-
-          {/* Import */}
-          <button
-            onClick={onImportDisputes}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-          >
-            <Upload className="h-4 w-4" />
-            <span>Import</span>
           </button>
 
           {/* New Dispute */}

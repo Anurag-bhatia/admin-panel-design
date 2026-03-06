@@ -22,21 +22,21 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
     label: 'Open',
     className: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
   },
-  under_review: {
-    label: 'Under Review',
+  in_progress: {
+    label: 'In Progress',
     className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
   },
-  escalated: {
-    label: 'Escalated',
+  refund_raised: {
+    label: 'Refund Raised',
     className: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
   },
-  resolved: {
-    label: 'Resolved',
-    className: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
-  },
-  rejected: {
-    label: 'Rejected',
+  not_settled: {
+    label: 'Not Settled',
     className: 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
+  },
+  settled: {
+    label: 'Settled',
+    className: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
   },
 }
 

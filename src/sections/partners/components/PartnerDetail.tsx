@@ -612,31 +612,6 @@ export function PartnerDetail({
             </div>
           )}
 
-          {/* Activity Tab */}
-          {activeTab === 'activity' && (
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Activity Log</h2>
-              <div className="space-y-3">
-                {partner.activityLog.length === 0 ? (
-                  <p className="text-sm text-slate-500 dark:text-slate-400">No activity yet</p>
-                ) : (
-                  partner.activityLog.map((entry, idx) => (
-                    <div key={entry.id} className={`flex gap-4 ${idx !== partner.activityLog.length - 1 ? 'pb-3 border-b border-slate-200 dark:border-slate-800' : ''}`}>
-                      <div className="flex flex-col items-center">
-                        <div className="w-2 h-2 rounded-full bg-cyan-500 mt-1.5" />
-                        {idx !== partner.activityLog.length - 1 && <div className="w-0.5 h-12 bg-slate-200 dark:bg-slate-800 my-1" />}
-                      </div>
-                      <div className="flex-1 pt-0.5">
-                        <p className="font-medium text-slate-900 dark:text-slate-50">{entry.action}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{entry.details}</p>
-                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{formatDate(entry.timestamp)}</p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
         </div>
         )}
       </div>
