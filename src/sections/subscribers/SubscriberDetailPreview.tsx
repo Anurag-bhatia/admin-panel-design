@@ -31,7 +31,8 @@ export default function SubscriberDetailPreview() {
       amount: 2000,
       status: 'resolved',
       challanType: 'online',
-      date: '2024-01-15T09:30:00Z'
+      date: '2024-01-15T09:30:00Z',
+      location: 'Mumbai-Pune Expressway, Lonavala'
     },
     {
       id: 'CH-2024-002',
@@ -40,7 +41,8 @@ export default function SubscriberDetailPreview() {
       amount: 1500,
       status: 'pending',
       challanType: 'court',
-      date: '2024-01-28T16:45:00Z'
+      date: '2024-01-28T16:45:00Z',
+      location: 'Lucknow-Agra Expressway, Unnao'
     },
     {
       id: 'CH-2024-003',
@@ -49,7 +51,8 @@ export default function SubscriberDetailPreview() {
       amount: 500,
       status: 'resolved',
       challanType: 'online',
-      date: '2024-02-02T11:20:00Z'
+      date: '2024-02-02T11:20:00Z',
+      location: 'Connaught Place, New Delhi'
     }
   ]
 

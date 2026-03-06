@@ -1,5 +1,5 @@
 import React from 'react'
-import { SECTION_IDS, getSectionLabel, getSectionIcon, SectionId } from './sectionRegistry'
+import { VISIBLE_SECTION_IDS, getSectionLabel, getSectionIcon, SectionId } from './sectionRegistry'
 import { usePreviewState } from './usePreviewState'
 
 interface PreviewSidebarProps {
@@ -20,7 +20,7 @@ export const PreviewSidebar: React.FC<PreviewSidebarProps> = ({
       </div>
 
       <nav className="p-4 space-y-2">
-        {SECTION_IDS.map((sectionId) => {
+        {VISIBLE_SECTION_IDS.map((sectionId) => {
           const label = getSectionLabel(sectionId)
           const Icon = getSectionIcon(sectionId)
           const isActive = activeSection === sectionId

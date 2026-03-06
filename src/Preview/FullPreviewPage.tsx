@@ -4,7 +4,7 @@ import SectionRenderer from './SectionRenderer'
 import { LoginPage } from '../sections/auth/components/LoginPage'
 import {
   SECTION_DATA,
-  SECTION_IDS,
+  VISIBLE_SECTION_IDS,
   isSectionId,
   SectionId,
 } from './sectionRegistry'
@@ -15,7 +15,7 @@ const FullPreviewPage: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true)
 
   // Build navigation items from SECTION_DATA
-  const navigationItems: NavigationItem[] = SECTION_IDS.map((sectionId) => {
+  const navigationItems: NavigationItem[] = VISIBLE_SECTION_IDS.map((sectionId) => {
     const data = SECTION_DATA[sectionId]
     const navItem: NavigationItem = {
       label: data.label,

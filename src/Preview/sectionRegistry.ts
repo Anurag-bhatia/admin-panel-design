@@ -137,6 +137,12 @@ export const SECTION_IDS = [
   'lawyers',
 ] as const
 
+// Sections hidden from sidebar navigation (kept in registry for data access)
+export const HIDDEN_SECTIONS: Set<string> = new Set(['customers'])
+
+// Visible section IDs for navigation
+export const VISIBLE_SECTION_IDS = SECTION_IDS.filter((id) => !HIDDEN_SECTIONS.has(id))
+
 export type SectionId = (typeof SECTION_IDS)[number]
 
 export function isSectionId(value: unknown): value is SectionId {

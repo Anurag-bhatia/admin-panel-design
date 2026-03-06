@@ -64,13 +64,13 @@ export function SubscribersDashboard({
 
   // Sample challans data
   const challans = selectedSubscriber ? [
-    { id: 'MH11279200417102541', vehicleNumber: 'MH02AB1234', violation: 'Overspeeding on National Highway Beyond Permissible Limit', amount: 2000, status: 'pending', challanType: 'online', date: '2024-02-10T08:30:00Z' },
-    { id: 'MH11279200417102542', vehicleNumber: 'MH02AB1234', violation: 'Red Light Jump at Signal Controlled Intersection', amount: 5000, status: 'resolved', challanType: 'court', date: '2024-01-15T11:00:00Z' },
-    { id: 'MH11279200417102543', vehicleNumber: 'MH02AB1234', violation: 'No Parking in Designated No-Parking Zone', amount: 1500, status: 'pending', challanType: 'online', date: '2024-02-20T14:45:00Z' },
-    { id: 'MH11279200417102544', vehicleNumber: 'MH02CD5678', violation: 'Overloading Beyond Permitted Gross Vehicle Weight', amount: 10000, status: 'pending', challanType: 'court', date: '2024-02-05T09:15:00Z' },
-    { id: 'MH11279200417102545', vehicleNumber: 'MH02CD5678', violation: 'Lane Violation and Dangerous Driving on Expressway', amount: 3000, status: 'resolved', challanType: 'online', date: '2023-12-28T16:30:00Z' },
-    { id: 'MH11279200417102546', vehicleNumber: 'MH04EF9012', violation: 'Expired Vehicle Registration and Fitness Certificate', amount: 7500, status: 'pending', challanType: 'court', date: '2024-02-18T10:00:00Z' },
-    { id: 'MH11279200417102547', vehicleNumber: 'MH04EF9012', violation: 'Riding Without Helmet in Municipal Corporation Area', amount: 1000, status: 'resolved', challanType: 'online', date: '2024-01-05T13:20:00Z' },
+    { id: 'MH11279200417102541', vehicleNumber: 'MH02AB1234', violation: 'Overspeeding on National Highway Beyond Permissible Limit', amount: 2000, status: 'pending', challanType: 'online', date: '2024-02-10T08:30:00Z', location: 'Mumbai-Pune Expressway, Lonavala' },
+    { id: 'MH11279200417102542', vehicleNumber: 'MH02AB1234', violation: 'Red Light Jump at Signal Controlled Intersection', amount: 5000, status: 'resolved', challanType: 'court', date: '2024-01-15T11:00:00Z', location: 'Andheri Signal, Mumbai' },
+    { id: 'MH11279200417102543', vehicleNumber: 'MH02AB1234', violation: 'No Parking in Designated No-Parking Zone', amount: 1500, status: 'pending', challanType: 'online', date: '2024-02-20T14:45:00Z', location: 'Bandra West, Mumbai' },
+    { id: 'MH11279200417102544', vehicleNumber: 'MH02CD5678', violation: 'Overloading Beyond Permitted Gross Vehicle Weight', amount: 10000, status: 'pending', challanType: 'court', date: '2024-02-05T09:15:00Z', location: 'Vashi Toll Naka, Navi Mumbai' },
+    { id: 'MH11279200417102545', vehicleNumber: 'MH02CD5678', violation: 'Lane Violation and Dangerous Driving on Expressway', amount: 3000, status: 'resolved', challanType: 'online', date: '2023-12-28T16:30:00Z', location: 'Eastern Express Highway, Thane' },
+    { id: 'MH11279200417102546', vehicleNumber: 'MH04EF9012', violation: 'Expired Vehicle Registration and Fitness Certificate', amount: 7500, status: 'pending', challanType: 'court', date: '2024-02-18T10:00:00Z', location: 'Hinjewadi, Pune' },
+    { id: 'MH11279200417102547', vehicleNumber: 'MH04EF9012', violation: 'Riding Without Helmet in Municipal Corporation Area', amount: 1000, status: 'resolved', challanType: 'online', date: '2024-01-05T13:20:00Z', location: 'FC Road, Pune' },
   ] : []
 
   // Sample team members

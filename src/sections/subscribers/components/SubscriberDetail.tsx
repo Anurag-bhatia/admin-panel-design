@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Wallet, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download } from 'lucide-react'
+import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Wallet, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power } from 'lucide-react'
 import type { Subscriber, Subscription, User as UserType, Vehicle } from '@/../product/sections/subscribers/types'
 import { AddSubscriberModal } from './AddSubscriberModal'
 
@@ -22,6 +22,8 @@ interface SubscriberDetailProps {
   onViewIncident?: (incidentId: string) => void
   onViewChallan?: (challanId: string) => void
   onViewTransaction?: (transactionId: string) => void
+  onEditVehicle?: (vehicleId: string) => void
+  onDeactivateVehicle?: (vehicleId: string) => void
   onAssignTeamMember?: () => void
   onRemoveTeamMember?: (userId: string) => void
   users?: UserType[]
@@ -48,6 +50,8 @@ export function SubscriberDetail({
   onViewIncident,
   onViewChallan,
   onViewTransaction,
+  onEditVehicle,
+  onDeactivateVehicle,
   onAssignTeamMember,
   onRemoveTeamMember,
   users = [],
@@ -67,6 +71,7 @@ export function SubscriberDetail({
   const [showVehicleFilters, setShowVehicleFilters] = useState(false)
   const [vehiclePage, setVehiclePage] = useState(1)
   const vehiclePageSize = 5
+  const [vehicleActionMenu, setVehicleActionMenu] = useState<string | null>(null)
   const [showAddTeamModal, setShowAddTeamModal] = useState(false)
   const [newTeamName, setNewTeamName] = useState('')
   const [newTeamEmail, setNewTeamEmail] = useState('')
@@ -307,7 +312,7 @@ export function SubscriberDetail({
         )}
 
         {/* Tab Content */}
-        <div className={`bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 ${activeTab === 'details' ? 'hidden' : ''}`}>
+        <div className={`bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 overflow-visible ${activeTab === 'details' ? 'hidden' : ''}`}>
           {/* Challans Tab */}
           {activeTab === 'challans' && (
             <div>
@@ -375,15 +380,10 @@ export function SubscriberDetail({
                                 </div>
                               ) : (
                                 (currentSubTab === 'pending' ? pendingChallans : paidChallans).map((challan) => (
-                                  <div key={challan.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                                  <div key={challan.id} className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30">
                                     <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2">
-                                        <span className="relative group">
-                                          <p className="text-sm font-medium text-slate-900 dark:text-slate-50 truncate max-w-[150px] cursor-default">{challan.violation}</p>
-                                          <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 z-50 hidden group-hover:block w-max max-w-xs px-2.5 py-1.5 rounded-md bg-slate-900 dark:bg-slate-100 text-xs text-white dark:text-slate-900 shadow-lg">
-                                            {challan.violation}
-                                          </span>
-                                        </span>
+                                      <div className="flex items-center gap-2.5">
+                                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{challan.violation}</p>
                                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
                                           challan.status === 'pending'
                                             ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
@@ -401,15 +401,18 @@ export function SubscriberDetail({
                                           </span>
                                         )}
                                       </div>
-                                      <div className="flex items-center gap-3 mt-1">
+                                      <div className="flex items-center gap-4 mt-2">
                                         <span className="text-xs text-slate-500 dark:text-slate-400">{challan.id}</span>
                                         <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                                           <Calendar className="w-3 h-3" />
                                           {formatDate(challan.date)}
                                         </span>
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                                          {challan.location}
+                                        </span>
                                       </div>
                                     </div>
-                                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">₹{challan.amount?.toLocaleString('en-IN')}</p>
+                                    <p className="text-base font-semibold text-slate-900 dark:text-slate-50 ml-4">₹{challan.amount?.toLocaleString('en-IN')}</p>
                                   </div>
                                 ))
                               )}
@@ -500,31 +503,6 @@ export function SubscriberDetail({
                         <FileText className="w-5 h-5 text-slate-400 flex-shrink-0" />
                         <div className="min-w-0">
                           <p className="font-medium text-slate-900 dark:text-slate-50">{doc.fileName}</p>
-                          <div className="flex flex-wrap items-center gap-2 mt-1.5">
-                            {doc.category && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400">
-                                {doc.category}
-                              </span>
-                            )}
-                            {doc.vehicleNumber && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                                <Truck className="w-3 h-3" />
-                                {doc.vehicleNumber}
-                              </span>
-                            )}
-                            {doc.companyName && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                                <Building2 className="w-3 h-3" />
-                                {doc.companyName}
-                              </span>
-                            )}
-                            {doc.driverName && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                                <Users className="w-3 h-3" />
-                                {doc.driverName}
-                              </span>
-                            )}
-                          </div>
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Uploaded {formatDate(doc.uploadedDate)}</p>
                         </div>
                       </div>
@@ -645,7 +623,7 @@ export function SubscriberDetail({
                   </button>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="overflow-visible">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-slate-200 dark:border-slate-800">
@@ -655,6 +633,7 @@ export function SubscriberDetail({
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Model</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Registration Date</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -674,6 +653,44 @@ export function SubscriberDetail({
                               {vehicle.status === 'active' ? 'Active' : 'Inactive'}
                             </span>
                           </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="relative inline-block">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setVehicleActionMenu(vehicleActionMenu === vehicle.id ? null : vehicle.id)
+                                }}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </button>
+                              {vehicleActionMenu === vehicle.id && (
+                                <>
+                                  <div className="fixed inset-0 z-40" onClick={() => setVehicleActionMenu(null)} />
+                                  <div className="absolute right-0 top-full mt-1 z-50 w-44 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg py-1">
+                                    <button
+                                      onClick={() => {
+                                        onEditVehicle?.(vehicle.id)
+                                        setVehicleActionMenu(null)
+                                      }}
+                                      className="w-full text-left px-3.5 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                                    >
+                                      Edit Vehicle
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        onDeactivateVehicle?.(vehicle.id)
+                                        setVehicleActionMenu(null)
+                                      }}
+                                      className="w-full text-left px-3.5 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                    >
+                                      Deactivate Vehicle
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -682,8 +699,8 @@ export function SubscriberDetail({
               )}
 
               {/* Pagination */}
-              {filteredVehicles.length > vehiclePageSize && (
-                <div className="mt-4 flex items-center justify-between">
+              {filteredVehicles.length > 0 && (
+                <div className="mt-4 flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-4">
                   <p className="text-sm text-slate-500 dark:text-slate-400">
                     Showing <span className="font-semibold text-slate-700 dark:text-slate-300">{(vehiclePage - 1) * vehiclePageSize + 1}</span> to <span className="font-semibold text-slate-700 dark:text-slate-300">{Math.min(vehiclePage * vehiclePageSize, filteredVehicles.length)}</span> of <span className="font-semibold text-slate-700 dark:text-slate-300">{filteredVehicles.length}</span>
                   </p>
@@ -695,7 +712,7 @@ export function SubscriberDetail({
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                     </button>
-                    {Array.from({ length: vehicleTotalPages }, (_, i) => i + 1).map(page => (
+                    {Array.from({ length: Math.max(1, vehicleTotalPages) }, (_, i) => i + 1).map(page => (
                       <button
                         key={page}
                         onClick={() => setVehiclePage(page)}
@@ -709,8 +726,8 @@ export function SubscriberDetail({
                       </button>
                     ))}
                     <button
-                      onClick={() => setVehiclePage(p => Math.min(vehicleTotalPages, p + 1))}
-                      disabled={vehiclePage === vehicleTotalPages}
+                      onClick={() => setVehiclePage(p => Math.min(Math.max(1, vehicleTotalPages), p + 1))}
+                      disabled={vehiclePage >= vehicleTotalPages}
                       className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>

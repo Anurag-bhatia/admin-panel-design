@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck } from 'lucide-react'
+import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { PartnerDetailProps } from '@/../product/sections/partners/types'
 
-type TabType = 'profile' | 'subscribers' | 'vehicles' | 'financial' | 'documents' | 'activity'
+type TabType = 'profile' | 'subscribers' | 'vehicles' | 'financial' | 'documents'
 
 export function PartnerDetail({
   partner,
@@ -14,6 +14,12 @@ export function PartnerDetail({
 }: PartnerDetailProps) {
   const [activeTab, setActiveTab] = useState<TabType>('profile')
   const [showDocumentUpload, setShowDocumentUpload] = useState(false)
+  const [vehiclePage, setVehiclePage] = useState(1)
+  const vehiclesPerPage = 5
+  const totalVehicles = partner.linkedVehicles?.length || 0
+  const totalVehiclePages = Math.max(1, Math.ceil(totalVehicles / vehiclesPerPage))
+  const safeVehiclePage = Math.min(vehiclePage, totalVehiclePages)
+  const paginatedVehicles = partner.linkedVehicles?.slice((safeVehiclePage - 1) * vehiclesPerPage, safeVehiclePage * vehiclesPerPage) || []
 
   const handleEditClick = () => {
     onEditPartner?.(partner.id)
@@ -40,11 +46,12 @@ export function PartnerDetail({
       subscribers: <Users className="w-4 h-4" />,
       vehicles: <Truck className="w-4 h-4" />,
       financial: <BarChart3 className="w-4 h-4" />,
-      documents: <FileCheck className="w-4 h-4" />,
-      activity: <Clock className="w-4 h-4" />
+      documents: <FileCheck className="w-4 h-4" />
     }
     return icons[tab]
   }
+
+  const isChallanPay = partner.partnerType === 'challanPay'
 
   const SubscriberStatusBadge = ({ status }: { status: 'active' | 'inactive' | 'paused' }) => {
     const styles = {
@@ -72,13 +79,18 @@ export function PartnerDetail({
           </button>
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-semibold text-slate-900 dark:text-slate-50">{partner.companyName}</h1>
+              <h1 className="text-3xl font-semibold text-slate-900 dark:text-slate-50">
+                {isChallanPay ? (partner.companyName || `${partner.firstName} ${partner.lastName}`) : partner.companyName}
+              </h1>
               <span className={`inline-flex px-3 py-1.5 text-xs font-medium rounded-full ${
                 partner.status === 'active'
                   ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
               }`}>
                 {partner.status.charAt(0).toUpperCase() + partner.status.slice(1)}
+              </span>
+              <span className="inline-flex px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                {isChallanPay ? 'ChallanPay' : 'LOTS247'}
               </span>
             </div>
             <p className="text-slate-500 dark:text-slate-400 mt-1">Partner ID: {partner.partnerId}</p>
@@ -93,7 +105,7 @@ export function PartnerDetail({
 
         {/* Tabs */}
         <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit mb-6">
-          {(['profile', 'subscribers', 'vehicles', 'financial', 'documents', 'activity'] as TabType[]).map((tab) => (
+          {(['profile', 'subscribers', 'vehicles', 'financial', 'documents'] as TabType[]).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -110,40 +122,228 @@ export function PartnerDetail({
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
-          {/* Profile Tab */}
-          {activeTab === 'profile' && (
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Partner Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Personal Details</h3>
-                  <div className="space-y-4">
-                    <InfoField label="Contact Person" value={`${partner.firstName} ${partner.lastName}`} />
-                    <InfoField label="Email" value={partner.email} />
-                    <InfoField label="Mobile" value={partner.mobile} />
-                    <InfoField label="Onboarded Date" value={formatDate(partner.dateOnboarded)} />
+
+        {/* Profile Tab — two-column layout with activity sidebar */}
+        {activeTab === 'profile' && (
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left: Profile Content */}
+            <div className="flex-1 min-w-0 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+              {isChallanPay ? (
+                /* ===== ChallanPay Profile ===== */
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Basic Information</h2>
+                    <div className="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg">
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Primary Contact</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.mobile}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Business/Individual Name</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.companyName || `${partner.firstName} ${partner.lastName}`}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Business Type</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.subscriberTypesAllowed?.[0] || 'Not specified'}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">State</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.state}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Pincode</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.pinCode}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Email</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.email}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Onboarded Date</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{formatDate(partner.dateOnboarded)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Permissions */}
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Permissions</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Permissions</p>
+                        <div className="flex flex-wrap gap-2">
+                          {partner.productsAllowed.map((p) => (
+                            <span key={p} className="inline-flex px-2.5 py-1 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 rounded text-xs font-medium">{p}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Dashboard Permissions</p>
+                        <div className="flex flex-wrap gap-2">
+                          {partner.subscriberTypesAllowed.map((t) => (
+                            <span key={t} className="inline-flex px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-xs font-medium">{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bank Details */}
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Bank Details</h2>
+                    <div className="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg">
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Account Holder</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.companyName || `${partner.firstName} ${partner.lastName}`}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Account Number</span>
+                        <span className="text-sm font-mono text-slate-900 dark:text-slate-50">{partner.bankAccountNumber}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Bank Name</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.bankName}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">IFSC Code</span>
+                        <span className="text-sm font-mono text-slate-900 dark:text-slate-50">{(partner as any).ifscCode || '—'}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Company Details</h3>
-                  <div className="space-y-4">
-                    <InfoField label="Company Name" value={partner.companyName} />
-                    <InfoField label="Company Email" value={partner.officialEmail} />
-                    <InfoField label="Company Phone" value={partner.phone} />
-                    <InfoField label="Website" value={partner.website || 'Not provided'} />
+              ) : (
+                /* ===== LOTS247 Profile ===== */
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Personal Information</h2>
+                    <div className="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg">
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Full Name</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.firstName} {partner.lastName}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Email</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.email}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Mobile</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.mobile}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Onboarded Date</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{formatDate(partner.dateOnboarded)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Company Information</h2>
+                    <div className="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg">
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Company Name</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.companyName}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Official Email</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.officialEmail}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Phone</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.phone}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Address</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.address}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">State / City / Pin</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.state}, {partner.city} — {partner.pinCode}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Website</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.website || '—'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Permissions</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Permissions</p>
+                        <div className="flex flex-wrap gap-2">
+                          {partner.productsAllowed.map((p) => (
+                            <span key={p} className="inline-flex px-2.5 py-1 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 rounded text-xs font-medium">{p}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Dashboard Permissions</p>
+                        <div className="flex flex-wrap gap-2">
+                          {partner.subscriberTypesAllowed.map((t) => (
+                            <span key={t} className="inline-flex px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-xs font-medium">{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Bank Details</h2>
+                    <div className="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg">
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Account Holder</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{`${partner.firstName} ${partner.lastName}`}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Account Number</span>
+                        <span className="text-sm font-mono text-slate-900 dark:text-slate-50">{partner.bankAccountNumber}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Bank Name</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.bankName}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">IFSC Code</span>
+                        <span className="text-sm font-mono text-slate-900 dark:text-slate-50">{(partner as any).ifscCode || '—'}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="md:col-span-2">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Address</h3>
-                  <p className="text-slate-600 dark:text-slate-300">{partner.address}</p>
-                  <p className="text-slate-600 dark:text-slate-300">{partner.city}, {partner.state} {partner.pinCode}</p>
-                  <p className="text-slate-600 dark:text-slate-300">{partner.country}</p>
+              )}
+            </div>
+
+            {/* Right: Activity Timeline */}
+            <div className="lg:w-72 xl:w-80 flex-shrink-0">
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6 sticky top-6">
+                <div className="flex items-center gap-2.5 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">Timeline</h3>
+                </div>
+                <div className="relative">
+                  {partner.activityLog.length > 0 && (
+                    <div className="absolute left-[5px] top-2 bottom-2 w-px bg-slate-200 dark:bg-slate-700" />
+                  )}
+                  <div className="space-y-6">
+                    {partner.activityLog.length === 0 ? (
+                      <p className="text-sm text-slate-500 dark:text-slate-400">No activity yet</p>
+                    ) : (
+                      partner.activityLog.map((entry) => (
+                        <TimelineItem key={entry.id} title={entry.action} date={formatDate(entry.timestamp)} />
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
+        {/* Other Tabs — in card wrapper */}
+        {activeTab !== 'profile' && (
+        <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
           {/* Subscribers Tab */}
           {activeTab === 'subscribers' && (
             <div>
@@ -207,55 +407,96 @@ export function PartnerDetail({
               {!partner.linkedVehicles || partner.linkedVehicles.length === 0 ? (
                 <p className="text-slate-500 dark:text-slate-400">No linked vehicles yet</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Registration</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Owner</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Type</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incidents</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Last Incident</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscriber</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {partner.linkedVehicles.map((vehicle) => (
-                        <tr key={vehicle.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3">
-                            <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{vehicle.registrationNumber}</span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div>
-                              <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{vehicle.make} {vehicle.model}</p>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">{vehicle.year}</p>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicle.ownerName}</td>
-                          <td className="px-4 py-3">
-                            <span className="inline-block px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-xs font-medium capitalize">
-                              {vehicle.vehicleType}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <VehicleStatusBadge status={vehicle.status} />
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
-                              {vehicle.incidentCount}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
-                            {vehicle.lastIncidentDate ? formatDate(vehicle.lastIncidentDate) : '—'}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicle.subscriberName}</td>
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Registration</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Owner</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Type</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incidents</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscriber</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {paginatedVehicles.map((vehicle) => (
+                          <tr key={vehicle.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3">
+                              <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{vehicle.registrationNumber}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div>
+                                <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{vehicle.make} {vehicle.model}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">{vehicle.year}</p>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicle.ownerName}</td>
+                            <td className="px-4 py-3">
+                              <span className="inline-block px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-xs font-medium capitalize">
+                                {vehicle.vehicleType}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <VehicleStatusBadge status={vehicle.status} />
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                {vehicle.incidentCount}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicle.subscriberName}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Showing {(safeVehiclePage - 1) * vehiclesPerPage + 1}–{Math.min(safeVehiclePage * vehiclesPerPage, totalVehicles)} of {totalVehicles}
+                      </p>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setVehiclePage(safeVehiclePage - 1)}
+                          disabled={safeVehiclePage === 1}
+                          className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+                            safeVehiclePage === 1
+                              ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        {Array.from({ length: totalVehiclePages }, (_, i) => i + 1).map((page) => (
+                          <button
+                            key={page}
+                            onClick={() => setVehiclePage(page)}
+                            className={`inline-flex items-center justify-center min-w-[32px] h-8 px-2 rounded-md text-sm font-medium transition-colors ${
+                              page === safeVehiclePage
+                                ? 'bg-cyan-500 text-white'
+                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                        <button
+                          onClick={() => setVehiclePage(safeVehiclePage + 1)}
+                          disabled={safeVehiclePage === totalVehiclePages}
+                          className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+                            safeVehiclePage === totalVehiclePages
+                              ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                </>
               )}
             </div>
           )}
@@ -397,6 +638,19 @@ export function PartnerDetail({
             </div>
           )}
         </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function TimelineItem({ title, date }: { title: string; date: string }) {
+  return (
+    <div className="flex gap-3.5 relative">
+      <div className="relative z-10 w-[11px] h-[11px] rounded-full bg-cyan-400 dark:bg-cyan-500 mt-1 flex-shrink-0 ring-2 ring-white dark:ring-slate-900" />
+      <div>
+        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{title}</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{date}</p>
       </div>
     </div>
   )
@@ -412,14 +666,5 @@ function VehicleStatusBadge({ status }: { status: 'active' | 'inactive' | 'black
     <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${styles[status]}`}>
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
-  )
-}
-
-function InfoField({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">{label}</p>
-      <p className="text-sm text-slate-900 dark:text-slate-50">{value}</p>
-    </div>
   )
 }
