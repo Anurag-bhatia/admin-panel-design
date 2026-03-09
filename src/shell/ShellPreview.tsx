@@ -9,6 +9,7 @@ import {
   HeadphonesIcon,
   BarChart3,
   UsersRound,
+  Settings,
 } from 'lucide-react'
 import { AppShell } from './components/AppShell'
 
@@ -63,14 +64,19 @@ export default function ShellPreview() {
       icon: HeadphonesIcon,
     },
     {
-      label: 'Reports',
-      href: '/reports',
+      label: 'Analytics',
+      href: '/analytics',
       icon: BarChart3,
     },
     {
       label: 'Team',
       href: '/team',
       icon: UsersRound,
+    },
+    {
+      label: 'Setup',
+      href: '/setup',
+      icon: Settings,
     },
   ]
 

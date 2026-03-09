@@ -2,15 +2,44 @@
 // Data Types
 // =============================================================================
 
+export interface RefundActivityLogEntry {
+  id: string
+  action: string
+  performedBy: string
+  timestamp: string
+  details: string
+}
+
+export interface RefundNote {
+  id: string
+  author: string
+  timestamp: string
+  content: string
+}
+
+export interface RefundFollowUp {
+  id: string
+  outcome: string
+  notes: string
+  createdAt: string
+  createdByName: string
+}
+
 export interface Refund {
   id: string
   linkedIncident: string
   customerSubscriber: string
   originalPaymentId: string
   refundAmount: number
-  refundStatus: 'Initiated' | 'Approved' | 'Completed'
-  approvedBy: string | null
+  refundStatus: 'Refund Raised' | 'Completed' | 'Hold' | 'Rejected'
+  initiatedBy: string | null
   refundDate: string | null
+  createdOn: string
+  lastUpdated: string
+  reason: string
+  activityLog: RefundActivityLogEntry[]
+  notes: RefundNote[]
+  followUps: RefundFollowUp[]
 }
 
 export interface LawyerFee {
@@ -20,7 +49,7 @@ export interface LawyerFee {
   challanNo: string
   totalAmount: number
   commissionAmount: number
-  status: 'To Pay' | 'Completed'
+  status: 'To Pay' | 'Completed' | 'Hold' | 'Rejected'
   dueDate: string
   paidDate: string | null
 }
@@ -32,7 +61,7 @@ export interface PartnerPayout {
   subscriberCount: number
   totalEarnings: number
   payoutAmount: number
-  status: 'To Pay' | 'Completed'
+  status: 'To Pay' | 'Completed' | 'Hold' | 'Rejected'
   dueDate: string
   paidDate: string | null
 }
@@ -50,6 +79,8 @@ export interface PaymentsProps {
   leads?: import('@/../product/sections/sales-crm/types').Lead[]
   /** Available users for lead assignment */
   users?: import('@/../product/sections/sales-crm/types').User[]
+  /** List of lawyers for profile navigation from Lawyer Payments */
+  lawyers?: import('@/../product/sections/lawyers/types').Lawyer[]
   /** Called when user approves a refund */
   onApproveRefund?: (id: string) => void
   /** Called when user processes a refund */
@@ -74,6 +105,8 @@ export interface PaymentsProps {
   onBulkMarkLeadsConverted?: (ids: string[]) => void
   /** List of partner payout records */
   partnerPayouts?: PartnerPayout[]
+  /** List of full partner objects for detail navigation from ChallanPay Partners */
+  partners?: import('@/../product/sections/partners/types').Partner[]
   /** Called when user bulk marks selected partner payouts as paid */
   onBulkMarkPartnerPayoutsPaid?: (keys: string[]) => void
   /** Called when user clicks a partner payout row to navigate to partner profile */

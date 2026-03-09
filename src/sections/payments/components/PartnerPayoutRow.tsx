@@ -19,6 +19,14 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
     label: 'Completed',
     className: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400',
   },
+  Hold: {
+    label: 'Hold',
+    className: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
+  },
+  Rejected: {
+    label: 'Rejected',
+    className: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
+  },
 }
 
 function formatDate(dateString: string | null): string {
@@ -92,13 +100,6 @@ export function PartnerPayoutRow({
             </span>
           </div>
         </div>
-      </td>
-
-      {/* Subscribers */}
-      <td className="px-4 py-3">
-        <span className="text-sm text-slate-700 dark:text-slate-300">
-          {payout.subscriberCount}
-        </span>
       </td>
 
       {/* Total Earnings */}

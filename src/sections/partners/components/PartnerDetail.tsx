@@ -10,9 +10,10 @@ export function PartnerDetail({
   onEditPartner,
   onViewIncidents,
   onUploadDocument,
-  onDeleteDocument
+  onDeleteDocument,
+  allowedTabs,
 }: PartnerDetailProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('profile')
+  const [activeTab, setActiveTab] = useState<TabType>(allowedTabs?.[0] ?? 'profile')
   const [showDocumentUpload, setShowDocumentUpload] = useState(false)
   const [vehiclePage, setVehiclePage] = useState(1)
   const [vehicleSearch, setVehicleSearch] = useState('')
@@ -186,9 +187,11 @@ export function PartnerDetail({
 
         {/* Tabs */}
         <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit mb-6 flex-wrap">
-          {(isChallanPay
-            ? ['profile', 'visitors', 'registeredVisitors', 'vehicles', 'customers', 'outlets', 'qrs', 'financial', 'documents'] as TabType[]
-            : ['profile', 'customers', 'vehicles', 'reports', 'financial', 'documents'] as TabType[]
+          {(allowedTabs
+            ? allowedTabs as TabType[]
+            : isChallanPay
+              ? ['profile', 'visitors', 'registeredVisitors', 'vehicles', 'customers', 'outlets', 'qrs', 'financial', 'documents'] as TabType[]
+              : ['profile', 'customers', 'vehicles', 'reports', 'financial', 'documents'] as TabType[]
           ).map((tab) => (
             <button
               key={tab}

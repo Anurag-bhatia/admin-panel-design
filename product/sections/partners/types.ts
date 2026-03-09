@@ -173,6 +173,9 @@ export interface PartnerDetailProps {
 
   /** Called when user deletes a document */
   onDeleteDocument?: (id: string, documentId: string) => void
+
+  /** Optional list of tabs to show. If not provided, shows all tabs for the partner type. */
+  allowedTabs?: ('profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'financial' | 'documents' | 'reports')[]
 }
 
 export interface AddPartnerProps {

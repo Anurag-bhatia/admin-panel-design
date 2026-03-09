@@ -1,8 +1,12 @@
 import data from '@/../product/sections/payments/data.json'
 import leadsData from '@/../product/sections/sales-crm/data.json'
+import lawyersData from '@/../product/sections/lawyers/data.json'
+import partnersData from '@/../product/sections/partners/data.json'
 import { PaymentsDashboard } from './components/PaymentsDashboard'
 import type { Refund, LawyerFee, PartnerPayout } from '@/../product/sections/payments/types'
 import type { Lead, User } from '@/../product/sections/sales-crm/types'
+import type { Lawyer } from '@/../product/sections/lawyers/types'
+import type { Partner } from '@/../product/sections/partners/types'
 
 export default function PaymentsDashboardPreview() {
   return (
@@ -13,6 +17,8 @@ export default function PaymentsDashboardPreview() {
         leads={leadsData.leads as Lead[]}
         users={leadsData.users as User[]}
         partnerPayouts={data.partnerPayouts as PartnerPayout[]}
+        lawyers={lawyersData.lawyers as Lawyer[]}
+        partners={partnersData.partners as Partner[]}
         onApproveRefund={(id) => console.log('Approve refund:', id)}
         onProcessRefund={(id) => console.log('Process refund:', id)}
         onBulkApproveRefunds={(ids) => console.log('Bulk approve refunds:', ids)}

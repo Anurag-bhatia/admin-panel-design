@@ -62,6 +62,7 @@ interface LawyerProfileProps {
   incidents?: LawyerIncident[]
   pendingInvoices?: PendingInvoice[]
   transactions?: LawyerTransaction[]
+  initialTab?: TabType
   onBack: () => void
   onEdit: () => void
   onDeactivate: () => void
@@ -76,6 +77,7 @@ export function LawyerProfile({
   incidents = [],
   pendingInvoices = [],
   transactions = [],
+  initialTab = 'details',
   onBack,
   onEdit,
   onDeactivate,
@@ -84,7 +86,7 @@ export function LawyerProfile({
   onViewTransaction,
   onRaiseInvoice,
 }: LawyerProfileProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('details')
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab)
   const isActive = lawyer.activityState === 'Active'
   const fullName = `${lawyer.firstName} ${lawyer.lastName}`
 

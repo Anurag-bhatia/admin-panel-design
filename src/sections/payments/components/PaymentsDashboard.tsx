@@ -8,18 +8,25 @@ import { RefundRow } from './RefundRow'
 import { LawyerFeeRow } from './LawyerFeeRow'
 import { PartnerPayoutRow } from './PartnerPayoutRow'
 import { RefundBulkActionsBar } from './RefundBulkActionsBar'
+import { RefundDetailView } from './RefundDetailView'
 import { Pagination } from './Pagination'
 import { LeadsTable } from '@/sections/sales-crm/components/LeadsTable'
 import { LeadDetailView } from '@/sections/sales-crm/components/LeadDetailView'
+import { LawyerProfile } from '@/sections/lawyers/components/LawyerProfile'
+import { PartnerDetail } from '@/sections/partners/components/PartnerDetail'
 
 const REFUND_TABS = [
-  { key: 'to_refund', label: 'To Refund' },
+  { key: 'refund_raised', label: 'Refund Raised' },
   { key: 'completed', label: 'Completed' },
+  { key: 'hold', label: 'Hold' },
+  { key: 'rejected', label: 'Rejected' },
 ]
 
 const LAWYER_FEE_TABS = [
   { key: 'to_pay', label: 'To Pay' },
   { key: 'completed', label: 'Completed' },
+  { key: 'hold', label: 'Hold' },
+  { key: 'rejected', label: 'Rejected' },
 ]
 
 const LEADS_TABS = [
@@ -30,39 +37,52 @@ const LEADS_TABS = [
 const PARTNER_TABS = [
   { key: 'to_pay', label: 'To Pay' },
   { key: 'completed', label: 'Completed' },
+  { key: 'hold', label: 'Hold' },
+  { key: 'rejected', label: 'Rejected' },
 ]
 
 const REFUND_STATUS_OPTIONS = [
-  { value: 'Initiated', label: 'Initiated' },
-  { value: 'Approved', label: 'Approved' },
+  { value: 'Refund Raised', label: 'Refund Raised' },
   { value: 'Completed', label: 'Completed' },
+  { value: 'Hold', label: 'Hold' },
+  { value: 'Rejected', label: 'Rejected' },
 ]
 
 const LAWYER_FEE_STATUS_OPTIONS = [
   { value: 'To Pay', label: 'To Pay' },
   { value: 'Completed', label: 'Completed' },
+  { value: 'Hold', label: 'Hold' },
+  { value: 'Rejected', label: 'Rejected' },
 ]
 
 const PARTNER_STATUS_OPTIONS = [
   { value: 'To Pay', label: 'To Pay' },
   { value: 'Completed', label: 'Completed' },
+  { value: 'Hold', label: 'Hold' },
+  { value: 'Rejected', label: 'Rejected' },
 ]
 
 function isRefundInStage(refund: Refund, stage: string): boolean {
-  if (stage === 'to_refund') return refund.refundStatus !== 'Completed'
+  if (stage === 'refund_raised') return refund.refundStatus === 'Refund Raised'
   if (stage === 'completed') return refund.refundStatus === 'Completed'
+  if (stage === 'hold') return refund.refundStatus === 'Hold'
+  if (stage === 'rejected') return refund.refundStatus === 'Rejected'
   return true
 }
 
 function isLawyerFeeInStage(fee: LawyerFee, stage: string): boolean {
   if (stage === 'to_pay') return fee.status === 'To Pay'
   if (stage === 'completed') return fee.status === 'Completed'
+  if (stage === 'hold') return fee.status === 'Hold'
+  if (stage === 'rejected') return fee.status === 'Rejected'
   return true
 }
 
 function isPartnerPayoutInStage(payout: PartnerPayout, stage: string): boolean {
   if (stage === 'to_pay') return payout.status === 'To Pay'
   if (stage === 'completed') return payout.status === 'Completed'
+  if (stage === 'hold') return payout.status === 'Hold'
+  if (stage === 'rejected') return payout.status === 'Rejected'
   return true
 }
 
@@ -71,6 +91,8 @@ export function PaymentsDashboard({
   lawyerFees,
   leads = [],
   users = [],
+  lawyers = [],
+  partners = [],
   partnerPayouts = [],
   onApproveRefund,
   onProcessRefund,
@@ -91,7 +113,7 @@ export function PaymentsDashboard({
   const [sidebarView, setSidebarView] = useState<'refunds' | 'lawyer-fees' | 'leads' | 'partners'>('refunds')
 
   // Active stage tab
-  const [refundStage, setRefundStage] = useState('to_refund')
+  const [refundStage, setRefundStage] = useState('refund_raised')
   const [feeStage, setFeeStage] = useState('to_pay')
   const [leadsStage, setLeadsStage] = useState('ready_to_invoice')
   const [partnerStage, setPartnerStage] = useState('to_pay')
@@ -115,16 +137,32 @@ export function PaymentsDashboard({
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
   const selectedLead = selectedLeadId ? leads.find(l => l.id === selectedLeadId) : null
 
+  // Lawyer profile view (from lawyer fees)
+  const [selectedLawyerId, setSelectedLawyerId] = useState<string | null>(null)
+  const selectedLawyer = selectedLawyerId ? lawyers.find(l => l.lawyerId === selectedLawyerId) : null
+
+  // Refund detail view
+  const [selectedRefundId, setSelectedRefundId] = useState<string | null>(null)
+  const selectedRefund = selectedRefundId ? refunds.find(r => r.id === selectedRefundId) : null
+
+  // Partner detail view (from ChallanPay Partners)
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null)
+  const selectedPartner = selectedPartnerId ? partners.find(p => p.partnerId === selectedPartnerId) : null
+
   // Refund stage counts
   const refundStageCounts = useMemo(() => ({
-    to_refund: refunds.filter((r) => r.refundStatus !== 'Completed').length,
+    refund_raised: refunds.filter((r) => r.refundStatus === 'Refund Raised').length,
     completed: refunds.filter((r) => r.refundStatus === 'Completed').length,
+    hold: refunds.filter((r) => r.refundStatus === 'Hold').length,
+    rejected: refunds.filter((r) => r.refundStatus === 'Rejected').length,
   }), [refunds])
 
   // Lawyer fee stage counts
   const feeStageCounts = useMemo(() => ({
     to_pay: lawyerFees.filter((f) => f.status === 'To Pay').length,
     completed: lawyerFees.filter((f) => f.status === 'Completed').length,
+    hold: lawyerFees.filter((f) => f.status === 'Hold').length,
+    rejected: lawyerFees.filter((f) => f.status === 'Rejected').length,
   }), [lawyerFees])
 
   // Leads stage counts
@@ -137,6 +175,8 @@ export function PaymentsDashboard({
   const partnerStageCounts = useMemo(() => ({
     to_pay: partnerPayouts.filter((p) => p.status === 'To Pay').length,
     completed: partnerPayouts.filter((p) => p.status === 'Completed').length,
+    hold: partnerPayouts.filter((p) => p.status === 'Hold').length,
+    rejected: partnerPayouts.filter((p) => p.status === 'Rejected').length,
   }), [partnerPayouts])
 
   // Filtered leads
@@ -317,6 +357,95 @@ export function PaymentsDashboard({
     setSelectedPartnerKeys(new Set())
   }
 
+  // Derive pending invoices from lawyerFees for the selected lawyer
+  const lawyerPendingInvoices = useMemo(() => {
+    if (!selectedLawyerId) return []
+    return lawyerFees
+      .filter((f) => f.lawyerId === selectedLawyerId)
+      .map((f, i) => ({
+        id: `${f.lawyerId}-${f.incidentId}-${i}`,
+        incidentId: f.incidentId,
+        resolutionDate: f.paidDate || f.dueDate,
+        commissionAmount: f.commissionAmount,
+        status: (f.status === 'Completed' ? 'Settled' : 'Not Settled') as 'Settled' | 'Not Settled' | 'Refund',
+      }))
+  }, [selectedLawyerId, lawyerFees])
+
+  // --- All hooks are above this line. Early returns below. ---
+
+  // Show refund detail view if a refund is selected
+  if (selectedRefund) {
+    return (
+      <div className="flex h-full bg-slate-100 dark:bg-slate-950">
+        <PaymentsSidebar
+          view={sidebarView}
+          onViewChange={(view) => {
+            handleSidebarChange(view)
+            setSelectedRefundId(null)
+          }}
+        />
+        <div className="flex-1 overflow-auto">
+          <RefundDetailView
+            refund={selectedRefund}
+            onBack={() => setSelectedRefundId(null)}
+            onAddNote={(id, content) => console.log('Add note:', id, content)}
+            onAddFollowUp={(id, followUp) => console.log('Add follow-up:', id, followUp)}
+            onMoveTicket={(id, stage) => console.log('Move ticket:', id, stage)}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  // Show lawyer profile if a lawyer is selected from fees
+  if (selectedLawyer) {
+    return (
+      <div className="flex h-full bg-slate-100 dark:bg-slate-950">
+        <PaymentsSidebar
+          view={sidebarView}
+          onViewChange={(view) => {
+            handleSidebarChange(view)
+            setSelectedLawyerId(null)
+          }}
+        />
+        <div className="flex-1 overflow-auto">
+          <LawyerProfile
+            lawyer={selectedLawyer}
+            pendingInvoices={lawyerPendingInvoices}
+            initialTab="invoicing"
+            onBack={() => setSelectedLawyerId(null)}
+            onEdit={() => console.log('Edit lawyer:', selectedLawyer.lawyerId)}
+            onDeactivate={() => console.log('Deactivate lawyer:', selectedLawyer.lawyerId)}
+            onReactivate={() => console.log('Reactivate lawyer:', selectedLawyer.lawyerId)}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  // Show partner detail view if a partner is selected from ChallanPay Partners
+  if (selectedPartner) {
+    return (
+      <div className="flex h-full bg-slate-100 dark:bg-slate-950">
+        <PaymentsSidebar
+          view={sidebarView}
+          onViewChange={(view) => {
+            handleSidebarChange(view)
+            setSelectedPartnerId(null)
+          }}
+        />
+        <div className="flex-1 overflow-auto">
+          <PartnerDetail
+            partner={selectedPartner}
+            allowedTabs={['profile', 'documents', 'financial']}
+            onBack={() => setSelectedPartnerId(null)}
+            onEditPartner={() => console.log('Edit partner:', selectedPartner.partnerId)}
+          />
+        </div>
+      </div>
+    )
+  }
+
   // Show lead detail view if a lead is selected
   if (selectedLead) {
     return (
@@ -445,7 +574,7 @@ export function PaymentsDashboard({
                     Status
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Approved By
+                    Initiated By
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Refund Date
@@ -496,6 +625,8 @@ export function PaymentsDashboard({
                       onSelect={(checked) => handleSelectOne(refund.id, checked)}
                       onApprove={() => onApproveRefund?.(refund.id)}
                       onProcess={() => onProcessRefund?.(refund.id)}
+                      onMove={(stage) => console.log('Move refund:', refund.id, 'to', stage)}
+                      onClick={() => setSelectedRefundId(refund.id)}
                     />
                   ))
                 )}
@@ -584,7 +715,7 @@ export function PaymentsDashboard({
                         fee={fee}
                         isSelected={selectedFeeKeys.has(key)}
                         onSelect={(checked) => handleSelectOneFee(key, checked)}
-                        onViewLawyerProfile={() => onViewLawyerProfile?.(fee.lawyerId)}
+                        onViewLawyerProfile={() => setSelectedLawyerId(fee.lawyerId)}
                         onMarkComplete={() => console.log('Mark as complete:', fee.lawyerId, fee.incidentId)}
                       />
                     )
@@ -614,9 +745,6 @@ export function PaymentsDashboard({
                     Partner
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Subscribers
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Total Earnings
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -640,7 +768,7 @@ export function PaymentsDashboard({
                 {filteredPartnerPayouts.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={10}
+                      colSpan={9}
                       className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                     >
                       <div className="flex flex-col items-center gap-2">
@@ -677,7 +805,7 @@ export function PaymentsDashboard({
                         payout={payout}
                         isSelected={selectedPartnerKeys.has(key)}
                         onSelect={(checked) => handleSelectOnePartner(key, checked)}
-                        onViewPartnerProfile={() => onViewPartnerProfile?.(payout.partnerId)}
+                        onViewPartnerProfile={() => setSelectedPartnerId(payout.partnerId)}
                         onMarkComplete={() => console.log('Mark as paid:', payout.partnerId)}
                       />
                     )
@@ -724,9 +852,12 @@ export function PaymentsDashboard({
       {sidebarView === 'refunds' && selectedIds.size > 0 && (
         <RefundBulkActionsBar
           selectedCount={selectedIds.size}
-          actionLabel="Mark as Complete"
           onClearSelection={() => setSelectedIds(new Set())}
-          onMarkComplete={() => onBulkProcessRefunds?.(selectedArray)}
+          moveOptions={REFUND_STATUS_OPTIONS}
+          onMove={(targetStage) => {
+            console.log('Move refunds:', selectedArray, 'to', targetStage)
+            setSelectedIds(new Set())
+          }}
         />
       )}
 

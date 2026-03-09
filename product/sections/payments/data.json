@@ -19,86 +19,208 @@
       "linkedIncident": "IRN-44821",
       "customerSubscriber": "Bharat Fleet Solutions Pvt. Ltd.",
       "originalPaymentId": "PAY-88210",
-      "refundAmount": 4500.00,
+      "refundAmount": 4500,
       "refundStatus": "Completed",
-      "approvedBy": "Priya Sharma",
-      "refundDate": "2025-12-18"
+      "initiatedBy": "Priya Sharma",
+      "refundDate": "2025-12-18",
+      "createdOn": "2025-12-10T09:30:00Z",
+      "lastUpdated": "2025-12-18T14:20:00Z",
+      "reason": "Challan IRN-44821 was resolved by the court but payment was already collected from subscriber. Full refund approved.",
+      "activityLog": [
+        { "id": "act-101", "action": "Refund created", "performedBy": "Priya Sharma", "timestamp": "2025-12-10T09:30:00Z", "details": "Refund request created for IRN-44821" },
+        { "id": "act-102", "action": "Refund approved", "performedBy": "Amit Verma", "timestamp": "2025-12-15T11:00:00Z", "details": "Refund of ₹4,500 approved after verification" },
+        { "id": "act-103", "action": "Refund processed", "performedBy": "System", "timestamp": "2025-12-18T14:20:00Z", "details": "Refund processed and marked as completed" }
+      ],
+      "notes": [
+        { "id": "note-101", "author": "Priya Sharma", "timestamp": "2025-12-10T09:35:00Z", "content": "Subscriber confirmed court resolution. Original payment PAY-88210 verified." },
+        { "id": "note-102", "author": "Amit Verma", "timestamp": "2025-12-15T10:50:00Z", "content": "Verified against incident records. Amount matches. Approving refund." }
+      ],
+      "followUps": [
+        { "id": "fu-101", "outcome": "Completed", "notes": "Refund processed successfully. Subscriber notified via email.", "createdAt": "2025-12-18T14:25:00Z", "createdByName": "Priya Sharma" }
+      ]
     },
     {
       "id": "RFD-10002",
       "linkedIncident": "IRN-44956",
       "customerSubscriber": "Rajesh Kumar",
       "originalPaymentId": "PAY-88345",
-      "refundAmount": 2000.00,
-      "refundStatus": "Initiated",
-      "approvedBy": null,
-      "refundDate": null
+      "refundAmount": 2000,
+      "refundStatus": "Refund Raised",
+      "initiatedBy": "Priya Sharma",
+      "refundDate": null,
+      "createdOn": "2026-02-20T10:15:00Z",
+      "lastUpdated": "2026-02-22T16:00:00Z",
+      "reason": "Customer claims double payment for challan IRN-44956. Requesting refund of duplicate amount.",
+      "activityLog": [
+        { "id": "act-201", "action": "Refund created", "performedBy": "Priya Sharma", "timestamp": "2026-02-20T10:15:00Z", "details": "Refund request created for duplicate payment on IRN-44956" },
+        { "id": "act-202", "action": "Assigned to reviewer", "performedBy": "System", "timestamp": "2026-02-20T10:20:00Z", "details": "Auto-assigned to Neha Gupta for review" }
+      ],
+      "notes": [
+        { "id": "note-201", "author": "Priya Sharma", "timestamp": "2026-02-20T10:20:00Z", "content": "Customer Rajesh Kumar called claiming he was charged twice. Checking payment records." }
+      ],
+      "followUps": [
+        { "id": "fu-201", "outcome": "Under Review", "notes": "Contacted payment gateway to verify duplicate transaction. Awaiting response.", "createdAt": "2026-02-22T16:00:00Z", "createdByName": "Neha Gupta" }
+      ]
     },
     {
       "id": "RFD-10003",
       "linkedIncident": "IRN-45102",
       "customerSubscriber": "TransLogix India Ltd.",
       "originalPaymentId": "PAY-88501",
-      "refundAmount": 12750.00,
-      "refundStatus": "Approved",
-      "approvedBy": "Amit Verma",
-      "refundDate": null
+      "refundAmount": 12750,
+      "refundStatus": "Refund Raised",
+      "initiatedBy": "Amit Verma",
+      "refundDate": null,
+      "createdOn": "2026-02-25T14:00:00Z",
+      "lastUpdated": "2026-03-01T09:30:00Z",
+      "reason": "Incident IRN-45102 was incorrectly categorized. Subscriber was overcharged by ₹12,750.",
+      "activityLog": [
+        { "id": "act-301", "action": "Refund created", "performedBy": "Amit Verma", "timestamp": "2026-02-25T14:00:00Z", "details": "Refund request created due to overcharge on IRN-45102" },
+        { "id": "act-302", "action": "Reviewed linked incident", "performedBy": "Amit Verma", "timestamp": "2026-02-26T11:00:00Z", "details": "Incident categorization confirmed as incorrect" },
+        { "id": "act-303", "action": "Contacted subscriber", "performedBy": "Priya Sharma", "timestamp": "2026-03-01T09:30:00Z", "details": "Contacted TransLogix India Ltd. to confirm refund details" }
+      ],
+      "notes": [
+        { "id": "note-301", "author": "Amit Verma", "timestamp": "2026-02-25T14:10:00Z", "content": "Incident was wrongly marked as Pay & Close instead of Contest. The challan amount was ₹12,750 higher than it should have been." },
+        { "id": "note-302", "author": "Priya Sharma", "timestamp": "2026-03-01T09:35:00Z", "content": "Subscriber confirmed the overcharge. They are expecting the refund within this week." }
+      ],
+      "followUps": [
+        { "id": "fu-301", "outcome": "Refund Raised", "notes": "Refund request submitted. Awaiting finance team approval for amounts above ₹10,000.", "createdAt": "2026-02-25T14:15:00Z", "createdByName": "Amit Verma" },
+        { "id": "fu-302", "outcome": "Under Review", "notes": "Finance team reviewing the high-value refund. Expected decision by end of week.", "createdAt": "2026-03-01T09:40:00Z", "createdByName": "Priya Sharma" }
+      ]
     },
     {
       "id": "RFD-10004",
       "linkedIncident": "IRN-45230",
       "customerSubscriber": "QuickMove Logistics",
       "originalPaymentId": "PAY-88672",
-      "refundAmount": 1500.00,
+      "refundAmount": 1500,
       "refundStatus": "Completed",
-      "approvedBy": "Priya Sharma",
-      "refundDate": "2026-01-05"
+      "initiatedBy": "Priya Sharma",
+      "refundDate": "2026-01-05",
+      "createdOn": "2025-12-28T08:00:00Z",
+      "lastUpdated": "2026-01-05T16:45:00Z",
+      "reason": "Challan was dismissed by court. Payment already collected needs to be refunded.",
+      "activityLog": [
+        { "id": "act-401", "action": "Refund created", "performedBy": "Priya Sharma", "timestamp": "2025-12-28T08:00:00Z", "details": "Refund request created — challan dismissed" },
+        { "id": "act-402", "action": "Refund approved", "performedBy": "Neha Gupta", "timestamp": "2026-01-02T10:30:00Z", "details": "Refund of ₹1,500 approved" },
+        { "id": "act-403", "action": "Refund processed", "performedBy": "System", "timestamp": "2026-01-05T16:45:00Z", "details": "Refund completed successfully" }
+      ],
+      "notes": [
+        { "id": "note-401", "author": "Priya Sharma", "timestamp": "2025-12-28T08:10:00Z", "content": "Court order copy received confirming challan dismissal." }
+      ],
+      "followUps": [
+        { "id": "fu-401", "outcome": "Completed", "notes": "Refund of ₹1,500 processed. QuickMove Logistics notified.", "createdAt": "2026-01-05T16:50:00Z", "createdByName": "Neha Gupta" }
+      ]
     },
     {
       "id": "RFD-10005",
       "linkedIncident": "IRN-45318",
       "customerSubscriber": "Suresh Patel",
       "originalPaymentId": "PAY-88790",
-      "refundAmount": 8200.00,
-      "refundStatus": "Initiated",
-      "approvedBy": null,
-      "refundDate": null
+      "refundAmount": 8200,
+      "refundStatus": "Hold",
+      "initiatedBy": "Neha Gupta",
+      "refundDate": null,
+      "createdOn": "2026-03-01T11:00:00Z",
+      "lastUpdated": "2026-03-05T15:00:00Z",
+      "reason": "Customer claims service was not delivered for incident IRN-45318. Under investigation.",
+      "activityLog": [
+        { "id": "act-501", "action": "Refund created", "performedBy": "Neha Gupta", "timestamp": "2026-03-01T11:00:00Z", "details": "Refund request created for service non-delivery claim" },
+        { "id": "act-502", "action": "Status changed to Hold", "performedBy": "Amit Verma", "timestamp": "2026-03-03T14:00:00Z", "details": "Put on hold pending investigation of service delivery records" },
+        { "id": "act-503", "action": "Contacted customer", "performedBy": "Priya Sharma", "timestamp": "2026-03-05T15:00:00Z", "details": "Called Suresh Patel to gather more details about the complaint" }
+      ],
+      "notes": [
+        { "id": "note-501", "author": "Neha Gupta", "timestamp": "2026-03-01T11:10:00Z", "content": "Customer Suresh Patel claims the lawyer never appeared for the hearing. Need to verify with lawyer records." },
+        { "id": "note-502", "author": "Amit Verma", "timestamp": "2026-03-03T14:10:00Z", "content": "Lawyer LAW-2007 records show hearing was attended. Discrepancy needs investigation. Placing on hold." },
+        { "id": "note-503", "author": "Priya Sharma", "timestamp": "2026-03-05T15:10:00Z", "content": "Customer insists lawyer was absent. Will check court records for attendance confirmation." }
+      ],
+      "followUps": [
+        { "id": "fu-501", "outcome": "Hold", "notes": "Refund on hold while we verify lawyer attendance at the hearing. Court records requested.", "createdAt": "2026-03-03T14:15:00Z", "createdByName": "Amit Verma" },
+        { "id": "fu-502", "outcome": "Under Review", "notes": "Court records received. Reviewing to confirm lawyer attendance for IRN-45318 hearing.", "createdAt": "2026-03-05T15:15:00Z", "createdByName": "Priya Sharma" }
+      ]
     },
     {
       "id": "RFD-10006",
       "linkedIncident": "IRN-45410",
       "customerSubscriber": "GreenWheels Transport Co.",
       "originalPaymentId": "PAY-88903",
-      "refundAmount": 3400.00,
-      "refundStatus": "Approved",
-      "approvedBy": "Neha Gupta",
-      "refundDate": null
+      "refundAmount": 3400,
+      "refundStatus": "Rejected",
+      "initiatedBy": "Neha Gupta",
+      "refundDate": null,
+      "createdOn": "2026-02-15T09:00:00Z",
+      "lastUpdated": "2026-02-28T12:00:00Z",
+      "reason": "Subscriber claims incorrect challan amount. Investigation found the amount was correct.",
+      "activityLog": [
+        { "id": "act-601", "action": "Refund created", "performedBy": "Neha Gupta", "timestamp": "2026-02-15T09:00:00Z", "details": "Refund request created — subscriber disputes challan amount" },
+        { "id": "act-602", "action": "Reviewed linked incident", "performedBy": "Amit Verma", "timestamp": "2026-02-20T10:00:00Z", "details": "Incident and challan records reviewed" },
+        { "id": "act-603", "action": "Refund rejected", "performedBy": "Amit Verma", "timestamp": "2026-02-28T12:00:00Z", "details": "Refund rejected — challan amount verified as correct by traffic authority" }
+      ],
+      "notes": [
+        { "id": "note-601", "author": "Neha Gupta", "timestamp": "2026-02-15T09:10:00Z", "content": "GreenWheels Transport Co. claims challan fine was higher than what traffic authority imposed." },
+        { "id": "note-602", "author": "Amit Verma", "timestamp": "2026-02-20T10:15:00Z", "content": "Cross-checked with traffic authority portal. The challan amount of ₹3,400 matches exactly." },
+        { "id": "note-603", "author": "Amit Verma", "timestamp": "2026-02-28T12:05:00Z", "content": "Refund rejected. Subscriber has been informed with supporting documentation from the traffic authority." }
+      ],
+      "followUps": [
+        { "id": "fu-601", "outcome": "Under Review", "notes": "Checking challan amount against traffic authority records.", "createdAt": "2026-02-20T10:20:00Z", "createdByName": "Amit Verma" },
+        { "id": "fu-602", "outcome": "Rejected", "notes": "Challan amount confirmed correct. Refund request denied. Subscriber notified.", "createdAt": "2026-02-28T12:10:00Z", "createdByName": "Amit Verma" }
+      ]
     },
     {
       "id": "RFD-10007",
       "linkedIncident": "IRN-45522",
       "customerSubscriber": "Metro Cab Services",
       "originalPaymentId": "PAY-89012",
-      "refundAmount": 950.00,
+      "refundAmount": 950,
       "refundStatus": "Completed",
-      "approvedBy": "Amit Verma",
-      "refundDate": "2026-01-22"
+      "initiatedBy": "Amit Verma",
+      "refundDate": "2026-01-22",
+      "createdOn": "2026-01-10T13:00:00Z",
+      "lastUpdated": "2026-01-22T17:00:00Z",
+      "reason": "Minor overcharge on incident IRN-45522 due to system rounding error.",
+      "activityLog": [
+        { "id": "act-701", "action": "Refund created", "performedBy": "Amit Verma", "timestamp": "2026-01-10T13:00:00Z", "details": "Refund created for rounding error overcharge" },
+        { "id": "act-702", "action": "Refund approved", "performedBy": "Priya Sharma", "timestamp": "2026-01-18T09:00:00Z", "details": "Small amount refund approved" },
+        { "id": "act-703", "action": "Refund processed", "performedBy": "System", "timestamp": "2026-01-22T17:00:00Z", "details": "Refund of ₹950 processed" }
+      ],
+      "notes": [
+        { "id": "note-701", "author": "Amit Verma", "timestamp": "2026-01-10T13:10:00Z", "content": "System rounding caused ₹950 overcharge. Straightforward refund." }
+      ],
+      "followUps": [
+        { "id": "fu-701", "outcome": "Completed", "notes": "Refund processed. System rounding bug reported to engineering.", "createdAt": "2026-01-22T17:05:00Z", "createdByName": "Amit Verma" }
+      ]
     },
     {
       "id": "RFD-10008",
       "linkedIncident": "IRN-45601",
       "customerSubscriber": "Anita Deshmukh",
       "originalPaymentId": "PAY-89134",
-      "refundAmount": 22000.00,
-      "refundStatus": "Initiated",
-      "approvedBy": null,
-      "refundDate": null
+      "refundAmount": 22000,
+      "refundStatus": "Refund Raised",
+      "initiatedBy": "Amit Verma",
+      "refundDate": null,
+      "createdOn": "2026-03-05T10:00:00Z",
+      "lastUpdated": "2026-03-08T11:30:00Z",
+      "reason": "High-value refund for incident IRN-45601. Challan was contested and won, but payment was already deducted.",
+      "activityLog": [
+        { "id": "act-801", "action": "Refund created", "performedBy": "Amit Verma", "timestamp": "2026-03-05T10:00:00Z", "details": "High-value refund request created for IRN-45601" },
+        { "id": "act-802", "action": "Assigned to reviewer", "performedBy": "System", "timestamp": "2026-03-05T10:05:00Z", "details": "Auto-assigned to Priya Sharma for high-value review" },
+        { "id": "act-803", "action": "Reviewed linked incident", "performedBy": "Priya Sharma", "timestamp": "2026-03-08T11:30:00Z", "details": "Incident reviewed — challan contest won confirmed" }
+      ],
+      "notes": [
+        { "id": "note-801", "author": "Amit Verma", "timestamp": "2026-03-05T10:10:00Z", "content": "Customer Anita Deshmukh's challan was contested and won. Payment of ₹22,000 was already collected. Full refund required." },
+        { "id": "note-802", "author": "Priya Sharma", "timestamp": "2026-03-08T11:35:00Z", "content": "Verified court order. Contest was won. Refund is justified. Escalating to finance for high-value approval." }
+      ],
+      "followUps": [
+        { "id": "fu-801", "outcome": "Refund Raised", "notes": "High-value refund of ₹22,000 submitted. Requires finance team approval for amounts above ₹10,000.", "createdAt": "2026-03-05T10:15:00Z", "createdByName": "Amit Verma" },
+        { "id": "fu-802", "outcome": "Under Review", "notes": "Court order verified. Forwarded to finance team for final approval.", "createdAt": "2026-03-08T11:40:00Z", "createdByName": "Priya Sharma" }
+      ]
     }
   ],
   "lawyerFees": [
     {
-      "lawyerId": "LAW-2001",
-      "lawyerName": "Adv. Vikram Mehta",
+      "lawyerId": "LAW-1006",
+      "lawyerName": "Adv. Vikram Verma",
       "incidentId": "IRN-44100",
       "challanNo": "CH-DL-2025-98234",
       "totalAmount": 6500.00,
@@ -108,8 +230,8 @@
       "paidDate": "2025-12-08"
     },
     {
-      "lawyerId": "LAW-2003",
-      "lawyerName": "Adv. Sonal Rao",
+      "lawyerId": "LAW-1002",
+      "lawyerName": "Adv. Priya Mehta",
       "incidentId": "IRN-44256",
       "challanNo": "CH-MH-2025-45120",
       "totalAmount": 4200.00,
@@ -119,8 +241,8 @@
       "paidDate": null
     },
     {
-      "lawyerId": "LAW-2007",
-      "lawyerName": "Adv. Rohan Kapoor",
+      "lawyerId": "LAW-1003",
+      "lawyerName": "Adv. Anil Kumar",
       "incidentId": "IRN-44389",
       "challanNo": "CH-KA-2025-77801",
       "totalAmount": 11000.00,
@@ -130,8 +252,8 @@
       "paidDate": "2025-11-28"
     },
     {
-      "lawyerId": "LAW-2001",
-      "lawyerName": "Adv. Vikram Mehta",
+      "lawyerId": "LAW-1006",
+      "lawyerName": "Adv. Vikram Verma",
       "incidentId": "IRN-44510",
       "challanNo": "CH-DL-2025-99102",
       "totalAmount": 3800.00,
@@ -141,8 +263,8 @@
       "paidDate": null
     },
     {
-      "lawyerId": "LAW-2012",
-      "lawyerName": "Adv. Meera Joshi",
+      "lawyerId": "LAW-1005",
+      "lawyerName": "Adv. Lakshmi Reddy",
       "incidentId": "IRN-44678",
       "challanNo": "CH-GJ-2025-33456",
       "totalAmount": 7500.00,
@@ -152,8 +274,8 @@
       "paidDate": null
     },
     {
-      "lawyerId": "LAW-2003",
-      "lawyerName": "Adv. Sonal Rao",
+      "lawyerId": "LAW-1002",
+      "lawyerName": "Adv. Priya Mehta",
       "incidentId": "IRN-44801",
       "challanNo": "CH-MH-2026-10234",
       "totalAmount": 5600.00,
@@ -163,8 +285,8 @@
       "paidDate": "2026-01-18"
     },
     {
-      "lawyerId": "LAW-2019",
-      "lawyerName": "Adv. Deepak Tiwari",
+      "lawyerId": "LAW-1008",
+      "lawyerName": "Adv. Ramesh Iyer",
       "incidentId": "IRN-44923",
       "challanNo": "CH-UP-2026-12890",
       "totalAmount": 15200.00,
@@ -174,8 +296,8 @@
       "paidDate": null
     },
     {
-      "lawyerId": "LAW-2007",
-      "lawyerName": "Adv. Rohan Kapoor",
+      "lawyerId": "LAW-1003",
+      "lawyerName": "Adv. Anil Kumar",
       "incidentId": "IRN-45050",
       "challanNo": "CH-KA-2026-15670",
       "totalAmount": 2900.00,
@@ -183,6 +305,50 @@
       "status": "Completed",
       "dueDate": "2026-02-01",
       "paidDate": "2026-01-30"
+    },
+    {
+      "lawyerId": "LAW-1001",
+      "lawyerName": "Adv. Rajesh Sharma",
+      "incidentId": "IRN-45180",
+      "challanNo": "CH-DL-2026-18432",
+      "totalAmount": 9200.00,
+      "commissionAmount": 2760.00,
+      "status": "Hold",
+      "dueDate": "2026-03-20",
+      "paidDate": null
+    },
+    {
+      "lawyerId": "LAW-1007",
+      "lawyerName": "Adv. Neha Patel",
+      "incidentId": "IRN-45295",
+      "challanNo": "CH-GJ-2026-20156",
+      "totalAmount": 5400.00,
+      "commissionAmount": 1620.00,
+      "status": "Hold",
+      "dueDate": "2026-03-25",
+      "paidDate": null
+    },
+    {
+      "lawyerId": "LAW-1004",
+      "lawyerName": "Adv. Harpreet Singh",
+      "incidentId": "IRN-45340",
+      "challanNo": "CH-PB-2026-22078",
+      "totalAmount": 3100.00,
+      "commissionAmount": 930.00,
+      "status": "Rejected",
+      "dueDate": "2026-02-20",
+      "paidDate": null
+    },
+    {
+      "lawyerId": "LAW-1005",
+      "lawyerName": "Adv. Lakshmi Reddy",
+      "incidentId": "IRN-45412",
+      "challanNo": "CH-AP-2026-24890",
+      "totalAmount": 7800.00,
+      "commissionAmount": 2340.00,
+      "status": "Rejected",
+      "dueDate": "2026-01-30",
+      "paidDate": null
     }
   ],
   "partnerPayouts": [

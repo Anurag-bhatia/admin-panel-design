@@ -34,3 +34,6 @@ Comprehensive reporting dashboards and analytics across all business metrics and
 
 ### 11. Team
 User and team administration for managing internal operations staff and permissions.
+
+### 12. Setup
+Centralized configuration hub for managing system-wide categories, data points, statuses, and configurable values used across all modules.

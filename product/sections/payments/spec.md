@@ -5,8 +5,8 @@ The Payments module handles refund processing, lawyer fee management, and partne
 
 ## User Flows
 - **Navigate to Payments** — Opens workspace with collapsible sidebar; click Refunds or Lawyer Fees to switch views
-- **View refund stages** — Table view with horizontal stage tabs: To Refund, Completed
-- **Scan refunds** — Table displays Refund ID, Linked Incident, Customer/Subscriber, Original Payment ID, Refund Amount, Refund Status (Initiated / Approved / Completed), Approved By, Refund Date
+- **View refund stages** — Table view with horizontal stage tabs: Refund Raised, Completed, Hold, Rejected
+- **Scan refunds** — Table displays Refund ID, Linked Incident, Customer/Subscriber, Original Payment ID, Refund Amount, Refund Status (Refund Raised / Completed / Hold / Rejected), Initiated By, Refund Date
 - **Search and filter refunds** — Search by Refund ID, linked incident, customer/subscriber; filter by status, date range
 - **Select multiple refunds** — Checkbox selection enables Bulk Actions bar
 - **Perform bulk refund operations** — Bulk approve, bulk process refunds; all permission-controlled with confirmation
@@ -31,7 +31,7 @@ The Payments module handles refund processing, lawyer fee management, and partne
 ### Refunds View
 
 #### Stage Tabs
-- Horizontal tabs above table: To Refund | Completed
+- Horizontal tabs above table: Refund Raised | Completed | Hold | Rejected
 - Each tab shows count of refunds in that stage
 
 #### Table Header
@@ -40,7 +40,7 @@ The Payments module handles refund processing, lawyer fee management, and partne
 - Export button
 
 #### Refunds Table
-- Columns: Refund ID, Linked Incident, Customer/Subscriber, Original Payment ID, Refund Amount, Refund Status (Initiated / Approved / Completed), Approved By, Refund Date
+- Columns: Refund ID, Linked Incident, Customer/Subscriber, Original Payment ID, Refund Amount, Refund Status (Refund Raised / Completed / Hold / Rejected), Initiated By, Refund Date
 - Checkbox selection per row with select-all in header
 - Row-level action menu for individual refund operations
 - Pagination at bottom with page numbers, items per page selector, and total count

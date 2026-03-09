@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MoreHorizontal, CheckCircle } from 'lucide-react'
+import { MoreHorizontal, ArrowRightLeft } from 'lucide-react'
 import type { Refund } from '@/../product/sections/payments/types'
 
 interface RefundRowProps {
@@ -8,20 +8,26 @@ interface RefundRowProps {
   onSelect: (selected: boolean) => void
   onApprove?: () => void
   onProcess?: () => void
+  onMove?: (targetStage: string) => void
+  onClick?: () => void
 }
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  Initiated: {
-    label: 'Initiated',
+  'Refund Raised': {
+    label: 'Refund Raised',
     className: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
-  },
-  Approved: {
-    label: 'Approved',
-    className: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
   },
   Completed: {
     label: 'Completed',
     className: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400',
+  },
+  Hold: {
+    label: 'Hold',
+    className: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
+  },
+  Rejected: {
+    label: 'Rejected',
+    className: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
   },
 }
 
@@ -44,12 +50,21 @@ function formatCurrency(amount: number): string {
   }).format(amount)
 }
 
+const MOVE_OPTIONS = [
+  { value: 'Refund Raised', label: 'Refund Raised' },
+  { value: 'Completed', label: 'Completed' },
+  { value: 'Hold', label: 'Hold' },
+  { value: 'Rejected', label: 'Rejected' },
+]
+
 export function RefundRow({
   refund,
   isSelected,
   onSelect,
   onApprove,
   onProcess,
+  onMove,
+  onClick,
 }: RefundRowProps) {
   const [showMenu, setShowMenu] = useState(false)
 
@@ -60,12 +75,13 @@ export function RefundRow({
 
   return (
     <tr
-      className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+      className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${
         isSelected ? 'bg-cyan-50 dark:bg-cyan-900/10' : ''
       }`}
+      onClick={onClick}
     >
       {/* Checkbox */}
-      <td className="px-4 py-3">
+      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
         <input
           type="checkbox"
           checked={isSelected}
@@ -111,15 +127,15 @@ export function RefundRow({
         </span>
       </td>
 
-      {/* Approved By */}
+      {/* Initiated By */}
       <td className="px-4 py-3">
-        {refund.approvedBy ? (
+        {refund.initiatedBy ? (
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300">
-              {refund.approvedBy.charAt(0)}
+              {refund.initiatedBy.charAt(0)}
             </div>
             <span className="text-sm text-slate-700 dark:text-slate-300">
-              {refund.approvedBy.split(' ')[0]}
+              {refund.initiatedBy.split(' ')[0]}
             </span>
           </div>
         ) : (
@@ -135,7 +151,7 @@ export function RefundRow({
       </td>
 
       {/* Actions Menu */}
-      <td className="px-4 py-3">
+      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
@@ -150,23 +166,23 @@ export function RefundRow({
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
-                {refund.refundStatus !== 'Completed' ? (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
+                <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Move to
+                </div>
+                {MOVE_OPTIONS.filter((o) => o.value !== refund.refundStatus).map((option) => (
                   <button
+                    key={option.value}
                     onClick={() => {
-                      onProcess?.()
+                      onMove?.(option.value)
                       setShowMenu(false)
                     }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                   >
-                    <CheckCircle className="h-4 w-4" />
-                    Mark as Complete
+                    <ArrowRightLeft className="h-4 w-4" />
+                    {option.label}
                   </button>
-                ) : (
-                  <div className="px-3 py-2 text-sm text-slate-400 dark:text-slate-500">
-                    No actions available
-                  </div>
-                )}
+                ))}
               </div>
             </>
           )}

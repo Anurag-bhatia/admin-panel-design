@@ -11,6 +11,7 @@ import {
   HeadphonesIcon,
   BarChart3,
   UsersRound,
+  Settings,
 } from 'lucide-react'
 
 // Lazy-loaded section preview components
@@ -46,6 +47,9 @@ const DisputeListPreview = React.lazy(() =>
 )
 const PaymentsDashboardPreview = React.lazy(() =>
   import('../sections/payments/PaymentsDashboardPreview')
+)
+const SetupDashboard = React.lazy(() =>
+  import('../sections/setup/SetupDashboard')
 )
 
 // Section metadata mapping
@@ -96,7 +100,7 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     icon: HeadphonesIcon,
   },
   reports: {
-    label: 'Reports',
+    label: 'Analytics',
     description: 'Comprehensive reporting dashboards and analytics across all business metrics and operations.',
     icon: BarChart3,
   },
@@ -104,6 +108,11 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     label: 'Team',
     description: 'User and team administration for managing internal operations staff and permissions.',
     icon: UsersRound,
+  },
+  setup: {
+    label: 'Setup',
+    description: 'Centralized configuration hub for managing services, pricing, departments, masters, geographic values, and audit log.',
+    icon: Settings,
   },
 }
 
@@ -120,6 +129,7 @@ export const SECTION_COMPONENTS: Record<string, React.ComponentType<any> | null>
   support: SupportDashboard,
   reports: ReportsDashboard,
   team: TeamManagement,
+  setup: SetupDashboard,
 }
 
 // Ordered list of section IDs for consistent navigation
@@ -135,6 +145,7 @@ export const SECTION_IDS = [
   'support',
   'customers',
   'lawyers',
+  'setup',
 ] as const
 
 // Sections hidden from sidebar navigation (kept in registry for data access)
