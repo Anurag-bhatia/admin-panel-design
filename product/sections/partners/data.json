@@ -48,8 +48,8 @@
           "contactPerson": "Manoj Tiwari",
           "contactPhone": "+919812345001",
           "status": "active",
-          "subscriberCount": 12,
-          "vehicleCount": 38,
+          "subscriberCount": 38,
+          "vehicleCount": 12,
           "openedDate": "2023-05-20"
         },
         {
@@ -62,8 +62,8 @@
           "contactPerson": "Sanjay Gupta",
           "contactPhone": "+919812345002",
           "status": "active",
-          "subscriberCount": 8,
-          "vehicleCount": 32,
+          "subscriberCount": 32,
+          "vehicleCount": 8,
           "openedDate": "2023-07-10"
         },
         {
@@ -76,8 +76,8 @@
           "contactPerson": "Rakesh Yadav",
           "contactPhone": "+919812345003",
           "status": "active",
-          "subscriberCount": 6,
-          "vehicleCount": 30,
+          "subscriberCount": 30,
+          "vehicleCount": 6,
           "openedDate": "2023-09-15"
         },
         {
@@ -90,8 +90,8 @@
           "contactPerson": "Deepak Sharma",
           "contactPhone": "+919812345004",
           "status": "inactive",
-          "subscriberCount": 3,
-          "vehicleCount": 26,
+          "subscriberCount": 26,
+          "vehicleCount": 3,
           "openedDate": "2024-01-05"
         }
       ],
@@ -182,7 +182,7 @@
       "linkedSubscribers": [
         {
           "id": "LWD-1160523",
-          "name": "ABC Logistics",
+          "name": "Ramesh Verma",
           "company": "ABC Logistics Pvt Ltd",
           "mobile": "+919111111111",
           "status": "active",
@@ -191,7 +191,7 @@
         },
         {
           "id": "LWD-1160524",
-          "name": "XYZ Transport",
+          "name": "Sunil Mehra",
           "company": "XYZ Transport Services",
           "mobile": "+919111111112",
           "status": "active",
@@ -200,7 +200,7 @@
         },
         {
           "id": "LWD-1160525",
-          "name": "Delhi Couriers",
+          "name": "Arvind Joshi",
           "company": "Delhi Couriers Co",
           "mobile": "+919111111113",
           "status": "paused",
@@ -294,8 +294,8 @@
           "contactPerson": "Anil Patil",
           "contactPhone": "+919822345001",
           "status": "active",
-          "subscriberCount": 10,
-          "vehicleCount": 52,
+          "subscriberCount": 52,
+          "vehicleCount": 10,
           "openedDate": "2023-08-28"
         },
         {
@@ -308,8 +308,8 @@
           "contactPerson": "Prashant Deshmukh",
           "contactPhone": "+919822345002",
           "status": "active",
-          "subscriberCount": 5,
-          "vehicleCount": 32,
+          "subscriberCount": 32,
+          "vehicleCount": 5,
           "openedDate": "2023-11-15"
         }
       ],
@@ -380,7 +380,7 @@
       "linkedSubscribers": [
         {
           "id": "LWD-1160526",
-          "name": "Mumbai Freight",
+          "name": "Nikhil Patil",
           "company": "Mumbai Freight Express",
           "mobile": "+919222222221",
           "status": "active",
@@ -389,7 +389,7 @@
         },
         {
           "id": "LWD-1160527",
-          "name": "West India Roads",
+          "name": "Pradeep Kulkarni",
           "company": "West India Roads Ltd",
           "mobile": "+919222222222",
           "status": "active",
@@ -488,7 +488,7 @@
       "linkedSubscribers": [
         {
           "id": "LWD-1160528",
-          "name": "Gujarat Fleet Services",
+          "name": "Hitesh Shah",
           "company": "Gujarat Fleet Services Pvt",
           "mobile": "+919333333331",
           "status": "active",
@@ -560,7 +560,7 @@
       "linkedSubscribers": [
         {
           "id": "LWD-1160529",
-          "name": "Bangalore Express",
+          "name": "Kiran Rao",
           "company": "Bangalore Express Logistics",
           "mobile": "+919444444441",
           "status": "inactive",
@@ -635,8 +635,8 @@
           "contactPerson": "Naveen Chopra",
           "contactPhone": "+919812345010",
           "status": "active",
-          "subscriberCount": 4,
-          "vehicleCount": 42,
+          "subscriberCount": 42,
+          "vehicleCount": 4,
           "openedDate": "2024-01-10"
         }
       ],
@@ -689,7 +689,7 @@
       "linkedSubscribers": [
         {
           "id": "LWD-1160530",
-          "name": "Delhi Traders",
+          "name": "Mohit Taneja",
           "company": "Delhi Traders Association",
           "mobile": "+919555555551",
           "status": "active",
@@ -698,7 +698,7 @@
         },
         {
           "id": "LWD-1160531",
-          "name": "NCR Logistics",
+          "name": "Gaurav Bhalla",
           "company": "NCR Logistics Hub",
           "mobile": "+919555555552",
           "status": "active",
@@ -817,7 +817,7 @@
       "linkedSubscribers": [
         {
           "id": "LWD-1160532",
-          "name": "Hyderabad Movers",
+          "name": "Venkat Reddy",
           "company": "Hyderabad Movers Ltd",
           "mobile": "+919666666661",
           "status": "active",
@@ -826,7 +826,7 @@
         },
         {
           "id": "LWD-1160533",
-          "name": "Telangana Express",
+          "name": "Srinivas Rao",
           "company": "Telangana Express Services",
           "mobile": "+919666666662",
           "status": "active",
@@ -835,7 +835,7 @@
         },
         {
           "id": "LWD-1160534",
-          "name": "South India Cargo",
+          "name": "Arun Nair",
           "company": "South India Cargo Co",
           "mobile": "+919666666663",
           "status": "inactive",
@@ -959,7 +959,7 @@
       "linkedSubscribers": [
         {
           "id": "LWD-1160535",
-          "name": "Lucknow Transport",
+          "name": "Deepak Tiwari",
           "company": "Lucknow Transport Pvt Ltd",
           "mobile": "+919777777771",
           "status": "active",
@@ -1064,7 +1064,7 @@
       "linkedSubscribers": [
         {
           "id": "LWD-1160536",
-          "name": "Kolkata Couriers",
+          "name": "Soumya Das",
           "company": "Kolkata Couriers Express",
           "mobile": "+919888888881",
           "status": "active",
@@ -1073,7 +1073,7 @@
         },
         {
           "id": "LWD-1160537",
-          "name": "Eastern Roads",
+          "name": "Rajib Chatterjee",
           "company": "Eastern Roads Transport",
           "mobile": "+919888888882",
           "status": "paused",

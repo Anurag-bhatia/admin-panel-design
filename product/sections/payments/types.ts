@@ -62,14 +62,20 @@ export interface PaymentsProps {
   onExportRefunds?: () => void
   /** Called when user clicks a lawyer fee row to navigate to lawyer profile */
   onViewLawyerProfile?: (lawyerId: string) => void
+  /** Called when user bulk marks selected lawyer fees as paid */
+  onBulkMarkLawyerFeesPaid?: (keys: string[]) => void
   /** Called when user exports lawyer fees */
   onExportLawyerFees?: () => void
   /** Called when user wants to view a lead's details */
   onViewLead?: (id: string) => void
   /** Called when user wants to assign a lead */
   onAssignLead?: (id: string) => void
+  /** Called when user bulk marks selected leads as converted */
+  onBulkMarkLeadsConverted?: (ids: string[]) => void
   /** List of partner payout records */
   partnerPayouts?: PartnerPayout[]
+  /** Called when user bulk marks selected partner payouts as paid */
+  onBulkMarkPartnerPayoutsPaid?: (keys: string[]) => void
   /** Called when user clicks a partner payout row to navigate to partner profile */
   onViewPartnerProfile?: (partnerId: string) => void
   /** Called when user exports partner payouts */

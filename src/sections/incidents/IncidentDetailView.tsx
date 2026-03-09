@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, Clock, UserPlus, Scale, CheckCircle, Search, IndianRupee } from 'lucide-react'
+import { ArrowLeft, Clock, UserPlus, Scale, CheckCircle, Search, IndianRupee, ArrowRightLeft, ChevronDown } from 'lucide-react'
 import { ActivityTab } from './components/ActivityTab'
 import { NotesTab, type Note } from './components/NotesTab'
 import { DetailsTab } from './components/DetailsTab'
@@ -52,6 +52,7 @@ export function IncidentDetailView({
   const [activeTab, setActiveTab] = useState<TabType>('activity')
   const [notes, setNotes] = useState<Note[]>(SAMPLE_NOTES)
   const [showExpenseModal, setShowExpenseModal] = useState(false)
+  const [showMoveDropdown, setShowMoveDropdown] = useState(false)
 
   const handleAddFollowUp = (followUp: {
     notes: string
@@ -157,11 +158,57 @@ export function IncidentDetailView({
             </button>
             <button
               onClick={handleScreen}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
             >
               <Search className="h-4 w-4" />
               Screen
             </button>
+
+            {/* Move Ticket Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowMoveDropdown(!showMoveDropdown)}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+              >
+                <ArrowRightLeft className="h-4 w-4" />
+                Move Ticket
+                <ChevronDown className="h-4 w-4" />
+              </button>
+
+              {showMoveDropdown && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowMoveDropdown(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
+                    {[
+                      { key: 'newIncidents', label: 'New Incidents' },
+                      { key: 'screening', label: 'Screening' },
+                      { key: 'agentAssigned', label: 'Agent Assigned' },
+                      { key: 'lawyerAssigned', label: 'Lawyer Assigned' },
+                      { key: 'settled', label: 'Settled' },
+                      { key: 'notSettled', label: 'Not Settled' },
+                      { key: 'hold', label: 'Hold' },
+                      { key: 'refund', label: 'Refund' },
+                    ]
+                      .filter((q) => q.key !== incident.queue)
+                      .map((queue) => (
+                        <button
+                          key={queue.key}
+                          onClick={() => {
+                            handleMoveQueue(queue.key)
+                            setShowMoveDropdown(false)
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                        >
+                          {queue.label}
+                        </button>
+                      ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

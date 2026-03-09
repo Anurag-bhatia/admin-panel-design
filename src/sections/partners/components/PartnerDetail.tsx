@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight, UserCheck, Store, QrCode, MoreVertical, Ban, X, Download } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight, UserCheck, Store, QrCode, MoreVertical, Ban, X, Download, Search, Loader2, RefreshCw } from 'lucide-react'
 import type { PartnerDetailProps, OutletQR, RegisteredVisitorDetail } from '@/../product/sections/partners/types'
 
-type TabType = 'profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'financial' | 'documents'
+type TabType = 'profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'financial' | 'documents' | 'reports'
 
 export function PartnerDetail({
   partner,
@@ -15,24 +15,42 @@ export function PartnerDetail({
   const [activeTab, setActiveTab] = useState<TabType>('profile')
   const [showDocumentUpload, setShowDocumentUpload] = useState(false)
   const [vehiclePage, setVehiclePage] = useState(1)
+  const [vehicleSearch, setVehicleSearch] = useState('')
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all')
+  const [vehicleStatusFilter, setVehicleStatusFilter] = useState<string>('all')
   const [vehicleActionMenu, setVehicleActionMenu] = useState<string | null>(null)
   const [qrActionMenu, setQrActionMenu] = useState<string | null>(null)
   const [viewQr, setViewQr] = useState<OutletQR | null>(null)
+  const [customerPage, setCustomerPage] = useState(1)
   const [visitorPage, setVisitorPage] = useState(1)
   const [outletPage, setOutletPage] = useState(1)
   const [qrPage, setQrPage] = useState(1)
   const [regVisitorPage, setRegVisitorPage] = useState(1)
   const vehiclesPerPage = 5
-  const totalVehicles = partner.linkedVehicles?.length || 0
+  const filteredVehicles = (partner.linkedVehicles || []).filter((v) => {
+    const matchesSearch = vehicleSearch === '' ||
+      v.registrationNumber.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
+      v.ownerName.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
+      v.subscriberName.toLowerCase().includes(vehicleSearch.toLowerCase())
+    const matchesType = vehicleTypeFilter === 'all' || v.vehicleType === vehicleTypeFilter
+    const matchesStatus = vehicleStatusFilter === 'all' || v.status === vehicleStatusFilter
+    return matchesSearch && matchesType && matchesStatus
+  })
+  const totalVehicles = filteredVehicles.length
   const totalVehiclePages = Math.max(1, Math.ceil(totalVehicles / vehiclesPerPage))
   const safeVehiclePage = Math.min(vehiclePage, totalVehiclePages)
-  const paginatedVehicles = partner.linkedVehicles?.slice((safeVehiclePage - 1) * vehiclesPerPage, safeVehiclePage * vehiclesPerPage) || []
+  const paginatedVehicles = filteredVehicles.slice((safeVehiclePage - 1) * vehiclesPerPage, safeVehiclePage * vehiclesPerPage)
 
   const perPage = 5
   const totalVisitors = partner.registeredVisitors?.length || 0
   const totalVisitorPages = Math.max(1, Math.ceil(totalVisitors / perPage))
   const safeVisitorPage = Math.min(visitorPage, totalVisitorPages)
   const paginatedVisitors = partner.registeredVisitors?.slice((safeVisitorPage - 1) * perPage, safeVisitorPage * perPage) || []
+
+  const totalCustomers = partner.linkedSubscribers?.length || 0
+  const totalCustomerPages = Math.max(1, Math.ceil(totalCustomers / perPage))
+  const safeCustomerPage = Math.min(customerPage, totalCustomerPages)
+  const paginatedCustomers = partner.linkedSubscribers?.slice((safeCustomerPage - 1) * perPage, safeCustomerPage * perPage) || []
 
   const totalOutlets = partner.linkedOutlets?.length || 0
   const totalOutletPages = Math.max(1, Math.ceil(totalOutlets / perPage))
@@ -48,6 +66,20 @@ export function PartnerDetail({
   const totalRegVisitorPages = Math.max(1, Math.ceil(totalRegVisitors / perPage))
   const safeRegVisitorPage = Math.min(regVisitorPage, totalRegVisitorPages)
   const paginatedRegVisitors = partner.registeredVisitorDetails?.slice((safeRegVisitorPage - 1) * perPage, safeRegVisitorPage * perPage) || []
+
+  const partnerReports = useMemo(() => [
+    { id: 'RPT-001', reportType: 'MIS', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-03-01T06:00:00Z', fileSize: 245760, period: 'February 2026' },
+    { id: 'RPT-002', reportType: 'MIS-Challan', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-03-01T06:05:00Z', fileSize: 184320, period: 'February 2026' },
+    { id: 'RPT-003', reportType: 'MIS', format: 'CSV', status: 'generating', category: 'monthly', generatedAt: '2026-03-06T06:00:00Z', fileSize: null, period: 'March 2026' },
+    { id: 'RPT-004', reportType: 'MIS-Challan', format: 'CSV', status: 'failed', category: 'monthly', generatedAt: '2026-02-01T06:00:00Z', fileSize: null, period: 'January 2026' },
+    { id: 'RPT-005', reportType: 'MIS', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-02-01T06:00:00Z', fileSize: 312400, period: 'January 2026' },
+    { id: 'RPT-006', reportType: 'ICR', format: 'PDF', status: 'ready', category: 'incident', generatedAt: '2026-02-15T10:30:00Z', fileSize: 524288, incidentId: 'IRN-124501', incidentVehicle: 'GJ01QR0123', incidentStatus: 'Resolved' },
+    { id: 'RPT-007', reportType: 'ISR', format: 'PDF', status: 'ready', category: 'incident', generatedAt: '2026-02-15T10:35:00Z', fileSize: 412672, incidentId: 'IRN-124501', incidentVehicle: 'GJ01QR0123', incidentStatus: 'Resolved' },
+    { id: 'RPT-008', reportType: 'ICR', format: 'PDF', status: 'generating', category: 'incident', generatedAt: '2026-03-05T14:20:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'GJ05ST4567', incidentStatus: 'In Progress' },
+  ] as const, [])
+
+  const monthlyReports = useMemo(() => partnerReports.filter(r => r.category === 'monthly'), [partnerReports])
+  const incidentReports = useMemo(() => partnerReports.filter(r => r.category === 'incident'), [partnerReports])
 
   const handleEditClick = () => {
     onEditPartner?.(partner.id)
@@ -68,6 +100,8 @@ export function PartnerDetail({
     }).format(amount)
   }
 
+  const isChallanPay = partner.partnerType === 'challanPay'
+
   const getTabIcon = (tab: TabType) => {
     const icons: Record<TabType, React.ReactNode> = {
       profile: <Building2 className="w-4 h-4" />,
@@ -78,7 +112,8 @@ export function PartnerDetail({
       outlets: <Store className="w-4 h-4" />,
       qrs: <QrCode className="w-4 h-4" />,
       financial: <BarChart3 className="w-4 h-4" />,
-      documents: <FileCheck className="w-4 h-4" />
+      documents: <FileCheck className="w-4 h-4" />,
+      reports: <BarChart3 className="w-4 h-4" />
     }
     return icons[tab]
   }
@@ -88,17 +123,16 @@ export function PartnerDetail({
       profile: 'Profile',
       visitors: 'Visitors',
       registeredVisitors: 'Registered Visitors',
-      customers: 'Customers',
+      customers: isChallanPay ? 'Customers' : 'Subscribers',
       vehicles: 'Vehicles',
       outlets: 'Outlets',
       qrs: 'QRs',
       financial: 'Financial',
-      documents: 'Documents'
+      documents: 'Documents',
+      reports: 'Reports'
     }
     return labels[tab]
   }
-
-  const isChallanPay = partner.partnerType === 'challanPay'
 
   const SubscriberStatusBadge = ({ status }: { status: 'active' | 'inactive' | 'paused' }) => {
     const styles = {
@@ -154,7 +188,7 @@ export function PartnerDetail({
         <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit mb-6 flex-wrap">
           {(isChallanPay
             ? ['profile', 'visitors', 'registeredVisitors', 'vehicles', 'customers', 'outlets', 'qrs', 'financial', 'documents'] as TabType[]
-            : ['profile', 'customers', 'vehicles', 'financial', 'documents'] as TabType[]
+            : ['profile', 'customers', 'vehicles', 'reports', 'financial', 'documents'] as TabType[]
           ).map((tab) => (
             <button
               key={tab}
@@ -397,55 +431,96 @@ export function PartnerDetail({
           {/* Customers Tab */}
           {activeTab === 'customers' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Customers ({partner.linkedSubscribers.length})</h2>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">{isChallanPay ? 'Customers' : 'Subscribers'} ({partner.linkedSubscribers.length})</h2>
               {partner.linkedSubscribers.length === 0 ? (
-                <p className="text-slate-500 dark:text-slate-400">No customers yet</p>
+                <p className="text-slate-500 dark:text-slate-400">No {isChallanPay ? 'customers' : 'subscribers'} yet</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Customer</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Mobile</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscribed</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incidents</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {partner.linkedSubscribers.map((subscriber) => (
-                        <tr key={subscriber.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3">
-                            <div>
-                              <p className="font-medium text-slate-900 dark:text-slate-50">{subscriber.name}</p>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">{subscriber.company}</p>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{subscriber.mobile}</td>
-                          <td className="px-4 py-3">
-                            <SubscriberStatusBadge status={subscriber.status} />
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(subscriber.dateSubscribed)}</td>
-                          <td className="px-4 py-3">
-                            <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
-                              {subscriber.incidentCount}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <button
-                              onClick={() => onViewIncidents?.(subscriber.id)}
-                              className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded transition-colors"
-                            >
-                              <Eye className="w-3 h-3" />
-                              View Incidents
-                            </button>
-                          </td>
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">{isChallanPay ? 'Customer' : 'Subscriber'}</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Mobile</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscribed</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incidents</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
                         </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {paginatedCustomers.map((subscriber) => (
+                          <tr key={subscriber.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3">
+                              <p className="font-medium text-slate-900 dark:text-slate-50">{subscriber.name}</p>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{subscriber.mobile}</td>
+                            <td className="px-4 py-3">
+                              <SubscriberStatusBadge status={subscriber.status} />
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(subscriber.dateSubscribed)}</td>
+                            <td className="px-4 py-3">
+                              <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                {subscriber.incidentCount}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <button
+                                onClick={() => onViewIncidents?.(subscriber.id)}
+                                className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded transition-colors"
+                              >
+                                <Eye className="w-3 h-3" />
+                                View Incidents
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Showing {(safeCustomerPage - 1) * perPage + 1}–{Math.min(safeCustomerPage * perPage, totalCustomers)} of {totalCustomers}
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setCustomerPage(safeCustomerPage - 1)}
+                        disabled={safeCustomerPage === 1}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+                          safeCustomerPage === 1
+                            ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      {Array.from({ length: totalCustomerPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setCustomerPage(page)}
+                          className={`inline-flex items-center justify-center min-w-[32px] h-8 px-2 rounded-md text-sm font-medium transition-colors ${
+                            page === safeCustomerPage
+                              ? 'bg-cyan-500 text-white'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          {page}
+                        </button>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
+                      <button
+                        onClick={() => setCustomerPage(safeCustomerPage + 1)}
+                        disabled={safeCustomerPage === totalCustomerPages}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+                          safeCustomerPage === totalCustomerPages
+                            ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -458,6 +533,58 @@ export function PartnerDetail({
                 <p className="text-slate-500 dark:text-slate-400">No linked vehicles yet</p>
               ) : (
                 <>
+                  {/* Filters */}
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <div className="relative flex-1 min-w-[200px] max-w-xs">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                      <input
+                        type="text"
+                        placeholder="Search registration, owner..."
+                        value={vehicleSearch}
+                        onChange={(e) => { setVehicleSearch(e.target.value); setVehiclePage(1) }}
+                        className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                      />
+                    </div>
+                    <select
+                      value={vehicleTypeFilter}
+                      onChange={(e) => { setVehicleTypeFilter(e.target.value); setVehiclePage(1) }}
+                      className="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    >
+                      <option value="all">All Types</option>
+                      <option value="truck">Truck</option>
+                      <option value="van">Van</option>
+                      <option value="bus">Bus</option>
+                      <option value="car">Car</option>
+                      <option value="auto">Auto</option>
+                      <option value="two-wheeler">Two Wheeler</option>
+                    </select>
+                    <select
+                      value={vehicleStatusFilter}
+                      onChange={(e) => { setVehicleStatusFilter(e.target.value); setVehiclePage(1) }}
+                      className="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    >
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="blacklisted">Blacklisted</option>
+                    </select>
+                    {(vehicleSearch || vehicleTypeFilter !== 'all' || vehicleStatusFilter !== 'all') && (
+                      <button
+                        onClick={() => { setVehicleSearch(''); setVehicleTypeFilter('all'); setVehicleStatusFilter('all'); setVehiclePage(1) }}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  {filteredVehicles.length === 0 ? (
+                    <div className="py-12 text-center">
+                      <Truck className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                      <p className="text-sm text-slate-500 dark:text-slate-400">No vehicles match your filters</p>
+                    </div>
+                  ) : (<>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -571,6 +698,7 @@ export function PartnerDetail({
                         </button>
                       </div>
                     </div>
+                  </>)}
                 </>
               )}
             </div>
@@ -684,7 +812,6 @@ export function PartnerDetail({
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscribers</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicles</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Opened</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -719,7 +846,6 @@ export function PartnerDetail({
                                 {outlet.status.charAt(0).toUpperCase() + outlet.status.slice(1)}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(outlet.openedDate)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -998,6 +1124,101 @@ export function PartnerDetail({
             </div>
           )}
 
+          {/* Reports Tab */}
+          {activeTab === 'reports' && (
+            <div>
+              {/* Monthly Closure Reports */}
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Monthly Closure Reports</h2>
+                {monthlyReports.length === 0 ? (
+                  <div className="text-center py-10">
+                    <BarChart3 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500 dark:text-slate-400">No monthly reports generated yet</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Period</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Report Type</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Format</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Generated</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Size</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {monthlyReports.map((report) => (
+                          <tr key={report.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{report.period || '—'}</td>
+                            <td className="px-4 py-3"><ReportTypeBadge type={report.reportType} /></td>
+                            <td className="px-4 py-3"><FormatBadge format={report.format} /></td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(report.generatedAt)}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{report.fileSize ? formatFileSize(report.fileSize) : '—'}</td>
+                            <td className="px-4 py-3"><ReportStatusBadge status={report.status} /></td>
+                            <td className="px-4 py-3 text-right"><ReportAction status={report.status} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-slate-200 dark:border-slate-800 my-8" />
+
+              {/* Incident Reports */}
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Incident Reports</h2>
+                {incidentReports.length === 0 ? (
+                  <div className="text-center py-10">
+                    <BarChart3 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500 dark:text-slate-400">No incident reports generated yet</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Report Type</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Format</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Generated</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {incidentReports.map((report) => (
+                          <tr key={report.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{report.incidentId || '—'}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{report.incidentVehicle || '—'}</td>
+                            <td className="px-4 py-3"><ReportTypeBadge type={report.reportType} /></td>
+                            <td className="px-4 py-3"><FormatBadge format={report.format} /></td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(report.generatedAt)}</td>
+                            <td className="px-4 py-3">
+                              {report.incidentStatus ? (
+                                <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                  {report.incidentStatus}
+                                </span>
+                              ) : <span>—</span>}
+                            </td>
+                            <td className="px-4 py-3"><ReportStatusBadge status={report.status} /></td>
+                            <td className="px-4 py-3 text-right"><ReportAction status={report.status} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
         </div>
         )}
 
@@ -1116,4 +1337,86 @@ function VehicleStatusBadge({ status }: { status: 'active' | 'inactive' | 'black
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   )
+}
+
+function ReportTypeBadge({ type }: { type: string }) {
+  const styles: Record<string, string> = {
+    'MIS': 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+    'MIS-Challan': 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+    'ICR': 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400',
+    'ISR': 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+  }
+  return (
+    <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${styles[type] || 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'}`}>
+      {type}
+    </span>
+  )
+}
+
+function FormatBadge({ format }: { format: string }) {
+  const isCSV = format === 'CSV'
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
+      isCSV
+        ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+        : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+    }`}>
+      <FileText className="w-3 h-3" />
+      {format}
+    </span>
+  )
+}
+
+function ReportStatusBadge({ status }: { status: string }) {
+  if (status === 'ready') {
+    return (
+      <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+        Ready
+      </span>
+    )
+  }
+  if (status === 'generating') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 animate-pulse">
+        <Loader2 className="w-3 h-3 animate-spin" />
+        Generating
+      </span>
+    )
+  }
+  return (
+    <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400">
+      Failed
+    </span>
+  )
+}
+
+function ReportAction({ status }: { status: string }) {
+  if (status === 'ready') {
+    return (
+      <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-md transition-colors">
+        <Download className="w-3.5 h-3.5" />
+        Download
+      </button>
+    )
+  }
+  if (status === 'failed') {
+    return (
+      <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors">
+        <RefreshCw className="w-3.5 h-3.5" />
+        Retry
+      </button>
+    )
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-400 dark:text-slate-500">
+      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      Processing...
+    </span>
+  )
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }

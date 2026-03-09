@@ -2,12 +2,14 @@ import { X, CheckCircle } from 'lucide-react'
 
 interface RefundBulkActionsBarProps {
   selectedCount: number
+  actionLabel?: string
   onClearSelection: () => void
   onMarkComplete?: () => void
 }
 
 export function RefundBulkActionsBar({
   selectedCount,
+  actionLabel = 'Mark as Complete',
   onClearSelection,
   onMarkComplete,
 }: RefundBulkActionsBarProps) {
@@ -35,7 +37,7 @@ export function RefundBulkActionsBar({
             className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
           >
             <CheckCircle className="h-4 w-4" />
-            <span>Mark as Complete</span>
+            <span>{actionLabel}</span>
           </button>
         </div>
       </div>

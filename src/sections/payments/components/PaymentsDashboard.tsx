@@ -81,6 +81,9 @@ export function PaymentsDashboard({
   onExportLawyerFees,
   onViewLead,
   onAssignLead,
+  onBulkMarkLeadsConverted,
+  onBulkMarkLawyerFeesPaid,
+  onBulkMarkPartnerPayoutsPaid,
   onViewPartnerProfile,
   onExportPartnerPayouts,
 }: PaymentsProps) {
@@ -96,8 +99,14 @@ export function PaymentsDashboard({
   // Search
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Selection (refunds only)
+  // Selection (refunds)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  // Selection (lawyer fees) - keyed by lawyerId-incidentId
+  const [selectedFeeKeys, setSelectedFeeKeys] = useState<Set<string>>(new Set())
+
+  // Selection (partner payouts) - keyed by partnerId-dueDate
+  const [selectedPartnerKeys, setSelectedPartnerKeys] = useState<Set<string>>(new Set())
 
   // Selection (leads)
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set())
@@ -199,7 +208,11 @@ export function PaymentsDashboard({
     return filtered
   }, [partnerPayouts, partnerStage, searchQuery])
 
-  // Selection handlers (refunds only)
+  // Helpers to generate unique keys
+  const feeKey = (fee: LawyerFee) => `${fee.lawyerId}-${fee.incidentId}`
+  const partnerKey = (payout: PartnerPayout) => `${payout.partnerId}-${payout.dueDate}`
+
+  // Selection handlers (refunds)
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedIds(new Set(filteredRefunds.map((r) => r.id)))
@@ -224,10 +237,62 @@ export function PaymentsDashboard({
     filteredRefunds.every((r) => selectedIds.has(r.id))
   const someSelected = selectedIds.size > 0 && !allSelected
 
+  // Selection handlers (lawyer fees)
+  const handleSelectAllFees = (checked: boolean) => {
+    if (checked) {
+      setSelectedFeeKeys(new Set(filteredFees.map(feeKey)))
+    } else {
+      setSelectedFeeKeys(new Set())
+    }
+  }
+
+  const handleSelectOneFee = (key: string, checked: boolean) => {
+    const newSelected = new Set(selectedFeeKeys)
+    if (checked) {
+      newSelected.add(key)
+    } else {
+      newSelected.delete(key)
+    }
+    setSelectedFeeKeys(newSelected)
+  }
+
+  const selectedFeeArray = Array.from(selectedFeeKeys)
+  const allFeesSelected =
+    filteredFees.length > 0 &&
+    filteredFees.every((f) => selectedFeeKeys.has(feeKey(f)))
+  const someFeesSelected = selectedFeeKeys.size > 0 && !allFeesSelected
+
+  // Selection handlers (partner payouts)
+  const handleSelectAllPartners = (checked: boolean) => {
+    if (checked) {
+      setSelectedPartnerKeys(new Set(filteredPartnerPayouts.map(partnerKey)))
+    } else {
+      setSelectedPartnerKeys(new Set())
+    }
+  }
+
+  const handleSelectOnePartner = (key: string, checked: boolean) => {
+    const newSelected = new Set(selectedPartnerKeys)
+    if (checked) {
+      newSelected.add(key)
+    } else {
+      newSelected.delete(key)
+    }
+    setSelectedPartnerKeys(newSelected)
+  }
+
+  const selectedPartnerArray = Array.from(selectedPartnerKeys)
+  const allPartnersSelected =
+    filteredPartnerPayouts.length > 0 &&
+    filteredPartnerPayouts.every((p) => selectedPartnerKeys.has(partnerKey(p)))
+  const somePartnersSelected = selectedPartnerKeys.size > 0 && !allPartnersSelected
+
   // Clear selection on view/stage change
   const handleSidebarChange = (view: 'refunds' | 'lawyer-fees' | 'leads' | 'partners') => {
     setSidebarView(view)
     setSelectedIds(new Set())
+    setSelectedFeeKeys(new Set())
+    setSelectedPartnerKeys(new Set())
     setSelectedLeadIds(new Set())
     setSearchQuery('')
   }
@@ -235,6 +300,21 @@ export function PaymentsDashboard({
   const handleRefundStageChange = (stage: string) => {
     setRefundStage(stage)
     setSelectedIds(new Set())
+  }
+
+  const handleFeeStageChange = (stage: string) => {
+    setFeeStage(stage)
+    setSelectedFeeKeys(new Set())
+  }
+
+  const handleLeadsStageChange = (stage: string) => {
+    setLeadsStage(stage)
+    setSelectedLeadIds(new Set())
+  }
+
+  const handlePartnerStageChange = (stage: string) => {
+    setPartnerStage(stage)
+    setSelectedPartnerKeys(new Set())
   }
 
   // Show lead detail view if a lead is selected
@@ -278,9 +358,9 @@ export function PaymentsDashboard({
     : partnerStage
 
   const currentTabChange = sidebarView === 'refunds' ? handleRefundStageChange
-    : sidebarView === 'lawyer-fees' ? setFeeStage
-    : sidebarView === 'leads' ? setLeadsStage
-    : setPartnerStage
+    : sidebarView === 'lawyer-fees' ? handleFeeStageChange
+    : sidebarView === 'leads' ? handleLeadsStageChange
+    : handlePartnerStageChange
 
   const currentSearchPlaceholder = sidebarView === 'refunds'
     ? 'Search by Refund ID, incident, customer...'
@@ -425,6 +505,17 @@ export function PaymentsDashboard({
             <table className="w-full">
               <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                 <tr>
+                  <th className="px-4 py-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={allFeesSelected}
+                      ref={(el) => {
+                        if (el) el.indeterminate = someFeesSelected
+                      }}
+                      onChange={(e) => handleSelectAllFees(e.target.checked)}
+                      className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 dark:bg-slate-700"
+                    />
+                  </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Lawyer ID
                   </th>
@@ -456,7 +547,7 @@ export function PaymentsDashboard({
                 {filteredFees.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={9}
                       className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                     >
                       <div className="flex flex-col items-center gap-2">
@@ -485,14 +576,19 @@ export function PaymentsDashboard({
                     </td>
                   </tr>
                 ) : (
-                  filteredFees.map((fee, index) => (
-                    <LawyerFeeRow
-                      key={`${fee.lawyerId}-${fee.incidentId}-${index}`}
-                      fee={fee}
-                      onViewLawyerProfile={() => onViewLawyerProfile?.(fee.lawyerId)}
-                      onMarkComplete={() => console.log('Mark as complete:', fee.lawyerId, fee.incidentId)}
-                    />
-                  ))
+                  filteredFees.map((fee, index) => {
+                    const key = feeKey(fee)
+                    return (
+                      <LawyerFeeRow
+                        key={`${key}-${index}`}
+                        fee={fee}
+                        isSelected={selectedFeeKeys.has(key)}
+                        onSelect={(checked) => handleSelectOneFee(key, checked)}
+                        onViewLawyerProfile={() => onViewLawyerProfile?.(fee.lawyerId)}
+                        onMarkComplete={() => console.log('Mark as complete:', fee.lawyerId, fee.incidentId)}
+                      />
+                    )
+                  })
                 )}
               </tbody>
             </table>
@@ -500,6 +596,17 @@ export function PaymentsDashboard({
             <table className="w-full">
               <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                 <tr>
+                  <th className="px-4 py-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={allPartnersSelected}
+                      ref={(el) => {
+                        if (el) el.indeterminate = somePartnersSelected
+                      }}
+                      onChange={(e) => handleSelectAllPartners(e.target.checked)}
+                      className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 dark:bg-slate-700"
+                    />
+                  </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Partner ID
                   </th>
@@ -533,7 +640,7 @@ export function PaymentsDashboard({
                 {filteredPartnerPayouts.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={9}
+                      colSpan={10}
                       className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                     >
                       <div className="flex flex-col items-center gap-2">
@@ -562,14 +669,19 @@ export function PaymentsDashboard({
                     </td>
                   </tr>
                 ) : (
-                  filteredPartnerPayouts.map((payout, index) => (
-                    <PartnerPayoutRow
-                      key={`${payout.partnerId}-${index}`}
-                      payout={payout}
-                      onViewPartnerProfile={() => onViewPartnerProfile?.(payout.partnerId)}
-                      onMarkComplete={() => console.log('Mark as paid:', payout.partnerId)}
-                    />
-                  ))
+                  filteredPartnerPayouts.map((payout, index) => {
+                    const key = partnerKey(payout)
+                    return (
+                      <PartnerPayoutRow
+                        key={`${key}-${index}`}
+                        payout={payout}
+                        isSelected={selectedPartnerKeys.has(key)}
+                        onSelect={(checked) => handleSelectOnePartner(key, checked)}
+                        onViewPartnerProfile={() => onViewPartnerProfile?.(payout.partnerId)}
+                        onMarkComplete={() => console.log('Mark as paid:', payout.partnerId)}
+                      />
+                    )
+                  })
                 )}
               </tbody>
             </table>
@@ -608,12 +720,40 @@ export function PaymentsDashboard({
         />
       </div>
 
-      {/* Bulk Actions Bar (Refunds only) */}
+      {/* Bulk Actions Bar */}
       {sidebarView === 'refunds' && selectedIds.size > 0 && (
         <RefundBulkActionsBar
           selectedCount={selectedIds.size}
+          actionLabel="Mark as Complete"
           onClearSelection={() => setSelectedIds(new Set())}
           onMarkComplete={() => onBulkProcessRefunds?.(selectedArray)}
+        />
+      )}
+
+      {sidebarView === 'lawyer-fees' && selectedFeeKeys.size > 0 && (
+        <RefundBulkActionsBar
+          selectedCount={selectedFeeKeys.size}
+          actionLabel="Mark as Paid"
+          onClearSelection={() => setSelectedFeeKeys(new Set())}
+          onMarkComplete={() => onBulkMarkLawyerFeesPaid?.(selectedFeeArray)}
+        />
+      )}
+
+      {sidebarView === 'partners' && selectedPartnerKeys.size > 0 && (
+        <RefundBulkActionsBar
+          selectedCount={selectedPartnerKeys.size}
+          actionLabel="Mark as Paid"
+          onClearSelection={() => setSelectedPartnerKeys(new Set())}
+          onMarkComplete={() => onBulkMarkPartnerPayoutsPaid?.(selectedPartnerArray)}
+        />
+      )}
+
+      {sidebarView === 'leads' && selectedLeadIds.size > 0 && (
+        <RefundBulkActionsBar
+          selectedCount={selectedLeadIds.size}
+          actionLabel="Mark as Converted"
+          onClearSelection={() => setSelectedLeadIds(new Set())}
+          onMarkComplete={() => onBulkMarkLeadsConverted?.(Array.from(selectedLeadIds))}
         />
       )}
     </div>

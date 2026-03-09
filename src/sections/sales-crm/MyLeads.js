@@ -1,0 +1,6 @@
+import { jsx as _jsx } from "react/jsx-runtime";
+import data from '@/../product/sections/sales-crm/my-leads-data.json';
+import { MyLeads } from './components/MyLeads';
+export default function MyLeadsPreview() {
+    return (_jsx(MyLeads, { currentUser: data.currentUser, leads: data.leads, todaysMeetings: data.todaysMeetings, todaysPriorities: data.todaysPriorities, timelineActivities: data.timelineActivities, users: data.users, leadSources: data.leadSources, serviceTypes: data.serviceTypes, serviceSubTypes: data.serviceSubTypes, activityTypes: data.activityTypes, documentCategories: data.documentCategories, onViewLead: (leadId) => console.log('View lead:', leadId), onLogFollowUp: (leadId, note, nextDate) => console.log('Log follow-up:', { leadId, note, nextDate }), onSendQuotation: (leadId) => console.log('Send quotation:', leadId), onMarkConverted: (leadId) => console.log('Mark converted:', leadId), onMarkLost: (leadId, reason) => console.log('Mark lost:', { leadId, reason }), onEditLead: (id, leadData) => console.log('Edit lead:', { id, leadData }), onAddFollowUp: (leadId, followUpData) => console.log('Add follow-up:', { leadId, followUpData }), onUploadDocument: (leadId, file, category) => console.log('Upload document:', { leadId, file: file.name, category }) }));
+}

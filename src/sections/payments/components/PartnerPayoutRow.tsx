@@ -4,6 +4,8 @@ import type { PartnerPayout } from '@/../product/sections/payments/types'
 
 interface PartnerPayoutRowProps {
   payout: PartnerPayout
+  isSelected?: boolean
+  onSelect?: (selected: boolean) => void
   onViewPartnerProfile?: () => void
   onMarkComplete?: () => void
 }
@@ -40,6 +42,8 @@ function formatCurrency(amount: number): string {
 
 export function PartnerPayoutRow({
   payout,
+  isSelected = false,
+  onSelect,
   onViewPartnerProfile,
   onMarkComplete,
 }: PartnerPayoutRowProps) {
@@ -51,9 +55,21 @@ export function PartnerPayoutRow({
 
   return (
     <tr
-      className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+      className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${
+        isSelected ? 'bg-cyan-50 dark:bg-cyan-900/10' : ''
+      }`}
       onClick={onViewPartnerProfile}
     >
+      {/* Checkbox */}
+      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={(e) => onSelect?.(e.target.checked)}
+          className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 dark:bg-slate-800"
+        />
+      </td>
+
       {/* Partner ID */}
       <td className="px-4 py-3">
         <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">

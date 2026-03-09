@@ -19,9 +19,12 @@ export default function PaymentsDashboardPreview() {
         onBulkProcessRefunds={(ids) => console.log('Bulk process refunds:', ids)}
         onExportRefunds={() => console.log('Export refunds')}
         onViewLawyerProfile={(lawyerId) => console.log('View lawyer profile:', lawyerId)}
+        onBulkMarkLawyerFeesPaid={(keys) => console.log('Bulk mark lawyer fees paid:', keys)}
         onExportLawyerFees={() => console.log('Export lawyer fees')}
         onViewLead={(id) => console.log('View lead:', id)}
         onAssignLead={(id) => console.log('Assign lead:', id)}
+        onBulkMarkLeadsConverted={(ids) => console.log('Bulk mark leads converted:', ids)}
+        onBulkMarkPartnerPayoutsPaid={(keys) => console.log('Bulk mark partner payouts paid:', keys)}
         onViewPartnerProfile={(partnerId) => console.log('View partner profile:', partnerId)}
         onExportPartnerPayouts={() => console.log('Export partner payouts')}
       />
