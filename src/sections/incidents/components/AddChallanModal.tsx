@@ -36,6 +36,7 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
     }
 
     onSubmit?.({
+      workType: 'challan',
       challanNumber,
       subscriberId,
       subscriberName: subscribers.find((s) => s.id === subscriberId)?.name || '',

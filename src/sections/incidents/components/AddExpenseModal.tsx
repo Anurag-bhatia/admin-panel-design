@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { X, IndianRupee } from 'lucide-react'
+import { X } from 'lucide-react'
 
 interface AddExpenseModalProps {
   incidentId: string
+  workType?: 'cases' | 'challans'
   onSubmit?: (expense: {
     totalAmountReceived: number
     challanAmount: number
@@ -10,11 +11,17 @@ interface AddExpenseModalProps {
     gst: number
     gatewayCharges: number
     discount: number
+    lawyerCharge: number
+    governmentCharge: number
+    miscellaneousCharge: number
   }) => void
   onCancel: () => void
 }
 
-export function AddExpenseModal({ incidentId, onSubmit, onCancel }: AddExpenseModalProps) {
+export function AddExpenseModal({ incidentId, workType = 'challans', onSubmit, onCancel }: AddExpenseModalProps) {
+  const isCases = workType === 'cases'
+
+  // Challan fields
   const [totalAmountReceived, setTotalAmountReceived] = useState('')
   const [challanAmount, setChallanAmount] = useState('')
   const [convenienceFee, setConvenienceFee] = useState('')
@@ -22,20 +29,36 @@ export function AddExpenseModal({ incidentId, onSubmit, onCancel }: AddExpenseMo
   const [gatewayCharges, setGatewayCharges] = useState('')
   const [discount, setDiscount] = useState('')
 
+  // Case fields
+  const [lawyerCharge, setLawyerCharge] = useState('')
+  const [governmentCharge, setGovernmentCharge] = useState('')
+  const [miscellaneousCharge, setMiscellaneousCharge] = useState('')
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!totalAmountReceived || !challanAmount) return
+    if (isCases) {
+      if (!lawyerCharge || !governmentCharge) return
+    } else {
+      if (!totalAmountReceived || !challanAmount) return
+    }
 
     onSubmit?.({
-      totalAmountReceived: parseFloat(totalAmountReceived),
-      challanAmount: parseFloat(challanAmount),
+      totalAmountReceived: parseFloat(totalAmountReceived) || 0,
+      challanAmount: parseFloat(challanAmount) || 0,
       convenienceFee: parseFloat(convenienceFee) || 0,
       gst: parseFloat(gst) || 0,
       gatewayCharges: parseFloat(gatewayCharges) || 0,
       discount: parseFloat(discount) || 0,
+      lawyerCharge: parseFloat(lawyerCharge) || 0,
+      governmentCharge: parseFloat(governmentCharge) || 0,
+      miscellaneousCharge: parseFloat(miscellaneousCharge) || 0,
     })
   }
+
+  const isDisabled = isCases
+    ? !lawyerCharge || !governmentCharge
+    : !totalAmountReceived || !challanAmount
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -60,135 +83,206 @@ export function AddExpenseModal({ incidentId, onSubmit, onCancel }: AddExpenseMo
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Total Amount Received */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Total Amount Received <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                ₹
-              </span>
-              <input
-                type="number"
-                value={totalAmountReceived}
-                onChange={(e) => setTotalAmountReceived(e.target.value)}
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-                className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Challan Amount */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Challan Amount <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                ₹
-              </span>
-              <input
-                type="number"
-                value={challanAmount}
-                onChange={(e) => setChallanAmount(e.target.value)}
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-                className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Convenience Fee & GST */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Convenience Fee
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                  ₹
-                </span>
-                <input
-                  type="number"
-                  value={convenienceFee}
-                  onChange={(e) => setConvenienceFee(e.target.value)}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                />
+          {isCases ? (
+            <>
+              {/* Lawyer Charge */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Lawyer Charge <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    value={lawyerCharge}
+                    onChange={(e) => setLawyerCharge(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                GST
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                  ₹
-                </span>
-                <input
-                  type="number"
-                  value={gst}
-                  onChange={(e) => setGst(e.target.value)}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                />
+              {/* Government Charge */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Government Charge <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    value={governmentCharge}
+                    onChange={(e) => setGovernmentCharge(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                    required
+                  />
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Gateway Charges & Discount */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Gateway Charges
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                  ₹
-                </span>
-                <input
-                  type="number"
-                  value={gatewayCharges}
-                  onChange={(e) => setGatewayCharges(e.target.value)}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                />
+              {/* Miscellaneous Charge */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Miscellaneous Charge
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    value={miscellaneousCharge}
+                    onChange={(e) => setMiscellaneousCharge(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                  />
+                </div>
               </div>
-            </div>
+            </>
+          ) : (
+            <>
+              {/* Total Amount Received */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Total Amount Received <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    value={totalAmountReceived}
+                    onChange={(e) => setTotalAmountReceived(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                    required
+                  />
+                </div>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Discount
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                  ₹
-                </span>
-                <input
-                  type="number"
-                  value={discount}
-                  onChange={(e) => setDiscount(e.target.value)}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                />
+              {/* Challan Amount */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Challan Amount <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    value={challanAmount}
+                    onChange={(e) => setChallanAmount(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                    required
+                  />
+                </div>
               </div>
-            </div>
-          </div>
+
+              {/* Convenience Fee & GST */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Convenience Fee
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      value={convenienceFee}
+                      onChange={(e) => setConvenienceFee(e.target.value)}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    GST
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      value={gst}
+                      onChange={(e) => setGst(e.target.value)}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Gateway Charges & Discount */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Gateway Charges
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      value={gatewayCharges}
+                      onChange={(e) => setGatewayCharges(e.target.value)}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Discount
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      value={discount}
+                      onChange={(e) => setDiscount(e.target.value)}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -201,7 +295,7 @@ export function AddExpenseModal({ incidentId, onSubmit, onCancel }: AddExpenseMo
             </button>
             <button
               type="submit"
-              disabled={!totalAmountReceived || !challanAmount}
+              disabled={isDisabled}
               className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg transition-colors"
             >
               Add Expense

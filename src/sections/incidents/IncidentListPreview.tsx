@@ -3,6 +3,7 @@ import data from '@/../product/sections/incidents/data.json'
 import { IncidentList } from './components/IncidentList'
 import { IncidentDetailView } from './IncidentDetailView'
 import { AddChallanModal } from './components/AddChallanModal'
+import { AddCaseModal } from './components/AddCaseModal'
 import { AssignAgentModal } from './components/AssignAgentModal'
 import { AssignLawyerModal } from './components/AssignLawyerModal'
 import { MoveQueueModal } from './components/MoveQueueModal'
@@ -27,7 +28,7 @@ import type {
 
 type ViewMode = 'list' | 'detail' | 'validateResults' | 'screenResults'
 
-type ModalType = 'addChallan' | 'assignAgent' | 'assignLawyer' | 'moveQueue' | 'bulkUpdate' | null
+type ModalType = 'addChallan' | 'addCase' | 'assignAgent' | 'assignLawyer' | 'moveQueue' | 'bulkUpdate' | null
 
 export default function IncidentListPreview() {
   // View state
@@ -70,6 +71,10 @@ export default function IncidentListPreview() {
 
   const handleAddChallan = () => {
     setActiveModal('addChallan')
+  }
+
+  const handleAddCase = () => {
+    setActiveModal('addCase')
   }
 
   const handleValidate = (incidentIds: string[]) => {
@@ -200,8 +205,8 @@ export default function IncidentListPreview() {
       <div className="h-[calc(100vh-64px)]">
         <IncidentList
           incidents={data.incidents as Incident[]}
-          queueCounts={data.queueCounts as QueueCounts}
-          activeQueue="newIncidents"
+          challanQueueCounts={data.challanQueueCounts as QueueCounts}
+          caseQueueCounts={data.caseQueueCounts as QueueCounts}
           pagination={data.pagination as Pagination}
           users={data.users as User[]}
           lawyers={data.lawyers as Lawyer[]}
@@ -209,6 +214,7 @@ export default function IncidentListPreview() {
           offenceTypes={data.offenceTypes}
           onViewIncident={handleViewIncident}
           onAddChallan={handleAddChallan}
+          onAddCase={handleAddCase}
           onValidate={handleValidate}
           onScreen={handleScreen}
           onAssignAgent={(ids, agentId) => handleAssignAgent(ids, agentId)}
@@ -223,13 +229,26 @@ export default function IncidentListPreview() {
         />
       </div>
 
-      {/* Add Incident Modal */}
+      {/* Add Challan Modal */}
       {activeModal === 'addChallan' && (
         <AddChallanModal
           subscribers={data.subscribers as Subscriber[]}
           sources={data.sources as IncidentSource[]}
           onSubmit={(challan) => {
             console.log('Add challan:', challan)
+            setActiveModal(null)
+          }}
+          onCancel={() => setActiveModal(null)}
+        />
+      )}
+
+      {/* Add Case Modal */}
+      {activeModal === 'addCase' && (
+        <AddCaseModal
+          subscribers={data.subscribers as Subscriber[]}
+          sources={data.sources as IncidentSource[]}
+          onSubmit={(caseData) => {
+            console.log('Add case:', caseData)
             setActiveModal(null)
           }}
           onCancel={() => setActiveModal(null)}

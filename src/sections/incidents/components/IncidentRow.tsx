@@ -24,6 +24,10 @@ export interface SettlementFees {
   gst: number
   gatewayCharges: number
   discount: number
+  // Case-specific fields
+  lawyerCharge: number
+  governmentCharge: number
+  miscellaneousCharge: number
 }
 
 interface IncidentRowProps {
@@ -31,6 +35,7 @@ interface IncidentRowProps {
   isSelected: boolean
   users: User[]
   lawyers: Lawyer[]
+  workType?: 'cases' | 'challans'
   onSelect: (selected: boolean) => void
   onView?: () => void
   onValidate?: () => void
@@ -45,11 +50,27 @@ interface IncidentRowProps {
 const TYPE_LABELS: Record<string, string> = {
   payAndClose: 'PPT',
   contest: 'Bulk',
+  onSpot: 'On Spot',
+  onCall: 'On Call',
 }
 
 const CHALLAN_TYPE_LABELS: Record<string, string> = {
   court: 'Court',
   online: 'Online',
+}
+
+const CASE_CATEGORY_LABELS: Record<string, string> = {
+  iaStart: 'IA Start',
+  wills24: 'Wills 24',
+  legalNotice: 'Legal Notice',
+  others: 'Others',
+  litigation: 'Litigation',
+  laas: 'LAAS',
+  accident: 'Accident',
+  liveChallan: 'Live Challan',
+  oldChallan: 'Old Challan',
+  ndps: 'NDPS',
+  employmentLabour: 'Employment and Labour Case',
 }
 
 const QUEUE_OPTIONS: { key: IncidentQueue; label: string }[] = [
@@ -85,6 +106,7 @@ export function IncidentRow({
   isSelected,
   users,
   lawyers,
+  workType = 'challans',
   onSelect,
   onView,
   onValidate,
@@ -95,6 +117,7 @@ export function IncidentRow({
   onAddExpense,
   onUpdate,
 }: IncidentRowProps) {
+  const isCases = workType === 'cases'
   const [showMenu, setShowMenu] = useState(false)
   const [showAgentDropdown, setShowAgentDropdown] = useState(false)
   const [showLawyerDropdown, setShowLawyerDropdown] = useState(false)
@@ -107,6 +130,9 @@ export function IncidentRow({
     gst: 0,
     gatewayCharges: 0,
     discount: 0,
+    lawyerCharge: 0,
+    governmentCharge: 0,
+    miscellaneousCharge: 0,
   })
 
   const [pendingQueue, setPendingQueue] = useState<IncidentQueue | null>(null)
@@ -141,7 +167,7 @@ export function IncidentRow({
     setShowSettlementModal(false)
     setPendingQueue(null)
     setIsAddingExpense(false)
-    setSettlementFees({ totalAmountReceived: 0, challanAmount: 0, convenienceFee: 0, gst: 0, gatewayCharges: 0, discount: 0 })
+    setSettlementFees({ totalAmountReceived: 0, challanAmount: 0, convenienceFee: 0, gst: 0, gatewayCharges: 0, discount: 0, lawyerCharge: 0, governmentCharge: 0, miscellaneousCharge: 0 })
   }
 
   const assignedAgent = users.find((u) => u.id === incident.assignedAgentId)
@@ -200,31 +226,53 @@ export function IncidentRow({
 
       {/* Type */}
       <td className="px-4 py-3">
-        <span
-          className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-            incident.type === 'contest'
-              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-              : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-          }`}
-        >
-          {TYPE_LABELS[incident.type]}
-        </span>
-      </td>
-
-      {/* Challan Type */}
-      <td className="px-4 py-3">
-        {incident.challanType === 'court' || incident.challanType === 'online' ? (
+        {isCases ? (
           <span
             className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-              incident.challanType === 'court'
-                ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400'
-                : 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
+              incident.type === 'onSpot'
+                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
+                : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
             }`}
           >
-            {CHALLAN_TYPE_LABELS[incident.challanType]}
+            {TYPE_LABELS[incident.type]}
           </span>
         ) : (
-          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          <span
+            className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+              incident.type === 'contest'
+                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
+            }`}
+          >
+            {TYPE_LABELS[incident.type]}
+          </span>
+        )}
+      </td>
+
+      {/* Challan Type / Case Type */}
+      <td className="px-4 py-3">
+        {isCases ? (
+          incident.caseCategory ? (
+            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400">
+              {CASE_CATEGORY_LABELS[incident.caseCategory] || incident.caseCategory}
+            </span>
+          ) : (
+            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          )
+        ) : (
+          incident.challanType === 'court' || incident.challanType === 'online' ? (
+            <span
+              className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                incident.challanType === 'court'
+                  ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400'
+                  : 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
+              }`}
+            >
+              {CHALLAN_TYPE_LABELS[incident.challanType]}
+            </span>
+          ) : (
+            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          )
         )}
       </td>
 
@@ -252,23 +300,25 @@ export function IncidentRow({
         </div>
       </td>
 
-      {/* Assigned Agent */}
-      <td className="px-4 py-3">
-        {incident.queue === 'newIncidents' || incident.queue === 'screening' ? (
-          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-        ) : assignedAgent ? (
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300">
-              {assignedAgent.name.charAt(0)}
+      {/* Assigned Agent - hidden for cases */}
+      {!isCases && (
+        <td className="px-4 py-3">
+          {incident.queue === 'newIncidents' || incident.queue === 'screening' ? (
+            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          ) : assignedAgent ? (
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300">
+                {assignedAgent.name.charAt(0)}
+              </div>
+              <span className="text-sm text-slate-700 dark:text-slate-300">
+                {assignedAgent.name.split(' ')[0]}
+              </span>
             </div>
-            <span className="text-sm text-slate-700 dark:text-slate-300">
-              {assignedAgent.name.split(' ')[0]}
-            </span>
-          </div>
-        ) : (
-          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-        )}
-      </td>
+          ) : (
+            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          )}
+        </td>
+      )}
 
       {/* Assigned Lawyer */}
       <td className="px-4 py-3">
@@ -316,88 +366,95 @@ export function IncidentRow({
                   </button>
                 ) : (
                   <>
-                    <button
-                      onClick={() => {
-                        if (incident.queue === 'newIncidents') {
-                          onValidate?.()
-                          setShowMenu(false)
-                        }
-                      }}
-                      disabled={incident.queue !== 'newIncidents'}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm ${
-                        incident.queue !== 'newIncidents'
-                          ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-                      }`}
-                    >
-                      <CheckCircle2 className="h-4 w-4" />
-                      Validate
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (incident.queue === 'newIncidents') {
-                          onScreen?.()
-                          setShowMenu(false)
-                        }
-                      }}
-                      disabled={incident.queue !== 'newIncidents'}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm ${
-                        incident.queue !== 'newIncidents'
-                          ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-                      }`}
-                    >
-                      <Search className="h-4 w-4" />
-                      Screen
-                    </button>
+                    {/* Validate & Screen - hidden for cases */}
+                    {!isCases && (
+                      <>
+                        <button
+                          onClick={() => {
+                            if (incident.queue === 'newIncidents') {
+                              onValidate?.()
+                              setShowMenu(false)
+                            }
+                          }}
+                          disabled={incident.queue !== 'newIncidents'}
+                          className={`w-full flex items-center gap-2 px-3 py-2 text-sm ${
+                            incident.queue !== 'newIncidents'
+                              ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                          Validate
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (incident.queue === 'newIncidents') {
+                              onScreen?.()
+                              setShowMenu(false)
+                            }
+                          }}
+                          disabled={incident.queue !== 'newIncidents'}
+                          className={`w-full flex items-center gap-2 px-3 py-2 text-sm ${
+                            incident.queue !== 'newIncidents'
+                              ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          <Search className="h-4 w-4" />
+                          Screen
+                        </button>
 
-                    <div className="border-t border-slate-100 dark:border-slate-700 my-1" />
+                        <div className="border-t border-slate-100 dark:border-slate-700 my-1" />
+                      </>
+                    )}
 
-                    {/* Assign Agent */}
-                    <div className="relative">
-                      <button
-                        onClick={() => incident.queue !== 'newIncidents' && setShowAgentDropdown(!showAgentDropdown)}
-                        disabled={incident.queue === 'newIncidents'}
-                        className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm ${
-                          incident.queue === 'newIncidents'
-                            ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <UserPlus className="h-4 w-4" />
-                          Assign Agent
-                        </span>
-                        <ArrowRight className="h-3 w-3" />
-                      </button>
-                      {showAgentDropdown && incident.queue !== 'newIncidents' && (
-                        <div className="absolute left-full top-0 ml-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-48 overflow-y-auto">
-                          {users.map((user) => (
-                            <button
-                              key={user.id}
-                              onClick={() => {
-                                onAssignAgent?.(user.id)
-                                setShowMenu(false)
-                              }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                            >
-                              <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs">
-                                {user.name.charAt(0)}
-                              </div>
-                              {user.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    {/* Assign Agent - hidden for cases */}
+                    {!isCases && (
+                      <div className="relative">
+                        <button
+                          onClick={() => incident.queue !== 'newIncidents' && setShowAgentDropdown(!showAgentDropdown)}
+                          disabled={incident.queue === 'newIncidents'}
+                          className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm ${
+                            incident.queue === 'newIncidents'
+                              ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <UserPlus className="h-4 w-4" />
+                            Assign Agent
+                          </span>
+                          <ArrowRight className="h-3 w-3" />
+                        </button>
+                        {showAgentDropdown && incident.queue !== 'newIncidents' && (
+                          <div className="absolute left-full top-0 ml-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-48 overflow-y-auto">
+                            {users.map((user) => (
+                              <button
+                                key={user.id}
+                                onClick={() => {
+                                  onAssignAgent?.(user.id)
+                                  setShowMenu(false)
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                              >
+                                <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs">
+                                  {user.name.charAt(0)}
+                                </div>
+                                {user.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Assign Lawyer */}
                     <div className="relative">
                       <button
-                        onClick={() => incident.queue !== 'newIncidents' && setShowLawyerDropdown(!showLawyerDropdown)}
-                        disabled={incident.queue === 'newIncidents'}
+                        onClick={() => (isCases || incident.queue !== 'newIncidents') && setShowLawyerDropdown(!showLawyerDropdown)}
+                        disabled={!isCases && incident.queue === 'newIncidents'}
                         className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm ${
-                          incident.queue === 'newIncidents'
+                          !isCases && incident.queue === 'newIncidents'
                             ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
                             : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                         }`}
@@ -408,7 +465,7 @@ export function IncidentRow({
                         </span>
                         <ArrowRight className="h-3 w-3" />
                       </button>
-                      {showLawyerDropdown && incident.queue !== 'newIncidents' && (
+                      {showLawyerDropdown && (isCases || incident.queue !== 'newIncidents') && (
                         <div className="absolute left-full top-0 ml-1 w-52 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-48 overflow-y-auto">
                           {lawyers.map((lawyer) => (
                             <button
@@ -430,10 +487,10 @@ export function IncidentRow({
                     {/* Move Queue */}
                     <div className="relative">
                       <button
-                        onClick={() => incident.queue !== 'newIncidents' && setShowQueueDropdown(!showQueueDropdown)}
-                        disabled={incident.queue === 'newIncidents'}
+                        onClick={() => (isCases || incident.queue !== 'newIncidents') && setShowQueueDropdown(!showQueueDropdown)}
+                        disabled={!isCases && incident.queue === 'newIncidents'}
                         className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm ${
-                          incident.queue === 'newIncidents'
+                          !isCases && incident.queue === 'newIncidents'
                             ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
                             : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                         }`}
@@ -444,9 +501,9 @@ export function IncidentRow({
                         </span>
                         <ArrowRight className="h-3 w-3" />
                       </button>
-                      {showQueueDropdown && incident.queue !== 'newIncidents' && (
+                      {showQueueDropdown && (isCases || incident.queue !== 'newIncidents') && (
                         <div className="absolute left-full top-0 ml-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1">
-                          {QUEUE_OPTIONS.filter((q) => q.key !== incident.queue).map(
+                          {QUEUE_OPTIONS.filter((q) => q.key !== incident.queue && (!isCases || (q.key !== 'screening' && q.key !== 'agentAssigned'))).map(
                             (queue) => (
                               <button
                                 key={queue.key}
@@ -493,7 +550,7 @@ export function IncidentRow({
     {/* Settlement Modal */}
     {showSettlementModal && (
       <tr>
-        <td colSpan={10} className="p-0">
+        <td colSpan={isCases ? 9 : 10} className="p-0">
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div
               className="absolute inset-0 bg-black/50"
@@ -512,140 +569,209 @@ export function IncidentRow({
               </h2>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
                 {isAddingExpense
-                  ? 'Enter the expense details for this challan.'
+                  ? `Enter the expense details for this ${isCases ? 'case' : 'challan'}.`
                   : `Enter the fee details before marking as ${pendingQueue === 'settled' ? 'settled' : 'not settled'}.`}
               </p>
 
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Total Amount Received <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                    <input
-                      type="number"
-                      value={settlementFees.totalAmountReceived || ''}
-                      onChange={(e) =>
-                        setSettlementFees({
-                          ...settlementFees,
-                          totalAmountReceived: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      placeholder="0.00"
-                      className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Challan Amount <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                    <input
-                      type="number"
-                      value={settlementFees.challanAmount || ''}
-                      onChange={(e) =>
-                        setSettlementFees({
-                          ...settlementFees,
-                          challanAmount: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      placeholder="0.00"
-                      className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      Convenience Fee
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        value={settlementFees.convenienceFee || ''}
-                        onChange={(e) =>
-                          setSettlementFees({
-                            ...settlementFees,
-                            convenienceFee: parseFloat(e.target.value) || 0,
-                          })
-                        }
-                        placeholder="0.00"
-                        className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                      />
+                {isCases ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        Lawyer Charge <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={settlementFees.lawyerCharge || ''}
+                          onChange={(e) =>
+                            setSettlementFees({
+                              ...settlementFees,
+                              lawyerCharge: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      GST
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        value={settlementFees.gst || ''}
-                        onChange={(e) =>
-                          setSettlementFees({
-                            ...settlementFees,
-                            gst: parseFloat(e.target.value) || 0,
-                          })
-                        }
-                        placeholder="0.00"
-                        className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                      />
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        Government Charge <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={settlementFees.governmentCharge || ''}
+                          onChange={(e) =>
+                            setSettlementFees({
+                              ...settlementFees,
+                              governmentCharge: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      Gateway Charges
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        value={settlementFees.gatewayCharges || ''}
-                        onChange={(e) =>
-                          setSettlementFees({
-                            ...settlementFees,
-                            gatewayCharges: parseFloat(e.target.value) || 0,
-                          })
-                        }
-                        placeholder="0.00"
-                        className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                      />
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        Miscellaneous Charge
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={settlementFees.miscellaneousCharge || ''}
+                          onChange={(e) =>
+                            setSettlementFees({
+                              ...settlementFees,
+                              miscellaneousCharge: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        Total Amount Received <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={settlementFees.totalAmountReceived || ''}
+                          onChange={(e) =>
+                            setSettlementFees({
+                              ...settlementFees,
+                              totalAmountReceived: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      Discount
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        value={settlementFees.discount || ''}
-                        onChange={(e) =>
-                          setSettlementFees({
-                            ...settlementFees,
-                            discount: parseFloat(e.target.value) || 0,
-                          })
-                        }
-                        placeholder="0.00"
-                        className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                      />
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        Challan Amount <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={settlementFees.challanAmount || ''}
+                          onChange={(e) =>
+                            setSettlementFees({
+                              ...settlementFees,
+                              challanAmount: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          Convenience Fee
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                          <input
+                            type="number"
+                            value={settlementFees.convenienceFee || ''}
+                            onChange={(e) =>
+                              setSettlementFees({
+                                ...settlementFees,
+                                convenienceFee: parseFloat(e.target.value) || 0,
+                              })
+                            }
+                            placeholder="0.00"
+                            className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          GST
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                          <input
+                            type="number"
+                            value={settlementFees.gst || ''}
+                            onChange={(e) =>
+                              setSettlementFees({
+                                ...settlementFees,
+                                gst: parseFloat(e.target.value) || 0,
+                              })
+                            }
+                            placeholder="0.00"
+                            className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          Gateway Charges
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                          <input
+                            type="number"
+                            value={settlementFees.gatewayCharges || ''}
+                            onChange={(e) =>
+                              setSettlementFees({
+                                ...settlementFees,
+                                gatewayCharges: parseFloat(e.target.value) || 0,
+                              })
+                            }
+                            placeholder="0.00"
+                            className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          Discount
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                          <input
+                            type="number"
+                            value={settlementFees.discount || ''}
+                            onChange={(e) =>
+                              setSettlementFees({
+                                ...settlementFees,
+                                discount: parseFloat(e.target.value) || 0,
+                              })
+                            }
+                            placeholder="0.00"
+                            className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="mt-6 flex justify-end gap-3">

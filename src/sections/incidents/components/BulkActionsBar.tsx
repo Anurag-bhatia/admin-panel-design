@@ -18,6 +18,7 @@ interface BulkActionsBarProps {
   users: User[]
   lawyers: Lawyer[]
   activeQueue: IncidentQueue
+  workType?: 'cases' | 'challans'
   onClearSelection: () => void
   onValidate?: () => void
   onScreen?: () => void
@@ -44,6 +45,7 @@ export function BulkActionsBar({
   users,
   lawyers,
   activeQueue,
+  workType = 'challans',
   onClearSelection,
   onValidate,
   onScreen,
@@ -53,6 +55,7 @@ export function BulkActionsBar({
   onAddExpense,
   onBulkUpdate,
 }: BulkActionsBarProps) {
+  const isCases = workType === 'cases'
   const isNewIncidents = activeQueue === 'newIncidents'
   const [showAgentDropdown, setShowAgentDropdown] = useState(false)
   const [showLawyerDropdown, setShowLawyerDropdown] = useState(false)
@@ -68,6 +71,9 @@ export function BulkActionsBar({
     gst: 0,
     gatewayCharges: 0,
     discount: 0,
+    lawyerCharge: 0,
+    governmentCharge: 0,
+    miscellaneousCharge: 0,
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -98,7 +104,7 @@ export function BulkActionsBar({
     setShowSettlementModal(false)
     setPendingQueue(null)
     setIsAddingExpense(false)
-    setSettlementFees({ totalAmountReceived: 0, challanAmount: 0, convenienceFee: 0, gst: 0, gatewayCharges: 0, discount: 0 })
+    setSettlementFees({ totalAmountReceived: 0, challanAmount: 0, convenienceFee: 0, gst: 0, gatewayCharges: 0, discount: 0, lawyerCharge: 0, governmentCharge: 0, miscellaneousCharge: 0 })
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,111 +146,116 @@ export function BulkActionsBar({
               </button>
             ) : (
               <>
-                {/* Validate - only enabled in Screening queue */}
-                <button
-                  onClick={() => {
-                    if (activeQueue === 'screening') {
-                      onValidate?.()
-                    }
-                  }}
-                  disabled={activeQueue !== 'screening'}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                    activeQueue !== 'screening'
-                      ? 'text-slate-500 cursor-not-allowed'
-                      : 'text-white hover:bg-slate-700'
-                  }`}
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>Validate</span>
-                </button>
+                {/* Validate & Screen - hidden for cases */}
+                {!isCases && (
+                  <>
+                    <button
+                      onClick={() => {
+                        if (activeQueue === 'screening') {
+                          onValidate?.()
+                        }
+                      }}
+                      disabled={activeQueue !== 'screening'}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                        activeQueue !== 'screening'
+                          ? 'text-slate-500 cursor-not-allowed'
+                          : 'text-white hover:bg-slate-700'
+                      }`}
+                    >
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Validate</span>
+                    </button>
 
-                {/* Screen - only enabled in New Incidents queue */}
-                <button
-                  onClick={() => {
-                    if (activeQueue === 'newIncidents') {
-                      onScreen?.()
-                    }
-                  }}
-                  disabled={activeQueue !== 'newIncidents'}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                    activeQueue !== 'newIncidents'
-                      ? 'text-slate-500 cursor-not-allowed'
-                      : 'text-white hover:bg-slate-700'
-                  }`}
-                >
-                  <Search className="h-4 w-4" />
-                  <span>Screen</span>
-                </button>
+                    <button
+                      onClick={() => {
+                        if (activeQueue === 'newIncidents') {
+                          onScreen?.()
+                        }
+                      }}
+                      disabled={activeQueue !== 'newIncidents'}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                        activeQueue !== 'newIncidents'
+                          ? 'text-slate-500 cursor-not-allowed'
+                          : 'text-white hover:bg-slate-700'
+                      }`}
+                    >
+                      <Search className="h-4 w-4" />
+                      <span>Screen</span>
+                    </button>
+                  </>
+                )}
 
                 {/* Divider */}
                 <div className="w-px h-6 bg-slate-700 mx-1" />
 
-                {/* Assign Agent */}
-                <div className="relative">
-                  <button
-                    onClick={() => {
-                      if (!isNewIncidents) {
-                        setShowAgentDropdown(!showAgentDropdown)
-                        setShowLawyerDropdown(false)
-                        setShowQueueDropdown(false)
-                      }
-                    }}
-                    disabled={isNewIncidents}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                      isNewIncidents
-                        ? 'text-slate-500 cursor-not-allowed'
-                        : 'text-white hover:bg-slate-700'
-                    }`}
-                    title={isNewIncidents ? 'Available after screening' : undefined}
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    <span>Assign Agent</span>
-                    <ChevronDown className="h-3 w-3" />
-                  </button>
-                  {showAgentDropdown && (
-                    <>
-                      <div
-                        className="fixed inset-0"
-                        onClick={() => setShowAgentDropdown(false)}
-                      />
-                      <div className="absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-60 overflow-y-auto">
-                        {users.map((user) => (
-                          <button
-                            key={user.id}
-                            onClick={() => {
-                              onAssignAgent?.(user.id)
-                              setShowAgentDropdown(false)
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                          >
-                            <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs font-medium">
-                              {user.name.charAt(0)}
-                            </div>
-                            {user.name}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
+                {/* Assign Agent - hidden for cases */}
+                {!isCases && (
+                  <div className="relative">
+                    <button
+                      onClick={() => {
+                        if (!isNewIncidents) {
+                          setShowAgentDropdown(!showAgentDropdown)
+                          setShowLawyerDropdown(false)
+                          setShowQueueDropdown(false)
+                        }
+                      }}
+                      disabled={isNewIncidents}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                        isNewIncidents
+                          ? 'text-slate-500 cursor-not-allowed'
+                          : 'text-white hover:bg-slate-700'
+                      }`}
+                      title={isNewIncidents ? 'Available after screening' : undefined}
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      <span>Assign Agent</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
+                    {showAgentDropdown && (
+                      <>
+                        <div
+                          className="fixed inset-0"
+                          onClick={() => setShowAgentDropdown(false)}
+                        />
+                        <div className="absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-60 overflow-y-auto">
+                          {users.map((user) => (
+                            <button
+                              key={user.id}
+                              onClick={() => {
+                                onAssignAgent?.(user.id)
+                                setShowAgentDropdown(false)
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                            >
+                              <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs font-medium">
+                                {user.name.charAt(0)}
+                              </div>
+                              {user.name}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
 
                 {/* Assign Lawyer */}
                 <div className="relative">
                   <button
                     onClick={() => {
-                      if (!isNewIncidents) {
+                      if (isCases || !isNewIncidents) {
                         setShowLawyerDropdown(!showLawyerDropdown)
                         setShowAgentDropdown(false)
                         setShowQueueDropdown(false)
                       }
                     }}
-                    disabled={isNewIncidents}
+                    disabled={!isCases && isNewIncidents}
                     className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                      isNewIncidents
+                      !isCases && isNewIncidents
                         ? 'text-slate-500 cursor-not-allowed'
                         : 'text-white hover:bg-slate-700'
                     }`}
-                    title={isNewIncidents ? 'Available after screening' : undefined}
+                    title={!isCases && isNewIncidents ? 'Available after screening' : undefined}
                   >
                     <Scale className="h-4 w-4" />
                     <span>Assign Lawyer</span>
@@ -279,19 +290,19 @@ export function BulkActionsBar({
                 <div className="relative">
                   <button
                     onClick={() => {
-                      if (!isNewIncidents) {
+                      if (isCases || !isNewIncidents) {
                         setShowQueueDropdown(!showQueueDropdown)
                         setShowAgentDropdown(false)
                         setShowLawyerDropdown(false)
                       }
                     }}
-                    disabled={isNewIncidents}
+                    disabled={!isCases && isNewIncidents}
                     className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                      isNewIncidents
+                      !isCases && isNewIncidents
                         ? 'text-slate-500 cursor-not-allowed'
                         : 'text-white hover:bg-slate-700'
                     }`}
-                    title={isNewIncidents ? 'Available after screening' : undefined}
+                    title={!isCases && isNewIncidents ? 'Available after screening' : undefined}
                   >
                     <ArrowRight className="h-4 w-4" />
                     <span>Move Queue</span>
@@ -304,7 +315,7 @@ export function BulkActionsBar({
                         onClick={() => setShowQueueDropdown(false)}
                       />
                       <div className="absolute bottom-full left-0 mb-2 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1">
-                        {QUEUE_OPTIONS.map((queue) => (
+                        {QUEUE_OPTIONS.filter((q) => !isCases || (q.key !== 'screening' && q.key !== 'agentAssigned')).map((queue) => (
                           <button
                             key={queue.key}
                             onClick={() => handleMoveToQueue(queue.key)}
@@ -360,11 +371,11 @@ export function BulkActionsBar({
             </button>
 
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-              Bulk Update Challans
+              Bulk Update {isCases ? 'Cases' : 'Challans'}
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
               Upload an Excel or CSV file to update {selectedCount} selected
-              challans.
+              {isCases ? ' case' : ' challan'}{selectedCount > 1 ? 's' : ''}.
             </p>
 
             <div
@@ -419,140 +430,209 @@ export function BulkActionsBar({
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
               {isAddingExpense
-                ? `Enter the expense details for ${selectedCount} selected challan${selectedCount > 1 ? 's' : ''}.`
-                : `Enter the fee details for ${selectedCount} selected challan${selectedCount > 1 ? 's' : ''} before marking as ${pendingQueue === 'settled' ? 'settled' : 'not settled'}.`}
+                ? `Enter the expense details for ${selectedCount} selected ${isCases ? 'case' : 'challan'}${selectedCount > 1 ? 's' : ''}.`
+                : `Enter the fee details for ${selectedCount} selected ${isCases ? 'case' : 'challan'}${selectedCount > 1 ? 's' : ''} before marking as ${pendingQueue === 'settled' ? 'settled' : 'not settled'}.`}
             </p>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Total Amount Received <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                  <input
-                    type="number"
-                    value={settlementFees.totalAmountReceived || ''}
-                    onChange={(e) =>
-                      setSettlementFees({
-                        ...settlementFees,
-                        totalAmountReceived: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                    placeholder="0.00"
-                    className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Challan Amount <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                  <input
-                    type="number"
-                    value={settlementFees.challanAmount || ''}
-                    onChange={(e) =>
-                      setSettlementFees({
-                        ...settlementFees,
-                        challanAmount: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                    placeholder="0.00"
-                    className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Convenience Fee
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                    <input
-                      type="number"
-                      value={settlementFees.convenienceFee || ''}
-                      onChange={(e) =>
-                        setSettlementFees({
-                          ...settlementFees,
-                          convenienceFee: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      placeholder="0.00"
-                      className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                    />
+              {isCases ? (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      Lawyer Charge <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                      <input
+                        type="number"
+                        value={settlementFees.lawyerCharge || ''}
+                        onChange={(e) =>
+                          setSettlementFees({
+                            ...settlementFees,
+                            lawyerCharge: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0.00"
+                        className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    GST
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                    <input
-                      type="number"
-                      value={settlementFees.gst || ''}
-                      onChange={(e) =>
-                        setSettlementFees({
-                          ...settlementFees,
-                          gst: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      placeholder="0.00"
-                      className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                    />
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      Government Charge <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                      <input
+                        type="number"
+                        value={settlementFees.governmentCharge || ''}
+                        onChange={(e) =>
+                          setSettlementFees({
+                            ...settlementFees,
+                            governmentCharge: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0.00"
+                        className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Gateway Charges
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                    <input
-                      type="number"
-                      value={settlementFees.gatewayCharges || ''}
-                      onChange={(e) =>
-                        setSettlementFees({
-                          ...settlementFees,
-                          gatewayCharges: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      placeholder="0.00"
-                      className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                    />
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      Miscellaneous Charge
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                      <input
+                        type="number"
+                        value={settlementFees.miscellaneousCharge || ''}
+                        onChange={(e) =>
+                          setSettlementFees({
+                            ...settlementFees,
+                            miscellaneousCharge: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0.00"
+                        className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                      />
+                    </div>
                   </div>
-                </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      Total Amount Received <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                      <input
+                        type="number"
+                        value={settlementFees.totalAmountReceived || ''}
+                        onChange={(e) =>
+                          setSettlementFees({
+                            ...settlementFees,
+                            totalAmountReceived: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0.00"
+                        className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Discount
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                    <input
-                      type="number"
-                      value={settlementFees.discount || ''}
-                      onChange={(e) =>
-                        setSettlementFees({
-                          ...settlementFees,
-                          discount: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      placeholder="0.00"
-                      className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                    />
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      Challan Amount <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                      <input
+                        type="number"
+                        value={settlementFees.challanAmount || ''}
+                        onChange={(e) =>
+                          setSettlementFees({
+                            ...settlementFees,
+                            challanAmount: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0.00"
+                        className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        Convenience Fee
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={settlementFees.convenienceFee || ''}
+                          onChange={(e) =>
+                            setSettlementFees({
+                              ...settlementFees,
+                              convenienceFee: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        GST
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={settlementFees.gst || ''}
+                          onChange={(e) =>
+                            setSettlementFees({
+                              ...settlementFees,
+                              gst: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        Gateway Charges
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={settlementFees.gatewayCharges || ''}
+                          onChange={(e) =>
+                            setSettlementFees({
+                              ...settlementFees,
+                              gatewayCharges: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        Discount
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={settlementFees.discount || ''}
+                          onChange={(e) =>
+                            setSettlementFees({
+                              ...settlementFees,
+                              discount: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="mt-6 flex justify-end gap-3">

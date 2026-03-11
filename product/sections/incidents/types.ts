@@ -21,9 +21,13 @@ export type IncidentStatus =
   | 'unresolved'
   | 'refund_initiated'
 
-export type IncidentType = 'payAndClose' | 'contest'
+export type WorkType = 'case' | 'challan'
+
+export type IncidentType = 'payAndClose' | 'contest' | 'onSpot' | 'onCall'
 
 export type ChallanType = 'court' | 'online'
+
+export type CaseCategory = 'iaStart' | 'wills24' | 'legalNotice' | 'others' | 'litigation' | 'laas' | 'accident' | 'liveChallan' | 'oldChallan' | 'ndps' | 'employmentLabour'
 
 export type IncidentSource = 'API' | 'Manual' | 'Bulk Upload' | 'Partner'
 
@@ -77,12 +81,14 @@ export interface Lawyer {
 export interface Incident {
   id: string
   incidentId: string
+  workType: WorkType
   challanNumber: string
   subscriberId: string
   subscriberName: string
   vehicle: string
   type: IncidentType
   challanType: ChallanType
+  caseCategory?: CaseCategory
   status: IncidentStatus
   queue: IncidentQueue
   createdAt: string

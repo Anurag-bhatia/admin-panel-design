@@ -1,6 +1,6 @@
 interface PaymentsSidebarProps {
-  view: 'refunds' | 'lawyer-fees' | 'leads' | 'partners'
-  onViewChange?: (view: 'refunds' | 'lawyer-fees' | 'leads' | 'partners') => void
+  view: 'challan-refunds' | 'case-refunds' | 'lawyer-fees' | 'leads' | 'partners'
+  onViewChange?: (view: 'challan-refunds' | 'case-refunds' | 'lawyer-fees' | 'leads' | 'partners') => void
 }
 
 export function PaymentsSidebar({
@@ -10,17 +10,34 @@ export function PaymentsSidebar({
   return (
     <div className="flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 w-52">
       <div className="flex-1 py-4">
-        {/* Refunds */}
+        {/* Challan Refunds */}
         <div className="px-2 mb-1">
           <button
-            onClick={() => onViewChange?.('refunds')}
+            onClick={() => onViewChange?.('challan-refunds')}
             className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all ${
-              view === 'refunds'
+              view === 'challan-refunds'
                 ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
                 : 'text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
           >
-            Refunds
+            Challan Refunds
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div className="mx-4 my-3 border-t border-slate-200 dark:border-slate-700" />
+
+        {/* Case Refunds */}
+        <div className="px-2 mb-1">
+          <button
+            onClick={() => onViewChange?.('case-refunds')}
+            className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all ${
+              view === 'case-refunds'
+                ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
+                : 'text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
+            }`}
+          >
+            Case Refunds
           </button>
         </div>
 

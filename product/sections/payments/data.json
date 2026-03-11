@@ -16,6 +16,7 @@
   "refunds": [
     {
       "id": "RFD-10001",
+      "workType": "challan",
       "linkedIncident": "IRN-44821",
       "customerSubscriber": "Bharat Fleet Solutions Pvt. Ltd.",
       "originalPaymentId": "PAY-88210",
@@ -41,6 +42,7 @@
     },
     {
       "id": "RFD-10002",
+      "workType": "challan",
       "linkedIncident": "IRN-44956",
       "customerSubscriber": "Rajesh Kumar",
       "originalPaymentId": "PAY-88345",
@@ -64,6 +66,7 @@
     },
     {
       "id": "RFD-10003",
+      "workType": "challan",
       "linkedIncident": "IRN-45102",
       "customerSubscriber": "TransLogix India Ltd.",
       "originalPaymentId": "PAY-88501",
@@ -90,6 +93,7 @@
     },
     {
       "id": "RFD-10004",
+      "workType": "challan",
       "linkedIncident": "IRN-45230",
       "customerSubscriber": "QuickMove Logistics",
       "originalPaymentId": "PAY-88672",
@@ -114,6 +118,7 @@
     },
     {
       "id": "RFD-10005",
+      "workType": "challan",
       "linkedIncident": "IRN-45318",
       "customerSubscriber": "Suresh Patel",
       "originalPaymentId": "PAY-88790",
@@ -141,6 +146,7 @@
     },
     {
       "id": "RFD-10006",
+      "workType": "challan",
       "linkedIncident": "IRN-45410",
       "customerSubscriber": "GreenWheels Transport Co.",
       "originalPaymentId": "PAY-88903",
@@ -168,6 +174,7 @@
     },
     {
       "id": "RFD-10007",
+      "workType": "challan",
       "linkedIncident": "IRN-45522",
       "customerSubscriber": "Metro Cab Services",
       "originalPaymentId": "PAY-89012",
@@ -192,6 +199,7 @@
     },
     {
       "id": "RFD-10008",
+      "workType": "challan",
       "linkedIncident": "IRN-45601",
       "customerSubscriber": "Anita Deshmukh",
       "originalPaymentId": "PAY-89134",
@@ -214,6 +222,103 @@
       "followUps": [
         { "id": "fu-801", "outcome": "Refund Raised", "notes": "High-value refund of ₹22,000 submitted. Requires finance team approval for amounts above ₹10,000.", "createdAt": "2026-03-05T10:15:00Z", "createdByName": "Amit Verma" },
         { "id": "fu-802", "outcome": "Under Review", "notes": "Court order verified. Forwarded to finance team for final approval.", "createdAt": "2026-03-08T11:40:00Z", "createdByName": "Priya Sharma" }
+      ]
+    },
+    {
+      "id": "RFD-20001",
+      "workType": "case",
+      "linkedIncident": "IRN-50101",
+      "customerSubscriber": "Vikram Transport Pvt. Ltd.",
+      "originalPaymentId": "PAY-90201",
+      "refundAmount": 7500,
+      "refundStatus": "Refund Raised",
+      "initiatedBy": "Neha Gupta",
+      "refundDate": null,
+      "createdOn": "2026-03-02T09:00:00Z",
+      "lastUpdated": "2026-03-06T14:00:00Z",
+      "reason": "Case IRN-50101 was resolved on spot but customer was already charged the full amount. Partial refund required.",
+      "activityLog": [
+        { "id": "act-901", "action": "Refund created", "performedBy": "Neha Gupta", "timestamp": "2026-03-02T09:00:00Z", "details": "Refund request created for case IRN-50101" },
+        { "id": "act-902", "action": "Assigned to reviewer", "performedBy": "System", "timestamp": "2026-03-02T09:05:00Z", "details": "Auto-assigned to Amit Verma for review" }
+      ],
+      "notes": [
+        { "id": "note-901", "author": "Neha Gupta", "timestamp": "2026-03-02T09:10:00Z", "content": "Case was resolved on spot. Customer was overcharged by ₹7,500." }
+      ],
+      "followUps": [
+        { "id": "fu-901", "outcome": "Under Review", "notes": "Reviewing case resolution details and payment records.", "createdAt": "2026-03-06T14:00:00Z", "createdByName": "Amit Verma" }
+      ]
+    },
+    {
+      "id": "RFD-20002",
+      "workType": "case",
+      "linkedIncident": "IRN-50245",
+      "customerSubscriber": "Roadway Logistics Co.",
+      "originalPaymentId": "PAY-90350",
+      "refundAmount": 3200,
+      "refundStatus": "Completed",
+      "initiatedBy": "Priya Sharma",
+      "refundDate": "2026-02-20",
+      "createdOn": "2026-02-10T11:00:00Z",
+      "lastUpdated": "2026-02-20T16:30:00Z",
+      "reason": "Case IRN-50245 on-call consultation was not delivered. Full refund approved.",
+      "activityLog": [
+        { "id": "act-1001", "action": "Refund created", "performedBy": "Priya Sharma", "timestamp": "2026-02-10T11:00:00Z", "details": "Refund request created for undelivered on-call consultation" },
+        { "id": "act-1002", "action": "Refund approved", "performedBy": "Amit Verma", "timestamp": "2026-02-18T10:00:00Z", "details": "Refund of ₹3,200 approved" },
+        { "id": "act-1003", "action": "Refund processed", "performedBy": "System", "timestamp": "2026-02-20T16:30:00Z", "details": "Refund processed successfully" }
+      ],
+      "notes": [
+        { "id": "note-1001", "author": "Priya Sharma", "timestamp": "2026-02-10T11:10:00Z", "content": "Lawyer did not attend the on-call consultation. Customer requesting full refund." }
+      ],
+      "followUps": [
+        { "id": "fu-1001", "outcome": "Completed", "notes": "Refund processed. Customer notified via email.", "createdAt": "2026-02-20T16:35:00Z", "createdByName": "Priya Sharma" }
+      ]
+    },
+    {
+      "id": "RFD-20003",
+      "workType": "case",
+      "linkedIncident": "IRN-50389",
+      "customerSubscriber": "Deepak Agarwal",
+      "originalPaymentId": "PAY-90478",
+      "refundAmount": 15000,
+      "refundStatus": "Refund Raised",
+      "initiatedBy": "Amit Verma",
+      "refundDate": null,
+      "createdOn": "2026-03-07T08:30:00Z",
+      "lastUpdated": "2026-03-09T10:00:00Z",
+      "reason": "Case IRN-50389 was incorrectly filed as on-spot instead of on-call. Customer charged premium on-spot rate.",
+      "activityLog": [
+        { "id": "act-1101", "action": "Refund created", "performedBy": "Amit Verma", "timestamp": "2026-03-07T08:30:00Z", "details": "Refund request for incorrect case type classification" },
+        { "id": "act-1102", "action": "Reviewed case records", "performedBy": "Neha Gupta", "timestamp": "2026-03-09T10:00:00Z", "details": "Confirmed case was misfiled as on-spot" }
+      ],
+      "notes": [
+        { "id": "note-1101", "author": "Amit Verma", "timestamp": "2026-03-07T08:40:00Z", "content": "Customer Deepak Agarwal was charged ₹15,000 extra due to incorrect case type. Should have been on-call rate." }
+      ],
+      "followUps": [
+        { "id": "fu-1101", "outcome": "Under Review", "notes": "Case classification error confirmed. Awaiting finance approval for high-value refund.", "createdAt": "2026-03-09T10:05:00Z", "createdByName": "Neha Gupta" }
+      ]
+    },
+    {
+      "id": "RFD-20004",
+      "workType": "case",
+      "linkedIncident": "IRN-50420",
+      "customerSubscriber": "SafeDrive Fleet Services",
+      "originalPaymentId": "PAY-90512",
+      "refundAmount": 5800,
+      "refundStatus": "Hold",
+      "initiatedBy": "Priya Sharma",
+      "refundDate": null,
+      "createdOn": "2026-02-28T14:00:00Z",
+      "lastUpdated": "2026-03-04T11:00:00Z",
+      "reason": "Case IRN-50420 disputed by customer. Claims lawyer charge was higher than agreed.",
+      "activityLog": [
+        { "id": "act-1201", "action": "Refund created", "performedBy": "Priya Sharma", "timestamp": "2026-02-28T14:00:00Z", "details": "Refund request created for disputed lawyer charge" },
+        { "id": "act-1202", "action": "Status changed to Hold", "performedBy": "Amit Verma", "timestamp": "2026-03-04T11:00:00Z", "details": "Put on hold pending lawyer fee verification" }
+      ],
+      "notes": [
+        { "id": "note-1201", "author": "Priya Sharma", "timestamp": "2026-02-28T14:10:00Z", "content": "SafeDrive Fleet Services disputes the lawyer charge of ₹5,800. They claim agreed rate was lower." }
+      ],
+      "followUps": [
+        { "id": "fu-1201", "outcome": "Hold", "notes": "Verifying agreed lawyer rates from the original case agreement.", "createdAt": "2026-03-04T11:05:00Z", "createdByName": "Amit Verma" }
       ]
     }
   ],

@@ -110,10 +110,11 @@ export function PaymentsDashboard({
   onExportPartnerPayouts,
 }: PaymentsProps) {
   // Sidebar state
-  const [sidebarView, setSidebarView] = useState<'refunds' | 'lawyer-fees' | 'leads' | 'partners'>('refunds')
+  const [sidebarView, setSidebarView] = useState<'challan-refunds' | 'case-refunds' | 'lawyer-fees' | 'leads' | 'partners'>('challan-refunds')
 
   // Active stage tab
-  const [refundStage, setRefundStage] = useState('refund_raised')
+  const [challanRefundStage, setChallanRefundStage] = useState('refund_raised')
+  const [caseRefundStage, setCaseRefundStage] = useState('refund_raised')
   const [feeStage, setFeeStage] = useState('to_pay')
   const [leadsStage, setLeadsStage] = useState('ready_to_invoice')
   const [partnerStage, setPartnerStage] = useState('to_pay')
@@ -121,8 +122,11 @@ export function PaymentsDashboard({
   // Search
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Selection (refunds)
+  // Selection (challan refunds)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  // Selection (case refunds)
+  const [selectedCaseRefundIds, setSelectedCaseRefundIds] = useState<Set<string>>(new Set())
 
   // Selection (lawyer fees) - keyed by lawyerId-incidentId
   const [selectedFeeKeys, setSelectedFeeKeys] = useState<Set<string>>(new Set())
@@ -149,13 +153,25 @@ export function PaymentsDashboard({
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null)
   const selectedPartner = selectedPartnerId ? partners.find(p => p.partnerId === selectedPartnerId) : null
 
-  // Refund stage counts
-  const refundStageCounts = useMemo(() => ({
-    refund_raised: refunds.filter((r) => r.refundStatus === 'Refund Raised').length,
-    completed: refunds.filter((r) => r.refundStatus === 'Completed').length,
-    hold: refunds.filter((r) => r.refundStatus === 'Hold').length,
-    rejected: refunds.filter((r) => r.refundStatus === 'Rejected').length,
-  }), [refunds])
+  // Split refunds by workType
+  const challanRefunds = useMemo(() => refunds.filter((r) => r.workType === 'challan'), [refunds])
+  const caseRefunds = useMemo(() => refunds.filter((r) => r.workType === 'case'), [refunds])
+
+  // Challan refund stage counts
+  const challanRefundStageCounts = useMemo(() => ({
+    refund_raised: challanRefunds.filter((r) => r.refundStatus === 'Refund Raised').length,
+    completed: challanRefunds.filter((r) => r.refundStatus === 'Completed').length,
+    hold: challanRefunds.filter((r) => r.refundStatus === 'Hold').length,
+    rejected: challanRefunds.filter((r) => r.refundStatus === 'Rejected').length,
+  }), [challanRefunds])
+
+  // Case refund stage counts
+  const caseRefundStageCounts = useMemo(() => ({
+    refund_raised: caseRefunds.filter((r) => r.refundStatus === 'Refund Raised').length,
+    completed: caseRefunds.filter((r) => r.refundStatus === 'Completed').length,
+    hold: caseRefunds.filter((r) => r.refundStatus === 'Hold').length,
+    rejected: caseRefunds.filter((r) => r.refundStatus === 'Rejected').length,
+  }), [caseRefunds])
 
   // Lawyer fee stage counts
   const feeStageCounts = useMemo(() => ({
@@ -197,9 +213,9 @@ export function PaymentsDashboard({
     return filtered
   }, [leads, leadsStage, searchQuery])
 
-  // Filtered refunds
-  const filteredRefunds = useMemo(() => {
-    let filtered = refunds.filter((r) => isRefundInStage(r, refundStage))
+  // Filtered challan refunds
+  const filteredChallanRefunds = useMemo(() => {
+    let filtered = challanRefunds.filter((r) => isRefundInStage(r, challanRefundStage))
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
@@ -212,7 +228,27 @@ export function PaymentsDashboard({
     }
 
     return filtered
-  }, [refunds, refundStage, searchQuery])
+  }, [challanRefunds, challanRefundStage, searchQuery])
+
+  // Filtered case refunds
+  const filteredCaseRefunds = useMemo(() => {
+    let filtered = caseRefunds.filter((r) => isRefundInStage(r, caseRefundStage))
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (r) =>
+          r.id.toLowerCase().includes(query) ||
+          r.linkedIncident.toLowerCase().includes(query) ||
+          r.customerSubscriber.toLowerCase().includes(query)
+      )
+    }
+
+    return filtered
+  }, [caseRefunds, caseRefundStage, searchQuery])
+
+  // Active filtered refunds based on current sidebar view
+  const filteredRefunds = sidebarView === 'case-refunds' ? filteredCaseRefunds : filteredChallanRefunds
 
   // Filtered lawyer fees
   const filteredFees = useMemo(() => {
@@ -271,11 +307,35 @@ export function PaymentsDashboard({
     setSelectedIds(newSelected)
   }
 
-  const selectedArray = Array.from(selectedIds)
+  // Case refund selection handlers
+  const handleCaseRefundSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedCaseRefundIds(new Set(filteredCaseRefunds.map((r) => r.id)))
+    } else {
+      setSelectedCaseRefundIds(new Set())
+    }
+  }
+
+  const handleCaseRefundSelectOne = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedCaseRefundIds)
+    if (checked) {
+      newSelected.add(id)
+    } else {
+      newSelected.delete(id)
+    }
+    setSelectedCaseRefundIds(newSelected)
+  }
+
+  // Active refund selection based on current view
+  const activeRefundSelectedIds = sidebarView === 'case-refunds' ? selectedCaseRefundIds : selectedIds
+  const activeRefundHandleSelectAll = sidebarView === 'case-refunds' ? handleCaseRefundSelectAll : handleSelectAll
+  const activeRefundHandleSelectOne = sidebarView === 'case-refunds' ? handleCaseRefundSelectOne : handleSelectOne
+
+  const selectedArray = Array.from(activeRefundSelectedIds)
   const allSelected =
     filteredRefunds.length > 0 &&
-    filteredRefunds.every((r) => selectedIds.has(r.id))
-  const someSelected = selectedIds.size > 0 && !allSelected
+    filteredRefunds.every((r) => activeRefundSelectedIds.has(r.id))
+  const someSelected = activeRefundSelectedIds.size > 0 && !allSelected
 
   // Selection handlers (lawyer fees)
   const handleSelectAllFees = (checked: boolean) => {
@@ -328,18 +388,24 @@ export function PaymentsDashboard({
   const somePartnersSelected = selectedPartnerKeys.size > 0 && !allPartnersSelected
 
   // Clear selection on view/stage change
-  const handleSidebarChange = (view: 'refunds' | 'lawyer-fees' | 'leads' | 'partners') => {
+  const handleSidebarChange = (view: 'challan-refunds' | 'case-refunds' | 'lawyer-fees' | 'leads' | 'partners') => {
     setSidebarView(view)
     setSelectedIds(new Set())
+    setSelectedCaseRefundIds(new Set())
     setSelectedFeeKeys(new Set())
     setSelectedPartnerKeys(new Set())
     setSelectedLeadIds(new Set())
     setSearchQuery('')
   }
 
-  const handleRefundStageChange = (stage: string) => {
-    setRefundStage(stage)
+  const handleChallanRefundStageChange = (stage: string) => {
+    setChallanRefundStage(stage)
     setSelectedIds(new Set())
+  }
+
+  const handleCaseRefundStageChange = (stage: string) => {
+    setCaseRefundStage(stage)
+    setSelectedCaseRefundIds(new Set())
   }
 
   const handleFeeStageChange = (stage: string) => {
@@ -471,27 +537,32 @@ export function PaymentsDashboard({
   }
 
   // Determine current stage tabs, counts, and active tab
-  const currentTabs = sidebarView === 'refunds' ? REFUND_TABS
+  const isRefundView = sidebarView === 'challan-refunds' || sidebarView === 'case-refunds'
+
+  const currentTabs = isRefundView ? REFUND_TABS
     : sidebarView === 'lawyer-fees' ? LAWYER_FEE_TABS
     : sidebarView === 'leads' ? LEADS_TABS
     : PARTNER_TABS
 
-  const currentCounts = sidebarView === 'refunds' ? refundStageCounts
+  const currentCounts = sidebarView === 'challan-refunds' ? challanRefundStageCounts
+    : sidebarView === 'case-refunds' ? caseRefundStageCounts
     : sidebarView === 'lawyer-fees' ? feeStageCounts
     : sidebarView === 'leads' ? leadsStageCounts
     : partnerStageCounts
 
-  const currentActiveTab = sidebarView === 'refunds' ? refundStage
+  const currentActiveTab = sidebarView === 'challan-refunds' ? challanRefundStage
+    : sidebarView === 'case-refunds' ? caseRefundStage
     : sidebarView === 'lawyer-fees' ? feeStage
     : sidebarView === 'leads' ? leadsStage
     : partnerStage
 
-  const currentTabChange = sidebarView === 'refunds' ? handleRefundStageChange
+  const currentTabChange = sidebarView === 'challan-refunds' ? handleChallanRefundStageChange
+    : sidebarView === 'case-refunds' ? handleCaseRefundStageChange
     : sidebarView === 'lawyer-fees' ? handleFeeStageChange
     : sidebarView === 'leads' ? handleLeadsStageChange
     : handlePartnerStageChange
 
-  const currentSearchPlaceholder = sidebarView === 'refunds'
+  const currentSearchPlaceholder = isRefundView
     ? 'Search by Refund ID, incident, customer...'
     : sidebarView === 'lawyer-fees'
     ? 'Search by Lawyer ID, name, incident...'
@@ -499,16 +570,16 @@ export function PaymentsDashboard({
     ? 'Search by Lead ID, company, contact...'
     : 'Search by Partner ID, name, company...'
 
-  const currentStatusOptions = sidebarView === 'refunds' ? REFUND_STATUS_OPTIONS
+  const currentStatusOptions = isRefundView ? REFUND_STATUS_OPTIONS
     : sidebarView === 'lawyer-fees' ? LAWYER_FEE_STATUS_OPTIONS
     : sidebarView === 'partners' ? PARTNER_STATUS_OPTIONS
     : LAWYER_FEE_STATUS_OPTIONS
 
-  const currentExport = sidebarView === 'refunds' ? onExportRefunds
+  const currentExport = isRefundView ? onExportRefunds
     : sidebarView === 'partners' ? onExportPartnerPayouts
     : onExportLawyerFees
 
-  const currentTotalItems = sidebarView === 'refunds' ? filteredRefunds.length
+  const currentTotalItems = isRefundView ? filteredRefunds.length
     : sidebarView === 'lawyer-fees' ? filteredFees.length
     : sidebarView === 'leads' ? filteredLeads.length
     : filteredPartnerPayouts.length
@@ -542,7 +613,7 @@ export function PaymentsDashboard({
 
         {/* Table */}
         <div className={`flex-1 bg-white dark:bg-slate-900 ${sidebarView === 'leads' ? 'overflow-visible' : 'overflow-auto'}`}>
-          {sidebarView === 'refunds' ? (
+          {isRefundView ? (
             <table className="w-full">
               <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                 <tr>
@@ -553,7 +624,7 @@ export function PaymentsDashboard({
                       ref={(el) => {
                         if (el) el.indeterminate = someSelected
                       }}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      onChange={(e) => activeRefundHandleSelectAll(e.target.checked)}
                       className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 dark:bg-slate-700"
                     />
                   </th>
@@ -621,8 +692,8 @@ export function PaymentsDashboard({
                     <RefundRow
                       key={refund.id}
                       refund={refund}
-                      isSelected={selectedIds.has(refund.id)}
-                      onSelect={(checked) => handleSelectOne(refund.id, checked)}
+                      isSelected={activeRefundSelectedIds.has(refund.id)}
+                      onSelect={(checked) => activeRefundHandleSelectOne(refund.id, checked)}
                       onApprove={() => onApproveRefund?.(refund.id)}
                       onProcess={() => onProcessRefund?.(refund.id)}
                       onMove={(stage) => console.log('Move refund:', refund.id, 'to', stage)}
@@ -849,14 +920,14 @@ export function PaymentsDashboard({
       </div>
 
       {/* Bulk Actions Bar */}
-      {sidebarView === 'refunds' && selectedIds.size > 0 && (
+      {isRefundView && activeRefundSelectedIds.size > 0 && (
         <RefundBulkActionsBar
-          selectedCount={selectedIds.size}
-          onClearSelection={() => setSelectedIds(new Set())}
+          selectedCount={activeRefundSelectedIds.size}
+          onClearSelection={() => sidebarView === 'case-refunds' ? setSelectedCaseRefundIds(new Set()) : setSelectedIds(new Set())}
           moveOptions={REFUND_STATUS_OPTIONS}
           onMove={(targetStage) => {
             console.log('Move refunds:', selectedArray, 'to', targetStage)
-            setSelectedIds(new Set())
+            sidebarView === 'case-refunds' ? setSelectedCaseRefundIds(new Set()) : setSelectedIds(new Set())
           }}
         />
       )}

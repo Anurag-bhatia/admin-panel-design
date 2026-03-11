@@ -27,6 +27,7 @@ export interface RefundFollowUp {
 
 export interface Refund {
   id: string
+  workType: 'challan' | 'case'
   linkedIncident: string
   customerSubscriber: string
   originalPaymentId: string

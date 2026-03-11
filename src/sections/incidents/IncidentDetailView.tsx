@@ -9,6 +9,20 @@ import type { IncidentDetailProps } from '@/../product/sections/incidents/types'
 
 type TabType = 'activity' | 'notes' | 'details' | 'callSummary'
 
+const CASE_CATEGORY_LABELS: Record<string, string> = {
+  iaStart: 'IA Start',
+  wills24: 'Wills 24',
+  legalNotice: 'Legal Notice',
+  others: 'Others',
+  litigation: 'Litigation',
+  laas: 'LAAS',
+  accident: 'Accident',
+  liveChallan: 'Live Challan',
+  oldChallan: 'Old Challan',
+  ndps: 'NDPS',
+  employmentLabour: 'Employment and Labour Case',
+}
+
 // Sample notes data for demo
 const SAMPLE_NOTES: Note[] = [
   {
@@ -49,6 +63,7 @@ export function IncidentDetailView({
   onScreen,
   onUpdate,
 }: IncidentDetailProps) {
+  const isCases = incident.workType === 'case'
   const [activeTab, setActiveTab] = useState<TabType>('activity')
   const [notes, setNotes] = useState<Note[]>(SAMPLE_NOTES)
   const [showExpenseModal, setShowExpenseModal] = useState(false)
@@ -149,20 +164,24 @@ export function IncidentDetailView({
               <IndianRupee className="h-4 w-4" />
               Add Expense
             </button>
-            <button
-              onClick={handleValidate}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-            >
-              <CheckCircle className="h-4 w-4" />
-              Validate
-            </button>
-            <button
-              onClick={handleScreen}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-            >
-              <Search className="h-4 w-4" />
-              Screen
-            </button>
+            {!isCases && (
+              <>
+                <button
+                  onClick={handleValidate}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Validate
+                </button>
+                <button
+                  onClick={handleScreen}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  <Search className="h-4 w-4" />
+                  Screen
+                </button>
+              </>
+            )}
 
             {/* Move Ticket Dropdown */}
             <div className="relative">
@@ -281,27 +300,46 @@ export function IncidentDetailView({
               <div className="text-base font-mono font-semibold text-slate-900 dark:text-white">
                 {incident.vehicle}
               </div>
-              <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                #{incident.challanNumber}
-              </div>
-              <div className="flex gap-2 mt-2">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                  incident.type === 'contest'
-                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-                    : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                }`}>
-                  {incident.type === 'payAndClose' ? 'PPT' : 'Bulk'}
-                </span>
-                {(incident.challanType === 'court' || incident.challanType === 'online') && (
+              {isCases ? (
+                <div className="flex gap-2 mt-2">
                   <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                    incident.challanType === 'court'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
-                      : 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
+                    incident.type === 'onSpot'
+                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                      : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                   }`}>
-                    {incident.challanType === 'court' ? 'Court' : 'Online'}
+                    {incident.type === 'onSpot' ? 'On Spot' : 'On Call'}
                   </span>
-                )}
-              </div>
+                  {incident.caseCategory && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400">
+                      {CASE_CATEGORY_LABELS[incident.caseCategory] || incident.caseCategory}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    #{incident.challanNumber}
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                      incident.type === 'contest'
+                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                        : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                    }`}>
+                      {incident.type === 'payAndClose' ? 'PPT' : 'Bulk'}
+                    </span>
+                    {(incident.challanType === 'court' || incident.challanType === 'online') && (
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        incident.challanType === 'court'
+                          ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+                          : 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
+                      }`}>
+                        {incident.challanType === 'court' ? 'Court' : 'Online'}
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Assignments Card */}
@@ -431,6 +469,7 @@ export function IncidentDetailView({
       {showExpenseModal && (
         <AddExpenseModal
           incidentId={incident.incidentId}
+          workType={isCases ? 'cases' : 'challans'}
           onSubmit={(expense) => {
             console.log('Expense added:', expense)
             setShowExpenseModal(false)
