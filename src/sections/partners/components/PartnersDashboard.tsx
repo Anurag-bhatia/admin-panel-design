@@ -23,6 +23,7 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
   const [activePartnerType, setActivePartnerType] = useState<'challanPay' | 'lots247'>('challanPay')
   const [showAddSubscriberModal, setShowAddSubscriberModal] = useState(false)
   const [bulkAssignPartnerIds, setBulkAssignPartnerIds] = useState<string[] | null>(null)
+  const [expandedStage, setExpandedStage] = useState<string | null>(null)
 
   const selectedPartner = selectedPartnerId ? partners.find(p => p.id === selectedPartnerId) : null
   const editingPartner = editingPartnerId ? partners.find(p => p.id === editingPartnerId) : null
@@ -37,6 +38,17 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
   const stageActivation = challanPayPartners.filter(p => p.stage === 'activation').length
   const stageTraining = challanPayPartners.filter(p => p.stage === 'training').length
   const stageMobilisation = challanPayPartners.filter(p => p.stage === 'mobilisation').length
+
+  // Sub-card metrics for the expanded stage
+  const getStageSubMetrics = (stageName: string) => {
+    const stagePartners = challanPayPartners.filter(p => p.stage === stageName)
+    return {
+      active: stagePartners.filter(p => p.status === 'active').length,
+      inactive: stagePartners.filter(p => p.status === 'inactive').length,
+      assigned: stagePartners.filter(p => p.assignedTo).length,
+      unassigned: stagePartners.filter(p => !p.assignedTo).length,
+    }
+  }
 
   // If a partner is selected, show detail view
   if (selectedPartner) {
@@ -118,19 +130,93 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
 
         {/* Summary Cards — ChallanPay only */}
         {activePartnerType === 'challanPay' && (
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {([
-              { label: 'Total RoadSmart Partners', value: challanPayCount, border: 'border-l-cyan-500', iconBg: 'bg-cyan-100 dark:bg-cyan-900/30', iconColor: 'text-cyan-600 dark:text-cyan-400' },
-              { label: 'Onboarding', value: stageOnboarding, border: 'border-l-amber-500', iconBg: 'bg-amber-100 dark:bg-amber-900/30', iconColor: 'text-amber-600 dark:text-amber-400' },
-              { label: 'Activation', value: stageActivation, border: 'border-l-blue-500', iconBg: 'bg-blue-100 dark:bg-blue-900/30', iconColor: 'text-blue-600 dark:text-blue-400' },
-              { label: 'Training', value: stageTraining, border: 'border-l-violet-500', iconBg: 'bg-violet-100 dark:bg-violet-900/30', iconColor: 'text-violet-600 dark:text-violet-400' },
-              { label: 'Mobilisation', value: stageMobilisation, border: 'border-l-emerald-500', iconBg: 'bg-emerald-100 dark:bg-emerald-900/30', iconColor: 'text-emerald-600 dark:text-emerald-400' },
-            ] as const).map((card) => (
-              <div key={card.label} className={`bg-white dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-800 border-l-[3px] ${card.border} shadow-sm`}>
-                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">{card.label}</p>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white">{card.value}</p>
-              </div>
-            ))}
+          <div className="mt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {([
+                { key: 'total', label: 'Total RoadSmart Partners', value: challanPayCount, accent: 'cyan' },
+                { key: 'onboarding', label: 'Onboarding', value: stageOnboarding, accent: 'amber' },
+                { key: 'activation', label: 'Activation', value: stageActivation, accent: 'blue' },
+                { key: 'training', label: 'Training', value: stageTraining, accent: 'violet' },
+                { key: 'mobilisation', label: 'Mobilisation', value: stageMobilisation, accent: 'emerald' },
+              ] as const).map((card) => {
+                const isExpanded = expandedStage === card.key
+                const accentBorder: Record<string, string> = {
+                  cyan: 'border-l-cyan-500',
+                  amber: 'border-l-amber-500',
+                  blue: 'border-l-blue-500',
+                  violet: 'border-l-violet-500',
+                  emerald: 'border-l-emerald-500',
+                }
+                const accentBg: Record<string, string> = {
+                  cyan: 'bg-cyan-50 dark:bg-cyan-950/20',
+                  amber: 'bg-amber-50 dark:bg-amber-950/20',
+                  blue: 'bg-blue-50 dark:bg-blue-950/20',
+                  violet: 'bg-violet-50 dark:bg-violet-950/20',
+                  emerald: 'bg-emerald-50 dark:bg-emerald-950/20',
+                }
+
+                return (
+                  <div
+                    key={card.key}
+                    className={`relative rounded-xl p-4 border-l-[3px] transition-all cursor-default ${accentBorder[card.accent]} ${
+                      isExpanded
+                        ? `${accentBg[card.accent]} border border-slate-200/80 dark:border-slate-700/80 shadow-md`
+                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">{card.label}</p>
+                        <p className="text-3xl font-bold text-slate-900 dark:text-white">{card.value}</p>
+                      </div>
+                      {card.key !== 'total' && (
+                        <button
+                          onClick={() => setExpandedStage(isExpanded ? null : card.key)}
+                          className={`mt-0.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
+                            isExpanded
+                              ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-200 rotate-45'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200'
+                          }`}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                            <line x1="6" y1="2" x2="6" y2="10" />
+                            <line x1="2" y1="6" x2="10" y2="6" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Expanded Sub-Cards */}
+            {expandedStage && expandedStage !== 'total' && (() => {
+              const metrics = getStageSubMetrics(expandedStage)
+              const stageLabel = expandedStage.charAt(0).toUpperCase() + expandedStage.slice(1)
+
+              return (
+                <div className="mt-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">{stageLabel} Breakdown</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    {([
+                      { label: 'Active', value: metrics.active, dot: 'bg-emerald-500' },
+                      { label: 'Inactive', value: metrics.inactive, dot: 'bg-slate-300 dark:bg-slate-600' },
+                      { label: 'Assigned', value: metrics.assigned, dot: 'bg-blue-500' },
+                      { label: 'Unassigned', value: metrics.unassigned, dot: 'bg-amber-400' },
+                    ]).map((sub) => (
+                      <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className={`w-1.5 h-1.5 rounded-full ${sub.dot}`} />
+                          <span className="text-xs text-slate-400 dark:text-slate-500">{sub.label}</span>
+                        </div>
+                        <p className="text-lg font-bold text-slate-800 dark:text-white">{sub.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
           </div>
         )}
 

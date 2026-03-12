@@ -38,10 +38,12 @@
       "partnerType": "challanPay",
       "stage": "training",
       "assignedTo": "Arun Kumar",
+      "utmSource": "Google Ads",
       "outlets": 4,
       "linkedOutlets": [
         {
           "id": "outlet-001",
+          "outletId": "OLT-100001",
           "name": "FleetPro Karol Bagh",
           "address": "45 Ajmal Khan Road, Karol Bagh",
           "city": "New Delhi",
@@ -56,6 +58,7 @@
         },
         {
           "id": "outlet-002",
+          "outletId": "OLT-100002",
           "name": "FleetPro Dwarka",
           "address": "Sector 12, Dwarka",
           "city": "New Delhi",
@@ -70,6 +73,7 @@
         },
         {
           "id": "outlet-003",
+          "outletId": "OLT-100003",
           "name": "FleetPro Noida",
           "address": "Block B, Sector 62",
           "city": "Noida",
@@ -84,6 +88,7 @@
         },
         {
           "id": "outlet-004",
+          "outletId": "OLT-100004",
           "name": "FleetPro Ghaziabad",
           "address": "Raj Nagar Extension",
           "city": "Ghaziabad",
@@ -107,13 +112,13 @@
         { "id": "vis-006", "visitorId": "VIS937150", "visitorToken": "www.challanpay.in/VIS937150/", "visitDate": "2026-03-03T13:50:00Z", "visitors": 1 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-001", "visitorId": "RV748201312", "visitorName": "Ramesh Kumar", "pendingChallans": 3, "pendingChallansAmount": 4500, "contactNumber": "9876543210" },
-        { "id": "rvd-002", "visitorId": "RV513084729", "visitorName": "Suresh Patel", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9812345678" },
-        { "id": "rvd-003", "visitorId": "RV291638405", "visitorName": "Amit Sharma", "pendingChallans": 5, "pendingChallansAmount": 7200, "contactNumber": "9988776655" },
-        { "id": "rvd-004", "visitorId": "RV604312187", "visitorName": "Vikas Singh", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9871234560" },
-        { "id": "rvd-005", "visitorId": "RV837592064", "visitorName": "Deepak Verma", "pendingChallans": 2, "pendingChallansAmount": 3000, "contactNumber": "9654321098" },
-        { "id": "rvd-006", "visitorId": "RV109456823", "visitorName": "Manoj Tiwari", "pendingChallans": 4, "pendingChallansAmount": 6800, "contactNumber": "9765432109" },
-        { "id": "rvd-007", "visitorId": "RV472806951", "visitorName": "Rajesh Gupta", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9543210987" }
+        { "id": "rvd-001", "visitorId": "RV748201312", "visitorName": "Ramesh Kumar", "subscriberId": "LWD-1160523", "pendingChallans": 3, "pendingChallansAmount": 4500, "contactNumber": "9876543210" },
+        { "id": "rvd-002", "visitorId": "RV513084729", "visitorName": "Suresh Patel", "subscriberId": "LWD-1160523", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9812345678" },
+        { "id": "rvd-003", "visitorId": "RV291638405", "visitorName": "Amit Sharma", "subscriberId": "LWD-1160524", "pendingChallans": 5, "pendingChallansAmount": 7200, "contactNumber": "9988776655" },
+        { "id": "rvd-004", "visitorId": "RV604312187", "visitorName": "Vikas Singh", "subscriberId": "LWD-1160524", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9871234560" },
+        { "id": "rvd-005", "visitorId": "RV837592064", "visitorName": "Deepak Verma", "subscriberId": "LWD-1160525", "pendingChallans": 2, "pendingChallansAmount": 3000, "contactNumber": "9654321098" },
+        { "id": "rvd-006", "visitorId": "RV109456823", "visitorName": "Manoj Tiwari", "subscriberId": "LWD-1160525", "pendingChallans": 4, "pendingChallansAmount": 6800, "contactNumber": "9765432109" },
+        { "id": "rvd-007", "visitorId": "RV472806951", "visitorName": "Rajesh Gupta", "subscriberId": "LWD-1160523", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9543210987" }
       ],
       "outletQRs": [
         { "id": "qr-001", "qrId": "QR - 3e93c4bc72", "outletId": "outlet-001", "outletName": "FleetPro Karol Bagh", "totalScans": 342, "status": "active", "createdDate": "2023-05-22" },
@@ -122,11 +127,11 @@
         { "id": "qr-004", "qrId": "QR - d4e6b7c091", "outletId": "outlet-004", "outletName": "FleetPro Ghaziabad", "totalScans": 89, "status": "inactive", "createdDate": "2024-01-07" }
       ],
       "followUps": [
-        { "id": "fu-001", "activityType": "onboarding", "notes": "Completed partner onboarding for Gurugram region. Documents verified and account activated.", "outcome": "converted", "createdAt": "2026-03-10T10:30:00Z", "createdBy": "Rohit Sharma" },
-        { "id": "fu-002", "activityType": "activation", "notes": "Activated 3 outlets in Delhi NCR. QR codes deployed and tested successfully.", "outcome": "converted", "createdAt": "2026-03-05T14:00:00Z", "createdBy": "Amit Verma" },
-        { "id": "fu-003", "activityType": "training", "notes": "Conducted staff training at Karol Bagh outlet. Covered challan processing and customer handling.", "outcome": "interested", "createdAt": "2026-02-28T09:15:00Z", "createdBy": "Rohit Sharma" },
-        { "id": "fu-004", "activityType": "mobilisation", "notes": "Mobilised field team for Dwarka and Noida outlets. Partner confirmed readiness.", "outcome": "interested", "createdAt": "2026-02-20T16:45:00Z", "createdBy": "Priya Singh" },
-        { "id": "fu-005", "activityType": "training", "notes": "Refresher training for outlet staff on updated challan process and new QR flow.", "outcome": "converted", "createdAt": "2026-02-15T11:00:00Z", "createdBy": "Amit Verma" }
+        { "id": "fu-001", "activityType": "onboarding", "subActivityType": "call", "notes": "Completed partner onboarding for Gurugram region. Documents verified and account activated.", "createdAt": "2026-03-10T10:30:00Z", "createdBy": "Rohit Sharma" },
+        { "id": "fu-002", "activityType": "activation", "subActivityType": "visit", "notes": "Activated 3 outlets in Delhi NCR. QR codes deployed and tested successfully.", "createdAt": "2026-03-05T14:00:00Z", "createdBy": "Amit Verma" },
+        { "id": "fu-003", "activityType": "training", "subActivityType": "meeting", "notes": "Conducted staff training at Karol Bagh outlet. Covered challan processing and customer handling.", "createdAt": "2026-02-28T09:15:00Z", "createdBy": "Rohit Sharma" },
+        { "id": "fu-004", "activityType": "mobilisation", "subActivityType": "whatsapp", "notes": "Mobilised field team for Dwarka and Noida outlets. Partner confirmed readiness.", "createdAt": "2026-02-20T16:45:00Z", "createdBy": "Priya Singh" },
+        { "id": "fu-005", "activityType": "training", "subActivityType": "visit", "notes": "Refresher training for outlet staff on updated challan process and new QR flow.", "createdAt": "2026-02-15T11:00:00Z", "createdBy": "Amit Verma" }
       ],
       "vehicles": 126,
       "linkedVehicles": [
@@ -225,10 +230,16 @@
         }
       ],
       "earnings": 45000,
+      "totalCommission": 35000,
+      "totalRspBenefit": 10000,
+      "totalIncidentsSubmitted": 156,
+      "totalOnlineChallansSubmitted": 120,
+      "totalCourtChallansSubmitted": 36,
       "totalPayouts": 40000,
       "payoutHistory": [
         {
           "id": "payout-001",
+          "transactionId": "TXN240115001",
           "amount": 20000,
           "date": "2024-01-15",
           "status": "completed",
@@ -236,6 +247,7 @@
         },
         {
           "id": "payout-002",
+          "transactionId": "TXN240215002",
           "amount": 20000,
           "date": "2024-02-15",
           "status": "completed",
@@ -300,10 +312,12 @@
       "partnerType": "challanPay",
       "stage": "activation",
       "assignedTo": "Neha Patel",
+      "utmSource": "Referral",
       "outlets": 2,
       "linkedOutlets": [
         {
           "id": "outlet-005",
+          "outletId": "OLT-100005",
           "name": "TransportNet Andheri",
           "address": "702 Link Road, Andheri West",
           "city": "Mumbai",
@@ -318,6 +332,7 @@
         },
         {
           "id": "outlet-006",
+          "outletId": "OLT-100006",
           "name": "TransportNet Thane",
           "address": "Ghodbunder Road, Thane West",
           "city": "Thane",
@@ -339,20 +354,20 @@
         { "id": "vis-010", "visitorId": "VIS370618", "visitorToken": "www.challanpay.in/VIS370618/", "visitDate": "2026-03-04T09:15:00Z", "visitors": 3 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-008", "visitorId": "RV385120946", "visitorName": "Anil Mehta", "pendingChallans": 2, "pendingChallansAmount": 3200, "contactNumber": "9876012345" },
-        { "id": "rvd-009", "visitorId": "RV729463508", "visitorName": "Sanjay Reddy", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9812098765" },
-        { "id": "rvd-010", "visitorId": "RV105782631", "visitorName": "Pradeep Joshi", "pendingChallans": 6, "pendingChallansAmount": 9100, "contactNumber": "9945678901" },
-        { "id": "rvd-011", "visitorId": "RV648103274", "visitorName": "Karan Malhotra", "pendingChallans": 1, "pendingChallansAmount": 1800, "contactNumber": "9734561230" },
-        { "id": "rvd-012", "visitorId": "RV920357148", "visitorName": "Nitin Agarwal", "pendingChallans": 3, "pendingChallansAmount": 4200, "contactNumber": "9623456789" }
+        { "id": "rvd-008", "visitorId": "RV385120946", "visitorName": "Anil Mehta", "subscriberId": "LWD-1160526", "pendingChallans": 2, "pendingChallansAmount": 3200, "contactNumber": "9876012345" },
+        { "id": "rvd-009", "visitorId": "RV729463508", "visitorName": "Sanjay Reddy", "subscriberId": "LWD-1160526", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9812098765" },
+        { "id": "rvd-010", "visitorId": "RV105782631", "visitorName": "Pradeep Joshi", "subscriberId": "LWD-1160527", "pendingChallans": 6, "pendingChallansAmount": 9100, "contactNumber": "9945678901" },
+        { "id": "rvd-011", "visitorId": "RV648103274", "visitorName": "Karan Malhotra", "subscriberId": "LWD-1160527", "pendingChallans": 1, "pendingChallansAmount": 1800, "contactNumber": "9734561230" },
+        { "id": "rvd-012", "visitorId": "RV920357148", "visitorName": "Nitin Agarwal", "subscriberId": "LWD-1160526", "pendingChallans": 3, "pendingChallansAmount": 4200, "contactNumber": "9623456789" }
       ],
       "outletQRs": [
         { "id": "qr-005", "qrId": "QR - 8c12ef4a67", "outletId": "outlet-005", "outletName": "TransportNet Andheri", "totalScans": 485, "status": "active", "createdDate": "2023-08-30" },
         { "id": "qr-006", "qrId": "QR - f0a3b59d21", "outletId": "outlet-006", "outletName": "TransportNet Thane", "totalScans": 210, "status": "active", "createdDate": "2023-11-17" }
       ],
       "followUps": [
-        { "id": "fu-006", "activityType": "onboarding", "notes": "Onboarding process initiated for Mumbai partner. KYC documents collected and verified.", "outcome": "callback", "createdAt": "2026-03-08T11:30:00Z", "createdBy": "Sanjay Mehta" },
-        { "id": "fu-007", "activityType": "activation", "notes": "Activated Andheri outlet. High footfall observed, suggested adding second QR station.", "outcome": "interested", "createdAt": "2026-02-25T10:00:00Z", "createdBy": "Sanjay Mehta" },
-        { "id": "fu-008", "activityType": "mobilisation", "notes": "Mobilised support team for Thane expansion. Resources allocated for next quarter.", "outcome": "no_response", "createdAt": "2026-02-10T09:00:00Z", "createdBy": "Priya Singh" }
+        { "id": "fu-006", "activityType": "onboarding", "subActivityType": "email", "notes": "Onboarding process initiated for Mumbai partner. KYC documents collected and verified.", "createdAt": "2026-03-08T11:30:00Z", "createdBy": "Sanjay Mehta" },
+        { "id": "fu-007", "activityType": "activation", "subActivityType": "visit", "notes": "Activated Andheri outlet. High footfall observed, suggested adding second QR station.", "createdAt": "2026-02-25T10:00:00Z", "createdBy": "Sanjay Mehta" },
+        { "id": "fu-008", "activityType": "mobilisation", "subActivityType": "call", "notes": "Mobilised support team for Thane expansion. Resources allocated for next quarter.", "createdAt": "2026-02-10T09:00:00Z", "createdBy": "Priya Singh" }
       ],
       "vehicles": 84,
       "linkedVehicles": [
@@ -426,10 +441,16 @@
         }
       ],
       "earnings": 32500,
+      "totalCommission": 25000,
+      "totalRspBenefit": 7500,
+      "totalIncidentsSubmitted": 98,
+      "totalOnlineChallansSubmitted": 72,
+      "totalCourtChallansSubmitted": 26,
       "totalPayouts": 25000,
       "payoutHistory": [
         {
           "id": "payout-003",
+          "transactionId": "TXN240210003",
           "amount": 25000,
           "date": "2024-02-10",
           "status": "completed",
@@ -527,10 +548,16 @@
         }
       ],
       "earnings": 12000,
+      "totalCommission": 12000,
+      "totalRspBenefit": 0,
+      "totalIncidentsSubmitted": 45,
+      "totalOnlineChallansSubmitted": 45,
+      "totalCourtChallansSubmitted": 0,
       "totalPayouts": 10000,
       "payoutHistory": [
         {
           "id": "payout-004",
+          "transactionId": "TXN240120004",
           "amount": 10000,
           "date": "2024-01-20",
           "status": "completed",
@@ -601,10 +628,16 @@
         }
       ],
       "earnings": 5000,
+      "totalCommission": 5000,
+      "totalRspBenefit": 0,
+      "totalIncidentsSubmitted": 18,
+      "totalOnlineChallansSubmitted": 18,
+      "totalCourtChallansSubmitted": 0,
       "totalPayouts": 5000,
       "payoutHistory": [
         {
           "id": "payout-005",
+          "transactionId": "TXN231215005",
           "amount": 5000,
           "date": "2023-12-15",
           "status": "completed",
@@ -657,10 +690,12 @@
       "partnerType": "challanPay",
       "stage": "onboarding",
       "assignedTo": null,
+      "utmSource": "Facebook",
       "outlets": 1,
       "linkedOutlets": [
         {
           "id": "outlet-007",
+          "outletId": "OLT-100007",
           "name": "Commerce Hub NH-8",
           "address": "654 Business Complex, NH-8",
           "city": "Gurgaon",
@@ -680,16 +715,16 @@
         { "id": "vis-012", "visitorId": "VIS183506", "visitorToken": "www.challanpay.in/VIS183506/", "visitDate": "2026-03-05T14:00:00Z", "visitors": 4 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-013", "visitorId": "RV452089173", "visitorName": "Harish Nair", "pendingChallans": 2, "pendingChallansAmount": 2800, "contactNumber": "9876543201" },
-        { "id": "rvd-014", "visitorId": "RV813609425", "visitorName": "Vivek Pandey", "pendingChallans": 4, "pendingChallansAmount": 5600, "contactNumber": "9812345097" },
-        { "id": "rvd-015", "visitorId": "RV670941382", "visitorName": "Ajay Chauhan", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670123" },
-        { "id": "rvd-016", "visitorId": "RV238470596", "visitorName": "Rohit Saxena", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9723456780" }
+        { "id": "rvd-013", "visitorId": "RV452089173", "visitorName": "Harish Nair", "subscriberId": "LWD-1160530", "pendingChallans": 2, "pendingChallansAmount": 2800, "contactNumber": "9876543201" },
+        { "id": "rvd-014", "visitorId": "RV813609425", "visitorName": "Vivek Pandey", "subscriberId": "LWD-1160530", "pendingChallans": 4, "pendingChallansAmount": 5600, "contactNumber": "9812345097" },
+        { "id": "rvd-015", "visitorId": "RV670941382", "visitorName": "Ajay Chauhan", "subscriberId": "LWD-1160531", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670123" },
+        { "id": "rvd-016", "visitorId": "RV238470596", "visitorName": "Rohit Saxena", "subscriberId": "LWD-1160531", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9723456780" }
       ],
       "outletQRs": [
         { "id": "qr-007", "qrId": "QR - 1d7e0c3b95", "outletId": "outlet-007", "outletName": "Commerce Hub NH-8", "totalScans": 127, "status": "active", "createdDate": "2024-01-12" }
       ],
       "followUps": [
-        { "id": "fu-009", "activityType": "onboarding", "notes": "Onboarding kickoff for Gurugram partner. Discussed setup requirements and timelines.", "outcome": "interested", "createdAt": "2026-03-02T15:00:00Z", "createdBy": "Amit Verma" }
+        { "id": "fu-009", "activityType": "onboarding", "subActivityType": "meeting", "notes": "Onboarding kickoff for Gurugram partner. Discussed setup requirements and timelines.", "createdAt": "2026-03-02T15:00:00Z", "createdBy": "Amit Verma" }
       ],
       "vehicles": 42,
       "linkedVehicles": [
@@ -749,6 +784,11 @@
         }
       ],
       "earnings": 8500,
+      "totalCommission": 6000,
+      "totalRspBenefit": 2500,
+      "totalIncidentsSubmitted": 42,
+      "totalOnlineChallansSubmitted": 30,
+      "totalCourtChallansSubmitted": 12,
       "totalPayouts": 0,
       "payoutHistory": [],
       "documents": [
@@ -797,6 +837,7 @@
       "partnerType": "challanPay",
       "stage": "training",
       "assignedTo": "Rajesh Verma",
+      "utmSource": "Google Ads",
       "outlets": 6,
       "registeredVisitorsCount": 485,
       "registeredVisitors": [
@@ -807,16 +848,16 @@
         { "id": "vis-017", "visitorId": "VIS597031", "visitorToken": "www.challanpay.in/VIS597031/", "visitDate": "2026-02-20T14:30:00Z", "visitors": 5 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-017", "visitorId": "RV750318642", "visitorName": "Sunil Yadav", "pendingChallans": 3, "pendingChallansAmount": 5100, "contactNumber": "9865432107" },
-        { "id": "rvd-018", "visitorId": "RV214830957", "visitorName": "Ashok Dubey", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9754321098" },
-        { "id": "rvd-019", "visitorId": "RV967240183", "visitorName": "Pawan Mishra", "pendingChallans": 2, "pendingChallansAmount": 3400, "contactNumber": "9643210987" },
-        { "id": "rvd-024", "visitorId": "RV481295730", "visitorName": "Rajesh Nair", "pendingChallans": 1, "pendingChallansAmount": 1800, "contactNumber": "9532109876" },
-        { "id": "rvd-025", "visitorId": "RV603172849", "visitorName": "Kiran Prasad", "pendingChallans": 4, "pendingChallansAmount": 7200, "contactNumber": "9421098765" }
+        { "id": "rvd-017", "visitorId": "RV750318642", "visitorName": "Sunil Yadav", "subscriberId": "LWD-1160532", "pendingChallans": 3, "pendingChallansAmount": 5100, "contactNumber": "9865432107" },
+        { "id": "rvd-018", "visitorId": "RV214830957", "visitorName": "Ashok Dubey", "subscriberId": "LWD-1160533", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9754321098" },
+        { "id": "rvd-019", "visitorId": "RV967240183", "visitorName": "Pawan Mishra", "subscriberId": "LWD-1160532", "pendingChallans": 2, "pendingChallansAmount": 3400, "contactNumber": "9643210987" },
+        { "id": "rvd-024", "visitorId": "RV481295730", "visitorName": "Rajesh Nair", "subscriberId": "LWD-1160534", "pendingChallans": 1, "pendingChallansAmount": 1800, "contactNumber": "9532109876" },
+        { "id": "rvd-025", "visitorId": "RV603172849", "visitorName": "Kiran Prasad", "subscriberId": "LWD-1160533", "pendingChallans": 4, "pendingChallansAmount": 7200, "contactNumber": "9421098765" }
       ],
       "outletQRs": [],
       "followUps": [
-        { "id": "fu-010", "activityType": "activation", "notes": "Activated partner account for Hyderabad. 2 outlets configured and QR codes generated.", "outcome": "interested", "createdAt": "2026-03-06T10:00:00Z", "createdBy": "Rohit Sharma" },
-        { "id": "fu-011", "activityType": "training", "notes": "Conducted training session for outlet staff. Covered onboarding checklist and challan workflow.", "outcome": "callback", "createdAt": "2026-03-01T14:30:00Z", "createdBy": "Priya Singh" }
+        { "id": "fu-010", "activityType": "activation", "subActivityType": "call", "notes": "Activated partner account for Hyderabad. 2 outlets configured and QR codes generated.", "createdAt": "2026-03-06T10:00:00Z", "createdBy": "Rohit Sharma" },
+        { "id": "fu-011", "activityType": "training", "subActivityType": "whatsapp", "notes": "Conducted training session for outlet staff. Covered onboarding checklist and challan workflow.", "createdAt": "2026-03-01T14:30:00Z", "createdBy": "Priya Singh" }
       ],
       "vehicles": 210,
       "linkedVehicles": [
@@ -901,10 +942,16 @@
         }
       ],
       "earnings": 38000,
+      "totalCommission": 28000,
+      "totalRspBenefit": 10000,
+      "totalIncidentsSubmitted": 134,
+      "totalOnlineChallansSubmitted": 98,
+      "totalCourtChallansSubmitted": 36,
       "totalPayouts": 30000,
       "payoutHistory": [
         {
           "id": "payout-006",
+          "transactionId": "TXN240110006",
           "amount": 15000,
           "date": "2024-01-10",
           "status": "completed",
@@ -912,6 +959,7 @@
         },
         {
           "id": "payout-007",
+          "transactionId": "TXN240210007",
           "amount": 15000,
           "date": "2024-02-10",
           "status": "completed",
@@ -1027,6 +1075,11 @@
         }
       ],
       "earnings": 6000,
+      "totalCommission": 6000,
+      "totalRspBenefit": 0,
+      "totalIncidentsSubmitted": 22,
+      "totalOnlineChallansSubmitted": 22,
+      "totalCourtChallansSubmitted": 0,
       "totalPayouts": 0,
       "payoutHistory": [],
       "documents": [],
@@ -1062,6 +1115,7 @@
       "partnerType": "challanPay",
       "stage": "activation",
       "assignedTo": "Kavita Sharma",
+      "utmSource": "Referral",
       "outlets": 3,
       "registeredVisitorsCount": 156,
       "registeredVisitors": [
@@ -1070,15 +1124,15 @@
         { "id": "vis-020", "visitorId": "VIS405389", "visitorToken": "www.challanpay.in/VIS405389/", "visitDate": "2026-02-15T10:45:00Z", "visitors": 1 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-020", "visitorId": "RV508134267", "visitorName": "Mukesh Bhatt", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9876501234" },
-        { "id": "rvd-021", "visitorId": "RV372960514", "visitorName": "Dinesh Rawat", "pendingChallans": 5, "pendingChallansAmount": 7500, "contactNumber": "9812340567" },
-        { "id": "rvd-022", "visitorId": "RV846015398", "visitorName": "Girish Kapoor", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670012" },
-        { "id": "rvd-023", "visitorId": "RV159372046", "visitorName": "Hemant Thakur", "pendingChallans": 2, "pendingChallansAmount": 3600, "contactNumber": "9734560189" }
+        { "id": "rvd-020", "visitorId": "RV508134267", "visitorName": "Mukesh Bhatt", "subscriberId": "LWD-1160536", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9876501234" },
+        { "id": "rvd-021", "visitorId": "RV372960514", "visitorName": "Dinesh Rawat", "subscriberId": "LWD-1160536", "pendingChallans": 5, "pendingChallansAmount": 7500, "contactNumber": "9812340567" },
+        { "id": "rvd-022", "visitorId": "RV846015398", "visitorName": "Girish Kapoor", "subscriberId": "LWD-1160537", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670012" },
+        { "id": "rvd-023", "visitorId": "RV159372046", "visitorName": "Hemant Thakur", "subscriberId": "LWD-1160537", "pendingChallans": 2, "pendingChallansAmount": 3600, "contactNumber": "9734560189" }
       ],
       "outletQRs": [],
       "followUps": [
-        { "id": "fu-012", "activityType": "mobilisation", "notes": "Mobilised field team for Kolkata region. Reviewed infrastructure and staff readiness.", "outcome": "converted", "createdAt": "2026-02-20T11:00:00Z", "createdBy": "Amit Verma" },
-        { "id": "fu-013", "activityType": "activation", "notes": "Activation completed for Kolkata partner. Partner reported smooth operations.", "outcome": "interested", "createdAt": "2026-03-09T16:00:00Z", "createdBy": "Sanjay Mehta" }
+        { "id": "fu-012", "activityType": "mobilisation", "subActivityType": "visit", "notes": "Mobilised field team for Kolkata region. Reviewed infrastructure and staff readiness.", "createdAt": "2026-02-20T11:00:00Z", "createdBy": "Amit Verma" },
+        { "id": "fu-013", "activityType": "activation", "subActivityType": "call", "notes": "Activation completed for Kolkata partner. Partner reported smooth operations.", "createdAt": "2026-03-09T16:00:00Z", "createdBy": "Sanjay Mehta" }
       ],
       "vehicles": 97,
       "linkedVehicles": [
@@ -1152,10 +1206,16 @@
         }
       ],
       "earnings": 28500,
+      "totalCommission": 20000,
+      "totalRspBenefit": 8500,
+      "totalIncidentsSubmitted": 112,
+      "totalOnlineChallansSubmitted": 82,
+      "totalCourtChallansSubmitted": 30,
       "totalPayouts": 20000,
       "payoutHistory": [
         {
           "id": "payout-008",
+          "transactionId": "TXN240205008",
           "amount": 20000,
           "date": "2024-02-05",
           "status": "completed",

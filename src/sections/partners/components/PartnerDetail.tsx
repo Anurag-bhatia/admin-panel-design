@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight, UserCheck, Store, QrCode, MoreVertical, Ban, X, Download, Search, Loader2, RefreshCw, Plus, Phone, Mail, MessageSquare, MapPin, CalendarCheck } from 'lucide-react'
 import type { PartnerDetailProps, OutletQR, RegisteredVisitorDetail, PartnerFollowUp } from '@/../product/sections/partners/types'
 
-type TabType = 'profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'followUps' | 'financial' | 'documents' | 'reports'
+type TabType = 'profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'followUps' | 'financial' | 'documents' | 'summary' | 'reports'
 
 export function PartnerDetail({
   partner,
@@ -16,7 +16,8 @@ export function PartnerDetail({
   onAddFollowUp,
   allowedTabs,
 }: PartnerDetailProps) {
-  const [activeTab, setActiveTab] = useState<TabType>(allowedTabs?.[0] ?? 'profile')
+  const [activeTab, setActiveTab] = useState<TabType>(allowedTabs?.[0] ?? 'summary')
+  const [globalSearch, setGlobalSearch] = useState('')
   const [showDocumentUpload, setShowDocumentUpload] = useState(false)
   const [vehiclePage, setVehiclePage] = useState(1)
   const [vehicleSearch, setVehicleSearch] = useState('')
@@ -32,7 +33,7 @@ export function PartnerDetail({
   const [regVisitorPage, setRegVisitorPage] = useState(1)
   const [followUpPage, setFollowUpPage] = useState(1)
   const [showAddFollowUp, setShowAddFollowUp] = useState(false)
-  const [followUpForm, setFollowUpForm] = useState({ activityType: '', notes: '', outcome: '' })
+  const [followUpForm, setFollowUpForm] = useState({ activityType: '', subActivityType: '', notes: '' })
   const vehiclesPerPage = 5
   const filteredVehicles = (partner.linkedVehicles || []).filter((v) => {
     const matchesSearch = vehicleSearch === '' ||
@@ -126,6 +127,7 @@ export function PartnerDetail({
       followUps: <CalendarCheck className="w-4 h-4" />,
       financial: <BarChart3 className="w-4 h-4" />,
       documents: <FileCheck className="w-4 h-4" />,
+      summary: <FileText className="w-4 h-4" />,
       reports: <BarChart3 className="w-4 h-4" />
     }
     return icons[tab]
@@ -140,9 +142,10 @@ export function PartnerDetail({
       vehicles: 'Vehicles',
       outlets: 'Outlets',
       qrs: 'QRs',
-      followUps: 'Follow Ups',
+      followUps: 'Activity',
       financial: 'Financial',
       documents: 'Documents',
+      summary: 'Summary',
       reports: 'Reports'
     }
     return labels[tab]
@@ -190,26 +193,38 @@ export function PartnerDetail({
             </div>
             <p className="text-slate-500 dark:text-slate-400 mt-1">Partner ID: {partner.partnerId}</p>
           </div>
-          <button
-            onClick={handleEditClick}
-            className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors"
-          >
-            Edit Details
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
+                placeholder="Search..."
+                className="w-48 pl-9 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+              />
+            </div>
+            <button
+              onClick={handleEditClick}
+              className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors"
+            >
+              Edit Details
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit mb-6 flex-wrap">
+        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg mb-6 overflow-x-auto flex-nowrap">
           {(allowedTabs
             ? allowedTabs as TabType[]
             : isChallanPay
-              ? ['profile', 'visitors', 'registeredVisitors', 'customers', 'outlets', 'qrs', 'followUps', 'financial', 'documents'] as TabType[]
+              ? ['summary', 'visitors', 'registeredVisitors', 'customers', 'financial', 'followUps', 'qrs', 'outlets', 'documents', 'profile'] as TabType[]
               : ['profile', 'customers', 'vehicles', 'reports', 'financial', 'documents'] as TabType[]
           ).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeTab === tab
                   ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -507,9 +522,9 @@ export function PartnerDetail({
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscriber ID</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">{isChallanPay ? 'Customer' : 'Subscriber'}</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Mobile</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscribed</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Submitted Challans</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Submitted Amount</th>
@@ -521,12 +536,12 @@ export function PartnerDetail({
                         {paginatedCustomers.map((subscriber) => (
                           <tr key={subscriber.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                             <td className="px-4 py-3">
+                              <span className="font-mono text-sm text-slate-600 dark:text-slate-300">{subscriber.id}</span>
+                            </td>
+                            <td className="px-4 py-3">
                               <p className="font-medium text-slate-900 dark:text-slate-50">{subscriber.name}</p>
                             </td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{subscriber.mobile}</td>
-                            <td className="px-4 py-3">
-                              <SubscriberStatusBadge status={subscriber.status} />
-                            </td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(subscriber.dateSubscribed)}</td>
                             <td className="px-4 py-3">
                               <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
@@ -843,6 +858,7 @@ export function PartnerDetail({
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800">
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitor ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscriber ID</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitor Name</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pending Challans</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pending Amount</th>
@@ -854,6 +870,9 @@ export function PartnerDetail({
                           <tr key={rv.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                             <td className="px-4 py-3">
                               <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{rv.visitorId}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="font-mono text-sm text-slate-600 dark:text-slate-300">{rv.subscriberId}</span>
                             </td>
                             <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{rv.visitorName}</td>
                             <td className="px-4 py-3">
@@ -892,6 +911,7 @@ export function PartnerDetail({
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet ID</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Location</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pincode</th>
@@ -903,6 +923,9 @@ export function PartnerDetail({
                       <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                         {paginatedOutlets.map((outlet) => (
                           <tr key={outlet.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3">
+                              <span className="font-mono text-sm text-slate-600 dark:text-slate-300">{outlet.outletId}</span>
+                            </td>
                             <td className="px-4 py-3">
                               <p className="font-medium text-slate-900 dark:text-slate-50">{outlet.name}</p>
                               <p className="text-xs text-slate-500 dark:text-slate-400">{outlet.address}</p>
@@ -956,6 +979,7 @@ export function PartnerDetail({
                     <thead>
                       <tr className="border-b border-slate-200 dark:border-slate-800">
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">QR ID</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet ID</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Created</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
@@ -966,6 +990,9 @@ export function PartnerDetail({
                         <tr key={qr.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                           <td className="px-4 py-3">
                             <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{qr.qrId}</span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="font-mono text-sm text-cyan-600 dark:text-cyan-400">{qr.outletId}</span>
                           </td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{qr.outletName}</td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(qr.createdDate)}</td>
@@ -1031,8 +1058,8 @@ export function PartnerDetail({
                 <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/40 rounded-lg border border-amber-200 dark:border-amber-800">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-1">Awaiting Payout (Last 30 Days)</p>
-                      <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{formatCurrency(partner.earnings - partner.totalPayouts)}</p>
+                      <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-1">Total Earnings Till Date</p>
+                      <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{formatCurrency(partner.totalPayouts)}</p>
                     </div>
                     <IndianRupee className="w-8 h-8 text-amber-400" />
                   </div>
@@ -1075,6 +1102,7 @@ export function PartnerDetail({
                       <div>
                         <p className="font-medium text-slate-900 dark:text-slate-50">{formatCurrency(payout.amount)}</p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(payout.date)} • {payout.paymentMethod}</p>
+                        <p className="text-xs font-mono text-cyan-600 dark:text-cyan-400 mt-0.5">{payout.transactionId}</p>
                       </div>
                       <span className="inline-block px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded text-xs font-medium">
                         {payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
@@ -1207,6 +1235,86 @@ export function PartnerDetail({
             </div>
           )}
 
+          {/* Summary Tab */}
+          {activeTab === 'summary' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Partner Summary</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {/* Stage */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Stage</p>
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium capitalize ${
+                    partner.stage === 'onboarding' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                    partner.stage === 'activation' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                    partner.stage === 'training' ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400' :
+                    partner.stage === 'mobilisation' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                    'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                  }`}>{partner.stage || 'Not set'}</span>
+                </div>
+
+                {/* Total Visitors */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Visitors</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{partner.registeredVisitors?.reduce((sum, v) => sum + v.visitors, 0) || 0}</p>
+                </div>
+
+                {/* Total Registered Visitors */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Registered Visitors</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{partner.registeredVisitorsCount || 0}</p>
+                </div>
+
+                {/* Total Customers */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Customers</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{partner.linkedSubscribers?.length || 0}</p>
+                </div>
+
+                {/* Total Outlets */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Outlets</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{partner.linkedOutlets?.length || 0}</p>
+                </div>
+
+                {/* Total Earnings */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Earnings</p>
+                  <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(partner.earnings)}</p>
+                </div>
+
+                {/* Total Commission */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Commission</p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(partner.totalCommission)}</p>
+                </div>
+
+                {/* Total RSP Benefit Received */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total RSP Benefit Received</p>
+                  <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">{formatCurrency(partner.totalRspBenefit)}</p>
+                </div>
+
+                {/* Total Incidents Submitted */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Incidents Submitted</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{partner.totalIncidentsSubmitted}</p>
+                </div>
+
+                {/* Total Online Challans Submitted */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Online Challans Submitted</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{partner.totalOnlineChallansSubmitted}</p>
+                </div>
+
+                {/* Total Court Challans Submitted */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Court Challans Submitted</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{partner.totalCourtChallansSubmitted}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Reports Tab */}
           {activeTab === 'reports' && (
             <div>
@@ -1309,7 +1417,7 @@ export function PartnerDetail({
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Follow Ups ({totalFollowUps})</h2>
                 <button
                   onClick={() => {
-                    setFollowUpForm({ activityType: '', notes: '', outcome: '' })
+                    setFollowUpForm({ activityType: '', subActivityType: '', notes: '' })
                     setShowAddFollowUp(true)
                   }}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
@@ -1345,6 +1453,9 @@ export function PartnerDetail({
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-sm font-medium text-slate-900 dark:text-slate-50 capitalize">{fu.activityType}</span>
+                                {fu.subActivityType && (
+                                  <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 capitalize">{fu.subActivityType}</span>
+                                )}
                               </div>
                               <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{fu.notes}</p>
                               <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
@@ -1415,22 +1526,22 @@ export function PartnerDetail({
                   />
                 </div>
 
-                {/* Outcome */}
+                {/* Sub Activity Type */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                    Outcome <span className="text-red-500">*</span>
+                    Sub Activity Type <span className="text-red-500">*</span>
                   </label>
                   <select
-                    value={followUpForm.outcome}
-                    onChange={(e) => setFollowUpForm({ ...followUpForm, outcome: e.target.value })}
+                    value={followUpForm.subActivityType}
+                    onChange={(e) => setFollowUpForm({ ...followUpForm, subActivityType: e.target.value })}
                     className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
-                    <option value="">Select Outcome</option>
-                    <option value="interested">Interested</option>
-                    <option value="not_interested">Not Interested</option>
-                    <option value="callback">Callback</option>
-                    <option value="converted">Converted</option>
-                    <option value="no_response">No Response</option>
+                    <option value="">Select Sub Activity Type</option>
+                    <option value="call">Call</option>
+                    <option value="meeting">Meeting</option>
+                    <option value="email">Email</option>
+                    <option value="visit">Visit</option>
+                    <option value="whatsapp">WhatsApp</option>
                   </select>
                 </div>
               </div>
@@ -1445,10 +1556,10 @@ export function PartnerDetail({
                 </button>
                 <button
                   onClick={() => {
-                    if (followUpForm.activityType && followUpForm.notes && followUpForm.outcome) {
+                    if (followUpForm.activityType && followUpForm.subActivityType && followUpForm.notes) {
                       onAddFollowUp?.(partner.id, followUpForm)
                       setShowAddFollowUp(false)
-                      setFollowUpForm({ activityType: '', notes: '', outcome: '' })
+                      setFollowUpForm({ activityType: '', subActivityType: '', notes: '' })
                     }
                   }}
                   disabled={!followUpForm.activityType || !followUpForm.notes || !followUpForm.outcome}
@@ -1505,27 +1616,6 @@ function QRCardModal({ qr, onClose }: { qr: OutletQR; onClose: () => void }) {
   )
 }
 
-function FollowUpOutcomeBadge({ outcome }: { outcome: string }) {
-  const styles: Record<string, string> = {
-    interested: 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400',
-    not_interested: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
-    callback: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
-    converted: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400',
-    no_response: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
-  }
-  const labels: Record<string, string> = {
-    interested: 'Interested',
-    not_interested: 'Not Interested',
-    callback: 'Callback',
-    converted: 'Converted',
-    no_response: 'No Response',
-  }
-  return (
-    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${styles[outcome] || styles.no_response}`}>
-      {labels[outcome] || outcome}
-    </span>
-  )
-}
 
 function TimelineItem({ title, date }: { title: string; date: string }) {
   return (

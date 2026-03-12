@@ -16,6 +16,7 @@ export interface LinkedSubscriber {
 
 export interface Payout {
   id: string
+  transactionId: string
   amount: number
   date: string
   status: 'completed' | 'pending' | 'failed'
@@ -63,6 +64,7 @@ export interface RegisteredVisitorDetail {
   id: string
   visitorId: string
   visitorName: string
+  subscriberId: string
   pendingChallans: number
   pendingChallansAmount: number
   contactNumber: string
@@ -71,8 +73,8 @@ export interface RegisteredVisitorDetail {
 export interface PartnerFollowUp {
   id: string
   activityType: 'onboarding' | 'activation' | 'training' | 'mobilisation'
+  subActivityType: 'call' | 'meeting' | 'email' | 'visit' | 'whatsapp'
   notes: string
-  outcome: 'interested' | 'not_interested' | 'callback' | 'converted' | 'no_response'
   createdAt: string
   createdBy: string
 }
@@ -89,6 +91,7 @@ export interface OutletQR {
 
 export interface Outlet {
   id: string
+  outletId: string
   name: string
   address: string
   city: string
@@ -135,9 +138,15 @@ export interface Partner {
   status: 'active' | 'inactive'
   stage?: 'onboarding' | 'activation' | 'training' | 'mobilisation'
   assignedTo?: string
+  utmSource?: string
   dateOnboarded: string
   linkedSubscribers: LinkedSubscriber[]
   earnings: number
+  totalCommission: number
+  totalRspBenefit: number
+  totalIncidentsSubmitted: number
+  totalOnlineChallansSubmitted: number
+  totalCourtChallansSubmitted: number
   totalPayouts: number
   payoutHistory: Payout[]
   documents: Document[]
@@ -200,10 +209,10 @@ export interface PartnerDetailProps {
   onBulkImportSubscribers?: () => void
 
   /** Called when user adds a follow-up (ChallanPay only) */
-  onAddFollowUp?: (partnerId: string, followUp: { activityType: string; notes: string; outcome: string }) => void
+  onAddFollowUp?: (partnerId: string, followUp: { activityType: string; subActivityType: string; notes: string }) => void
 
   /** Optional list of tabs to show. If not provided, shows all tabs for the partner type. */
-  allowedTabs?: ('profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'followUps' | 'financial' | 'documents' | 'reports')[]
+  allowedTabs?: ('profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'followUps' | 'financial' | 'documents' | 'summary' | 'reports')[]
 }
 
 export interface AddPartnerProps {

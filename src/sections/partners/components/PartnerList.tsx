@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MoreVertical, Search, Filter, ChevronLeft, ChevronRight, X, UserPlus } from 'lucide-react'
+import { MoreVertical, Search, Filter, ChevronLeft, ChevronRight, X, UserPlus, ArrowUpDown } from 'lucide-react'
 import type { PartnerListProps } from '@/../product/sections/partners/types'
 
 interface ExtendedPartnerListProps extends PartnerListProps {
@@ -19,8 +19,12 @@ export function PartnerList({
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [stateFilter, setStateFilter] = useState<string>('')
   const [assignedToFilter, setAssignedToFilter] = useState<string>('')
+  const [utmSourceFilter, setUtmSourceFilter] = useState<string>('')
   const [activeStatusFilter, setActiveStatusFilter] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
+  const [showSortMenu, setShowSortMenu] = useState(false)
+  const [sortField, setSortField] = useState<string>('')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -29,8 +33,9 @@ export function PartnerList({
   // Derive unique values for filter dropdowns
   const uniqueStates = [...new Set(partners.map(p => p.state))].sort()
   const uniqueAssignees = [...new Set(partners.map(p => p.assignedTo).filter(Boolean) as string[])].sort()
+  const uniqueUtmSources = [...new Set(partners.map(p => p.utmSource).filter(Boolean) as string[])].sort()
 
-  const activeFilterCount = [statusFilter, stateFilter, assignedToFilter, activeStatusFilter].filter(Boolean).length
+  const activeFilterCount = [statusFilter, stateFilter, assignedToFilter, utmSourceFilter, activeStatusFilter].filter(Boolean).length
 
   // Filter partners based on search and all filters
   let filtered = partners.filter(partner => {
@@ -40,9 +45,28 @@ export function PartnerList({
     const matchesStage = !statusFilter || (isChallanPay ? partner.stage === statusFilter : partner.status === statusFilter)
     const matchesState = !stateFilter || partner.state === stateFilter
     const matchesAssignedTo = !assignedToFilter || (assignedToFilter === 'unassigned' ? !partner.assignedTo : partner.assignedTo === assignedToFilter)
+    const matchesUtmSource = !utmSourceFilter || partner.utmSource === utmSourceFilter
     const matchesActiveStatus = !activeStatusFilter || partner.status === activeStatusFilter
-    return matchesSearch && matchesStage && matchesState && matchesAssignedTo && matchesActiveStatus
+    return matchesSearch && matchesStage && matchesState && matchesAssignedTo && matchesUtmSource && matchesActiveStatus
   })
+
+  // Sort
+  if (sortField) {
+    filtered.sort((a, b) => {
+      let aVal: string | number = ''
+      let bVal: string | number = ''
+      switch (sortField) {
+        case 'name': aVal = a.companyName.toLowerCase(); bVal = b.companyName.toLowerCase(); break
+        case 'date': aVal = new Date(a.dateOnboarded).getTime(); bVal = new Date(b.dateOnboarded).getTime(); break
+        case 'customers': aVal = a.linkedSubscribers?.length || 0; bVal = b.linkedSubscribers?.length || 0; break
+        case 'outlets': aVal = a.outlets || 0; bVal = b.outlets || 0; break
+        case 'visitors': aVal = a.registeredVisitorsCount || 0; bVal = b.registeredVisitorsCount || 0; break
+      }
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+  }
 
   // Pagination
   const totalItems = filtered.length
@@ -179,6 +203,68 @@ export function PartnerList({
             />
           </div>
 
+          {/* Sort Toggle */}
+          <div className="relative">
+            <button
+              onClick={() => setShowSortMenu(!showSortMenu)}
+              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                sortField
+                  ? 'bg-cyan-600 text-white'
+                  : 'bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+            >
+              <ArrowUpDown className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Sort</span>
+            </button>
+            {showSortMenu && (
+              <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-30 py-1">
+                {([
+                  { key: 'name', label: 'Partner Name' },
+                  { key: 'date', label: 'Date Onboarded' },
+                  { key: 'customers', label: 'Customers' },
+                  { key: 'outlets', label: 'Outlets' },
+                  { key: 'visitors', label: 'Registered Visitors' },
+                ] as const).map((option) => (
+                  <button
+                    key={option.key}
+                    onClick={() => {
+                      if (sortField === option.key) {
+                        if (sortDirection === 'asc') setSortDirection('desc')
+                        else { setSortField(''); setSortDirection('asc') }
+                      } else {
+                        setSortField(option.key)
+                        setSortDirection('asc')
+                      }
+                      setShowSortMenu(false)
+                      setCurrentPage(1)
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm transition-colors flex items-center justify-between ${
+                      sortField === option.key
+                        ? 'bg-cyan-50 dark:bg-cyan-950/30 text-cyan-700 dark:text-cyan-300'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {option.label}
+                    {sortField === option.key && (
+                      <span className="text-xs text-cyan-500">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </button>
+                ))}
+                {sortField && (
+                  <>
+                    <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+                    <button
+                      onClick={() => { setSortField(''); setSortDirection('asc'); setShowSortMenu(false) }}
+                      className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                    >
+                      Clear Sort
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Filter Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
@@ -261,6 +347,21 @@ export function PartnerList({
                 </div>
               )}
 
+              {/* UTM Source */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">UTM Source</label>
+                <select
+                  value={utmSourceFilter}
+                  onChange={(e) => { setUtmSourceFilter(e.target.value); setCurrentPage(1) }}
+                  className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                >
+                  <option value="">All Sources</option>
+                  {uniqueUtmSources.map(source => (
+                    <option key={source} value={source}>{source}</option>
+                  ))}
+                </select>
+              </div>
+
               {/* Active Status (when ChallanPay — stage is primary, this is secondary) */}
               {isChallanPay && (
                 <div>
@@ -284,6 +385,7 @@ export function PartnerList({
                   setStatusFilter('')
                   setStateFilter('')
                   setAssignedToFilter('')
+                  setUtmSourceFilter('')
                   setActiveStatusFilter('')
                   setCurrentPage(1)
                 }}
@@ -346,7 +448,7 @@ export function PartnerList({
                 >
                   <div>
                     <p className="font-medium text-slate-900 dark:text-white">{partner.companyName}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{partner.firstName} {partner.lastName}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{partner.utmSource || '—'}</p>
                   </div>
                 </td>
                 <td
@@ -477,7 +579,7 @@ export function PartnerList({
 
                 <div className="space-y-2 text-xs sm:text-sm">
                   <div className="text-slate-600 dark:text-slate-400">
-                    <span className="font-medium text-slate-900 dark:text-white">{partner.firstName} {partner.lastName}</span>
+                    <span className="font-medium text-slate-900 dark:text-white">{partner.utmSource || '—'}</span>
                   </div>
                   <div className="text-slate-600 dark:text-slate-400">
                     {partner.mobile}
