@@ -36,6 +36,8 @@
       "bankAccountNumber": "1234567890123456",
       "bankName": "HDFC Bank",
       "partnerType": "challanPay",
+      "stage": "training",
+      "assignedTo": "Arun Kumar",
       "outlets": 4,
       "linkedOutlets": [
         {
@@ -95,28 +97,36 @@
           "openedDate": "2024-01-05"
         }
       ],
+      "registeredVisitorsCount": 342,
       "registeredVisitors": [
-        { "id": "vis-001", "visitorId": "1212131221", "visitDate": "2026-01-15T10:30:00Z", "visitors": 3 },
-        { "id": "vis-002", "visitorId": "3847291056", "visitDate": "2026-01-20T14:15:00Z", "visitors": 1 },
-        { "id": "vis-003", "visitorId": "7593014682", "visitDate": "2026-02-05T09:45:00Z", "visitors": 5 },
-        { "id": "vis-004", "visitorId": "4028163975", "visitDate": "2026-02-18T16:00:00Z", "visitors": 2 },
-        { "id": "vis-005", "visitorId": "6184729310", "visitDate": "2026-03-01T11:20:00Z", "visitors": 4 },
-        { "id": "vis-006", "visitorId": "9371504826", "visitDate": "2026-03-03T13:50:00Z", "visitors": 1 }
+        { "id": "vis-001", "visitorId": "VIS232122", "visitorToken": "www.challanpay.in/VIS232122/", "visitDate": "2026-01-15T10:30:00Z", "visitors": 3 },
+        { "id": "vis-002", "visitorId": "VIS384729", "visitorToken": "www.challanpay.in/VIS384729/", "visitDate": "2026-01-20T14:15:00Z", "visitors": 1 },
+        { "id": "vis-003", "visitorId": "VIS759301", "visitorToken": "www.challanpay.in/VIS759301/", "visitDate": "2026-02-05T09:45:00Z", "visitors": 5 },
+        { "id": "vis-004", "visitorId": "VIS402816", "visitorToken": "www.challanpay.in/VIS402816/", "visitDate": "2026-02-18T16:00:00Z", "visitors": 2 },
+        { "id": "vis-005", "visitorId": "VIS618472", "visitorToken": "www.challanpay.in/VIS618472/", "visitDate": "2026-03-01T11:20:00Z", "visitors": 4 },
+        { "id": "vis-006", "visitorId": "VIS937150", "visitorToken": "www.challanpay.in/VIS937150/", "visitDate": "2026-03-03T13:50:00Z", "visitors": 1 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-001", "visitorId": "7482019365", "visitorName": "Ramesh Kumar", "pendingChallans": 3, "pendingChallansAmount": 4500, "contactNumber": "9876543210" },
-        { "id": "rvd-002", "visitorId": "5130847629", "visitorName": "Suresh Patel", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9812345678" },
-        { "id": "rvd-003", "visitorId": "2916384057", "visitorName": "Amit Sharma", "pendingChallans": 5, "pendingChallansAmount": 7200, "contactNumber": "9988776655" },
-        { "id": "rvd-004", "visitorId": "6043127895", "visitorName": "Vikas Singh", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9871234560" },
-        { "id": "rvd-005", "visitorId": "8375920146", "visitorName": "Deepak Verma", "pendingChallans": 2, "pendingChallansAmount": 3000, "contactNumber": "9654321098" },
-        { "id": "rvd-006", "visitorId": "1094563728", "visitorName": "Manoj Tiwari", "pendingChallans": 4, "pendingChallansAmount": 6800, "contactNumber": "9765432109" },
-        { "id": "rvd-007", "visitorId": "4728061593", "visitorName": "Rajesh Gupta", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9543210987" }
+        { "id": "rvd-001", "visitorId": "RV748201312", "visitorName": "Ramesh Kumar", "pendingChallans": 3, "pendingChallansAmount": 4500, "contactNumber": "9876543210" },
+        { "id": "rvd-002", "visitorId": "RV513084729", "visitorName": "Suresh Patel", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9812345678" },
+        { "id": "rvd-003", "visitorId": "RV291638405", "visitorName": "Amit Sharma", "pendingChallans": 5, "pendingChallansAmount": 7200, "contactNumber": "9988776655" },
+        { "id": "rvd-004", "visitorId": "RV604312187", "visitorName": "Vikas Singh", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9871234560" },
+        { "id": "rvd-005", "visitorId": "RV837592064", "visitorName": "Deepak Verma", "pendingChallans": 2, "pendingChallansAmount": 3000, "contactNumber": "9654321098" },
+        { "id": "rvd-006", "visitorId": "RV109456823", "visitorName": "Manoj Tiwari", "pendingChallans": 4, "pendingChallansAmount": 6800, "contactNumber": "9765432109" },
+        { "id": "rvd-007", "visitorId": "RV472806951", "visitorName": "Rajesh Gupta", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9543210987" }
       ],
       "outletQRs": [
         { "id": "qr-001", "qrId": "QR - 3e93c4bc72", "outletId": "outlet-001", "outletName": "FleetPro Karol Bagh", "totalScans": 342, "status": "active", "createdDate": "2023-05-22" },
         { "id": "qr-002", "qrId": "QR - a7f1d8e504", "outletId": "outlet-002", "outletName": "FleetPro Dwarka", "totalScans": 218, "status": "active", "createdDate": "2023-07-12" },
         { "id": "qr-003", "qrId": "QR - 5b2c9f1a38", "outletId": "outlet-003", "outletName": "FleetPro Noida", "totalScans": 156, "status": "active", "createdDate": "2023-09-17" },
         { "id": "qr-004", "qrId": "QR - d4e6b7c091", "outletId": "outlet-004", "outletName": "FleetPro Ghaziabad", "totalScans": 89, "status": "inactive", "createdDate": "2024-01-07" }
+      ],
+      "followUps": [
+        { "id": "fu-001", "activityType": "onboarding", "notes": "Completed partner onboarding for Gurugram region. Documents verified and account activated.", "outcome": "converted", "createdAt": "2026-03-10T10:30:00Z", "createdBy": "Rohit Sharma" },
+        { "id": "fu-002", "activityType": "activation", "notes": "Activated 3 outlets in Delhi NCR. QR codes deployed and tested successfully.", "outcome": "converted", "createdAt": "2026-03-05T14:00:00Z", "createdBy": "Amit Verma" },
+        { "id": "fu-003", "activityType": "training", "notes": "Conducted staff training at Karol Bagh outlet. Covered challan processing and customer handling.", "outcome": "interested", "createdAt": "2026-02-28T09:15:00Z", "createdBy": "Rohit Sharma" },
+        { "id": "fu-004", "activityType": "mobilisation", "notes": "Mobilised field team for Dwarka and Noida outlets. Partner confirmed readiness.", "outcome": "interested", "createdAt": "2026-02-20T16:45:00Z", "createdBy": "Priya Singh" },
+        { "id": "fu-005", "activityType": "training", "notes": "Refresher training for outlet staff on updated challan process and new QR flow.", "outcome": "converted", "createdAt": "2026-02-15T11:00:00Z", "createdBy": "Amit Verma" }
       ],
       "vehicles": 126,
       "linkedVehicles": [
@@ -187,7 +197,9 @@
           "mobile": "+919111111111",
           "status": "active",
           "dateSubscribed": "2023-06-01",
-          "incidentCount": 12
+          "incidentCount": 12,
+          "submittedChallans": 8,
+          "submittedAmount": 12400
         },
         {
           "id": "LWD-1160524",
@@ -196,7 +208,9 @@
           "mobile": "+919111111112",
           "status": "active",
           "dateSubscribed": "2023-07-10",
-          "incidentCount": 8
+          "incidentCount": 8,
+          "submittedChallans": 5,
+          "submittedAmount": 7500
         },
         {
           "id": "LWD-1160525",
@@ -205,7 +219,9 @@
           "mobile": "+919111111113",
           "status": "paused",
           "dateSubscribed": "2023-08-20",
-          "incidentCount": 3
+          "incidentCount": 3,
+          "submittedChallans": 2,
+          "submittedAmount": 3200
         }
       ],
       "earnings": 45000,
@@ -282,6 +298,8 @@
       "bankAccountNumber": "9876543210123456",
       "bankName": "ICICI Bank",
       "partnerType": "challanPay",
+      "stage": "activation",
+      "assignedTo": "Neha Patel",
       "outlets": 2,
       "linkedOutlets": [
         {
@@ -313,22 +331,28 @@
           "openedDate": "2023-11-15"
         }
       ],
+      "registeredVisitorsCount": 218,
       "registeredVisitors": [
-        { "id": "vis-007", "visitorId": "2058374916", "visitDate": "2026-02-01T10:00:00Z", "visitors": 2 },
-        { "id": "vis-008", "visitorId": "8463019275", "visitDate": "2026-02-10T15:30:00Z", "visitors": 6 },
-        { "id": "vis-009", "visitorId": "5129748063", "visitDate": "2026-02-22T11:45:00Z", "visitors": 1 },
-        { "id": "vis-010", "visitorId": "3706185294", "visitDate": "2026-03-04T09:15:00Z", "visitors": 3 }
+        { "id": "vis-007", "visitorId": "VIS205837", "visitorToken": "www.challanpay.in/VIS205837/", "visitDate": "2026-02-01T10:00:00Z", "visitors": 2 },
+        { "id": "vis-008", "visitorId": "VIS846301", "visitorToken": "www.challanpay.in/VIS846301/", "visitDate": "2026-02-10T15:30:00Z", "visitors": 6 },
+        { "id": "vis-009", "visitorId": "VIS512974", "visitorToken": "www.challanpay.in/VIS512974/", "visitDate": "2026-02-22T11:45:00Z", "visitors": 1 },
+        { "id": "vis-010", "visitorId": "VIS370618", "visitorToken": "www.challanpay.in/VIS370618/", "visitDate": "2026-03-04T09:15:00Z", "visitors": 3 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-008", "visitorId": "3851209764", "visitorName": "Anil Mehta", "pendingChallans": 2, "pendingChallansAmount": 3200, "contactNumber": "9876012345" },
-        { "id": "rvd-009", "visitorId": "7294630518", "visitorName": "Sanjay Reddy", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9812098765" },
-        { "id": "rvd-010", "visitorId": "1057824396", "visitorName": "Pradeep Joshi", "pendingChallans": 6, "pendingChallansAmount": 9100, "contactNumber": "9945678901" },
-        { "id": "rvd-011", "visitorId": "6481032975", "visitorName": "Karan Malhotra", "pendingChallans": 1, "pendingChallansAmount": 1800, "contactNumber": "9734561230" },
-        { "id": "rvd-012", "visitorId": "9203571648", "visitorName": "Nitin Agarwal", "pendingChallans": 3, "pendingChallansAmount": 4200, "contactNumber": "9623456789" }
+        { "id": "rvd-008", "visitorId": "RV385120946", "visitorName": "Anil Mehta", "pendingChallans": 2, "pendingChallansAmount": 3200, "contactNumber": "9876012345" },
+        { "id": "rvd-009", "visitorId": "RV729463508", "visitorName": "Sanjay Reddy", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9812098765" },
+        { "id": "rvd-010", "visitorId": "RV105782631", "visitorName": "Pradeep Joshi", "pendingChallans": 6, "pendingChallansAmount": 9100, "contactNumber": "9945678901" },
+        { "id": "rvd-011", "visitorId": "RV648103274", "visitorName": "Karan Malhotra", "pendingChallans": 1, "pendingChallansAmount": 1800, "contactNumber": "9734561230" },
+        { "id": "rvd-012", "visitorId": "RV920357148", "visitorName": "Nitin Agarwal", "pendingChallans": 3, "pendingChallansAmount": 4200, "contactNumber": "9623456789" }
       ],
       "outletQRs": [
         { "id": "qr-005", "qrId": "QR - 8c12ef4a67", "outletId": "outlet-005", "outletName": "TransportNet Andheri", "totalScans": 485, "status": "active", "createdDate": "2023-08-30" },
         { "id": "qr-006", "qrId": "QR - f0a3b59d21", "outletId": "outlet-006", "outletName": "TransportNet Thane", "totalScans": 210, "status": "active", "createdDate": "2023-11-17" }
+      ],
+      "followUps": [
+        { "id": "fu-006", "activityType": "onboarding", "notes": "Onboarding process initiated for Mumbai partner. KYC documents collected and verified.", "outcome": "callback", "createdAt": "2026-03-08T11:30:00Z", "createdBy": "Sanjay Mehta" },
+        { "id": "fu-007", "activityType": "activation", "notes": "Activated Andheri outlet. High footfall observed, suggested adding second QR station.", "outcome": "interested", "createdAt": "2026-02-25T10:00:00Z", "createdBy": "Sanjay Mehta" },
+        { "id": "fu-008", "activityType": "mobilisation", "notes": "Mobilised support team for Thane expansion. Resources allocated for next quarter.", "outcome": "no_response", "createdAt": "2026-02-10T09:00:00Z", "createdBy": "Priya Singh" }
       ],
       "vehicles": 84,
       "linkedVehicles": [
@@ -385,7 +409,9 @@
           "mobile": "+919222222221",
           "status": "active",
           "dateSubscribed": "2023-09-05",
-          "incidentCount": 18
+          "incidentCount": 18,
+          "submittedChallans": 14,
+          "submittedAmount": 21000
         },
         {
           "id": "LWD-1160527",
@@ -394,7 +420,9 @@
           "mobile": "+919222222222",
           "status": "active",
           "dateSubscribed": "2023-10-12",
-          "incidentCount": 7
+          "incidentCount": 7,
+          "submittedChallans": 4,
+          "submittedAmount": 6200
         }
       ],
       "earnings": 32500,
@@ -493,7 +521,9 @@
           "mobile": "+919333333331",
           "status": "active",
           "dateSubscribed": "2023-11-20",
-          "incidentCount": 5
+          "incidentCount": 5,
+          "submittedChallans": 3,
+          "submittedAmount": 4800
         }
       ],
       "earnings": 12000,
@@ -565,7 +595,9 @@
           "mobile": "+919444444441",
           "status": "inactive",
           "dateSubscribed": "2023-03-20",
-          "incidentCount": 2
+          "incidentCount": 2,
+          "submittedChallans": 1,
+          "submittedAmount": 1500
         }
       ],
       "earnings": 5000,
@@ -623,6 +655,8 @@
       "bankAccountNumber": "3333444455556666",
       "bankName": "HDFC Bank",
       "partnerType": "challanPay",
+      "stage": "onboarding",
+      "assignedTo": null,
       "outlets": 1,
       "linkedOutlets": [
         {
@@ -640,18 +674,22 @@
           "openedDate": "2024-01-10"
         }
       ],
+      "registeredVisitorsCount": 127,
       "registeredVisitors": [
-        { "id": "vis-011", "visitorId": "6947201358", "visitDate": "2026-03-01T10:30:00Z", "visitors": 2 },
-        { "id": "vis-012", "visitorId": "1835062749", "visitDate": "2026-03-05T14:00:00Z", "visitors": 4 }
+        { "id": "vis-011", "visitorId": "VIS694720", "visitorToken": "www.challanpay.in/VIS694720/", "visitDate": "2026-03-01T10:30:00Z", "visitors": 2 },
+        { "id": "vis-012", "visitorId": "VIS183506", "visitorToken": "www.challanpay.in/VIS183506/", "visitDate": "2026-03-05T14:00:00Z", "visitors": 4 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-013", "visitorId": "4520891376", "visitorName": "Harish Nair", "pendingChallans": 2, "pendingChallansAmount": 2800, "contactNumber": "9876543201" },
-        { "id": "rvd-014", "visitorId": "8136094527", "visitorName": "Vivek Pandey", "pendingChallans": 4, "pendingChallansAmount": 5600, "contactNumber": "9812345097" },
-        { "id": "rvd-015", "visitorId": "6709418253", "visitorName": "Ajay Chauhan", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670123" },
-        { "id": "rvd-016", "visitorId": "2384706159", "visitorName": "Rohit Saxena", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9723456780" }
+        { "id": "rvd-013", "visitorId": "RV452089173", "visitorName": "Harish Nair", "pendingChallans": 2, "pendingChallansAmount": 2800, "contactNumber": "9876543201" },
+        { "id": "rvd-014", "visitorId": "RV813609425", "visitorName": "Vivek Pandey", "pendingChallans": 4, "pendingChallansAmount": 5600, "contactNumber": "9812345097" },
+        { "id": "rvd-015", "visitorId": "RV670941382", "visitorName": "Ajay Chauhan", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670123" },
+        { "id": "rvd-016", "visitorId": "RV238470596", "visitorName": "Rohit Saxena", "pendingChallans": 1, "pendingChallansAmount": 1500, "contactNumber": "9723456780" }
       ],
       "outletQRs": [
         { "id": "qr-007", "qrId": "QR - 1d7e0c3b95", "outletId": "outlet-007", "outletName": "Commerce Hub NH-8", "totalScans": 127, "status": "active", "createdDate": "2024-01-12" }
+      ],
+      "followUps": [
+        { "id": "fu-009", "activityType": "onboarding", "notes": "Onboarding kickoff for Gurugram partner. Discussed setup requirements and timelines.", "outcome": "interested", "createdAt": "2026-03-02T15:00:00Z", "createdBy": "Amit Verma" }
       ],
       "vehicles": 42,
       "linkedVehicles": [
@@ -694,7 +732,9 @@
           "mobile": "+919555555551",
           "status": "active",
           "dateSubscribed": "2024-01-15",
-          "incidentCount": 1
+          "incidentCount": 1,
+          "submittedChallans": 1,
+          "submittedAmount": 1200
         },
         {
           "id": "LWD-1160531",
@@ -703,7 +743,9 @@
           "mobile": "+919555555552",
           "status": "active",
           "dateSubscribed": "2024-01-20",
-          "incidentCount": 4
+          "incidentCount": 4,
+          "submittedChallans": 3,
+          "submittedAmount": 4500
         }
       ],
       "earnings": 8500,
@@ -753,20 +795,29 @@
       "bankAccountNumber": "7777888899990000",
       "bankName": "Yes Bank",
       "partnerType": "challanPay",
+      "stage": "training",
+      "assignedTo": "Rajesh Verma",
       "outlets": 6,
+      "registeredVisitorsCount": 485,
       "registeredVisitors": [
-        { "id": "vis-013", "visitorId": "4291657083", "visitDate": "2026-01-10T09:00:00Z", "visitors": 7 },
-        { "id": "vis-014", "visitorId": "7530184926", "visitDate": "2026-01-15T12:30:00Z", "visitors": 1 },
-        { "id": "vis-015", "visitorId": "0862493175", "visitDate": "2026-01-20T16:45:00Z", "visitors": 3 },
-        { "id": "vis-016", "visitorId": "3148072659", "visitDate": "2026-02-05T10:15:00Z", "visitors": 2 },
-        { "id": "vis-017", "visitorId": "5970316482", "visitDate": "2026-02-20T14:30:00Z", "visitors": 5 }
+        { "id": "vis-013", "visitorId": "VIS429165", "visitorToken": "www.challanpay.in/VIS429165/", "visitDate": "2026-01-10T09:00:00Z", "visitors": 7 },
+        { "id": "vis-014", "visitorId": "VIS753018", "visitorToken": "www.challanpay.in/VIS753018/", "visitDate": "2026-01-15T12:30:00Z", "visitors": 1 },
+        { "id": "vis-015", "visitorId": "VIS086249", "visitorToken": "www.challanpay.in/VIS086249/", "visitDate": "2026-01-20T16:45:00Z", "visitors": 3 },
+        { "id": "vis-016", "visitorId": "VIS314807", "visitorToken": "www.challanpay.in/VIS314807/", "visitDate": "2026-02-05T10:15:00Z", "visitors": 2 },
+        { "id": "vis-017", "visitorId": "VIS597031", "visitorToken": "www.challanpay.in/VIS597031/", "visitDate": "2026-02-20T14:30:00Z", "visitors": 5 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-017", "visitorId": "7503184926", "visitorName": "Sunil Yadav", "pendingChallans": 3, "pendingChallansAmount": 5100, "contactNumber": "9865432107" },
-        { "id": "rvd-018", "visitorId": "2148306597", "visitorName": "Ashok Dubey", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9754321098" },
-        { "id": "rvd-019", "visitorId": "9672401835", "visitorName": "Pawan Mishra", "pendingChallans": 2, "pendingChallansAmount": 3400, "contactNumber": "9643210987" }
+        { "id": "rvd-017", "visitorId": "RV750318642", "visitorName": "Sunil Yadav", "pendingChallans": 3, "pendingChallansAmount": 5100, "contactNumber": "9865432107" },
+        { "id": "rvd-018", "visitorId": "RV214830957", "visitorName": "Ashok Dubey", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9754321098" },
+        { "id": "rvd-019", "visitorId": "RV967240183", "visitorName": "Pawan Mishra", "pendingChallans": 2, "pendingChallansAmount": 3400, "contactNumber": "9643210987" },
+        { "id": "rvd-024", "visitorId": "RV481295730", "visitorName": "Rajesh Nair", "pendingChallans": 1, "pendingChallansAmount": 1800, "contactNumber": "9532109876" },
+        { "id": "rvd-025", "visitorId": "RV603172849", "visitorName": "Kiran Prasad", "pendingChallans": 4, "pendingChallansAmount": 7200, "contactNumber": "9421098765" }
       ],
       "outletQRs": [],
+      "followUps": [
+        { "id": "fu-010", "activityType": "activation", "notes": "Activated partner account for Hyderabad. 2 outlets configured and QR codes generated.", "outcome": "interested", "createdAt": "2026-03-06T10:00:00Z", "createdBy": "Rohit Sharma" },
+        { "id": "fu-011", "activityType": "training", "notes": "Conducted training session for outlet staff. Covered onboarding checklist and challan workflow.", "outcome": "callback", "createdAt": "2026-03-01T14:30:00Z", "createdBy": "Priya Singh" }
+      ],
       "vehicles": 210,
       "linkedVehicles": [
         {
@@ -822,7 +873,9 @@
           "mobile": "+919666666661",
           "status": "active",
           "dateSubscribed": "2023-10-05",
-          "incidentCount": 9
+          "incidentCount": 9,
+          "submittedChallans": 7,
+          "submittedAmount": 10500
         },
         {
           "id": "LWD-1160533",
@@ -831,7 +884,9 @@
           "mobile": "+919666666662",
           "status": "active",
           "dateSubscribed": "2023-11-10",
-          "incidentCount": 6
+          "incidentCount": 6,
+          "submittedChallans": 4,
+          "submittedAmount": 6800
         },
         {
           "id": "LWD-1160534",
@@ -840,7 +895,9 @@
           "mobile": "+919666666663",
           "status": "inactive",
           "dateSubscribed": "2023-12-01",
-          "incidentCount": 0
+          "incidentCount": 0,
+          "submittedChallans": 0,
+          "submittedAmount": 0
         }
       ],
       "earnings": 38000,
@@ -964,7 +1021,9 @@
           "mobile": "+919777777771",
           "status": "active",
           "dateSubscribed": "2023-12-10",
-          "incidentCount": 3
+          "incidentCount": 3,
+          "submittedChallans": 2,
+          "submittedAmount": 3600
         }
       ],
       "earnings": 6000,
@@ -1001,19 +1060,26 @@
       "bankAccountNumber": "8888999900001111",
       "bankName": "SBI",
       "partnerType": "challanPay",
+      "stage": "activation",
+      "assignedTo": "Kavita Sharma",
       "outlets": 3,
+      "registeredVisitorsCount": 156,
       "registeredVisitors": [
-        { "id": "vis-018", "visitorId": "8214630597", "visitDate": "2026-01-15T11:00:00Z", "visitors": 2 },
-        { "id": "vis-019", "visitorId": "2679051348", "visitDate": "2026-02-01T13:20:00Z", "visitors": 4 },
-        { "id": "vis-020", "visitorId": "4053892716", "visitDate": "2026-02-15T10:45:00Z", "visitors": 1 }
+        { "id": "vis-018", "visitorId": "VIS821463", "visitorToken": "www.challanpay.in/VIS821463/", "visitDate": "2026-01-15T11:00:00Z", "visitors": 2 },
+        { "id": "vis-019", "visitorId": "VIS267905", "visitorToken": "www.challanpay.in/VIS267905/", "visitDate": "2026-02-01T13:20:00Z", "visitors": 4 },
+        { "id": "vis-020", "visitorId": "VIS405389", "visitorToken": "www.challanpay.in/VIS405389/", "visitDate": "2026-02-15T10:45:00Z", "visitors": 1 }
       ],
       "registeredVisitorDetails": [
-        { "id": "rvd-020", "visitorId": "5081347629", "visitorName": "Mukesh Bhatt", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9876501234" },
-        { "id": "rvd-021", "visitorId": "3729604185", "visitorName": "Dinesh Rawat", "pendingChallans": 5, "pendingChallansAmount": 7500, "contactNumber": "9812340567" },
-        { "id": "rvd-022", "visitorId": "8460152937", "visitorName": "Girish Kapoor", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670012" },
-        { "id": "rvd-023", "visitorId": "1593728046", "visitorName": "Hemant Thakur", "pendingChallans": 2, "pendingChallansAmount": 3600, "contactNumber": "9734560189" }
+        { "id": "rvd-020", "visitorId": "RV508134267", "visitorName": "Mukesh Bhatt", "pendingChallans": 1, "pendingChallansAmount": 2000, "contactNumber": "9876501234" },
+        { "id": "rvd-021", "visitorId": "RV372960514", "visitorName": "Dinesh Rawat", "pendingChallans": 5, "pendingChallansAmount": 7500, "contactNumber": "9812340567" },
+        { "id": "rvd-022", "visitorId": "RV846015398", "visitorName": "Girish Kapoor", "pendingChallans": 0, "pendingChallansAmount": 0, "contactNumber": "9945670012" },
+        { "id": "rvd-023", "visitorId": "RV159372046", "visitorName": "Hemant Thakur", "pendingChallans": 2, "pendingChallansAmount": 3600, "contactNumber": "9734560189" }
       ],
       "outletQRs": [],
+      "followUps": [
+        { "id": "fu-012", "activityType": "mobilisation", "notes": "Mobilised field team for Kolkata region. Reviewed infrastructure and staff readiness.", "outcome": "converted", "createdAt": "2026-02-20T11:00:00Z", "createdBy": "Amit Verma" },
+        { "id": "fu-013", "activityType": "activation", "notes": "Activation completed for Kolkata partner. Partner reported smooth operations.", "outcome": "interested", "createdAt": "2026-03-09T16:00:00Z", "createdBy": "Sanjay Mehta" }
+      ],
       "vehicles": 97,
       "linkedVehicles": [
         {
@@ -1069,7 +1135,9 @@
           "mobile": "+919888888881",
           "status": "active",
           "dateSubscribed": "2023-11-01",
-          "incidentCount": 11
+          "incidentCount": 11,
+          "submittedChallans": 9,
+          "submittedAmount": 13500
         },
         {
           "id": "LWD-1160537",
@@ -1078,7 +1146,9 @@
           "mobile": "+919888888882",
           "status": "paused",
           "dateSubscribed": "2023-11-15",
-          "incidentCount": 2
+          "incidentCount": 2,
+          "submittedChallans": 1,
+          "submittedAmount": 1800
         }
       ],
       "earnings": 28500,

@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react'
-import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3, RefreshCw, Loader2 } from 'lucide-react'
+import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3, RefreshCw, Loader2, Shield } from 'lucide-react'
 import type { Subscriber, Subscription, User as UserType, Vehicle, SubscriberReport } from '@/../product/sections/subscribers/types'
 import { AddSubscriberModal } from './AddSubscriberModal'
 
-type TabType = 'details' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'team' | 'api-catalogue' | 'report'
+type TabType = 'details' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'team' | 'api-catalogue' | 'report' | 'permissions'
 
 interface SubscriberDetailProps {
   subscriber: Subscriber
@@ -94,6 +94,71 @@ export function SubscriberDetail({
   const [uploadDocCategory, setUploadDocCategory] = useState('')
   const [uploadDocFile, setUploadDocFile] = useState<File | null>(null)
 
+  // Check New Challan state
+  const [showCheckChallanModal, setShowCheckChallanModal] = useState(false)
+  const [checkChallanVehicle, setCheckChallanVehicle] = useState('')
+  const [checkChallanState, setCheckChallanState] = useState<'input' | 'loading' | 'results'>('input')
+  const [checkChallanResults, setCheckChallanResults] = useState<any[]>([])
+  const [checkChallanResultTab, setCheckChallanResultTab] = useState<'pending' | 'paid'>('pending')
+  const [incidentReportSearch, setIncidentReportSearch] = useState('')
+
+  // Permissions state
+  const [permissions, setPermissions] = useState<Record<string, boolean>>({
+    'view-challans': true,
+    'manage-challans': true,
+    'view-incidents': true,
+    'manage-incidents': false,
+    'view-vehicles': true,
+    'manage-vehicles': true,
+    'view-documents': true,
+    'upload-documents': true,
+    'delete-documents': false,
+    'view-reports': true,
+    'download-reports': true,
+    'view-payments': true,
+    'make-payments': false,
+    'manage-team': false,
+    'api-access': false,
+  })
+
+  const [activePermissionCategory, setActivePermissionCategory] = useState('challans')
+
+  const togglePermission = (key: string) => {
+    setPermissions(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const permissionCategories = [
+    { id: 'challans', label: 'Challans', permissions: [
+      { key: 'view-challans', label: 'View Challans', description: 'Can view challan details and history' },
+      { key: 'manage-challans', label: 'Manage Challans', description: 'Can update challan status and assignments' },
+    ]},
+    { id: 'incidents', label: 'Incidents', permissions: [
+      { key: 'view-incidents', label: 'View Incidents', description: 'Can view incident details and timeline' },
+      { key: 'manage-incidents', label: 'Manage Incidents', description: 'Can create, update, and close incidents' },
+    ]},
+    { id: 'vehicles', label: 'Vehicles', permissions: [
+      { key: 'view-vehicles', label: 'View Vehicles', description: 'Can view vehicle list and details' },
+      { key: 'manage-vehicles', label: 'Manage Vehicles', description: 'Can add, edit, and deactivate vehicles' },
+    ]},
+    { id: 'documents', label: 'Documents', permissions: [
+      { key: 'view-documents', label: 'View Documents', description: 'Can view and download documents' },
+      { key: 'upload-documents', label: 'Upload Documents', description: 'Can upload new documents' },
+      { key: 'delete-documents', label: 'Delete Documents', description: 'Can delete uploaded documents' },
+    ]},
+    { id: 'reports', label: 'Reports', permissions: [
+      { key: 'view-reports', label: 'View Reports', description: 'Can view report listings' },
+      { key: 'download-reports', label: 'Download Reports', description: 'Can download generated reports' },
+    ]},
+    { id: 'payments', label: 'Payments', permissions: [
+      { key: 'view-payments', label: 'View Payments', description: 'Can view payment history and invoices' },
+      { key: 'make-payments', label: 'Make Payments', description: 'Can initiate and process payments' },
+    ]},
+    { id: 'other', label: 'Other', permissions: [
+      { key: 'manage-team', label: 'Manage Team', description: 'Can add and remove team members' },
+      { key: 'api-access', label: 'API Access', description: 'Can access and configure API catalogue' },
+    ]},
+  ]
+
   // API Catalogue state
   const defaultApis = [
     { id: 'challan-api', name: 'Challan API', enabled: false, credits: 0, creditPerHit: 0, usedCredits: 0, transactions: [] as { id: string; description: string; creditsUsed: number; date: string }[] },
@@ -158,12 +223,72 @@ export function SubscriberDetail({
       .sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime())
   }, [reports])
 
+  const filteredIncidentReports = useMemo(() => {
+    if (!incidentReportSearch) return incidentReports
+    const q = incidentReportSearch.toLowerCase()
+    return incidentReports.filter(r =>
+      (r.incidentId && r.incidentId.toLowerCase().includes(q)) ||
+      (r.incidentVehicle && r.incidentVehicle.toLowerCase().includes(q)) ||
+      (r.reportType && r.reportType.toLowerCase().includes(q))
+    )
+  }, [incidentReports, incidentReportSearch])
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     })
+  }
+
+  const generateSampleChallans = (vehicleNumber: string) => {
+    const violations = [
+      'Overspeeding', 'Red Light Violation', 'No Parking', 'Without Helmet',
+      'Driving Without License', 'No Seatbelt', 'Using Mobile While Driving',
+      'Wrong Side Driving', 'Overloading', 'Without Insurance', 'Expired PUC',
+      'Lane Violation', 'Disobeying Traffic Signal'
+    ]
+    const locations = [
+      'NH-48, Gurugram', 'MG Road, Pune', 'Ring Road, Delhi', 'JVLR, Mumbai',
+      'Hosur Road, Bangalore', 'Anna Salai, Chennai', 'SG Highway, Ahmedabad',
+      'Outer Ring Road, Hyderabad', 'Lal Darwaja, Ahmedabad', 'Marine Drive, Mumbai'
+    ]
+    const count = 3 + Math.floor(Math.random() * 5)
+    return Array.from({ length: count }, (_, i) => {
+      const isPending = Math.random() > 0.4
+      const amount = [500, 1000, 1500, 2000, 2500, 5000, 10000][Math.floor(Math.random() * 7)]
+      const daysAgo = Math.floor(Math.random() * 365)
+      const date = new Date()
+      date.setDate(date.getDate() - daysAgo)
+      return {
+        id: `CH${String(Math.floor(Math.random() * 9000000000) + 1000000000)}`,
+        vehicleNumber,
+        violation: violations[Math.floor(Math.random() * violations.length)],
+        amount,
+        status: isPending ? 'pending' : 'resolved',
+        challanType: Math.random() > 0.5 ? 'online' : 'court',
+        date: date.toISOString(),
+        location: locations[Math.floor(Math.random() * locations.length)]
+      }
+    })
+  }
+
+  const handleCheckChallan = () => {
+    setCheckChallanState('loading')
+    setTimeout(() => {
+      const results = generateSampleChallans(checkChallanVehicle)
+      setCheckChallanResults(results)
+      setCheckChallanResultTab('pending')
+      setCheckChallanState('results')
+    }, 1500)
+  }
+
+  const resetCheckChallanModal = () => {
+    setShowCheckChallanModal(false)
+    setCheckChallanVehicle('')
+    setCheckChallanState('input')
+    setCheckChallanResults([])
+    setCheckChallanResultTab('pending')
   }
 
   const getTabIcon = (tab: TabType) => {
@@ -175,7 +300,8 @@ export function SubscriberDetail({
       vehicles: <Truck className="w-4 h-4" />,
       team: <Users className="w-4 h-4" />,
       'api-catalogue': <BookOpen className="w-4 h-4" />,
-      report: <BarChart3 className="w-4 h-4" />
+      report: <BarChart3 className="w-4 h-4" />,
+      permissions: <Shield className="w-4 h-4" />
     }
     return icons[tab]
   }
@@ -215,7 +341,7 @@ export function SubscriberDetail({
         {/* Tabs */}
         <div className="mb-6 -mx-6 lg:-mx-8 px-6 lg:px-8 overflow-x-auto">
           <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit min-w-full">
-            {(['details', 'vehicles', 'incidents', 'challans', 'documents', 'team', 'api-catalogue', 'report'] as TabType[]).map((tab) => (
+            {(['details', 'vehicles', 'incidents', 'challans', 'documents', 'team', 'api-catalogue', 'report', 'permissions'] as TabType[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -226,7 +352,7 @@ export function SubscriberDetail({
                 }`}
               >
                 {getTabIcon(tab)}
-                {tab === 'api-catalogue' ? 'API Catalogue' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'api-catalogue' ? 'API Catalogue' : tab === 'permissions' ? 'Permissions' : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>
@@ -356,7 +482,16 @@ export function SubscriberDetail({
           {/* Challans Tab */}
           {activeTab === 'challans' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Linked Challans ({challans.length})</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Linked Challans ({challans.length})</h2>
+                <button
+                  onClick={() => setShowCheckChallanModal(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  <Search className="w-4 h-4" />
+                  Check New Challan
+                </button>
+              </div>
               {challans.length === 0 ? (
                 <div className="text-center py-12">
                   <AlertCircle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
@@ -955,8 +1090,6 @@ export function SubscriberDetail({
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Report Type</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Format</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Generated</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Size</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                           <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Action</th>
                         </tr>
                       </thead>
@@ -967,8 +1100,6 @@ export function SubscriberDetail({
                             <td className="px-4 py-3"><ReportTypeBadge type={report.reportType} /></td>
                             <td className="px-4 py-3"><FormatBadge format={report.format} /></td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(report.generatedAt)}</td>
-                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{report.fileSize ? formatFileSize(report.fileSize) : '—'}</td>
-                            <td className="px-4 py-3"><ReportStatusBadge status={report.status} /></td>
                             <td className="px-4 py-3 text-right"><ReportAction report={report} onDownload={onDownloadReport} onRetry={onRetryReport} /></td>
                           </tr>
                         ))}
@@ -983,11 +1114,36 @@ export function SubscriberDetail({
 
               {/* Incident Reports */}
               <div>
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Incident Reports</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Incident Reports</h2>
+                  {incidentReports.length > 0 && (
+                    <div className="relative w-64">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder="Search by ID, vehicle, type..."
+                        value={incidentReportSearch}
+                        onChange={e => setIncidentReportSearch(e.target.value)}
+                        className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      />
+                    </div>
+                  )}
+                </div>
                 {incidentReports.length === 0 ? (
                   <div className="text-center py-10">
                     <BarChart3 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
                     <p className="text-sm text-slate-500 dark:text-slate-400">No incident reports generated yet</p>
+                  </div>
+                ) : filteredIncidentReports.length === 0 ? (
+                  <div className="text-center py-10">
+                    <Search className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500 dark:text-slate-400">No reports match your search</p>
+                    <button
+                      onClick={() => setIncidentReportSearch('')}
+                      className="mt-2 text-sm text-cyan-600 dark:text-cyan-400 hover:underline"
+                    >
+                      Clear search
+                    </button>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
@@ -1000,12 +1156,11 @@ export function SubscriberDetail({
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Format</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Generated</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident Status</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                           <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Action</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                        {incidentReports.map((report) => (
+                        {filteredIncidentReports.map((report) => (
                           <tr key={report.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                             <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{report.incidentId || '—'}</td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{report.incidentVehicle || '—'}</td>
@@ -1019,7 +1174,6 @@ export function SubscriberDetail({
                                 </span>
                               ) : '—'}
                             </td>
-                            <td className="px-4 py-3"><ReportStatusBadge status={report.status} /></td>
                             <td className="px-4 py-3 text-right"><ReportAction report={report} onDownload={onDownloadReport} onRetry={onRetryReport} /></td>
                           </tr>
                         ))}
@@ -1027,6 +1181,60 @@ export function SubscriberDetail({
                     </table>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Permissions Tab */}
+          {activeTab === 'permissions' && (
+            <div className="flex min-h-[480px] -m-6 overflow-hidden rounded-lg">
+              {/* Left Sidebar */}
+              <div className="w-52 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 py-4">
+                {permissionCategories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActivePermissionCategory(cat.id)}
+                    className={`w-full text-left px-6 py-3 text-sm font-medium transition-colors ${
+                      activePermissionCategory === cat.id
+                        ? 'text-cyan-600 dark:text-cyan-400 border-l-2 border-cyan-600 dark:border-cyan-400 bg-cyan-50/50 dark:bg-cyan-900/10'
+                        : 'text-slate-600 dark:text-slate-400 border-l-2 border-transparent hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Right Content */}
+              <div className="flex-1 min-w-0 p-6">
+                {(() => {
+                  const activeCat = permissionCategories.find(c => c.id === activePermissionCategory)
+                  if (!activeCat) return null
+                  return (
+                    <div>
+                      <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">{activeCat.label}</h2>
+                        <button
+                          onClick={() => console.log('Save permissions:', permissions)}
+                          className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors"
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                      <div className="space-y-1">
+                        {activeCat.permissions.map((perm) => (
+                          <PermissionRow
+                            key={perm.key}
+                            label={perm.label}
+                            description={perm.description}
+                            enabled={permissions[perm.key]}
+                            onToggle={() => togglePermission(perm.key)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
             </div>
           )}
@@ -1376,6 +1584,202 @@ export function SubscriberDetail({
           </div>
         </div>
       )}
+
+      {/* Check New Challan Modal */}
+      {showCheckChallanModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-3xl my-8">
+            {/* Header */}
+            <div className="flex items-center justify-between px-7 py-5 border-b border-slate-200 dark:border-slate-800">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  {checkChallanState === 'results' ? 'Challan Results' : 'Check New Challan'}
+                </h3>
+                {checkChallanState === 'results' && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <Truck className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-sm text-slate-500 dark:text-slate-400">{checkChallanVehicle}</span>
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={resetCheckChallanModal}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+
+            {/* Input State */}
+            {checkChallanState === 'input' && (
+              <div className="px-7 py-10">
+                <div className="max-w-md mx-auto">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Vehicle Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={checkChallanVehicle}
+                    onChange={e => setCheckChallanVehicle(e.target.value.toUpperCase())}
+                    placeholder="e.g., MH02AB1234"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    autoFocus
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && checkChallanVehicle.trim()) handleCheckChallan()
+                    }}
+                  />
+                  <div className="flex justify-end mt-6">
+                    <button
+                      onClick={handleCheckChallan}
+                      disabled={!checkChallanVehicle.trim()}
+                      className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Search className="w-4 h-4" />
+                      Check Challan
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Loading State */}
+            {checkChallanState === 'loading' && (
+              <div className="px-7 py-20 flex flex-col items-center justify-center">
+                <Loader2 className="w-10 h-10 text-cyan-600 animate-spin mb-5" />
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Fetching challans for <span className="font-semibold text-slate-900 dark:text-slate-50">{checkChallanVehicle}</span>...
+                </p>
+              </div>
+            )}
+
+            {/* Results State */}
+            {checkChallanState === 'results' && (() => {
+              const pendingResults = checkChallanResults.filter(c => c.status === 'pending')
+              const paidResults = checkChallanResults.filter(c => c.status !== 'pending')
+              const pendingTotal = pendingResults.reduce((sum, c) => sum + c.amount, 0)
+              const paidTotal = paidResults.reduce((sum, c) => sum + c.amount, 0)
+              const displayedResults = checkChallanResultTab === 'pending' ? pendingResults : paidResults
+
+              return (
+                <div className="flex min-h-[420px]">
+                  {/* Left Sidebar — Summary */}
+                  <div className="w-52 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 p-5 space-y-4 bg-slate-50/50 dark:bg-slate-800/20">
+                    <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/60 px-4 py-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-amber-500 dark:text-amber-400 mb-2">Pending</p>
+                      <p className="text-3xl font-bold text-amber-700 dark:text-amber-300">{pendingResults.length}</p>
+                      <div className="mt-3 pt-3 border-t border-amber-200/60 dark:border-amber-700/40">
+                        <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">₹{pendingTotal.toLocaleString('en-IN')}</p>
+                        <p className="text-[11px] text-amber-500 dark:text-amber-400 mt-0.5">Total Amount</p>
+                      </div>
+                    </div>
+                    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/60 px-4 py-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-emerald-500 dark:text-emerald-400 mb-2">Paid</p>
+                      <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">{paidResults.length}</p>
+                      <div className="mt-3 pt-3 border-t border-emerald-200/60 dark:border-emerald-700/40">
+                        <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">₹{paidTotal.toLocaleString('en-IN')}</p>
+                        <p className="text-[11px] text-emerald-500 dark:text-emerald-400 mt-0.5">Total Amount</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Content */}
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    {/* Tabs */}
+                    <div className="flex gap-0 border-b border-slate-200 dark:border-slate-700 px-5">
+                      <button
+                        onClick={() => setCheckChallanResultTab('pending')}
+                        className={`px-5 py-3 text-sm font-medium transition-colors ${
+                          checkChallanResultTab === 'pending'
+                            ? 'text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                        }`}
+                      >
+                        Pending ({pendingResults.length})
+                      </button>
+                      <button
+                        onClick={() => setCheckChallanResultTab('paid')}
+                        className={`px-5 py-3 text-sm font-medium transition-colors ${
+                          checkChallanResultTab === 'paid'
+                            ? 'text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                        }`}
+                      >
+                        Paid ({paidResults.length})
+                      </button>
+                    </div>
+
+                    {/* Challan Cards */}
+                    <div className="flex-1 overflow-y-auto max-h-[360px]">
+                      {displayedResults.length === 0 ? (
+                        <div className="py-16 text-center">
+                          <AlertCircle className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                          <p className="text-sm text-slate-400 dark:text-slate-500">
+                            No {checkChallanResultTab} challans found
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {displayedResults.map((challan) => (
+                            <div key={challan.id} className="px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2.5 flex-wrap">
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 truncate max-w-[200px]" title={challan.violation}>{challan.violation}</p>
+                                    <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                                      challan.status === 'pending'
+                                        ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400'
+                                        : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400'
+                                    }`}>
+                                      {challan.status === 'pending' ? 'Pending' : 'Paid'}
+                                    </span>
+                                    <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                                      challan.challanType === 'online'
+                                        ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-400'
+                                        : 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-400'
+                                    }`}>
+                                      {challan.challanType === 'online' ? 'Online' : 'Court'}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-3 mt-2">
+                                    <span className="text-xs font-mono text-slate-400 dark:text-slate-500">{challan.id}</span>
+                                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">{formatDate(challan.date)}</span>
+                                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                                    <span className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[140px]" title={challan.location}>{challan.location}</span>
+                                  </div>
+                                </div>
+                                <p className="text-base font-bold text-slate-900 dark:text-slate-50 whitespace-nowrap pt-0.5">₹{challan.amount.toLocaleString('en-IN')}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* Footer for results */}
+            {checkChallanState === 'results' && (
+              <div className="flex items-center justify-end px-7 py-4 border-t border-slate-200 dark:border-slate-800">
+                <button
+                  onClick={() => {
+                    setCheckChallanVehicle('')
+                    setCheckChallanResults([])
+                    setCheckChallanResultTab('pending')
+                    setCheckChallanState('input')
+                  }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Check Another Vehicle
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1458,9 +1862,9 @@ function ReportStatusBadge({ status }: { status: string }) {
   )
 }
 
-function ReportAction({ report, onDownload, onRetry }: { report: SubscriberReport; onDownload?: (id: string) => void; onRetry?: (id: string) => void }) {
-  if (report.status === 'ready') {
-    return (
+function ReportAction({ report, onDownload }: { report: SubscriberReport; onDownload?: (id: string) => void; onRetry?: (id: string) => void }) {
+  return (
+    <div className="inline-flex items-center gap-2">
       <button
         onClick={() => onDownload?.(report.id)}
         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-md transition-colors"
@@ -1468,24 +1872,14 @@ function ReportAction({ report, onDownload, onRetry }: { report: SubscriberRepor
         <Download className="w-3.5 h-3.5" />
         Download
       </button>
-    )
-  }
-  if (report.status === 'failed') {
-    return (
       <button
-        onClick={() => onRetry?.(report.id)}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+        onClick={() => console.log('View report:', report.id)}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
       >
-        <RefreshCw className="w-3.5 h-3.5" />
-        Retry
+        <Eye className="w-3.5 h-3.5" />
+        View Report
       </button>
-    )
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-400 dark:text-slate-500">
-      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-      Processing...
-    </span>
+    </div>
   )
 }
 
@@ -1493,4 +1887,26 @@ function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function PermissionRow({ label, description, enabled, onToggle }: { label: string; description: string; enabled: boolean; onToggle: () => void }) {
+  return (
+    <div className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+      <div>
+        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{label}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 ${
+          enabled ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-600'
+        }`}
+      >
+        <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform ${
+          enabled ? 'translate-x-[18px]' : 'translate-x-[3px]'
+        }`} />
+      </button>
+    </div>
+  )
 }

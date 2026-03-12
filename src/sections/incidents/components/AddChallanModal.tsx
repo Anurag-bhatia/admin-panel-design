@@ -22,6 +22,7 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
   const [source, setSource] = useState<IncidentSource>('Manual')
   const [state, setState] = useState('')
   const [amount, setAmount] = useState('')
+  const [offence, setOffence] = useState('')
 
   const filteredSubscribers = subscribers.filter((sub) =>
     sub.name.toLowerCase().includes(subscriberSearch.toLowerCase()) ||
@@ -46,7 +47,7 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
       source,
       state,
       amount: parseFloat(amount),
-      offence: null,
+      offence: offence || null,
       assignedAgentId: null,
       assignedLawyerId: null,
     })
@@ -82,7 +83,7 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
                 type="text"
                 value={vehicle}
                 onChange={(e) => setVehicle(e.target.value.toUpperCase())}
-                placeholder="DL01AB1234"
+                placeholder="UP32MM11113"
                 className="w-full px-4 py-2.5 text-sm font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white uppercase"
                 required
               />
@@ -111,7 +112,7 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
               type="text"
               value={challanNumber}
               onChange={(e) => setChallanNumber(e.target.value)}
-              placeholder="Enter challan number"
+              placeholder="CH1213131312121"
               className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
               required
             />
@@ -268,6 +269,20 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
                 />
               </div>
             </div>
+          </div>
+
+          {/* Offence */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Offence
+            </label>
+            <input
+              type="text"
+              value={offence}
+              onChange={(e) => setOffence(e.target.value)}
+              placeholder="e.g., Driving without seat belt, Over speeding..."
+              className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+            />
           </div>
 
           {/* Actions */}

@@ -4,6 +4,7 @@ import { DisputeList } from './components/DisputeList'
 import { DisputeDetailView } from './components/DisputeDetailView'
 import { BulkUpdateModal } from './components/BulkUpdateModal'
 import { CreateDisputeModal } from './components/CreateDisputeModal'
+import { AssignReviewerModal } from './components/AssignReviewerModal'
 import type { DisputeFollowUp } from './components/DisputeActivityTab'
 import type {
   Dispute,
@@ -36,12 +37,13 @@ const SAMPLE_FOLLOW_UPS: DisputeFollowUp[] = [
 ]
 
 type ViewMode = 'list' | 'detail'
-type ModalType = 'bulkUpdate' | 'create' | null
+type ModalType = 'bulkUpdate' | 'create' | 'assignReviewer' | null
 
 export default function DisputeListPreview() {
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [selectedDisputeId, setSelectedDisputeId] = useState<string | null>(null)
   const [activeModal, setActiveModal] = useState<ModalType>(null)
+  const [assignDisputeIds, setAssignDisputeIds] = useState<string[]>([])
 
   const selectedDispute = data.disputes.find(d => d.id === selectedDisputeId) as Dispute | undefined
 
@@ -98,16 +100,18 @@ export default function DisputeListPreview() {
           onViewDispute={handleViewDispute}
           onCreateDispute={() => setActiveModal('create')}
           onBulkUpdate={() => setActiveModal('bulkUpdate')}
-          onAssignReviewer={(disputeId, reviewerId) =>
-            console.log('Assign reviewer:', reviewerId, 'to dispute:', disputeId)
-          }
+          onAssignReviewer={(disputeId) => {
+            setAssignDisputeIds([disputeId])
+            setActiveModal('assignReviewer')
+          }}
           onEscalate={(id) => console.log('Escalate dispute:', id)}
           onChangePriority={(id, priority) =>
             console.log('Change priority:', id, priority)
           }
-          onBulkAssignReviewer={(ids, reviewerId) =>
-            console.log('Bulk assign reviewer:', reviewerId, 'to disputes:', ids)
-          }
+          onBulkAssignReviewer={(ids) => {
+            setAssignDisputeIds(ids)
+            setActiveModal('assignReviewer')
+          }}
           onBulkChangePriority={(ids, priority) =>
             console.log('Bulk change priority:', priority, 'for disputes:', ids)
           }
@@ -138,6 +142,23 @@ export default function DisputeListPreview() {
             setActiveModal(null)
           }}
           onClose={() => setActiveModal(null)}
+        />
+      )}
+
+      {/* Assign Reviewer Modal */}
+      {activeModal === 'assignReviewer' && (
+        <AssignReviewerModal
+          selectedCount={assignDisputeIds.length}
+          reviewers={data.reviewers as Reviewer[]}
+          onAssign={(reviewerId, notes) => {
+            console.log('Assign reviewer:', reviewerId, 'to disputes:', assignDisputeIds, 'notes:', notes)
+            setActiveModal(null)
+            setAssignDisputeIds([])
+          }}
+          onClose={() => {
+            setActiveModal(null)
+            setAssignDisputeIds([])
+          }}
         />
       )}
     </>

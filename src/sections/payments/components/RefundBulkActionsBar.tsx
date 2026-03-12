@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, ArrowRightLeft, CheckCircle, ChevronDown } from 'lucide-react'
+import { X, ArrowRightLeft, CheckCircle, ChevronDown, FileText, Receipt } from 'lucide-react'
 
 interface MoveOption {
   value: string
@@ -13,6 +13,8 @@ interface RefundBulkActionsBarProps {
   onMarkComplete?: () => void
   moveOptions?: MoveOption[]
   onMove?: (targetStage: string) => void
+  onSendPI?: () => void
+  onSendInvoice?: () => void
 }
 
 export function RefundBulkActionsBar({
@@ -22,6 +24,8 @@ export function RefundBulkActionsBar({
   onMarkComplete,
   moveOptions,
   onMove,
+  onSendPI,
+  onSendInvoice,
 }: RefundBulkActionsBarProps) {
   const [showMoveMenu, setShowMoveMenu] = useState(false)
 
@@ -86,6 +90,32 @@ export function RefundBulkActionsBar({
               <CheckCircle className="h-4 w-4" />
               <span>{actionLabel}</span>
             </button>
+          )}
+
+          {onSendPI && (
+            <>
+              <div className="w-px h-5 bg-slate-700" />
+              <button
+                onClick={onSendPI}
+                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <FileText className="h-4 w-4" />
+                <span>Send PI</span>
+              </button>
+            </>
+          )}
+
+          {onSendInvoice && (
+            <>
+              {!onSendPI && <div className="w-px h-5 bg-slate-700" />}
+              <button
+                onClick={onSendInvoice}
+                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <Receipt className="h-4 w-4" />
+                <span>Send Invoice</span>
+              </button>
+            </>
           )}
         </div>
       </div>

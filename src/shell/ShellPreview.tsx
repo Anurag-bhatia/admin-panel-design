@@ -10,6 +10,7 @@ import {
   BarChart3,
   UsersRound,
   Settings,
+  FileText,
 } from 'lucide-react'
 import { AppShell } from './components/AppShell'
 
@@ -77,6 +78,11 @@ export default function ShellPreview() {
       label: 'Setup',
       href: '/setup',
       icon: Settings,
+    },
+    {
+      label: 'CMS',
+      href: '/cms',
+      icon: FileText,
     },
   ]
 

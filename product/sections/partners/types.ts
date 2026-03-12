@@ -10,6 +10,8 @@ export interface LinkedSubscriber {
   status: 'active' | 'inactive' | 'paused'
   dateSubscribed: string
   incidentCount: number
+  submittedChallans?: number
+  submittedAmount?: number
 }
 
 export interface Payout {
@@ -52,6 +54,7 @@ export interface Vehicle {
 export interface RegisteredVisitor {
   id: string
   visitorId: string
+  visitorToken: string
   visitDate: string
   visitors: number
 }
@@ -63,6 +66,15 @@ export interface RegisteredVisitorDetail {
   pendingChallans: number
   pendingChallansAmount: number
   contactNumber: string
+}
+
+export interface PartnerFollowUp {
+  id: string
+  activityType: 'onboarding' | 'activation' | 'training' | 'mobilisation'
+  notes: string
+  outcome: 'interested' | 'not_interested' | 'callback' | 'converted' | 'no_response'
+  createdAt: string
+  createdBy: string
 }
 
 export interface OutletQR {
@@ -113,12 +125,16 @@ export interface Partner {
   partnerType: 'challanPay' | 'lots247'
   outlets?: number
   linkedOutlets?: Outlet[]
+  registeredVisitorsCount?: number
   registeredVisitors?: RegisteredVisitor[]
   registeredVisitorDetails?: RegisteredVisitorDetail[]
   outletQRs?: OutletQR[]
+  followUps?: PartnerFollowUp[]
   vehicles?: number
   linkedVehicles: Vehicle[]
   status: 'active' | 'inactive'
+  stage?: 'onboarding' | 'activation' | 'training' | 'mobilisation'
+  assignedTo?: string
   dateOnboarded: string
   linkedSubscribers: LinkedSubscriber[]
   earnings: number
@@ -153,6 +169,9 @@ export interface PartnerListProps {
 
   /** Called when user sorts by a column */
   onSort?: (column: string, direction: 'asc' | 'desc') => void
+
+  /** Called when user clicks "Export" button */
+  onExport?: () => void
 }
 
 export interface PartnerDetailProps {
@@ -174,8 +193,17 @@ export interface PartnerDetailProps {
   /** Called when user deletes a document */
   onDeleteDocument?: (id: string, documentId: string) => void
 
+  /** Called when user clicks "Add Subscriber" on the subscribers tab (LOTS247 only) */
+  onAddSubscriber?: () => void
+
+  /** Called when user clicks "Bulk Import" on the subscribers tab (LOTS247 only) */
+  onBulkImportSubscribers?: () => void
+
+  /** Called when user adds a follow-up (ChallanPay only) */
+  onAddFollowUp?: (partnerId: string, followUp: { activityType: string; notes: string; outcome: string }) => void
+
   /** Optional list of tabs to show. If not provided, shows all tabs for the partner type. */
-  allowedTabs?: ('profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'financial' | 'documents' | 'reports')[]
+  allowedTabs?: ('profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'followUps' | 'financial' | 'documents' | 'reports')[]
 }
 
 export interface AddPartnerProps {

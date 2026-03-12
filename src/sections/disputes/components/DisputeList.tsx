@@ -20,10 +20,10 @@ export interface DisputeListProps {
   onViewDispute?: (id: string) => void
   onCreateDispute?: () => void
   onBulkUpdate?: () => void
-  onAssignReviewer?: (disputeId: string, reviewerId: string) => void
+  onAssignReviewer?: (disputeId: string) => void
   onEscalate?: (id: string) => void
   onChangePriority?: (id: string, priority: DisputePriority) => void
-  onBulkAssignReviewer?: (disputeIds: string[], reviewerId: string) => void
+  onBulkAssignReviewer?: (disputeIds: string[]) => void
   onBulkChangePriority?: (disputeIds: string[], priority: DisputePriority) => void
   onExport?: (disputeIds?: string[]) => void
   onSearch?: (query: string) => void
@@ -254,11 +254,10 @@ export function DisputeList({
                     key={dispute.id}
                     dispute={dispute}
                     isSelected={selectedIds.has(dispute.id)}
-                    reviewers={reviewers}
                     onSelect={(checked) => handleSelectOne(dispute.id, checked)}
                     onView={() => onViewDispute?.(dispute.id)}
-                    onAssignReviewer={(reviewerId) =>
-                      onAssignReviewer?.(dispute.id, reviewerId)
+                    onAssignReviewer={() =>
+                      onAssignReviewer?.(dispute.id)
                     }
                     onEscalate={() => onEscalate?.(dispute.id)}
                     onChangePriority={(priority) =>
@@ -285,10 +284,9 @@ export function DisputeList({
       {selectedIds.size > 0 && (
         <DisputeBulkActionsBar
           selectedCount={selectedIds.size}
-          reviewers={reviewers}
           onClearSelection={() => setSelectedIds(new Set())}
-          onAssignReviewer={(reviewerId) =>
-            onBulkAssignReviewer?.(selectedArray, reviewerId)
+          onAssignReviewer={() =>
+            onBulkAssignReviewer?.(selectedArray)
           }
           onChangePriority={(priority) =>
             onBulkChangePriority?.(selectedArray, priority)

@@ -10,20 +10,18 @@ import {
   ChevronDown,
   Receipt,
 } from 'lucide-react'
-import type { User, Lawyer, IncidentQueue } from '@/../product/sections/incidents/types'
+import type { IncidentQueue } from '@/../product/sections/incidents/types'
 import type { SettlementFees } from './IncidentRow'
 
 interface BulkActionsBarProps {
   selectedCount: number
-  users: User[]
-  lawyers: Lawyer[]
   activeQueue: IncidentQueue
   workType?: 'cases' | 'challans'
   onClearSelection: () => void
   onValidate?: () => void
   onScreen?: () => void
-  onAssignAgent?: (agentId: string) => void
-  onAssignLawyer?: (lawyerId: string) => void
+  onAssignAgent?: () => void
+  onAssignLawyer?: () => void
   onMoveQueue?: (queue: IncidentQueue, fees?: SettlementFees) => void
   onAddExpense?: (fees: SettlementFees) => void
   onBulkUpdate?: (file: File) => void
@@ -42,8 +40,6 @@ const QUEUE_OPTIONS: { key: IncidentQueue; label: string }[] = [
 
 export function BulkActionsBar({
   selectedCount,
-  users,
-  lawyers,
   activeQueue,
   workType = 'challans',
   onClearSelection,
@@ -57,8 +53,6 @@ export function BulkActionsBar({
 }: BulkActionsBarProps) {
   const isCases = workType === 'cases'
   const isNewIncidents = activeQueue === 'newIncidents'
-  const [showAgentDropdown, setShowAgentDropdown] = useState(false)
-  const [showLawyerDropdown, setShowLawyerDropdown] = useState(false)
   const [showQueueDropdown, setShowQueueDropdown] = useState(false)
   const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false)
   const [showSettlementModal, setShowSettlementModal] = useState(false)
@@ -190,101 +184,45 @@ export function BulkActionsBar({
 
                 {/* Assign Agent - hidden for cases */}
                 {!isCases && (
-                  <div className="relative">
-                    <button
-                      onClick={() => {
-                        if (!isNewIncidents) {
-                          setShowAgentDropdown(!showAgentDropdown)
-                          setShowLawyerDropdown(false)
-                          setShowQueueDropdown(false)
-                        }
-                      }}
-                      disabled={isNewIncidents}
-                      className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                        isNewIncidents
-                          ? 'text-slate-500 cursor-not-allowed'
-                          : 'text-white hover:bg-slate-700'
-                      }`}
-                      title={isNewIncidents ? 'Available after screening' : undefined}
-                    >
-                      <UserPlus className="h-4 w-4" />
-                      <span>Assign Agent</span>
-                      <ChevronDown className="h-3 w-3" />
-                    </button>
-                    {showAgentDropdown && (
-                      <>
-                        <div
-                          className="fixed inset-0"
-                          onClick={() => setShowAgentDropdown(false)}
-                        />
-                        <div className="absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-60 overflow-y-auto">
-                          {users.map((user) => (
-                            <button
-                              key={user.id}
-                              onClick={() => {
-                                onAssignAgent?.(user.id)
-                                setShowAgentDropdown(false)
-                              }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                            >
-                              <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs font-medium">
-                                {user.name.charAt(0)}
-                              </div>
-                              {user.name}
-                            </button>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                {/* Assign Lawyer */}
-                <div className="relative">
                   <button
                     onClick={() => {
-                      if (isCases || !isNewIncidents) {
-                        setShowLawyerDropdown(!showLawyerDropdown)
-                        setShowAgentDropdown(false)
+                      if (!isNewIncidents) {
                         setShowQueueDropdown(false)
+                        onAssignAgent?.()
                       }
                     }}
-                    disabled={!isCases && isNewIncidents}
+                    disabled={isNewIncidents}
                     className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                      !isCases && isNewIncidents
+                      isNewIncidents
                         ? 'text-slate-500 cursor-not-allowed'
                         : 'text-white hover:bg-slate-700'
                     }`}
-                    title={!isCases && isNewIncidents ? 'Available after screening' : undefined}
+                    title={isNewIncidents ? 'Available after screening' : undefined}
                   >
-                    <Scale className="h-4 w-4" />
-                    <span>Assign Lawyer</span>
-                    <ChevronDown className="h-3 w-3" />
+                    <UserPlus className="h-4 w-4" />
+                    <span>Assign Agent</span>
                   </button>
-                  {showLawyerDropdown && (
-                    <>
-                      <div
-                        className="fixed inset-0"
-                        onClick={() => setShowLawyerDropdown(false)}
-                      />
-                      <div className="absolute bottom-full left-0 mb-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-60 overflow-y-auto">
-                        {lawyers.map((lawyer) => (
-                          <button
-                            key={lawyer.id}
-                            onClick={() => {
-                              onAssignLawyer?.(lawyer.id)
-                              setShowLawyerDropdown(false)
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                          >
-                            <Scale className="h-4 w-4 text-slate-400" />
-                            <span className="truncate">{lawyer.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
+                )}
+
+                {/* Assign Lawyer */}
+                <button
+                  onClick={() => {
+                    if (isCases || !isNewIncidents) {
+                      setShowQueueDropdown(false)
+                      onAssignLawyer?.()
+                    }
+                  }}
+                  disabled={!isCases && isNewIncidents}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                    !isCases && isNewIncidents
+                      ? 'text-slate-500 cursor-not-allowed'
+                      : 'text-white hover:bg-slate-700'
+                  }`}
+                  title={!isCases && isNewIncidents ? 'Available after screening' : undefined}
+                >
+                  <Scale className="h-4 w-4" />
+                  <span>Assign Lawyer</span>
+                </button>
 
                 {/* Move Queue */}
                 <div className="relative">
@@ -292,8 +230,6 @@ export function BulkActionsBar({
                     onClick={() => {
                       if (isCases || !isNewIncidents) {
                         setShowQueueDropdown(!showQueueDropdown)
-                        setShowAgentDropdown(false)
-                        setShowLawyerDropdown(false)
                       }
                     }}
                     disabled={!isCases && isNewIncidents}

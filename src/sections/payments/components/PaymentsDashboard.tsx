@@ -137,6 +137,12 @@ export function PaymentsDashboard({
   // Selection (leads)
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set())
 
+  // Send PI / Send Invoice modal (single lead)
+  const [sendModal, setSendModal] = useState<{ type: 'pi' | 'invoice'; lead: Lead } | null>(null)
+  // Send PI / Send Invoice modal (bulk)
+  const [bulkSendModal, setBulkSendModal] = useState<{ type: 'pi' | 'invoice'; leads: Lead[] } | null>(null)
+  const [sendSuccess, setSendSuccess] = useState<{ type: 'pi' | 'invoice'; message: string } | null>(null)
+
   // Lead detail view
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
   const selectedLead = selectedLeadId ? leads.find(l => l.id === selectedLeadId) : null
@@ -905,6 +911,8 @@ export function PaymentsDashboard({
                 }}
                 onViewLead={(id) => setSelectedLeadId(id)}
                 onAssignLead={onAssignLead}
+                onSendPI={(lead) => setSendModal({ type: 'pi', lead })}
+                onSendInvoice={(lead) => setSendModal({ type: 'invoice', lead })}
               />
             </div>
           )}
@@ -956,7 +964,114 @@ export function PaymentsDashboard({
           actionLabel="Mark as Converted"
           onClearSelection={() => setSelectedLeadIds(new Set())}
           onMarkComplete={() => onBulkMarkLeadsConverted?.(Array.from(selectedLeadIds))}
+          onSendPI={() => {
+            const selected = leads.filter((l) => selectedLeadIds.has(l.id))
+            setBulkSendModal({ type: 'pi', leads: selected })
+          }}
+          onSendInvoice={() => {
+            const selected = leads.filter((l) => selectedLeadIds.has(l.id))
+            setBulkSendModal({ type: 'invoice', leads: selected })
+          }}
         />
+      )}
+
+      {/* Send PI / Send Invoice Confirmation Modal */}
+      {sendModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setSendModal(null)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+              Send {sendModal.type === 'pi' ? 'Proforma Invoice' : 'Invoice'}
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
+              Are you sure you want to send the {sendModal.type === 'pi' ? 'Proforma Invoice' : 'Invoice'} to the client{' '}
+              <span className="font-medium text-slate-900 dark:text-white">{sendModal.lead.companyAlias}</span>?
+              It will be sent to{' '}
+              <span className="font-medium text-cyan-600 dark:text-cyan-400">{sendModal.lead.emailId}</span>.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setSendModal(null)}
+                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setSendSuccess({ type: sendModal.type, message: `Sent to ${sendModal.lead.emailId}` })
+                  setSendModal(null)
+                  setTimeout(() => setSendSuccess(null), 4000)
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Send PI / Send Invoice Confirmation Modal */}
+      {bulkSendModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setBulkSendModal(null)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+              Send {bulkSendModal.type === 'pi' ? 'Proforma Invoice' : 'Invoice'}
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+              Are you sure you want to send the {bulkSendModal.type === 'pi' ? 'Proforma Invoice' : 'Invoice'} to{' '}
+              <span className="font-medium text-slate-900 dark:text-white">{bulkSendModal.leads.length} client{bulkSendModal.leads.length !== 1 ? 's' : ''}</span>?
+            </p>
+            <div className="max-h-32 overflow-y-auto mb-4 space-y-1.5">
+              {bulkSendModal.leads.map((lead) => (
+                <div key={lead.id} className="flex items-center justify-between text-xs px-3 py-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                  <span className="font-medium text-slate-900 dark:text-white">{lead.companyAlias}</span>
+                  <span className="text-cyan-600 dark:text-cyan-400">{lead.emailId}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setBulkSendModal(null)}
+                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setSendSuccess({
+                    type: bulkSendModal.type,
+                    message: `Sent to ${bulkSendModal.leads.length} client${bulkSendModal.leads.length !== 1 ? 's' : ''}`,
+                  })
+                  setBulkSendModal(null)
+                  setSelectedLeadIds(new Set())
+                  setTimeout(() => setSendSuccess(null), 4000)
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+              >
+                Send All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {sendSuccess && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-emerald-600 text-white px-5 py-3.5 rounded-lg shadow-lg animate-[fadeIn_0.2s_ease-out]">
+          <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="text-sm font-medium">
+            {sendSuccess.type === 'pi' ? 'Proforma Invoice' : 'Invoice'} {sendSuccess.message}
+          </span>
+          <button onClick={() => setSendSuccess(null)} className="ml-2 text-white/80 hover:text-white">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       )}
     </div>
   )

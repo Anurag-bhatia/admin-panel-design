@@ -1,32 +1,47 @@
 import { useState } from 'react'
-import { MoreVertical, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MoreVertical, Search, Filter, ChevronLeft, ChevronRight, X, UserPlus } from 'lucide-react'
 import type { PartnerListProps } from '@/../product/sections/partners/types'
 
 interface ExtendedPartnerListProps extends PartnerListProps {
   partnerType?: 'challanPay' | 'lots247'
+  onBulkAssign?: (partnerIds: string[]) => void
 }
 
 export function PartnerList({
   partners,
   onView,
   onToggleStatus,
-  partnerType
+  partnerType,
+  onBulkAssign,
 }: ExtendedPartnerListProps) {
   const isChallanPay = partnerType === 'challanPay'
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('')
+  const [stateFilter, setStateFilter] = useState<string>('')
+  const [assignedToFilter, setAssignedToFilter] = useState<string>('')
+  const [activeStatusFilter, setActiveStatusFilter] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const itemsPerPage = 10
 
-  // Filter partners based on search and status
+  // Derive unique values for filter dropdowns
+  const uniqueStates = [...new Set(partners.map(p => p.state))].sort()
+  const uniqueAssignees = [...new Set(partners.map(p => p.assignedTo).filter(Boolean) as string[])].sort()
+
+  const activeFilterCount = [statusFilter, stateFilter, assignedToFilter, activeStatusFilter].filter(Boolean).length
+
+  // Filter partners based on search and all filters
   let filtered = partners.filter(partner => {
     const matchesSearch = partner.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          partner.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          partner.lastName.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = !statusFilter || partner.status === statusFilter
-    return matchesSearch && matchesStatus
+    const matchesStage = !statusFilter || (isChallanPay ? partner.stage === statusFilter : partner.status === statusFilter)
+    const matchesState = !stateFilter || partner.state === stateFilter
+    const matchesAssignedTo = !assignedToFilter || (assignedToFilter === 'unassigned' ? !partner.assignedTo : partner.assignedTo === assignedToFilter)
+    const matchesActiveStatus = !activeStatusFilter || partner.status === activeStatusFilter
+    return matchesSearch && matchesStage && matchesState && matchesAssignedTo && matchesActiveStatus
   })
 
   // Pagination
@@ -43,6 +58,35 @@ export function PartnerList({
       setCurrentPage(page)
     }
   }
+
+  // Selection helpers (challanPay only)
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    const pageIds = paginatedPartners.map(p => p.id)
+    const allSelected = pageIds.every(id => selectedIds.has(id))
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (allSelected) {
+        pageIds.forEach(id => next.delete(id))
+      } else {
+        pageIds.forEach(id => next.add(id))
+      }
+      return next
+    })
+  }
+
+  const clearSelection = () => setSelectedIds(new Set())
+
+  const pageAllSelected = paginatedPartners.length > 0 && paginatedPartners.every(p => selectedIds.has(p.id))
+  const pageSomeSelected = paginatedPartners.some(p => selectedIds.has(p.id)) && !pageAllSelected
 
   const getPageNumbers = () => {
     const pages: (number | 'ellipsis')[] = []
@@ -71,6 +115,33 @@ export function PartnerList({
       }`}>
         <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${isActive ? 'bg-cyan-500' : 'bg-slate-400'}`} />
         {isActive ? 'Active' : 'Inactive'}
+      </div>
+    )
+  }
+
+  const StageBadge = ({ stage }: { stage: 'onboarding' | 'activation' | 'training' | 'mobilisation' }) => {
+    const styles = {
+      onboarding: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+      activation: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+      training: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300',
+      mobilisation: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
+    }
+    const dots = {
+      onboarding: 'bg-amber-500',
+      activation: 'bg-blue-500',
+      training: 'bg-violet-500',
+      mobilisation: 'bg-emerald-500',
+    }
+    const labels = {
+      onboarding: 'Onboarding',
+      activation: 'Activation',
+      training: 'Training',
+      mobilisation: 'Mobilisation',
+    }
+    return (
+      <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${styles[stage]}`}>
+        <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${dots[stage]}`} />
+        {labels[stage]}
       </div>
     )
   }
@@ -119,9 +190,9 @@ export function PartnerList({
           >
             <Filter className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="hidden sm:inline">Filters</span>
-            {statusFilter && (
+            {activeFilterCount > 0 && (
               <span className="w-5 h-5 flex items-center justify-center bg-cyan-100 dark:bg-cyan-800 text-cyan-700 dark:text-cyan-200 rounded-full text-xs font-bold">
-                1
+                {activeFilterCount}
               </span>
             )}
           </button>
@@ -130,24 +201,92 @@ export function PartnerList({
         {/* Filter Panel */}
         {showFilters && (
           <div className="mt-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Stage / Status */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Status</label>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{isChallanPay ? 'Stage' : 'Status'}</label>
                 <select
                   value={statusFilter}
                   onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1) }}
                   className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
                 >
-                  <option value="">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  {isChallanPay ? (
+                    <>
+                      <option value="">All Stages</option>
+                      <option value="onboarding">Onboarding</option>
+                      <option value="activation">Activation</option>
+                      <option value="training">Training</option>
+                      <option value="mobilisation">Mobilisation</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </>
+                  )}
                 </select>
               </div>
+
+              {/* State */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">State</label>
+                <select
+                  value={stateFilter}
+                  onChange={(e) => { setStateFilter(e.target.value); setCurrentPage(1) }}
+                  className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                >
+                  <option value="">All States</option>
+                  {uniqueStates.map(state => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Assigned To (ChallanPay only) */}
+              {isChallanPay && (
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Assigned To</label>
+                  <select
+                    value={assignedToFilter}
+                    onChange={(e) => { setAssignedToFilter(e.target.value); setCurrentPage(1) }}
+                    className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                  >
+                    <option value="">All Agents</option>
+                    <option value="unassigned">Unassigned</option>
+                    {uniqueAssignees.map(name => (
+                      <option key={name} value={name}>{name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Active Status (when ChallanPay — stage is primary, this is secondary) */}
+              {isChallanPay && (
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Status</label>
+                  <select
+                    value={activeStatusFilter}
+                    onChange={(e) => { setActiveStatusFilter(e.target.value); setCurrentPage(1) }}
+                    className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                  >
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              )}
             </div>
 
             <div className="mt-4 flex justify-end">
               <button
-                onClick={() => setStatusFilter('')}
+                onClick={() => {
+                  setStatusFilter('')
+                  setStateFilter('')
+                  setAssignedToFilter('')
+                  setActiveStatusFilter('')
+                  setCurrentPage(1)
+                }}
                 className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
               >
                 Clear all filters
@@ -163,13 +302,25 @@ export function PartnerList({
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+              {isChallanPay && (
+                <th className="w-12 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={pageAllSelected}
+                    ref={el => { if (el) el.indeterminate = pageSomeSelected }}
+                    onChange={toggleSelectAll}
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 cursor-pointer"
+                  />
+                </th>
+              )}
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Partner</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Partner ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Contact</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Subscribers</th>
+              {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Registered Visitors</th>}
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">{isChallanPay ? 'Customers' : 'Subscribers'}</th>
               {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Outlets</th>}
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Vehicles</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status</th>
+              {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Assigned To</th>}
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">{isChallanPay ? 'Stage' : 'Status'}</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -177,8 +328,18 @@ export function PartnerList({
             {paginatedPartners.map((partner) => (
               <tr
                 key={partner.id}
-                className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isChallanPay && selectedIds.has(partner.id) ? 'bg-cyan-50/50 dark:bg-cyan-900/10' : ''}`}
               >
+                {isChallanPay && (
+                  <td className="w-12 px-4 py-4" onClick={e => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(partner.id)}
+                      onChange={() => toggleSelect(partner.id)}
+                      className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 cursor-pointer"
+                    />
+                  </td>
+                )}
                 <td
                   className="px-6 py-4 cursor-pointer"
                   onClick={() => onView?.(partner.id)}
@@ -203,6 +364,14 @@ export function PartnerList({
                     <p className="text-xs text-slate-500 dark:text-slate-400">{partner.email}</p>
                   </div>
                 </td>
+                {isChallanPay && (
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onView?.(partner.id)}
+                  >
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.registeredVisitorsCount ?? '—'}</p>
+                  </td>
+                )}
                 <td
                   className="px-6 py-4 whitespace-nowrap cursor-pointer"
                   onClick={() => onView?.(partner.id)}
@@ -217,17 +386,28 @@ export function PartnerList({
                     <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.outlets ?? '—'}</p>
                   </td>
                 )}
+                {isChallanPay && (
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onView?.(partner.id)}
+                  >
+                    {partner.assignedTo ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 flex items-center justify-center text-xs font-medium">
+                          {partner.assignedTo.charAt(0)}
+                        </div>
+                        <span className="text-sm text-slate-900 dark:text-white">{partner.assignedTo}</span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-slate-400 dark:text-slate-500">Unassigned</span>
+                    )}
+                  </td>
+                )}
                 <td
                   className="px-6 py-4 whitespace-nowrap cursor-pointer"
                   onClick={() => onView?.(partner.id)}
                 >
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.vehicles ?? '—'}</p>
-                </td>
-                <td
-                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                  onClick={() => onView?.(partner.id)}
-                >
-                  <StatusBadge status={partner.status} />
+                  {isChallanPay && partner.stage ? <StageBadge stage={partner.stage} /> : <StatusBadge status={partner.status} />}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right" onClick={e => e.stopPropagation()}>
                   <div className="relative inline-block">
@@ -275,30 +455,40 @@ export function PartnerList({
         {paginatedPartners.map(partner => (
           <div
             key={partner.id}
-            onClick={() => onView?.(partner.id)}
-            className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
+            className={`p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${isChallanPay && selectedIds.has(partner.id) ? 'bg-cyan-50/50 dark:bg-cyan-900/10' : ''}`}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <div className="text-xs sm:text-sm font-medium text-cyan-600 dark:text-cyan-400 mb-1">{partner.partnerId}</div>
-                <div className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">{partner.companyName}</div>
-              </div>
-              <StatusBadge status={partner.status} />
-            </div>
+            <div className="flex items-start gap-3">
+              {isChallanPay && (
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(partner.id)}
+                  onChange={() => toggleSelect(partner.id)}
+                  className="mt-1 w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 cursor-pointer shrink-0"
+                />
+              )}
+              <div className="flex-1 min-w-0" onClick={() => onView?.(partner.id)}>
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <div className="text-xs sm:text-sm font-medium text-cyan-600 dark:text-cyan-400 mb-1">{partner.partnerId}</div>
+                    <div className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">{partner.companyName}</div>
+                  </div>
+                  {isChallanPay && partner.stage ? <StageBadge stage={partner.stage} /> : <StatusBadge status={partner.status} />}
+                </div>
 
-            <div className="space-y-2 text-xs sm:text-sm">
-              <div className="text-slate-600 dark:text-slate-400">
-                <span className="font-medium text-slate-900 dark:text-white">{partner.firstName} {partner.lastName}</span>
-              </div>
-              <div className="text-slate-600 dark:text-slate-400">
-                {partner.mobile}
-              </div>
-              <div className="text-slate-600 dark:text-slate-400">
-                {partner.linkedSubscribers.length} subscribers
-              </div>
-              <div className="flex gap-4 text-slate-600 dark:text-slate-400">
-                {isChallanPay && <span>{partner.outlets ?? 0} outlets</span>}
-                <span>{partner.vehicles ?? 0} vehicles</span>
+                <div className="space-y-2 text-xs sm:text-sm">
+                  <div className="text-slate-600 dark:text-slate-400">
+                    <span className="font-medium text-slate-900 dark:text-white">{partner.firstName} {partner.lastName}</span>
+                  </div>
+                  <div className="text-slate-600 dark:text-slate-400">
+                    {partner.mobile}
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-slate-600 dark:text-slate-400">
+                    {isChallanPay && <span>{partner.registeredVisitorsCount ?? 0} visitors</span>}
+                    <span>{partner.linkedSubscribers.length} {isChallanPay ? 'customers' : 'subscribers'}</span>
+                    {isChallanPay && <span>{partner.outlets ?? 0} outlets</span>}
+                    {isChallanPay && <span>{partner.assignedTo || 'Unassigned'}</span>}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -369,6 +559,36 @@ export function PartnerList({
         </div>
       )}
       </div>
+
+      {/* Bulk Actions Bar */}
+      {isChallanPay && selectedIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+          <div className="flex items-center gap-2 px-4 py-3 bg-slate-900 dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-700">
+            <div className="flex items-center gap-2 pr-3 border-r border-slate-700">
+              <span className="flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-cyan-500 text-white text-sm font-semibold">
+                {selectedIds.size}
+              </span>
+              <span className="text-sm text-slate-300">selected</span>
+              <button
+                onClick={clearSelection}
+                className="p-1 hover:bg-slate-700 rounded transition-colors"
+              >
+                <X className="h-4 w-4 text-slate-400" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => onBulkAssign?.(Array.from(selectedIds))}
+                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <UserPlus className="h-4 w-4" />
+                <span>Assign</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

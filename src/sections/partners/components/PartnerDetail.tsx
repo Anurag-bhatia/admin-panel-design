@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
-import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight, UserCheck, Store, QrCode, MoreVertical, Ban, X, Download, Search, Loader2, RefreshCw } from 'lucide-react'
-import type { PartnerDetailProps, OutletQR, RegisteredVisitorDetail } from '@/../product/sections/partners/types'
+import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight, UserCheck, Store, QrCode, MoreVertical, Ban, X, Download, Search, Loader2, RefreshCw, Plus, Phone, Mail, MessageSquare, MapPin, CalendarCheck } from 'lucide-react'
+import type { PartnerDetailProps, OutletQR, RegisteredVisitorDetail, PartnerFollowUp } from '@/../product/sections/partners/types'
 
-type TabType = 'profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'financial' | 'documents' | 'reports'
+type TabType = 'profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'followUps' | 'financial' | 'documents' | 'reports'
 
 export function PartnerDetail({
   partner,
@@ -11,6 +11,9 @@ export function PartnerDetail({
   onViewIncidents,
   onUploadDocument,
   onDeleteDocument,
+  onAddSubscriber,
+  onBulkImportSubscribers,
+  onAddFollowUp,
   allowedTabs,
 }: PartnerDetailProps) {
   const [activeTab, setActiveTab] = useState<TabType>(allowedTabs?.[0] ?? 'profile')
@@ -27,6 +30,9 @@ export function PartnerDetail({
   const [outletPage, setOutletPage] = useState(1)
   const [qrPage, setQrPage] = useState(1)
   const [regVisitorPage, setRegVisitorPage] = useState(1)
+  const [followUpPage, setFollowUpPage] = useState(1)
+  const [showAddFollowUp, setShowAddFollowUp] = useState(false)
+  const [followUpForm, setFollowUpForm] = useState({ activityType: '', notes: '', outcome: '' })
   const vehiclesPerPage = 5
   const filteredVehicles = (partner.linkedVehicles || []).filter((v) => {
     const matchesSearch = vehicleSearch === '' ||
@@ -67,6 +73,11 @@ export function PartnerDetail({
   const totalRegVisitorPages = Math.max(1, Math.ceil(totalRegVisitors / perPage))
   const safeRegVisitorPage = Math.min(regVisitorPage, totalRegVisitorPages)
   const paginatedRegVisitors = partner.registeredVisitorDetails?.slice((safeRegVisitorPage - 1) * perPage, safeRegVisitorPage * perPage) || []
+
+  const totalFollowUps = partner.followUps?.length || 0
+  const totalFollowUpPages = Math.max(1, Math.ceil(totalFollowUps / perPage))
+  const safeFollowUpPage = Math.min(followUpPage, totalFollowUpPages)
+  const paginatedFollowUps = partner.followUps?.slice((safeFollowUpPage - 1) * perPage, safeFollowUpPage * perPage) || []
 
   const partnerReports = useMemo(() => [
     { id: 'RPT-001', reportType: 'MIS', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-03-01T06:00:00Z', fileSize: 245760, period: 'February 2026' },
@@ -112,6 +123,7 @@ export function PartnerDetail({
       vehicles: <Truck className="w-4 h-4" />,
       outlets: <Store className="w-4 h-4" />,
       qrs: <QrCode className="w-4 h-4" />,
+      followUps: <CalendarCheck className="w-4 h-4" />,
       financial: <BarChart3 className="w-4 h-4" />,
       documents: <FileCheck className="w-4 h-4" />,
       reports: <BarChart3 className="w-4 h-4" />
@@ -128,6 +140,7 @@ export function PartnerDetail({
       vehicles: 'Vehicles',
       outlets: 'Outlets',
       qrs: 'QRs',
+      followUps: 'Follow Ups',
       financial: 'Financial',
       documents: 'Documents',
       reports: 'Reports'
@@ -190,7 +203,7 @@ export function PartnerDetail({
           {(allowedTabs
             ? allowedTabs as TabType[]
             : isChallanPay
-              ? ['profile', 'visitors', 'registeredVisitors', 'vehicles', 'customers', 'outlets', 'qrs', 'financial', 'documents'] as TabType[]
+              ? ['profile', 'visitors', 'registeredVisitors', 'customers', 'outlets', 'qrs', 'followUps', 'financial', 'documents'] as TabType[]
               : ['profile', 'customers', 'vehicles', 'reports', 'financial', 'documents'] as TabType[]
           ).map((tab) => (
             <button
@@ -400,16 +413,16 @@ export function PartnerDetail({
               )}
             </div>
 
-            {/* Right: Activity Timeline */}
-            <div className="lg:w-72 xl:w-80 flex-shrink-0">
-              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6 sticky top-6">
+            {/* Right: Activity Timeline + Assign */}
+            <div className="lg:w-72 xl:w-80 flex-shrink-0 sticky top-6 space-y-4">
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
                 <div className="flex items-center gap-2.5 mb-6">
                   <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                     <Clock className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                   </div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">Timeline</h3>
                 </div>
-                <div className="relative">
+                <div className="relative max-h-64 overflow-y-auto">
                   {partner.activityLog.length > 0 && (
                     <div className="absolute left-[5px] top-2 bottom-2 w-px bg-slate-200 dark:bg-slate-700" />
                   )}
@@ -424,6 +437,37 @@ export function PartnerDetail({
                   </div>
                 </div>
               </div>
+
+              {/* Assigned Reviewer Card */}
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">Assigned Reviewer</p>
+                {partner.assignedTo ? (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-cyan-600 text-white flex items-center justify-center text-sm font-medium">
+                        {partner.assignedTo.charAt(0)}
+                      </div>
+                      <span className="text-sm font-medium text-slate-900 dark:text-slate-50">{partner.assignedTo}</span>
+                    </div>
+                    <button
+                      onClick={() => onEditPartner?.(partner.id)}
+                      className="text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors"
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-400 dark:text-slate-500">Not assigned</span>
+                    <button
+                      onClick={() => onEditPartner?.(partner.id)}
+                      className="text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors"
+                    >
+                      Assign
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -434,7 +478,27 @@ export function PartnerDetail({
           {/* Customers Tab */}
           {activeTab === 'customers' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">{isChallanPay ? 'Customers' : 'Subscribers'} ({partner.linkedSubscribers.length})</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">{isChallanPay ? 'Customers' : 'Subscribers'} ({partner.linkedSubscribers.length})</h2>
+                {!isChallanPay && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={onAddSubscriber}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Subscriber
+                    </button>
+                    <button
+                      onClick={onBulkImportSubscribers}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                    >
+                      <Upload className="w-4 h-4" />
+                      Bulk Import
+                    </button>
+                  </div>
+                )}
+              </div>
               {partner.linkedSubscribers.length === 0 ? (
                 <p className="text-slate-500 dark:text-slate-400">No {isChallanPay ? 'customers' : 'subscribers'} yet</p>
               ) : (
@@ -447,6 +511,8 @@ export function PartnerDetail({
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Mobile</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscribed</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Submitted Challans</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Submitted Amount</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incidents</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
                         </tr>
@@ -462,6 +528,12 @@ export function PartnerDetail({
                               <SubscriberStatusBadge status={subscriber.status} />
                             </td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(subscriber.dateSubscribed)}</td>
+                            <td className="px-4 py-3">
+                              <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                {subscriber.submittedChallans ?? 0}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{formatCurrency(subscriber.submittedAmount ?? 0)}</td>
                             <td className="px-4 py-3">
                               <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
                                 {subscriber.incidentCount}
@@ -720,6 +792,7 @@ export function PartnerDetail({
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800">
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitor ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Visitor Token</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Date & Time</th>
                         </tr>
                       </thead>
@@ -728,6 +801,16 @@ export function PartnerDetail({
                           <tr key={visitor.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                             <td className="px-4 py-3">
                               <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{visitor.visitorId}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <a
+                                href={`https://${visitor.visitorToken}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-cyan-600 dark:text-cyan-400 hover:underline"
+                              >
+                                {visitor.visitorToken}
+                              </a>
                             </td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
                               {new Date(visitor.visitDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
@@ -812,7 +895,7 @@ export function PartnerDetail({
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Location</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pincode</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscribers</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Customers</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicles</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                         </tr>
@@ -874,8 +957,6 @@ export function PartnerDetail({
                       <tr className="border-b border-slate-200 dark:border-slate-800">
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">QR ID</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Scans</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Created</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
                       </tr>
@@ -887,20 +968,6 @@ export function PartnerDetail({
                             <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{qr.qrId}</span>
                           </td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{qr.outletName}</td>
-                          <td className="px-4 py-3">
-                            <span className="inline-block px-2.5 py-1 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 rounded text-xs font-medium">
-                              {qr.totalScans.toLocaleString()}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                              qr.status === 'active'
-                                ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                            }`}>
-                              {qr.status.charAt(0).toUpperCase() + qr.status.slice(1)}
-                            </span>
-                          </td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(qr.createdDate)}</td>
                           <td className="px-4 py-3">
                             <div className="relative">
@@ -951,7 +1018,7 @@ export function PartnerDetail({
           {activeTab === 'financial' && (
             <div>
               <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Earnings & Payouts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div className="p-4 bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-900/40 rounded-lg border border-cyan-200 dark:border-cyan-800">
                   <div className="flex items-center justify-between">
                     <div>
@@ -979,7 +1046,20 @@ export function PartnerDetail({
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-emerald-700 dark:text-emerald-300">Court Challans</span>
-                      <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">{formatCurrency(50)}</span>
+                      <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">{formatCurrency(100)}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4 bg-gradient-to-br from-violet-50 to-violet-100 dark:from-violet-900/20 dark:to-violet-900/40 rounded-lg border border-violet-200 dark:border-violet-800">
+                  <p className="text-sm text-violet-600 dark:text-violet-400 font-medium mb-3">Road Smart Partner Benefit</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-violet-700 dark:text-violet-300">Per Court Challan</span>
+                      <span className="text-sm font-bold text-violet-700 dark:text-violet-300">{formatCurrency(50)}</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-violet-200 dark:border-violet-700">
+                      <span className="text-sm font-medium text-violet-700 dark:text-violet-300">Total Benefit Earned</span>
+                      <span className="text-sm font-bold text-violet-700 dark:text-violet-300">{formatCurrency(50)}</span>
                     </div>
                   </div>
                 </div>
@@ -1222,7 +1302,163 @@ export function PartnerDetail({
             </div>
           )}
 
+          {/* Follow Ups Tab */}
+          {activeTab === 'followUps' && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Follow Ups ({totalFollowUps})</h2>
+                <button
+                  onClick={() => {
+                    setFollowUpForm({ activityType: '', notes: '', outcome: '' })
+                    setShowAddFollowUp(true)
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Follow Up
+                </button>
+              </div>
+              {totalFollowUps === 0 ? (
+                <div className="text-center py-10">
+                  <CalendarCheck className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No follow-ups recorded yet</p>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-3">
+                    {paginatedFollowUps.map((fu) => (
+                      <div key={fu.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                              fu.activityType === 'onboarding' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' :
+                              fu.activityType === 'activation' ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' :
+                              fu.activityType === 'training' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400' :
+                              fu.activityType === 'mobilisation' ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400' :
+                              'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400'
+                            }`}>
+                              {fu.activityType === 'onboarding' && <UserCheck className="w-4 h-4" />}
+                              {fu.activityType === 'activation' && <RefreshCw className="w-4 h-4" />}
+                              {fu.activityType === 'training' && <FileText className="w-4 h-4" />}
+                              {fu.activityType === 'mobilisation' && <Truck className="w-4 h-4" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-sm font-medium text-slate-900 dark:text-slate-50 capitalize">{fu.activityType}</span>
+                              </div>
+                              <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{fu.notes}</p>
+                              <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+                                <span>{fu.createdBy}</span>
+                                <span>{new Date(fu.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} at {new Date(fu.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <PaginationBar current={safeFollowUpPage} total={totalFollowUpPages} count={totalFollowUps} perPage={perPage} onChange={setFollowUpPage} />
+                </>
+              )}
+            </div>
+          )}
+
         </div>
+        )}
+
+        {/* Add Follow Up Modal */}
+        {showAddFollowUp && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAddFollowUp(false)}>
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Add Follow Up</h2>
+                <button
+                  onClick={() => setShowAddFollowUp(false)}
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-slate-500" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="px-6 py-5 space-y-5">
+                {/* Activity Type */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    Activity Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={followUpForm.activityType}
+                    onChange={(e) => setFollowUpForm({ ...followUpForm, activityType: e.target.value })}
+                    className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  >
+                    <option value="">Select Activity Type</option>
+                    <option value="onboarding">Onboarding</option>
+                    <option value="activation">Activation</option>
+                    <option value="training">Training</option>
+                    <option value="mobilisation">Mobilisation</option>
+                  </select>
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    Notes <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={followUpForm.notes}
+                    onChange={(e) => setFollowUpForm({ ...followUpForm, notes: e.target.value })}
+                    placeholder="Record details of the interaction, discussion points, and any commitments made..."
+                    rows={5}
+                    className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
+                  />
+                </div>
+
+                {/* Outcome */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    Outcome <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={followUpForm.outcome}
+                    onChange={(e) => setFollowUpForm({ ...followUpForm, outcome: e.target.value })}
+                    className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  >
+                    <option value="">Select Outcome</option>
+                    <option value="interested">Interested</option>
+                    <option value="not_interested">Not Interested</option>
+                    <option value="callback">Callback</option>
+                    <option value="converted">Converted</option>
+                    <option value="no_response">No Response</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+                <button
+                  onClick={() => setShowAddFollowUp(false)}
+                  className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (followUpForm.activityType && followUpForm.notes && followUpForm.outcome) {
+                      onAddFollowUp?.(partner.id, followUpForm)
+                      setShowAddFollowUp(false)
+                      setFollowUpForm({ activityType: '', notes: '', outcome: '' })
+                    }
+                  }}
+                  disabled={!followUpForm.activityType || !followUpForm.notes || !followUpForm.outcome}
+                  className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg transition-colors"
+                >
+                  Add Follow Up
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* QR Card Modal */}
@@ -1266,6 +1502,28 @@ function QRCardModal({ qr, onClose }: { qr: OutletQR; onClose: () => void }) {
         </div>
       </div>
     </div>
+  )
+}
+
+function FollowUpOutcomeBadge({ outcome }: { outcome: string }) {
+  const styles: Record<string, string> = {
+    interested: 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400',
+    not_interested: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
+    callback: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
+    converted: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400',
+    no_response: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
+  }
+  const labels: Record<string, string> = {
+    interested: 'Interested',
+    not_interested: 'Not Interested',
+    callback: 'Callback',
+    converted: 'Converted',
+    no_response: 'No Response',
+  }
+  return (
+    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${styles[outcome] || styles.no_response}`}>
+      {labels[outcome] || outcome}
+    </span>
   )
 }
 

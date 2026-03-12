@@ -815,5 +815,25 @@
     "Fleet Data",
     "Technical",
     "Other"
+  ],
+  "utmSources": [
+    "whatsapp",
+    "sms",
+    "social_media",
+    "google",
+    "fb",
+    "facebook",
+    "instagram",
+    "direct",
+    "organic",
+    "email"
+  ],
+  "vehicleTypes": [
+    "Commercial Vehicle",
+    "Private Vehicle"
+  ],
+  "userTypes": [
+    "Subscribers",
+    "Visitors"
   ]
 }

@@ -224,6 +224,20 @@ export function IncidentRow({
         </span>
       </td>
 
+      {/* Offence */}
+      <td className="px-4 py-3 max-w-[180px]">
+        {incident.offence ? (
+          <span
+            className="block text-sm text-slate-700 dark:text-slate-300 truncate"
+            title={incident.offence}
+          >
+            {incident.offence}
+          </span>
+        ) : (
+          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+        )}
+      </td>
+
       {/* Type */}
       <td className="px-4 py-3">
         {isCases ? (
@@ -550,7 +564,7 @@ export function IncidentRow({
     {/* Settlement Modal */}
     {showSettlementModal && (
       <tr>
-        <td colSpan={isCases ? 9 : 10} className="p-0">
+        <td colSpan={isCases ? 10 : 11} className="p-0">
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div
               className="absolute inset-0 bg-black/50"

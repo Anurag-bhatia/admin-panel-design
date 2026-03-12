@@ -13,6 +13,9 @@ export default function SubscribersDashboardPreview() {
       subscriberSubTypes={data.subscriberSubTypes}
       planTypes={data.planTypes}
       priceCategories={data.priceCategories}
+      utmSources={data.utmSources}
+      vehicleTypes={data.vehicleTypes}
+      userTypes={data.userTypes}
       documents={data.documents as any}
       vehicles={data.vehicles as any}
       drivers={data.drivers as any}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MoreVertical, Eye, UserPlus, Phone, Mail, MapPin, Truck, Building2 } from 'lucide-react'
+import { MoreVertical, Eye, UserPlus, Phone, Mail, MapPin, Truck, Building2, FileText, Receipt } from 'lucide-react'
 import type { Lead, User } from '@/../product/sections/sales-crm/types'
 
 interface LeadsTableProps {
@@ -11,6 +11,8 @@ interface LeadsTableProps {
   onViewLead?: (id: string) => void
   onAssignLead?: (id: string) => void
   onChangeStatus?: (leadId: string, newStatus: Lead['status']) => void
+  onSendPI?: (lead: Lead) => void
+  onSendInvoice?: (lead: Lead) => void
 }
 
 export function LeadsTable({
@@ -21,7 +23,9 @@ export function LeadsTable({
   onSelectAll,
   onViewLead,
   onAssignLead,
-  onChangeStatus
+  onChangeStatus,
+  onSendPI,
+  onSendInvoice
 }: LeadsTableProps) {
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null)
 
@@ -185,16 +189,43 @@ export function LeadsTable({
                             <Eye className="w-4 h-4" />
                             View Details
                           </button>
-                          <button
-                            onClick={() => {
-                              onAssignLead?.(lead.id)
-                              setOpenActionMenu(null)
-                            }}
-                            className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
-                          >
-                            <UserPlus className="w-4 h-4" />
-                            Assign Lead
-                          </button>
+                          {lead.status !== 'sales' && lead.status !== 'lost' && (
+                            <button
+                              onClick={() => {
+                                onAssignLead?.(lead.id)
+                                setOpenActionMenu(null)
+                              }}
+                              className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                            >
+                              <UserPlus className="w-4 h-4" />
+                              Assign Lead
+                            </button>
+                          )}
+                          {(lead.status === 'invoiced' || lead.status === 'sales') && (
+                            <>
+                              <div className="border-t border-slate-200 dark:border-slate-700 my-1" />
+                              <button
+                                onClick={() => {
+                                  onSendPI?.(lead)
+                                  setOpenActionMenu(null)
+                                }}
+                                className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                              >
+                                <FileText className="w-4 h-4" />
+                                Send PI
+                              </button>
+                              <button
+                                onClick={() => {
+                                  onSendInvoice?.(lead)
+                                  setOpenActionMenu(null)
+                                }}
+                                className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                              >
+                                <Receipt className="w-4 h-4" />
+                                Send Invoice
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     )}

@@ -12,6 +12,8 @@ import {
   BarChart3,
   UsersRound,
   Settings,
+  FileText,
+  CheckCircle2,
 } from 'lucide-react'
 
 // Lazy-loaded section preview components
@@ -50,6 +52,12 @@ const PaymentsDashboardPreview = React.lazy(() =>
 )
 const SetupDashboard = React.lazy(() =>
   import('../sections/setup/SetupDashboard')
+)
+const CMSDashboardPreview = React.lazy(() =>
+  import('../sections/cms/CMSDashboardPreview')
+)
+const SettledChallansPreview = React.lazy(() =>
+  import('../sections/settled-challans/SettledChallansPreview')
 )
 
 // Section metadata mapping
@@ -114,6 +122,16 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     description: 'Centralized configuration hub for managing services, pricing, departments, masters, geographic values, and audit log.',
     icon: Settings,
   },
+  cms: {
+    label: 'CMS',
+    description: 'Content management system for creating, editing, and publishing blogs, events, and news articles.',
+    icon: FileText,
+  },
+  'settled-challans': {
+    label: 'Settled Challans',
+    description: 'Read-only table view for browsing all settled challans with search, filters, and export.',
+    icon: CheckCircle2,
+  },
 }
 
 // Component mapping for implemented sections
@@ -130,6 +148,8 @@ export const SECTION_COMPONENTS: Record<string, React.ComponentType<any> | null>
   reports: ReportsDashboard,
   team: TeamManagement,
   setup: SetupDashboard,
+  cms: CMSDashboardPreview,
+  'settled-challans': SettledChallansPreview,
 }
 
 // Ordered list of section IDs for consistent navigation
@@ -146,6 +166,8 @@ export const SECTION_IDS = [
   'customers',
   'lawyers',
   'setup',
+  'cms',
+  'settled-challans',
 ] as const
 
 // Sections hidden from sidebar navigation (kept in registry for data access)

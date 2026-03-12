@@ -5,13 +5,12 @@ import {
   AlertTriangle,
   ChevronDown,
 } from 'lucide-react'
-import type { DisputePriority, Reviewer } from '@/../product/sections/disputes/types'
+import type { DisputePriority } from '@/../product/sections/disputes/types'
 
 interface DisputeBulkActionsBarProps {
   selectedCount: number
-  reviewers: Reviewer[]
   onClearSelection: () => void
-  onAssignReviewer?: (reviewerId: string) => void
+  onAssignReviewer?: () => void
   onChangePriority?: (priority: DisputePriority) => void
 }
 
@@ -24,12 +23,10 @@ const PRIORITY_OPTIONS: { key: DisputePriority; label: string }[] = [
 
 export function DisputeBulkActionsBar({
   selectedCount,
-  reviewers,
   onClearSelection,
   onAssignReviewer,
   onChangePriority,
 }: DisputeBulkActionsBarProps) {
-  const [showReviewerDropdown, setShowReviewerDropdown] = useState(false)
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false)
 
   return (
@@ -52,44 +49,13 @@ export function DisputeBulkActionsBar({
         {/* Actions */}
         <div className="flex items-center gap-1">
           {/* Assign Reviewer */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setShowReviewerDropdown(!showReviewerDropdown)
-                setShowPriorityDropdown(false)
-              }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
-            >
-              <UserPlus className="h-4 w-4" />
-              <span>Assign Reviewer</span>
-              <ChevronDown className="h-3 w-3" />
-            </button>
-            {showReviewerDropdown && (
-              <>
-                <div
-                  className="fixed inset-0"
-                  onClick={() => setShowReviewerDropdown(false)}
-                />
-                <div className="absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-60 overflow-y-auto">
-                  {reviewers.map((reviewer) => (
-                    <button
-                      key={reviewer.id}
-                      onClick={() => {
-                        onAssignReviewer?.(reviewer.id)
-                        setShowReviewerDropdown(false)
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    >
-                      <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs font-medium">
-                        {reviewer.name.charAt(0)}
-                      </div>
-                      {reviewer.name}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+          <button
+            onClick={() => onAssignReviewer?.()}
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
+          >
+            <UserPlus className="h-4 w-4" />
+            <span>Assign Reviewer</span>
+          </button>
 
           {/* Divider */}
           <div className="w-px h-6 bg-slate-700 mx-1" />
@@ -99,7 +65,6 @@ export function DisputeBulkActionsBar({
             <button
               onClick={() => {
                 setShowPriorityDropdown(!showPriorityDropdown)
-                setShowReviewerDropdown(false)
               }}
               className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
             >

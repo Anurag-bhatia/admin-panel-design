@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
-import { Plus, ChevronDown } from 'lucide-react'
+import { Plus, ChevronDown, Download } from 'lucide-react'
 
 interface PartnersListHeaderProps {
   onCreateChallanPay?: () => void
   onCreateLots247?: () => void
+  onExport?: () => void
 }
 
-export function PartnersListHeader({ onCreateChallanPay, onCreateLots247 }: PartnersListHeaderProps) {
+export function PartnersListHeader({ onCreateChallanPay, onCreateLots247, onExport }: PartnersListHeaderProps) {
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -29,7 +30,15 @@ export function PartnersListHeader({ onCreateChallanPay, onCreateLots247 }: Part
           Partners
         </h1>
       </div>
-      <div className="relative" ref={dropdownRef}>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onExport}
+          className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs sm:text-sm font-medium transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          <span>Export</span>
+        </button>
+        <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
           className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors shadow-sm"
@@ -55,6 +64,7 @@ export function PartnersListHeader({ onCreateChallanPay, onCreateLots247 }: Part
             </button>
           </div>
         )}
+      </div>
       </div>
     </div>
   )

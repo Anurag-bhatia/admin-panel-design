@@ -30,8 +30,8 @@ export interface IncidentListProps {
   onAddCase?: () => void
   onValidate?: (incidentIds: string[]) => void
   onScreen?: (incidentIds: string[]) => void
-  onAssignAgent?: (incidentIds: string[], agentId: string) => void
-  onAssignLawyer?: (incidentIds: string[], lawyerId: string) => void
+  onAssignAgent?: (incidentIds: string[], agentId?: string) => void
+  onAssignLawyer?: (incidentIds: string[], lawyerId?: string) => void
   onMoveQueue?: (incidentIds: string[], targetQueue: IncidentQueue) => void
   onBulkUpdate?: (incidentIds: string[], file: File) => void
   onExport?: (incidentIds: string[] | 'all') => void
@@ -242,6 +242,9 @@ export function IncidentList({
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Vehicle
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 max-w-[180px]">
+                  Offence
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Type
                 </th>
@@ -271,7 +274,7 @@ export function IncidentList({
               {displayedIncidents.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={isCases ? 10 : 11}
+                    colSpan={isCases ? 11 : 12}
                     className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
@@ -335,15 +338,13 @@ export function IncidentList({
       {selectedIds.size > 0 && (
         <BulkActionsBar
           selectedCount={selectedIds.size}
-          users={users}
-          lawyers={lawyers}
           activeQueue={activeQueue}
           workType={workType}
           onClearSelection={() => setSelectedIds(new Set())}
           onValidate={() => onValidate?.(selectedArray)}
           onScreen={() => onScreen?.(selectedArray)}
-          onAssignAgent={(agentId) => onAssignAgent?.(selectedArray, agentId)}
-          onAssignLawyer={(lawyerId) => onAssignLawyer?.(selectedArray, lawyerId)}
+          onAssignAgent={() => onAssignAgent?.(selectedArray)}
+          onAssignLawyer={() => onAssignLawyer?.(selectedArray)}
           onMoveQueue={(queue) => onMoveQueue?.(selectedArray, queue)}
           onBulkUpdate={(file) => onBulkUpdate?.(selectedArray, file)}
         />

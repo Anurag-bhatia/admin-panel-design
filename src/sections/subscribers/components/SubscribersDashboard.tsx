@@ -17,6 +17,9 @@ interface SubscribersDashboardProps {
   vehicles?: any[]
   drivers?: any[]
   followUps?: any[]
+  utmSources?: string[]
+  vehicleTypes?: string[]
+  userTypes?: string[]
   onViewIncident?: (incidentId: string) => void
 }
 
@@ -34,6 +37,9 @@ export function SubscribersDashboard({
   vehicles = [],
   drivers = [],
   followUps = [],
+  utmSources = [],
+  vehicleTypes = [],
+  userTypes = [],
   onViewIncident
 }: SubscribersDashboardProps) {
   const [selectedSubscriberId, setSelectedSubscriberId] = useState<string | null>(null)
@@ -158,6 +164,9 @@ export function SubscribersDashboard({
       subscriberSubTypes={subscriberSubTypes}
       planTypes={planTypes}
       priceCategories={priceCategories}
+      utmSources={utmSources}
+      vehicleTypes={vehicleTypes}
+      userTypes={userTypes}
       onViewDetails={(id) => setSelectedSubscriberId(id)}
       onEdit={(id) => console.log('Edit subscriber:', id)}
       onAddSubscriber={() => console.log('Add subscriber')}

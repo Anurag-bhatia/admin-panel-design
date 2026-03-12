@@ -91,9 +91,9 @@ export default function IncidentListPreview() {
     setViewMode('screenResults')
   }
 
-  const handleAssignAgent = (incidentIds: string[], agentId?: string) => {
+  const handleAssignAgent = (incidentIds: string[], agentId?: string, notes?: string) => {
     if (agentId) {
-      console.log('Assigning agent:', agentId, 'to incidents:', incidentIds)
+      console.log('Assigning agent:', agentId, 'to incidents:', incidentIds, 'notes:', notes)
       setActiveModal(null)
     } else {
       setSelectedIncidentIds(incidentIds)
@@ -101,9 +101,9 @@ export default function IncidentListPreview() {
     }
   }
 
-  const handleAssignLawyer = (incidentIds: string[], lawyerId?: string) => {
+  const handleAssignLawyer = (incidentIds: string[], lawyerId?: string, notes?: string) => {
     if (lawyerId) {
-      console.log('Assigning lawyer:', lawyerId, 'to incidents:', incidentIds)
+      console.log('Assigning lawyer:', lawyerId, 'to incidents:', incidentIds, 'notes:', notes)
       setActiveModal(null)
     } else {
       setSelectedIncidentIds(incidentIds)
@@ -260,7 +260,7 @@ export default function IncidentListPreview() {
         <AssignAgentModal
           selectedCount={selectedIncidentIds.length}
           users={data.users as User[]}
-          onAssign={(agentId) => handleAssignAgent(selectedIncidentIds, agentId)}
+          onAssign={(agentId, notes) => handleAssignAgent(selectedIncidentIds, agentId, notes)}
           onClose={() => setActiveModal(null)}
         />
       )}
@@ -270,7 +270,7 @@ export default function IncidentListPreview() {
         <AssignLawyerModal
           selectedCount={selectedIncidentIds.length}
           lawyers={data.lawyers as Lawyer[]}
-          onAssign={(lawyerId) => handleAssignLawyer(selectedIncidentIds, lawyerId)}
+          onAssign={(lawyerId, notes) => handleAssignLawyer(selectedIncidentIds, lawyerId, notes)}
           onClose={() => setActiveModal(null)}
         />
       )}

@@ -9,16 +9,14 @@ import {
 import type {
   Dispute,
   DisputePriority,
-  Reviewer,
 } from '@/../product/sections/disputes/types'
 
 interface DisputeRowProps {
   dispute: Dispute
   isSelected: boolean
-  reviewers: Reviewer[]
   onSelect: (selected: boolean) => void
   onView?: () => void
-  onAssignReviewer?: (reviewerId: string) => void
+  onAssignReviewer?: () => void
   onEscalate?: () => void
   onChangePriority?: (priority: DisputePriority) => void
 }
@@ -94,7 +92,6 @@ function formatTime(dateString: string): string {
 export function DisputeRow({
   dispute,
   isSelected,
-  reviewers,
   onSelect,
   onView,
   onAssignReviewer,
@@ -102,7 +99,6 @@ export function DisputeRow({
   onChangePriority,
 }: DisputeRowProps) {
   const [showMenu, setShowMenu] = useState(false)
-  const [showReviewerDropdown, setShowReviewerDropdown] = useState(false)
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false)
 
   const typeConfig = TYPE_LABELS[dispute.disputeType] || { label: dispute.disputeType, className: '' }
@@ -237,46 +233,21 @@ export function DisputeRow({
                 className="fixed inset-0 z-10"
                 onClick={() => {
                   setShowMenu(false)
-                  setShowReviewerDropdown(false)
                   setShowPriorityDropdown(false)
                 }}
               />
               <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
                 {/* Assign Reviewer */}
-                <div className="relative">
-                  <button
-                    onClick={() => {
-                      setShowReviewerDropdown(!showReviewerDropdown)
-                      setShowPriorityDropdown(false)
-                    }}
-                    className="w-full flex items-center justify-between gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                  >
-                    <span className="flex items-center gap-2">
-                      <UserPlus className="h-4 w-4" />
-                      Assign Reviewer
-                    </span>
-                    <ChevronDown className="h-3 w-3" />
-                  </button>
-                  {showReviewerDropdown && (
-                    <div className="absolute right-full top-0 mr-1 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-48 overflow-y-auto">
-                      {reviewers.map((reviewer) => (
-                        <button
-                          key={reviewer.id}
-                          onClick={() => {
-                            onAssignReviewer?.(reviewer.id)
-                            setShowMenu(false)
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                        >
-                          <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs">
-                            {reviewer.name.charAt(0)}
-                          </div>
-                          {reviewer.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <button
+                  onClick={() => {
+                    onAssignReviewer?.()
+                    setShowMenu(false)
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Assign Reviewer
+                </button>
 
                 <div className="border-t border-slate-100 dark:border-slate-700 my-1" />
 
@@ -285,7 +256,6 @@ export function DisputeRow({
                   <button
                     onClick={() => {
                       setShowPriorityDropdown(!showPriorityDropdown)
-                      setShowReviewerDropdown(false)
                     }}
                     className="w-full flex items-center justify-between gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                   >

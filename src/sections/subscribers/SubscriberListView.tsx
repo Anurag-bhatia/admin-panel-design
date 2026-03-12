@@ -13,6 +13,9 @@ export default function SubscriberListPreview() {
       subscriberSubTypes={data.subscriberSubTypes}
       planTypes={data.planTypes}
       priceCategories={data.priceCategories}
+      utmSources={data.utmSources}
+      vehicleTypes={data.vehicleTypes}
+      userTypes={data.userTypes}
       onViewDetails={(id) => console.log('View details:', id)}
       onEdit={(id) => console.log('Edit subscriber:', id)}
       onAddSubscriber={() => console.log('Add subscriber')}

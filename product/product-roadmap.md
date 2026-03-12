@@ -37,3 +37,6 @@ User and team administration for managing internal operations staff and permissi
 
 ### 12. Setup
 Centralized configuration hub for managing system-wide categories, data points, statuses, and configurable values used across all modules.
+
+### 13. CMS
+Content management system for creating, editing, and publishing static pages, FAQs, blog posts, and other informational content surfaced across customer-facing channels.
