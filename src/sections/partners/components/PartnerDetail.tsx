@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight, UserCheck, Store, QrCode, MoreVertical, Ban, X, Download, Search, Loader2, RefreshCw, Plus, Phone, Mail, MessageSquare, MapPin, CalendarCheck } from 'lucide-react'
+import { ArrowLeft, Upload, Eye, IndianRupee, FileText, Building2, Users, BarChart3, FileCheck, Clock, Truck, ChevronLeft, ChevronRight, UserCheck, Store, QrCode, MoreVertical, Ban, X, Download, Search, Loader2, RefreshCw, Plus, Phone, Mail, MessageSquare, MapPin, CalendarCheck, Link2, Copy, Check } from 'lucide-react'
 import type { PartnerDetailProps, OutletQR, RegisteredVisitorDetail, PartnerFollowUp } from '@/../product/sections/partners/types'
 
 type TabType = 'profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'followUps' | 'financial' | 'documents' | 'summary' | 'reports'
@@ -25,7 +25,9 @@ export function PartnerDetail({
   const [vehicleStatusFilter, setVehicleStatusFilter] = useState<string>('all')
   const [vehicleActionMenu, setVehicleActionMenu] = useState<string | null>(null)
   const [qrActionMenu, setQrActionMenu] = useState<string | null>(null)
+  const [outletActionMenu, setOutletActionMenu] = useState<string | null>(null)
   const [viewQr, setViewQr] = useState<OutletQR | null>(null)
+  const [viewQrLink, setViewQrLink] = useState<OutletQR | null>(null)
   const [customerPage, setCustomerPage] = useState(1)
   const [visitorPage, setVisitorPage] = useState(1)
   const [outletPage, setOutletPage] = useState(1)
@@ -193,20 +195,20 @@ export function PartnerDetail({
             </div>
             <p className="text-slate-500 dark:text-slate-400 mt-1">Partner ID: {partner.partnerId}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="flex items-center gap-2 flex-1 justify-end">
+            <div className="relative flex-1 max-w-xl">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 value={globalSearch}
                 onChange={(e) => setGlobalSearch(e.target.value)}
                 placeholder="Search..."
-                className="w-48 pl-9 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                className="w-full pl-9 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
               />
             </div>
             <button
               onClick={handleEditClick}
-              className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors"
+              className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors shrink-0"
             >
               Edit Details
             </button>
@@ -218,7 +220,7 @@ export function PartnerDetail({
           {(allowedTabs
             ? allowedTabs as TabType[]
             : isChallanPay
-              ? ['summary', 'visitors', 'registeredVisitors', 'customers', 'financial', 'followUps', 'qrs', 'outlets', 'documents', 'profile'] as TabType[]
+              ? ['summary', 'visitors', 'registeredVisitors', 'customers', 'financial', 'followUps', 'outlets', 'documents', 'profile'] as TabType[]
               : ['profile', 'customers', 'vehicles', 'reports', 'financial', 'documents'] as TabType[]
           ).map((tab) => (
             <button
@@ -489,7 +491,8 @@ export function PartnerDetail({
 
         {/* Other Tabs — in card wrapper */}
         {activeTab !== 'profile' && (
-        <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+        <div className={activeTab === 'followUps' ? 'flex gap-5' : ''}>
+        <div className={`bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 ${activeTab === 'followUps' ? 'flex-1 min-w-0' : ''}`}>
           {/* Customers Tab */}
           {activeTab === 'customers' && (
             <div>
@@ -544,9 +547,21 @@ export function PartnerDetail({
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{subscriber.mobile}</td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(subscriber.dateSubscribed)}</td>
                             <td className="px-4 py-3">
-                              <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
-                                {subscriber.submittedChallans ?? 0}
-                              </span>
+                              <div className="flex items-center gap-3">
+                                <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                  {(subscriber.submittedCourtChallans ?? 0) + (subscriber.submittedOnlineChallans ?? 0)}
+                                </span>
+                                <div className="flex flex-col gap-1">
+                                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                                    <span className="text-slate-600 dark:text-slate-400">Court</span>
+                                    <span className="font-medium text-cyan-600 dark:text-cyan-400">{subscriber.submittedCourtChallans ?? 0}</span>
+                                  </span>
+                                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                                    <span className="text-slate-600 dark:text-slate-400">Online</span>
+                                    <span className="font-medium text-cyan-600 dark:text-cyan-400">{subscriber.submittedOnlineChallans ?? 0}</span>
+                                  </span>
+                                </div>
+                              </div>
                             </td>
                             <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{formatCurrency(subscriber.submittedAmount ?? 0)}</td>
                             <td className="px-4 py-3">
@@ -876,13 +891,25 @@ export function PartnerDetail({
                             </td>
                             <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{rv.visitorName}</td>
                             <td className="px-4 py-3">
-                              <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
-                                rv.pendingChallans > 0
-                                  ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
-                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                              }`}>
-                                {rv.pendingChallans}
-                              </span>
+                              <div className="flex items-center gap-3">
+                                <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
+                                  (rv.pendingCourtChallans + rv.pendingOnlineChallans) > 0
+                                    ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                                }`}>
+                                  {rv.pendingCourtChallans + rv.pendingOnlineChallans}
+                                </span>
+                                <div className="flex flex-col gap-1">
+                                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                                    <span className="text-slate-600 dark:text-slate-400">Court</span>
+                                    <span className="font-medium text-cyan-600 dark:text-cyan-400">{rv.pendingCourtChallans}</span>
+                                  </span>
+                                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                                    <span className="text-slate-600 dark:text-slate-400">Online</span>
+                                    <span className="font-medium text-cyan-600 dark:text-cyan-400">{rv.pendingOnlineChallans}</span>
+                                  </span>
+                                </div>
+                              </div>
                             </td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
                               {rv.pendingChallansAmount > 0 ? formatCurrency(rv.pendingChallansAmount) : '—'}
@@ -911,42 +938,43 @@ export function PartnerDetail({
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800">
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet ID</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Location</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pincode</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Customers</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicles</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase whitespace-nowrap">Outlet ID</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase whitespace-nowrap">QR ID</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pincode</th>
+                          <th className="px-3 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Customers</th>
+                          <th className="px-3 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase whitespace-nowrap">Visitors</th>
+                          <th className="px-3 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase whitespace-nowrap">Date Created</th>
+                          <th className="px-3 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                         {paginatedOutlets.map((outlet) => (
                           <tr key={outlet.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-3 whitespace-nowrap">
                               <span className="font-mono text-sm text-slate-600 dark:text-slate-300">{outlet.outletId}</span>
                             </td>
-                            <td className="px-4 py-3">
-                              <p className="font-medium text-slate-900 dark:text-slate-50">{outlet.name}</p>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">{outlet.address}</p>
+                            <td className="px-3 py-3 whitespace-nowrap">
+                              <span className="font-mono text-sm text-slate-600 dark:text-slate-300">{partner.outletQRs?.find(q => q.outletId === outlet.id)?.qrId || '—'}</span>
                             </td>
-                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
-                              {outlet.state}
+                            <td className="px-3 py-3">
+                              <p className="font-medium text-sm text-slate-900 dark:text-slate-50">{outlet.name}</p>
                             </td>
-                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                            <td className="px-3 py-3 text-sm text-slate-600 dark:text-slate-300">
                               {outlet.pinCode}
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-3 text-center">
                               <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
                                 {outlet.subscriberCount}
                               </span>
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-3 text-center">
                               <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
                                 {outlet.vehicleCount}
                               </span>
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-3 text-center">
                               <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                                 outlet.status === 'active'
                                   ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
@@ -954,6 +982,58 @@ export function PartnerDetail({
                               }`}>
                                 {outlet.status.charAt(0).toUpperCase() + outlet.status.slice(1)}
                               </span>
+                            </td>
+                            <td className="px-3 py-3 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                              {(() => {
+                                const qr = partner.outletQRs?.find(q => q.outletId === outlet.id)
+                                return qr?.createdDate ? new Date(qr.createdDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
+                              })()}
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              <div className="relative">
+                                <button
+                                  onClick={() => setOutletActionMenu(outletActionMenu === outlet.id ? null : outlet.id)}
+                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                  <MoreVertical className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                                </button>
+                                {outletActionMenu === outlet.id && (
+                                  <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg z-20">
+                                    <button
+                                      onClick={() => {
+                                        const qr = partner.outletQRs?.find(q => q.outletId === outlet.id)
+                                        if (qr) setViewQr(qr)
+                                        setOutletActionMenu(null)
+                                      }}
+                                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-t-lg transition-colors"
+                                    >
+                                      <QrCode className="w-3.5 h-3.5" />
+                                      View QR
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        const qr = partner.outletQRs?.find(q => q.outletId === outlet.id)
+                                        if (qr) setViewQrLink(qr)
+                                        setOutletActionMenu(null)
+                                      }}
+                                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                                    >
+                                      <Link2 className="w-3.5 h-3.5" />
+                                      View QR Link
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        console.log('Deactivate outlet:', outlet.id)
+                                        setOutletActionMenu(null)
+                                      }}
+                                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-b-lg transition-colors"
+                                    >
+                                      <Ban className="w-3.5 h-3.5" />
+                                      Deactivate
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -967,80 +1047,6 @@ export function PartnerDetail({
           )}
 
           {/* QRs Tab */}
-          {activeTab === 'qrs' && (
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">QR Codes ({partner.outletQRs?.length || 0})</h2>
-              {!partner.outletQRs || partner.outletQRs.length === 0 ? (
-                <p className="text-slate-500 dark:text-slate-400">No QR codes generated yet</p>
-              ) : (
-                <>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">QR ID</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet ID</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Outlet</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Created</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {paginatedQRs.map((qr) => (
-                        <tr key={qr.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3">
-                            <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-50">{qr.qrId}</span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="font-mono text-sm text-cyan-600 dark:text-cyan-400">{qr.outletId}</span>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{qr.outletName}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(qr.createdDate)}</td>
-                          <td className="px-4 py-3">
-                            <div className="relative">
-                              <button
-                                onClick={() => setQrActionMenu(qrActionMenu === qr.id ? null : qr.id)}
-                                className="inline-flex items-center justify-center w-8 h-8 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                              >
-                                <MoreVertical className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                              </button>
-                              {qrActionMenu === qr.id && (
-                                <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg z-20 py-1">
-                                  <button
-                                    onClick={() => {
-                                      setViewQr(qr)
-                                      setQrActionMenu(null)
-                                    }}
-                                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                                  >
-                                    <Eye className="w-3.5 h-3.5" />
-                                    View QR
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      console.log('Deactivate QR:', qr.id)
-                                      setQrActionMenu(null)
-                                    }}
-                                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                  >
-                                    <Ban className="w-3.5 h-3.5" />
-                                    Deactivate
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <PaginationBar current={safeQRPage} total={totalQRPages} count={totalQRs} perPage={perPage} onChange={setQrPage} />
-                </>
-              )}
-            </div>
-          )}
-
           {/* Financial Tab */}
           {activeTab === 'financial' && (
             <div>
@@ -1101,12 +1107,21 @@ export function PartnerDetail({
                     <div key={payout.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                       <div>
                         <p className="font-medium text-slate-900 dark:text-slate-50">{formatCurrency(payout.amount)}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(payout.date)} • {payout.paymentMethod}</p>
                         <p className="text-xs font-mono text-cyan-600 dark:text-cyan-400 mt-0.5">{payout.transactionId}</p>
                       </div>
-                      <span className="inline-block px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded text-xs font-medium">
-                        {payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
-                      </span>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-sm text-slate-700 dark:text-slate-300">{formatDate(payout.date)}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{payout.paymentMethod}</p>
+                        </div>
+                        <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
+                          payout.status === 'completed' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
+                          payout.status === 'pending' ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+                          'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                        }`}>
+                          {payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
+                        </span>
+                      </div>
                     </div>
                   ))
                 )}
@@ -1238,20 +1253,34 @@ export function PartnerDetail({
           {/* Summary Tab */}
           {activeTab === 'summary' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Partner Summary</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {/* Stage */}
-                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Stage</p>
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Partner Summary</h2>
+                {partner.stage && (
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium capitalize ${
                     partner.stage === 'onboarding' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
                     partner.stage === 'activation' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
                     partner.stage === 'training' ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400' :
                     partner.stage === 'mobilisation' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
                     'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
-                  }`}>{partner.stage || 'Not set'}</span>
-                </div>
-
+                  }`}>{partner.stage}</span>
+                )}
+                {(() => {
+                  const activity =
+                    partner.stage === 'onboarding' && partner.onboardingActivity
+                      ? { registration: 'Registration', qrCreation: 'QR Creation', profileVerification: 'Profile Verification' }[partner.onboardingActivity]
+                      : partner.stage === 'activation' && (partner as any).activationActivity
+                      ? { training: 'Training' }[(partner as any).activationActivity]
+                      : partner.stage === 'mobilisation' && partner.mobilisationActivity
+                      ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
+                      : null
+                  return activity ? (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400">
+                      {activity}
+                    </span>
+                  ) : null
+                })()}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {/* Total Visitors */}
                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Visitors</p>
@@ -1413,6 +1442,7 @@ export function PartnerDetail({
           {/* Follow Ups Tab */}
           {activeTab === 'followUps' && (
             <div>
+              {/* Activity List */}
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Activity ({totalFollowUps})</h2>
                 <button
@@ -1423,7 +1453,7 @@ export function PartnerDetail({
                   className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                  Add Follow Up
+                  Update
                 </button>
               </div>
               {totalFollowUps === 0 ? (
@@ -1453,9 +1483,6 @@ export function PartnerDetail({
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-sm font-medium text-slate-900 dark:text-slate-50 capitalize">{fu.activityType}</span>
-                                {fu.subActivityType && (
-                                  <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 capitalize">{fu.subActivityType}</span>
-                                )}
                               </div>
                               <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{fu.notes}</p>
                               <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
@@ -1474,6 +1501,24 @@ export function PartnerDetail({
             </div>
           )}
 
+        </div>
+        {/* Assigned Reviewer — right side card (Activity tab only) */}
+        {activeTab === 'followUps' && partner.assignedTo && (
+          <div className="w-72 shrink-0">
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-5 sticky top-4">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">Assigned Reviewer</p>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-cyan-600 text-white flex items-center justify-center text-sm font-semibold">
+                  {partner.assignedTo.charAt(0)}
+                </div>
+                <span className="text-sm font-medium text-slate-900 dark:text-slate-50">{partner.assignedTo}</span>
+              </div>
+              <button className="text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">
+                Change
+              </button>
+            </div>
+          </div>
+        )}
         </div>
         )}
 
@@ -1596,6 +1641,14 @@ export function PartnerDetail({
             onClose={() => setViewQr(null)}
           />
         )}
+
+        {/* QR Link Modal */}
+        {viewQrLink && (
+          <QRLinkModal
+            qr={viewQrLink}
+            onClose={() => setViewQrLink(null)}
+          />
+        )}
       </div>
     </div>
   )
@@ -1633,6 +1686,60 @@ function QRCardModal({ qr, onClose }: { qr: OutletQR; onClose: () => void }) {
   )
 }
 
+
+function QRLinkModal({ qr, onClose }: { qr: OutletQR; onClose: () => void }) {
+  const [copied, setCopied] = useState(false)
+  const qrLink = `https://challanpay.com/qr/${qr.qrId}`
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(qrLink)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50" onClick={onClose}>
+      <div className="w-[420px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">QR Link</h3>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            <X className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          </button>
+        </div>
+
+        {/* QR Info */}
+        <div className="flex flex-col items-center pt-4 pb-2 px-6">
+          <p className="text-sm font-medium text-slate-900 dark:text-slate-50 mb-1">{qr.outletName}</p>
+          <p className="text-xs font-mono text-slate-500 dark:text-slate-400">{qr.qrId}</p>
+        </div>
+
+        {/* Link + Copy */}
+        <div className="px-6 pb-6">
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 block">QR Link</label>
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
+            <Link2 className="w-4 h-4 text-slate-400 flex-shrink-0" />
+            <span className="text-sm text-slate-700 dark:text-slate-300 truncate">{qrLink}</span>
+          </div>
+          <button
+            onClick={handleCopy}
+            className={`w-full flex items-center justify-center gap-1.5 mt-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              copied
+                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
+                : 'bg-cyan-600 hover:bg-cyan-700 text-white'
+            }`}
+          >
+            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function TimelineItem({ title, date }: { title: string; date: string }) {
   return (

@@ -10,7 +10,8 @@ export interface LinkedSubscriber {
   status: 'active' | 'inactive' | 'paused'
   dateSubscribed: string
   incidentCount: number
-  submittedChallans?: number
+  submittedCourtChallans?: number
+  submittedOnlineChallans?: number
   submittedAmount?: number
 }
 
@@ -65,7 +66,8 @@ export interface RegisteredVisitorDetail {
   visitorId: string
   visitorName: string
   subscriberId: string
-  pendingChallans: number
+  pendingCourtChallans: number
+  pendingOnlineChallans: number
   pendingChallansAmount: number
   contactNumber: string
 }
@@ -138,6 +140,7 @@ export interface Partner {
   status: 'active' | 'inactive'
   stage?: 'onboarding' | 'activation' | 'training' | 'mobilisation'
   onboardingActivity?: 'registration' | 'qrCreation' | 'profileVerification'
+  activationActivity?: 'training'
   mobilisationActivity?: 'posterCreated' | 'welcomeLetterCreated' | 'keychainCreated' | 'dispatch' | 'delivered'
   assignedTo?: string
   utmSource?: string

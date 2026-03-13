@@ -415,15 +415,15 @@ export function PartnerList({
                   />
                 </th>
               )}
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Onboarding Date</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Partner</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Partner ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Contact</th>
+              {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Assigned To</th>}
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">{isChallanPay ? 'Stage' : 'Status'}</th>
+              {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Activity</th>}
               {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Registered Visitors</th>}
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">{isChallanPay ? 'Customers' : 'Subscribers'}</th>
               {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Outlets</th>}
-              {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Assigned To</th>}
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">{isChallanPay ? 'Stage' : 'Status'}</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Onboarding Date</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -444,6 +444,14 @@ export function PartnerList({
                   </td>
                 )}
                 <td
+                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                  onClick={() => onView?.(partner.id)}
+                >
+                  <p className="text-sm text-slate-900 dark:text-white">
+                    {new Date(partner.dateOnboarded).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </p>
+                </td>
+                <td
                   className="px-6 py-4 cursor-pointer"
                   onClick={() => onView?.(partner.id)}
                 >
@@ -458,37 +466,6 @@ export function PartnerList({
                 >
                   <p className="text-sm font-mono text-cyan-600 dark:text-cyan-400">{partner.partnerId}</p>
                 </td>
-                <td
-                  className="px-6 py-4 cursor-pointer"
-                  onClick={() => onView?.(partner.id)}
-                >
-                  <div className="text-sm">
-                    <p className="text-slate-900 dark:text-white">{partner.mobile}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{partner.email}</p>
-                  </div>
-                </td>
-                {isChallanPay && (
-                  <td
-                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                    onClick={() => onView?.(partner.id)}
-                  >
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.registeredVisitorsCount ?? '—'}</p>
-                  </td>
-                )}
-                <td
-                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                  onClick={() => onView?.(partner.id)}
-                >
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.linkedSubscribers.length}</p>
-                </td>
-                {isChallanPay && (
-                  <td
-                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                    onClick={() => onView?.(partner.id)}
-                  >
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.outlets ?? '—'}</p>
-                  </td>
-                )}
                 {isChallanPay && (
                   <td
                     className="px-6 py-4 whitespace-nowrap cursor-pointer"
@@ -512,14 +489,44 @@ export function PartnerList({
                 >
                   {isChallanPay && partner.stage ? <StageBadge stage={partner.stage} /> : <StatusBadge status={partner.status} />}
                 </td>
+                {isChallanPay && (
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onView?.(partner.id)}
+                  >
+                    <p className="text-sm text-slate-900 dark:text-white">
+                      {partner.stage === 'onboarding' && partner.onboardingActivity
+                        ? { registration: 'Registration', qrCreation: 'QR Creation', profileVerification: 'Profile Verification' }[partner.onboardingActivity]
+                        : partner.stage === 'activation' && partner.activationActivity
+                        ? { training: 'Training' }[partner.activationActivity]
+                        : partner.stage === 'mobilisation' && partner.mobilisationActivity
+                        ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
+                        : '—'}
+                    </p>
+                  </td>
+                )}
+                {isChallanPay && (
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onView?.(partner.id)}
+                  >
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.registeredVisitorsCount ?? '—'}</p>
+                  </td>
+                )}
                 <td
                   className="px-6 py-4 whitespace-nowrap cursor-pointer"
                   onClick={() => onView?.(partner.id)}
                 >
-                  <p className="text-sm text-slate-900 dark:text-white">
-                    {new Date(partner.dateOnboarded).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </p>
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.linkedSubscribers.length}</p>
                 </td>
+                {isChallanPay && (
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onView?.(partner.id)}
+                  >
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{partner.outlets ?? '—'}</p>
+                  </td>
+                )}
                 <td className="px-6 py-4 whitespace-nowrap text-right" onClick={e => e.stopPropagation()}>
                   <div className="relative inline-block">
                     <button
@@ -580,27 +587,36 @@ export function PartnerList({
               <div className="flex-1 min-w-0" onClick={() => onView?.(partner.id)}>
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <div className="text-xs sm:text-sm font-medium text-cyan-600 dark:text-cyan-400 mb-1">{partner.partnerId}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      {new Date(partner.dateOnboarded).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </div>
                     <div className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">{partner.companyName}</div>
+                    <div className="text-xs sm:text-sm font-medium text-cyan-600 dark:text-cyan-400">{partner.partnerId}</div>
                   </div>
                   {isChallanPay && partner.stage ? <StageBadge stage={partner.stage} /> : <StatusBadge status={partner.status} />}
                 </div>
 
                 <div className="space-y-2 text-xs sm:text-sm">
-                  <div className="text-slate-600 dark:text-slate-400">
-                    <span className="font-medium text-slate-900 dark:text-white">{partner.utmSource || '—'}</span>
-                  </div>
-                  <div className="text-slate-600 dark:text-slate-400">
-                    {partner.mobile}
-                  </div>
+                  {isChallanPay && (
+                    <div className="text-slate-600 dark:text-slate-400">
+                      {partner.assignedTo || 'Unassigned'}
+                    </div>
+                  )}
+                  {isChallanPay && (
+                    <div className="text-slate-600 dark:text-slate-400">
+                      {partner.stage === 'onboarding' && partner.onboardingActivity
+                        ? { registration: 'Registration', qrCreation: 'QR Creation', profileVerification: 'Profile Verification' }[partner.onboardingActivity]
+                        : partner.stage === 'activation' && partner.activationActivity
+                        ? { training: 'Training' }[partner.activationActivity]
+                        : partner.stage === 'mobilisation' && partner.mobilisationActivity
+                        ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
+                        : '—'}
+                    </div>
+                  )}
                   <div className="flex flex-wrap gap-4 text-slate-600 dark:text-slate-400">
                     {isChallanPay && <span>{partner.registeredVisitorsCount ?? 0} visitors</span>}
                     <span>{partner.linkedSubscribers.length} {isChallanPay ? 'customers' : 'subscribers'}</span>
                     {isChallanPay && <span>{partner.outlets ?? 0} outlets</span>}
-                    {isChallanPay && <span>{partner.assignedTo || 'Unassigned'}</span>}
-                  </div>
-                  <div className="text-slate-500 dark:text-slate-400">
-                    Onboarded: {new Date(partner.dateOnboarded).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </div>
                 </div>
               </div>
