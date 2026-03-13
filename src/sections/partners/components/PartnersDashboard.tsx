@@ -50,6 +50,28 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
     }
   }
 
+  // Onboarding activity counts
+  const getOnboardingActivityMetrics = () => {
+    const onboardingPartners = challanPayPartners.filter(p => p.stage === 'onboarding')
+    return {
+      registration: onboardingPartners.filter(p => p.onboardingActivity === 'registration').length,
+      qrCreation: onboardingPartners.filter(p => p.onboardingActivity === 'qrCreation').length,
+      profileVerification: onboardingPartners.filter(p => p.onboardingActivity === 'profileVerification').length,
+    }
+  }
+
+  // Mobilisation activity counts
+  const getMobilisationActivityMetrics = () => {
+    const mobilisationPartners = challanPayPartners.filter(p => p.stage === 'mobilisation')
+    return {
+      posterCreated: mobilisationPartners.filter(p => p.mobilisationActivity === 'posterCreated').length,
+      welcomeLetterCreated: mobilisationPartners.filter(p => p.mobilisationActivity === 'welcomeLetterCreated').length,
+      keychainCreated: mobilisationPartners.filter(p => p.mobilisationActivity === 'keychainCreated').length,
+      dispatch: mobilisationPartners.filter(p => p.mobilisationActivity === 'dispatch').length,
+      delivered: mobilisationPartners.filter(p => p.mobilisationActivity === 'delivered').length,
+    }
+  }
+
   // If a partner is selected, show detail view
   if (selectedPartner) {
     return (
@@ -131,12 +153,11 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
         {/* Summary Cards — ChallanPay only */}
         {activePartnerType === 'challanPay' && (
           <div className="mt-6">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {([
                 { key: 'total', label: 'Total RoadSmart Partners', value: challanPayCount, accent: 'cyan' },
                 { key: 'onboarding', label: 'Onboarding', value: stageOnboarding, accent: 'amber' },
                 { key: 'activation', label: 'Activation', value: stageActivation, accent: 'blue' },
-                { key: 'training', label: 'Training', value: stageTraining, accent: 'violet' },
                 { key: 'mobilisation', label: 'Mobilisation', value: stageMobilisation, accent: 'emerald' },
               ] as const).map((card) => {
                 const isExpanded = expandedStage === card.key
@@ -190,29 +211,117 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
               })}
             </div>
 
-            {/* Expanded Sub-Cards */}
+            {/* Expanded Sub-Cards with popover notch */}
             {expandedStage && expandedStage !== 'total' && (() => {
-              const metrics = getStageSubMetrics(expandedStage)
               const stageLabel = expandedStage.charAt(0).toUpperCase() + expandedStage.slice(1)
+              const stageKeys = ['total', 'onboarding', 'activation', 'mobilisation'] as const
+              const idx = stageKeys.indexOf(expandedStage as any)
+              const notchLeft = ((idx + 0.5) / 4) * 100
+
+              const isOnboarding = expandedStage === 'onboarding'
+              const isMobilisation = expandedStage === 'mobilisation'
+              const activityMetrics = isOnboarding ? getOnboardingActivityMetrics() : null
+              const mobilisationMetrics = isMobilisation ? getMobilisationActivityMetrics() : null
+              const metrics = (!isOnboarding && !isMobilisation) ? getStageSubMetrics(expandedStage) : null
 
               return (
-                <div className="mt-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">{stageLabel} Breakdown</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    {([
-                      { label: 'Active', value: metrics.active, dot: 'bg-emerald-500' },
-                      { label: 'Inactive', value: metrics.inactive, dot: 'bg-slate-300 dark:bg-slate-600' },
-                      { label: 'Assigned', value: metrics.assigned, dot: 'bg-blue-500' },
-                      { label: 'Unassigned', value: metrics.unassigned, dot: 'bg-amber-400' },
-                    ]).map((sub) => (
-                      <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <span className={`w-1.5 h-1.5 rounded-full ${sub.dot}`} />
-                          <span className="text-xs text-slate-400 dark:text-slate-500">{sub.label}</span>
-                        </div>
-                        <p className="text-lg font-bold text-slate-800 dark:text-white">{sub.value}</p>
+                <div className="relative mt-4">
+                  {/* Notch / caret pointing up */}
+                  <div className="absolute -top-2 z-10" style={{ left: `${notchLeft}%`, transform: 'translateX(-50%)' }}>
+                    {/* Border triangle */}
+                    <div
+                      className="w-0 h-0 absolute -top-px"
+                      style={{
+                        borderLeft: '10px solid transparent',
+                        borderRight: '10px solid transparent',
+                        borderBottom: '10px solid var(--notch-border, #e2e8f0)',
+                      }}
+                    />
+                    {/* Fill triangle */}
+                    <div
+                      className="w-0 h-0 relative"
+                      style={{
+                        top: '1px',
+                        borderLeft: '10px solid transparent',
+                        borderRight: '10px solid transparent',
+                        borderBottom: '10px solid var(--notch-fill, #ffffff)',
+                      }}
+                    />
+                  </div>
+
+                  {/* Card */}
+                  <div
+                    className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4"
+                    style={{
+                      '--notch-border': 'var(--tw-border-opacity, 1)',
+                      '--notch-fill': 'var(--tw-bg-opacity, 1)',
+                    } as React.CSSProperties}
+                    ref={(el) => {
+                      if (el) {
+                        const styles = getComputedStyle(el)
+                        el.style.setProperty('--notch-border', styles.borderColor)
+                        el.style.setProperty('--notch-fill', styles.backgroundColor)
+                      }
+                    }}
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
+                      {expandedStage === 'activation' ? 'Training Activity' : `${stageLabel} Activity`}
+                    </p>
+
+                    {isOnboarding && activityMetrics && (
+                      <div className="grid grid-cols-3 gap-2.5">
+                        {([
+                          { label: 'Registration', value: activityMetrics.registration, dot: 'bg-amber-500' },
+                          { label: 'QR Creation', value: activityMetrics.qrCreation, dot: 'bg-blue-500' },
+                          { label: 'Profile Verification', value: activityMetrics.profileVerification, dot: 'bg-emerald-500' },
+                        ]).map((sub) => (
+                          <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className={`w-2 h-2 rounded-full ${sub.dot}`} />
+                              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sub.label}</span>
+                            </div>
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{sub.value}</p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
+
+                    {isMobilisation && mobilisationMetrics && (
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                        {([
+                          { label: 'Poster Created', value: mobilisationMetrics.posterCreated, dot: 'bg-violet-500' },
+                          { label: 'Welcome Letter', value: mobilisationMetrics.welcomeLetterCreated, dot: 'bg-cyan-500' },
+                          { label: 'Keychain Created', value: mobilisationMetrics.keychainCreated, dot: 'bg-amber-500' },
+                          { label: 'Dispatch', value: mobilisationMetrics.dispatch, dot: 'bg-blue-500' },
+                          { label: 'Delivered', value: mobilisationMetrics.delivered, dot: 'bg-emerald-500' },
+                        ]).map((sub) => (
+                          <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className={`w-2 h-2 rounded-full ${sub.dot}`} />
+                              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sub.label}</span>
+                            </div>
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{sub.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {!isOnboarding && !isMobilisation && metrics && (
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {([
+                          { label: 'Assigned', value: metrics.assigned, dot: 'bg-blue-500' },
+                          { label: 'Trained', value: metrics.active, dot: 'bg-emerald-500' },
+                        ]).map((sub) => (
+                          <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className={`w-2 h-2 rounded-full ${sub.dot}`} />
+                              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sub.label}</span>
+                            </div>
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{sub.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )

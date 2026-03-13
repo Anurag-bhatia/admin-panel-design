@@ -137,6 +137,8 @@ export interface Partner {
   linkedVehicles: Vehicle[]
   status: 'active' | 'inactive'
   stage?: 'onboarding' | 'activation' | 'training' | 'mobilisation'
+  onboardingActivity?: 'registration' | 'qrCreation' | 'profileVerification'
+  mobilisationActivity?: 'posterCreated' | 'welcomeLetterCreated' | 'keychainCreated' | 'dispatch' | 'delivered'
   assignedTo?: string
   utmSource?: string
   dateOnboarded: string

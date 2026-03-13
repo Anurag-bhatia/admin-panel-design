@@ -1414,7 +1414,7 @@ export function PartnerDetail({
           {activeTab === 'followUps' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Follow Ups ({totalFollowUps})</h2>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Activity ({totalFollowUps})</h2>
                 <button
                   onClick={() => {
                     setFollowUpForm({ activityType: '', subActivityType: '', notes: '' })
@@ -1494,21 +1494,57 @@ export function PartnerDetail({
 
               {/* Body */}
               <div className="px-6 py-5 space-y-5">
-                {/* Activity Type */}
+                {/* Stage */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                    Activity Type <span className="text-red-500">*</span>
+                    Stage <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={followUpForm.activityType}
-                    onChange={(e) => setFollowUpForm({ ...followUpForm, activityType: e.target.value })}
+                    onChange={(e) => setFollowUpForm({ ...followUpForm, activityType: e.target.value, subActivityType: '' })}
                     className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
-                    <option value="">Select Activity Type</option>
+                    <option value="">Select Stage</option>
                     <option value="onboarding">Onboarding</option>
                     <option value="activation">Activation</option>
-                    <option value="training">Training</option>
                     <option value="mobilisation">Mobilisation</option>
+                  </select>
+                </div>
+
+                {/* Activity */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    Activity <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={followUpForm.subActivityType}
+                    onChange={(e) => setFollowUpForm({ ...followUpForm, subActivityType: e.target.value })}
+                    disabled={!followUpForm.activityType}
+                    className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">Select Activity</option>
+                    {followUpForm.activityType === 'onboarding' && (
+                      <>
+                        <option value="registration">Registration</option>
+                        <option value="qrCreation">QR Creation</option>
+                        <option value="profileVerification">Profile Verification</option>
+                      </>
+                    )}
+                    {followUpForm.activityType === 'activation' && (
+                      <>
+                        <option value="assigned">Assigned</option>
+                        <option value="trained">Trained</option>
+                      </>
+                    )}
+                    {followUpForm.activityType === 'mobilisation' && (
+                      <>
+                        <option value="posterCreated">Poster Created</option>
+                        <option value="welcomeLetterCreated">Welcome Letter</option>
+                        <option value="keychainCreated">Keychain Created</option>
+                        <option value="dispatch">Dispatch</option>
+                        <option value="delivered">Delivered</option>
+                      </>
+                    )}
                   </select>
                 </div>
 
@@ -1524,25 +1560,6 @@ export function PartnerDetail({
                     rows={5}
                     className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
                   />
-                </div>
-
-                {/* Sub Activity Type */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                    Sub Activity Type <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={followUpForm.subActivityType}
-                    onChange={(e) => setFollowUpForm({ ...followUpForm, subActivityType: e.target.value })}
-                    className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  >
-                    <option value="">Select Sub Activity Type</option>
-                    <option value="call">Call</option>
-                    <option value="meeting">Meeting</option>
-                    <option value="email">Email</option>
-                    <option value="visit">Visit</option>
-                    <option value="whatsapp">WhatsApp</option>
-                  </select>
                 </div>
               </div>
 

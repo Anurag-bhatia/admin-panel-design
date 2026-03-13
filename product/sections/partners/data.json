@@ -689,6 +689,7 @@
       "bankName": "HDFC Bank",
       "partnerType": "challanPay",
       "stage": "onboarding",
+      "onboardingActivity": "registration",
       "assignedTo": null,
       "utmSource": "Facebook",
       "outlets": 1,

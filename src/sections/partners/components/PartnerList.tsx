@@ -219,21 +219,21 @@ export function PartnerList({
             {showSortMenu && (
               <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-30 py-1">
                 {([
-                  { key: 'name', label: 'Partner Name' },
-                  { key: 'date', label: 'Date Onboarded' },
-                  { key: 'customers', label: 'Customers' },
-                  { key: 'outlets', label: 'Outlets' },
-                  { key: 'visitors', label: 'Registered Visitors' },
+                  { key: 'name', label: 'Partner Name (A to Z)', defaultDir: 'asc' as const },
+                  { key: 'date', label: 'Date Onboarded', defaultDir: 'asc' as const },
+                  { key: 'customers', label: 'Customers (High to Low)', defaultDir: 'desc' as const },
+                  { key: 'outlets', label: 'Outlets (High to Low)', defaultDir: 'desc' as const },
+                  { key: 'visitors', label: 'Registered Visitors (High to Low)', defaultDir: 'desc' as const },
                 ] as const).map((option) => (
                   <button
                     key={option.key}
                     onClick={() => {
                       if (sortField === option.key) {
-                        if (sortDirection === 'asc') setSortDirection('desc')
+                        if (sortDirection === option.defaultDir) setSortDirection(option.defaultDir === 'asc' ? 'desc' : 'asc')
                         else { setSortField(''); setSortDirection('asc') }
                       } else {
                         setSortField(option.key)
-                        setSortDirection('asc')
+                        setSortDirection(option.defaultDir)
                       }
                       setShowSortMenu(false)
                       setCurrentPage(1)
@@ -423,6 +423,7 @@ export function PartnerList({
               {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Outlets</th>}
               {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Assigned To</th>}
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">{isChallanPay ? 'Stage' : 'Status'}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Onboarding Date</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -511,6 +512,14 @@ export function PartnerList({
                 >
                   {isChallanPay && partner.stage ? <StageBadge stage={partner.stage} /> : <StatusBadge status={partner.status} />}
                 </td>
+                <td
+                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                  onClick={() => onView?.(partner.id)}
+                >
+                  <p className="text-sm text-slate-900 dark:text-white">
+                    {new Date(partner.dateOnboarded).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </p>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right" onClick={e => e.stopPropagation()}>
                   <div className="relative inline-block">
                     <button
@@ -589,6 +598,9 @@ export function PartnerList({
                     <span>{partner.linkedSubscribers.length} {isChallanPay ? 'customers' : 'subscribers'}</span>
                     {isChallanPay && <span>{partner.outlets ?? 0} outlets</span>}
                     {isChallanPay && <span>{partner.assignedTo || 'Unassigned'}</span>}
+                  </div>
+                  <div className="text-slate-500 dark:text-slate-400">
+                    Onboarded: {new Date(partner.dateOnboarded).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </div>
                 </div>
               </div>
