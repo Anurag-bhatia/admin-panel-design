@@ -498,7 +498,7 @@ export function PartnerList({
                       {partner.stage === 'onboarding' && partner.onboardingActivity
                         ? { registration: 'Registration', qrCreation: 'QR Creation', profileVerification: 'Profile Verification' }[partner.onboardingActivity]
                         : partner.stage === 'activation' && partner.activationActivity
-                        ? { training: 'Training' }[partner.activationActivity]
+                        ? { assigned: 'Assigned', trained: 'Trained' }[partner.activationActivity]
                         : partner.stage === 'mobilisation' && partner.mobilisationActivity
                         ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
                         : '—'}
@@ -607,7 +607,7 @@ export function PartnerList({
                       {partner.stage === 'onboarding' && partner.onboardingActivity
                         ? { registration: 'Registration', qrCreation: 'QR Creation', profileVerification: 'Profile Verification' }[partner.onboardingActivity]
                         : partner.stage === 'activation' && partner.activationActivity
-                        ? { training: 'Training' }[partner.activationActivity]
+                        ? { assigned: 'Assigned', trained: 'Trained' }[partner.activationActivity]
                         : partner.stage === 'mobilisation' && partner.mobilisationActivity
                         ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
                         : '—'}

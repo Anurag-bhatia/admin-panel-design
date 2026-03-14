@@ -12,7 +12,8 @@ export interface LinkedSubscriber {
   incidentCount: number
   submittedCourtChallans?: number
   submittedOnlineChallans?: number
-  submittedAmount?: number
+  submittedCourtAmount?: number
+  submittedOnlineAmount?: number
 }
 
 export interface Payout {
@@ -69,6 +70,8 @@ export interface RegisteredVisitorDetail {
   pendingCourtChallans: number
   pendingOnlineChallans: number
   pendingChallansAmount: number
+  pendingCourtChallansAmount: number
+  pendingOnlineChallansAmount: number
   contactNumber: string
 }
 
@@ -138,9 +141,9 @@ export interface Partner {
   vehicles?: number
   linkedVehicles: Vehicle[]
   status: 'active' | 'inactive'
-  stage?: 'onboarding' | 'activation' | 'training' | 'mobilisation'
+  stage?: 'onboarding' | 'activation' | 'mobilisation'
   onboardingActivity?: 'registration' | 'qrCreation' | 'profileVerification'
-  activationActivity?: 'training'
+  activationActivity?: 'assigned' | 'trained'
   mobilisationActivity?: 'posterCreated' | 'welcomeLetterCreated' | 'keychainCreated' | 'dispatch' | 'delivered'
   assignedTo?: string
   utmSource?: string

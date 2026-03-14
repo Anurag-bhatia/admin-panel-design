@@ -525,57 +525,73 @@ export function PartnerDetail({
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800">
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscriber ID</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">{isChallanPay ? 'Customer' : 'Subscriber'}</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Mobile</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscribed</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Submitted Challans</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Submitted Amount</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incidents</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase whitespace-nowrap">Subscriber ID</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">{isChallanPay ? 'Customer' : 'Subscriber'}</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Mobile</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase whitespace-nowrap">Subscribed</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase whitespace-nowrap">Challans</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase whitespace-nowrap">Amount</th>
+                          <th className="px-3 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incidents</th>
+                          <th className="px-3 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                         {paginatedCustomers.map((subscriber) => (
                           <tr key={subscriber.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-3 whitespace-nowrap">
                               <span className="font-mono text-sm text-slate-600 dark:text-slate-300">{subscriber.id}</span>
                             </td>
-                            <td className="px-4 py-3">
-                              <p className="font-medium text-slate-900 dark:text-slate-50">{subscriber.name}</p>
+                            <td className="px-3 py-3 whitespace-nowrap">
+                              <p className="font-medium text-sm text-slate-900 dark:text-slate-50">{subscriber.name}</p>
                             </td>
-                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{subscriber.mobile}</td>
-                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(subscriber.dateSubscribed)}</td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-3">
-                                <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                            <td className="px-3 py-3 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">{subscriber.mobile}</td>
+                            <td className="px-3 py-3 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">{formatDate(subscriber.dateSubscribed)}</td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-2">
+                                <span className="inline-block px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
                                   {(subscriber.submittedCourtChallans ?? 0) + (subscriber.submittedOnlineChallans ?? 0)}
                                 </span>
-                                <div className="flex flex-col gap-1">
-                                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="inline-flex items-center gap-1 text-[11px]">
                                     <span className="text-slate-600 dark:text-slate-400">Court</span>
                                     <span className="font-medium text-cyan-600 dark:text-cyan-400">{subscriber.submittedCourtChallans ?? 0}</span>
                                   </span>
-                                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                                  <span className="inline-flex items-center gap-1 text-[11px]">
                                     <span className="text-slate-600 dark:text-slate-400">Online</span>
                                     <span className="font-medium text-cyan-600 dark:text-cyan-400">{subscriber.submittedOnlineChallans ?? 0}</span>
                                   </span>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{formatCurrency(subscriber.submittedAmount ?? 0)}</td>
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-2">
+                                <span className="inline-block px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium whitespace-nowrap">
+                                  {formatCurrency((subscriber.submittedCourtAmount ?? 0) + (subscriber.submittedOnlineAmount ?? 0))}
+                                </span>
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="inline-flex items-center gap-1 text-[11px] whitespace-nowrap">
+                                    <span className="text-slate-600 dark:text-slate-400">Court</span>
+                                    <span className="font-medium text-cyan-600 dark:text-cyan-400">{formatCurrency(subscriber.submittedCourtAmount ?? 0)}</span>
+                                  </span>
+                                  <span className="inline-flex items-center gap-1 text-[11px] whitespace-nowrap">
+                                    <span className="text-slate-600 dark:text-slate-400">Online</span>
+                                    <span className="font-medium text-cyan-600 dark:text-cyan-400">{formatCurrency(subscriber.submittedOnlineAmount ?? 0)}</span>
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-3 py-3 text-center">
                               <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
                                 {subscriber.incidentCount}
                               </span>
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-3 text-center">
                               <button
                                 onClick={() => onViewIncidents?.(subscriber.id)}
-                                className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded transition-colors"
+                                className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded transition-colors whitespace-nowrap"
                               >
                                 <Eye className="w-3 h-3" />
-                                View Incidents
+                                View
                               </button>
                             </td>
                           </tr>
@@ -911,8 +927,26 @@ export function PartnerDetail({
                                 </div>
                               </div>
                             </td>
-                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
-                              {rv.pendingChallansAmount > 0 ? formatCurrency(rv.pendingChallansAmount) : '—'}
+                            <td className="px-4 py-3">
+                              {rv.pendingChallansAmount > 0 ? (
+                                <div className="flex items-center gap-3">
+                                  <span className="inline-block px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-900 dark:text-slate-50">
+                                    {formatCurrency(rv.pendingChallansAmount)}
+                                  </span>
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="inline-flex items-center gap-1.5 text-[11px]">
+                                      <span className="text-slate-600 dark:text-slate-400">Court</span>
+                                      <span className="font-medium text-cyan-600 dark:text-cyan-400">{formatCurrency(rv.pendingCourtChallansAmount)}</span>
+                                    </span>
+                                    <span className="inline-flex items-center gap-1.5 text-[11px]">
+                                      <span className="text-slate-600 dark:text-slate-400">Online</span>
+                                      <span className="font-medium text-cyan-600 dark:text-cyan-400">{formatCurrency(rv.pendingOnlineChallansAmount)}</span>
+                                    </span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-sm text-slate-600 dark:text-slate-300">—</span>
+                              )}
                             </td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{rv.contactNumber}</td>
                           </tr>
@@ -1013,13 +1047,15 @@ export function PartnerDetail({
                                     <button
                                       onClick={() => {
                                         const qr = partner.outletQRs?.find(q => q.outletId === outlet.id)
-                                        if (qr) setViewQrLink(qr)
+                                        if (qr) {
+                                          navigator.clipboard.writeText(`https://challanpay.com/qr/${qr.qrId}`)
+                                        }
                                         setOutletActionMenu(null)
                                       }}
                                       className="flex items-center gap-2 w-full px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                                     >
                                       <Link2 className="w-3.5 h-3.5" />
-                                      View QR Link
+                                      Copy QR Link
                                     </button>
                                     <button
                                       onClick={() => {
@@ -1051,27 +1087,44 @@ export function PartnerDetail({
           {activeTab === 'financial' && (
             <div>
               <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Earnings & Payouts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="p-4 bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-900/40 rounded-lg border border-cyan-200 dark:border-cyan-800">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="p-5 bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-900/40 rounded-lg border border-cyan-200 dark:border-cyan-800">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-cyan-600 dark:text-cyan-400 font-medium mb-1">Total Earnings</p>
+                      <p className="text-xs text-cyan-600 dark:text-cyan-400 font-medium uppercase tracking-wide mb-2">Total Earnings</p>
                       <p className="text-2xl font-bold text-cyan-700 dark:text-cyan-300">{formatCurrency(partner.earnings)}</p>
                     </div>
-                    <IndianRupee className="w-8 h-8 text-cyan-400" />
+                    <div className="w-10 h-10 rounded-full bg-cyan-200/60 dark:bg-cyan-800/40 flex items-center justify-center">
+                      <IndianRupee className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                    </div>
                   </div>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/40 rounded-lg border border-amber-200 dark:border-amber-800">
+                <div className="p-5 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/40 rounded-lg border border-amber-200 dark:border-amber-800">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-1">Total Earnings Till Date</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400 font-medium uppercase tracking-wide mb-2">Earnings Till Date</p>
                       <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{formatCurrency(partner.totalPayouts)}</p>
                     </div>
-                    <IndianRupee className="w-8 h-8 text-amber-400" />
+                    <div className="w-10 h-10 rounded-full bg-amber-200/60 dark:bg-amber-800/40 flex items-center justify-center">
+                      <IndianRupee className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    </div>
                   </div>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/40 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                  <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium mb-3">Commission Per Challan</p>
+                <div className="p-5 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/40 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase tracking-wide mb-2">Total Amount Dispersed</p>
+                      <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{formatCurrency(partner.payoutHistory.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0))}</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-blue-200/60 dark:bg-blue-800/40 flex items-center justify-center">
+                      <IndianRupee className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="p-5 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/40 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium uppercase tracking-wide mb-3">Commission Per Challan</p>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-emerald-700 dark:text-emerald-300">Online Challans</span>
@@ -1083,8 +1136,8 @@ export function PartnerDetail({
                     </div>
                   </div>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-violet-50 to-violet-100 dark:from-violet-900/20 dark:to-violet-900/40 rounded-lg border border-violet-200 dark:border-violet-800">
-                  <p className="text-sm text-violet-600 dark:text-violet-400 font-medium mb-3">Road Smart Partner Benefit</p>
+                <div className="p-5 bg-gradient-to-br from-violet-50 to-violet-100 dark:from-violet-900/20 dark:to-violet-900/40 rounded-lg border border-violet-200 dark:border-violet-800">
+                  <p className="text-xs text-violet-600 dark:text-violet-400 font-medium uppercase tracking-wide mb-3">Road Smart Partner Benefit</p>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-violet-700 dark:text-violet-300">Per Court Challan</span>
@@ -1268,8 +1321,8 @@ export function PartnerDetail({
                   const activity =
                     partner.stage === 'onboarding' && partner.onboardingActivity
                       ? { registration: 'Registration', qrCreation: 'QR Creation', profileVerification: 'Profile Verification' }[partner.onboardingActivity]
-                      : partner.stage === 'activation' && (partner as any).activationActivity
-                      ? { training: 'Training' }[(partner as any).activationActivity]
+                      : partner.stage === 'activation' && partner.activationActivity
+                      ? { assigned: 'Assigned', trained: 'Trained' }[partner.activationActivity]
                       : partner.stage === 'mobilisation' && partner.mobilisationActivity
                       ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
                       : null
@@ -1339,6 +1392,12 @@ export function PartnerDetail({
                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Court Challans Submitted</p>
                   <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{partner.totalCourtChallansSubmitted}</p>
+                </div>
+
+                {/* Total Dispersed Amount */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Total Dispersed Amount</p>
+                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{formatCurrency(partner.totalPayouts)}</p>
                 </div>
               </div>
             </div>
@@ -1440,11 +1499,51 @@ export function PartnerDetail({
           )}
 
           {/* Follow Ups Tab */}
-          {activeTab === 'followUps' && (
+          {activeTab === 'followUps' && (() => {
+            const stages = [
+              {
+                key: 'onboarding',
+                label: 'Onboarding',
+                icon: <UserCheck className="w-4 h-4" />,
+                activities: [
+                  { key: 'registration', label: 'Registration' },
+                  { key: 'qrCreation', label: 'QR Creation' },
+                  { key: 'profileVerification', label: 'Profile Verification' },
+                ],
+                currentActivity: partner.onboardingActivity,
+              },
+              {
+                key: 'activation',
+                label: 'Activation',
+                icon: <RefreshCw className="w-4 h-4" />,
+                activities: [
+                  { key: 'assigned', label: 'Assigned' },
+                  { key: 'trained', label: 'Trained' },
+                ],
+                currentActivity: partner.activationActivity,
+              },
+              {
+                key: 'mobilisation',
+                label: 'Mobilisation',
+                icon: <Truck className="w-4 h-4" />,
+                activities: [
+                  { key: 'posterCreated', label: 'Poster Created' },
+                  { key: 'welcomeLetterCreated', label: 'Welcome Letter' },
+                  { key: 'keychainCreated', label: 'Keychain Created' },
+                  { key: 'dispatch', label: 'Dispatch' },
+                  { key: 'delivered', label: 'Delivered' },
+                ],
+                currentActivity: partner.mobilisationActivity,
+              },
+            ]
+            const stageOrder = ['onboarding', 'activation', 'mobilisation']
+            const currentStageIdx = partner.stage ? stageOrder.indexOf(partner.stage) : -1
+            const followUps = partner.followUps || []
+
+            return (
             <div>
-              {/* Activity List */}
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Activity ({totalFollowUps})</h2>
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Activity</h2>
                 <button
                   onClick={() => {
                     setFollowUpForm({ activityType: '', subActivityType: '', notes: '' })
@@ -1456,50 +1555,89 @@ export function PartnerDetail({
                   Update
                 </button>
               </div>
-              {totalFollowUps === 0 ? (
-                <div className="text-center py-10">
-                  <CalendarCheck className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                  <p className="text-sm text-slate-500 dark:text-slate-400">No follow-ups recorded yet</p>
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-3">
-                    {paginatedFollowUps.map((fu) => (
-                      <div key={fu.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-start gap-3 flex-1 min-w-0">
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                              fu.activityType === 'onboarding' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' :
-                              fu.activityType === 'activation' ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' :
-                              fu.activityType === 'training' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400' :
-                              fu.activityType === 'mobilisation' ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400' :
-                              'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400'
-                            }`}>
-                              {fu.activityType === 'onboarding' && <UserCheck className="w-4 h-4" />}
-                              {fu.activityType === 'activation' && <RefreshCw className="w-4 h-4" />}
-                              {fu.activityType === 'training' && <FileText className="w-4 h-4" />}
-                              {fu.activityType === 'mobilisation' && <Truck className="w-4 h-4" />}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm font-medium text-slate-900 dark:text-slate-50 capitalize">{fu.activityType}</span>
-                              </div>
-                              <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{fu.notes}</p>
-                              <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
-                                <span>{fu.createdBy}</span>
-                                <span>{new Date(fu.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} at {new Date(fu.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
-                              </div>
-                            </div>
-                          </div>
+
+              <div className="space-y-0">
+                {stages.map((stage, stageIdx) => {
+                  const isCompleted = stageIdx < currentStageIdx
+                  const isCurrent = stageIdx === currentStageIdx
+                  const isPending = stageIdx > currentStageIdx
+                  const stageFollowUps = followUps.filter(fu => fu.activityType === stage.key)
+                  const isLast = stageIdx === stages.length - 1
+
+                  return (
+                    <div key={stage.key} className="flex gap-4">
+                      {/* Stepper line + circle */}
+                      <div className="flex flex-col items-center">
+                        <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${
+                          isCompleted ? 'bg-cyan-600 border-cyan-600 text-white' :
+                          isCurrent ? 'bg-white dark:bg-slate-900 border-cyan-600 text-cyan-600' :
+                          'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-400 dark:text-slate-500'
+                        }`}>
+                          {isCompleted ? <Check className="w-4 h-4" /> : stage.icon}
                         </div>
+                        {!isLast && (
+                          <div className={`w-0.5 flex-1 min-h-[24px] ${
+                            isCompleted ? 'bg-cyan-600' : 'bg-slate-200 dark:bg-slate-700'
+                          }`} />
+                        )}
                       </div>
-                    ))}
-                  </div>
-                  <PaginationBar current={safeFollowUpPage} total={totalFollowUpPages} count={totalFollowUps} perPage={perPage} onChange={setFollowUpPage} />
-                </>
-              )}
+
+                      {/* Stage content */}
+                      <div className={`flex-1 min-w-0 ${!isLast ? 'pb-6' : 'pb-0'}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`text-sm font-semibold ${
+                            isCompleted || isCurrent ? 'text-slate-900 dark:text-slate-50' : 'text-slate-400 dark:text-slate-500'
+                          }`}>{stage.label}</span>
+                          {isCompleted && (
+                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400">Completed</span>
+                          )}
+                          {isCurrent && (
+                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400">In Progress</span>
+                          )}
+                        </div>
+
+                        {/* Sub-activities */}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {stage.activities.map((act) => {
+                            const actIdx = stage.activities.findIndex(a => a.key === act.key)
+                            const currentActIdx = stage.activities.findIndex(a => a.key === stage.currentActivity)
+                            const actCompleted = isCompleted || (isCurrent && currentActIdx >= 0 && actIdx < currentActIdx)
+                            const actCurrent = isCurrent && act.key === stage.currentActivity
+                            return (
+                              <span key={act.key} className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border ${
+                                actCompleted ? 'bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300' :
+                                actCurrent ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300' :
+                                'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500'
+                              }`}>
+                                {actCompleted && <Check className="w-3 h-3" />}
+                                {act.label}
+                              </span>
+                            )
+                          })}
+                        </div>
+
+                        {/* Follow-up entries for this stage */}
+                        {stageFollowUps.length > 0 && (
+                          <div className="space-y-2">
+                            {stageFollowUps.map((fu) => (
+                              <div key={fu.id} className="bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3.5 py-2.5">
+                                <p className="text-sm text-slate-700 dark:text-slate-300 mb-1">{fu.notes}</p>
+                                <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+                                  <span>{fu.createdBy}</span>
+                                  <span>{new Date(fu.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} at {new Date(fu.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          )}
+            )
+          })()}
 
         </div>
         {/* Assigned Reviewer — right side card (Activity tab only) */}

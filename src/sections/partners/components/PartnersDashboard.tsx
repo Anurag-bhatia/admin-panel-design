@@ -273,7 +273,7 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                         {([
                           { label: 'Registration', value: activityMetrics.registration, dot: 'bg-amber-500' },
                           { label: 'QR Creation', value: activityMetrics.qrCreation, dot: 'bg-blue-500' },
-                          { label: 'Profile Verification', value: activityMetrics.profileVerification, dot: 'bg-emerald-500' },
+                          { label: 'Profile Verification Approval', value: activityMetrics.profileVerification, dot: 'bg-emerald-500' },
                         ]).map((sub) => (
                           <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-1.5 mb-1">
@@ -309,8 +309,8 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                     {!isOnboarding && !isMobilisation && metrics && (
                       <div className="grid grid-cols-2 gap-2.5">
                         {([
-                          { label: 'Assigned', value: metrics.assigned, dot: 'bg-blue-500' },
-                          { label: 'Trained', value: metrics.active, dot: 'bg-emerald-500' },
+                          { label: 'QR Printed', value: metrics.assigned, dot: 'bg-blue-500' },
+                          { label: 'Training', value: metrics.active, dot: 'bg-emerald-500' },
                         ]).map((sub) => (
                           <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-1.5 mb-1">

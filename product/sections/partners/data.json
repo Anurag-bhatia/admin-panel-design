@@ -42,7 +42,8 @@
       "bankAccountNumber": "1234567890123456",
       "bankName": "HDFC Bank",
       "partnerType": "challanPay",
-      "stage": "training",
+      "stage": "activation",
+      "activationActivity": "trained",
       "assignedTo": "Arun Kumar",
       "utmSource": "Google Ads",
       "outlets": 4,
@@ -162,7 +163,9 @@
           "pendingChallansAmount": 4500,
           "contactNumber": "9876543210",
           "pendingCourtChallans": 1,
-          "pendingOnlineChallans": 2
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 2700,
+          "pendingOnlineChallansAmount": 1800
         },
         {
           "id": "rvd-002",
@@ -172,7 +175,9 @@
           "pendingChallansAmount": 1500,
           "contactNumber": "9812345678",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 900,
+          "pendingOnlineChallansAmount": 600
         },
         {
           "id": "rvd-003",
@@ -182,7 +187,9 @@
           "pendingChallansAmount": 7200,
           "contactNumber": "9988776655",
           "pendingCourtChallans": 2,
-          "pendingOnlineChallans": 3
+          "pendingOnlineChallans": 3,
+          "pendingCourtChallansAmount": 4320,
+          "pendingOnlineChallansAmount": 2880
         },
         {
           "id": "rvd-004",
@@ -192,7 +199,9 @@
           "pendingChallansAmount": 0,
           "contactNumber": "9871234560",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 0
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
         },
         {
           "id": "rvd-005",
@@ -202,7 +211,9 @@
           "pendingChallansAmount": 3000,
           "contactNumber": "9654321098",
           "pendingCourtChallans": 1,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1800,
+          "pendingOnlineChallansAmount": 1200
         },
         {
           "id": "rvd-006",
@@ -212,7 +223,9 @@
           "pendingChallansAmount": 6800,
           "contactNumber": "9765432109",
           "pendingCourtChallans": 2,
-          "pendingOnlineChallans": 2
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 4080,
+          "pendingOnlineChallansAmount": 2720
         },
         {
           "id": "rvd-007",
@@ -222,7 +235,9 @@
           "pendingChallansAmount": 2000,
           "contactNumber": "9543210987",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1200,
+          "pendingOnlineChallansAmount": 800
         }
       ],
       "outletQRs": [
@@ -375,9 +390,10 @@
           "status": "active",
           "dateSubscribed": "2023-06-01",
           "incidentCount": 12,
-          "submittedAmount": 12400,
           "submittedCourtChallans": 4,
-          "submittedOnlineChallans": 4
+          "submittedOnlineChallans": 4,
+          "submittedCourtAmount": 7440,
+          "submittedOnlineAmount": 4960
         },
         {
           "id": "LWD-1160524",
@@ -387,9 +403,10 @@
           "status": "active",
           "dateSubscribed": "2023-07-10",
           "incidentCount": 8,
-          "submittedAmount": 7500,
           "submittedCourtChallans": 2,
-          "submittedOnlineChallans": 3
+          "submittedOnlineChallans": 3,
+          "submittedCourtAmount": 4500,
+          "submittedOnlineAmount": 3000
         },
         {
           "id": "LWD-1160525",
@@ -399,9 +416,10 @@
           "status": "paused",
           "dateSubscribed": "2023-08-20",
           "incidentCount": 3,
-          "submittedAmount": 3200,
           "submittedCourtChallans": 1,
-          "submittedOnlineChallans": 1
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 1920,
+          "submittedOnlineAmount": 1280
         }
       ],
       "earnings": 45000,
@@ -462,7 +480,8 @@
           "timestamp": "2023-05-20T09:15:00Z",
           "details": "GST certificate uploaded"
         }
-      ]
+      ],
+      "onboardingActivity": "profileVerification"
     },
     {
       "id": "partner-002",
@@ -489,8 +508,8 @@
       "bankAccountNumber": "9876543210123456",
       "bankName": "ICICI Bank",
       "partnerType": "challanPay",
-      "stage": "activation",
-      "activationActivity": "training",
+      "stage": "mobilisation",
+      "activationActivity": "trained",
       "assignedTo": "Neha Patel",
       "utmSource": "Referral",
       "outlets": 2,
@@ -566,7 +585,9 @@
           "pendingChallansAmount": 3200,
           "contactNumber": "9876012345",
           "pendingCourtChallans": 1,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1920,
+          "pendingOnlineChallansAmount": 1280
         },
         {
           "id": "rvd-009",
@@ -576,7 +597,9 @@
           "pendingChallansAmount": 0,
           "contactNumber": "9812098765",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 0
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
         },
         {
           "id": "rvd-010",
@@ -586,7 +609,9 @@
           "pendingChallansAmount": 9100,
           "contactNumber": "9945678901",
           "pendingCourtChallans": 3,
-          "pendingOnlineChallans": 3
+          "pendingOnlineChallans": 3,
+          "pendingCourtChallansAmount": 5460,
+          "pendingOnlineChallansAmount": 3640
         },
         {
           "id": "rvd-011",
@@ -596,7 +621,9 @@
           "pendingChallansAmount": 1800,
           "contactNumber": "9734561230",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1080,
+          "pendingOnlineChallansAmount": 720
         },
         {
           "id": "rvd-012",
@@ -606,7 +633,9 @@
           "pendingChallansAmount": 4200,
           "contactNumber": "9623456789",
           "pendingCourtChallans": 1,
-          "pendingOnlineChallans": 2
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 2520,
+          "pendingOnlineChallansAmount": 1680
         }
       ],
       "outletQRs": [
@@ -711,9 +740,10 @@
           "status": "active",
           "dateSubscribed": "2023-09-05",
           "incidentCount": 18,
-          "submittedAmount": 21000,
           "submittedCourtChallans": 7,
-          "submittedOnlineChallans": 7
+          "submittedOnlineChallans": 7,
+          "submittedCourtAmount": 12600,
+          "submittedOnlineAmount": 8400
         },
         {
           "id": "LWD-1160527",
@@ -723,9 +753,10 @@
           "status": "active",
           "dateSubscribed": "2023-10-12",
           "incidentCount": 7,
-          "submittedAmount": 6200,
           "submittedCourtChallans": 2,
-          "submittedOnlineChallans": 2
+          "submittedOnlineChallans": 2,
+          "submittedCourtAmount": 3720,
+          "submittedOnlineAmount": 2480
         }
       ],
       "earnings": 32500,
@@ -766,7 +797,9 @@
           "timestamp": "2024-01-10T16:20:00Z",
           "details": "Partner status set to active"
         }
-      ]
+      ],
+      "onboardingActivity": "profileVerification",
+      "mobilisationActivity": "dispatch"
     },
     {
       "id": "partner-003",
@@ -837,9 +870,10 @@
           "status": "active",
           "dateSubscribed": "2023-11-20",
           "incidentCount": 5,
-          "submittedAmount": 4800,
           "submittedCourtChallans": 1,
-          "submittedOnlineChallans": 2
+          "submittedOnlineChallans": 2,
+          "submittedCourtAmount": 2880,
+          "submittedOnlineAmount": 1920
         }
       ],
       "earnings": 12000,
@@ -923,9 +957,10 @@
           "status": "inactive",
           "dateSubscribed": "2023-03-20",
           "incidentCount": 2,
-          "submittedAmount": 1500,
           "submittedCourtChallans": 0,
-          "submittedOnlineChallans": 1
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 900,
+          "submittedOnlineAmount": 600
         }
       ],
       "earnings": 5000,
@@ -1043,7 +1078,9 @@
           "pendingChallansAmount": 2800,
           "contactNumber": "9876543201",
           "pendingCourtChallans": 1,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1680,
+          "pendingOnlineChallansAmount": 1120
         },
         {
           "id": "rvd-014",
@@ -1053,7 +1090,9 @@
           "pendingChallansAmount": 5600,
           "contactNumber": "9812345097",
           "pendingCourtChallans": 2,
-          "pendingOnlineChallans": 2
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 3360,
+          "pendingOnlineChallansAmount": 2240
         },
         {
           "id": "rvd-015",
@@ -1063,7 +1102,9 @@
           "pendingChallansAmount": 0,
           "contactNumber": "9945670123",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 0
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
         },
         {
           "id": "rvd-016",
@@ -1073,7 +1114,9 @@
           "pendingChallansAmount": 1500,
           "contactNumber": "9723456780",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 900,
+          "pendingOnlineChallansAmount": 600
         }
       ],
       "outletQRs": [
@@ -1139,9 +1182,10 @@
           "status": "active",
           "dateSubscribed": "2024-01-15",
           "incidentCount": 1,
-          "submittedAmount": 1200,
           "submittedCourtChallans": 0,
-          "submittedOnlineChallans": 1
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 720,
+          "submittedOnlineAmount": 480
         },
         {
           "id": "LWD-1160531",
@@ -1151,9 +1195,10 @@
           "status": "active",
           "dateSubscribed": "2024-01-20",
           "incidentCount": 4,
-          "submittedAmount": 4500,
           "submittedCourtChallans": 1,
-          "submittedOnlineChallans": 2
+          "submittedOnlineChallans": 2,
+          "submittedCourtAmount": 2700,
+          "submittedOnlineAmount": 1800
         }
       ],
       "earnings": 8500,
@@ -1212,7 +1257,8 @@
       "bankAccountNumber": "7777888899990000",
       "bankName": "Yes Bank",
       "partnerType": "challanPay",
-      "stage": "training",
+      "stage": "activation",
+      "activationActivity": "assigned",
       "assignedTo": "Rajesh Verma",
       "utmSource": "Google Ads",
       "outlets": 6,
@@ -1263,7 +1309,9 @@
           "pendingChallansAmount": 5100,
           "contactNumber": "9865432107",
           "pendingCourtChallans": 1,
-          "pendingOnlineChallans": 2
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 3060,
+          "pendingOnlineChallansAmount": 2040
         },
         {
           "id": "rvd-018",
@@ -1273,7 +1321,9 @@
           "pendingChallansAmount": 0,
           "contactNumber": "9754321098",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 0
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
         },
         {
           "id": "rvd-019",
@@ -1283,7 +1333,9 @@
           "pendingChallansAmount": 3400,
           "contactNumber": "9643210987",
           "pendingCourtChallans": 1,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 2040,
+          "pendingOnlineChallansAmount": 1360
         },
         {
           "id": "rvd-024",
@@ -1293,7 +1345,9 @@
           "pendingChallansAmount": 1800,
           "contactNumber": "9532109876",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1080,
+          "pendingOnlineChallansAmount": 720
         },
         {
           "id": "rvd-025",
@@ -1303,7 +1357,9 @@
           "pendingChallansAmount": 7200,
           "contactNumber": "9421098765",
           "pendingCourtChallans": 2,
-          "pendingOnlineChallans": 2
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 4320,
+          "pendingOnlineChallansAmount": 2880
         }
       ],
       "outletQRs": [],
@@ -1381,9 +1437,10 @@
           "status": "active",
           "dateSubscribed": "2023-10-05",
           "incidentCount": 9,
-          "submittedAmount": 10500,
           "submittedCourtChallans": 3,
-          "submittedOnlineChallans": 4
+          "submittedOnlineChallans": 4,
+          "submittedCourtAmount": 6300,
+          "submittedOnlineAmount": 4200
         },
         {
           "id": "LWD-1160533",
@@ -1393,9 +1450,10 @@
           "status": "active",
           "dateSubscribed": "2023-11-10",
           "incidentCount": 6,
-          "submittedAmount": 6800,
           "submittedCourtChallans": 2,
-          "submittedOnlineChallans": 2
+          "submittedOnlineChallans": 2,
+          "submittedCourtAmount": 4080,
+          "submittedOnlineAmount": 2720
         },
         {
           "id": "LWD-1160534",
@@ -1405,9 +1463,10 @@
           "status": "inactive",
           "dateSubscribed": "2023-12-01",
           "incidentCount": 0,
-          "submittedAmount": 0,
           "submittedCourtChallans": 0,
-          "submittedOnlineChallans": 0
+          "submittedOnlineChallans": 0,
+          "submittedCourtAmount": 0,
+          "submittedOnlineAmount": 0
         }
       ],
       "earnings": 38000,
@@ -1474,7 +1533,8 @@
           "timestamp": "2023-10-05T12:45:00Z",
           "details": "Hyderabad Movers linked to partner"
         }
-      ]
+      ],
+      "onboardingActivity": "profileVerification"
     },
     {
       "id": "partner-007",
@@ -1545,9 +1605,10 @@
           "status": "active",
           "dateSubscribed": "2023-12-10",
           "incidentCount": 3,
-          "submittedAmount": 3600,
           "submittedCourtChallans": 1,
-          "submittedOnlineChallans": 1
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 2160,
+          "submittedOnlineAmount": 1440
         }
       ],
       "earnings": 6000,
@@ -1594,8 +1655,8 @@
       "bankAccountNumber": "8888999900001111",
       "bankName": "SBI",
       "partnerType": "challanPay",
-      "stage": "activation",
-      "activationActivity": "training",
+      "stage": "mobilisation",
+      "activationActivity": "trained",
       "assignedTo": "Kavita Sharma",
       "utmSource": "Referral",
       "outlets": 3,
@@ -1632,7 +1693,9 @@
           "pendingChallansAmount": 2000,
           "contactNumber": "9876501234",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1200,
+          "pendingOnlineChallansAmount": 800
         },
         {
           "id": "rvd-021",
@@ -1642,7 +1705,9 @@
           "pendingChallansAmount": 7500,
           "contactNumber": "9812340567",
           "pendingCourtChallans": 2,
-          "pendingOnlineChallans": 3
+          "pendingOnlineChallans": 3,
+          "pendingCourtChallansAmount": 4500,
+          "pendingOnlineChallansAmount": 3000
         },
         {
           "id": "rvd-022",
@@ -1652,7 +1717,9 @@
           "pendingChallansAmount": 0,
           "contactNumber": "9945670012",
           "pendingCourtChallans": 0,
-          "pendingOnlineChallans": 0
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
         },
         {
           "id": "rvd-023",
@@ -1662,7 +1729,9 @@
           "pendingChallansAmount": 3600,
           "contactNumber": "9734560189",
           "pendingCourtChallans": 1,
-          "pendingOnlineChallans": 1
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 2160,
+          "pendingOnlineChallansAmount": 1440
         }
       ],
       "outletQRs": [],
@@ -1740,9 +1809,10 @@
           "status": "active",
           "dateSubscribed": "2023-11-01",
           "incidentCount": 11,
-          "submittedAmount": 13500,
           "submittedCourtChallans": 4,
-          "submittedOnlineChallans": 5
+          "submittedOnlineChallans": 5,
+          "submittedCourtAmount": 8100,
+          "submittedOnlineAmount": 5400
         },
         {
           "id": "LWD-1160537",
@@ -1752,9 +1822,10 @@
           "status": "paused",
           "dateSubscribed": "2023-11-15",
           "incidentCount": 2,
-          "submittedAmount": 1800,
           "submittedCourtChallans": 0,
-          "submittedOnlineChallans": 1
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 1080,
+          "submittedOnlineAmount": 720
         }
       ],
       "earnings": 28500,
@@ -1795,7 +1866,9 @@
           "timestamp": "2023-10-28T14:20:00Z",
           "details": "GST certificate uploaded"
         }
-      ]
+      ],
+      "onboardingActivity": "profileVerification",
+      "mobilisationActivity": "welcomeLetterCreated"
     }
   ]
 }
