@@ -156,32 +156,9 @@ export function BulkUploadModal({ onUpload, onDownloadTemplate, onClose }: BulkU
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Step 1: Download Template */}
+          {/* Upload File */}
           <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600 p-4">
-            <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-sm font-bold">
-                1
-              </span>
-              Download Template
-            </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-              Start with our pre-formatted template to ensure all required fields are included correctly.
-            </p>
-            <button
-              onClick={generateCSVTemplate}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-700 dark:hover:bg-cyan-600 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              Download Template
-            </button>
-          </div>
-
-          {/* Step 2: Upload File */}
-          <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600 p-4">
-            <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-sm font-bold">
-                2
-              </span>
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3">
               Upload Your File
             </h3>
 
@@ -250,10 +227,7 @@ export function BulkUploadModal({ onUpload, onDownloadTemplate, onClose }: BulkU
           {/* Step 3: Review & Confirm */}
           {state.file && !state.uploadComplete && state.errors.length === 0 && (
             <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600 p-4">
-              <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-sm font-bold">
-                  3
-                </span>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3">
                 Review & Confirm
               </h3>
               <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
@@ -284,23 +258,32 @@ export function BulkUploadModal({ onUpload, onDownloadTemplate, onClose }: BulkU
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-200 dark:border-slate-700 px-6 py-4 flex gap-3 justify-end bg-slate-50 dark:bg-slate-700/50">
-          {!state.uploadComplete && (
-            <button
-              onClick={onClose}
-              className="px-6 py-2 rounded-lg font-medium text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-            >
-              Cancel
-            </button>
-          )}
-          {state.uploadComplete && (
-            <button
-              onClick={onClose}
-              className="px-6 py-2 rounded-lg font-medium text-white bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-700 dark:hover:bg-cyan-600 transition-colors"
-            >
-              Close
-            </button>
-          )}
+        <div className="border-t border-slate-200 dark:border-slate-700 px-6 py-4 flex gap-3 justify-between bg-slate-50 dark:bg-slate-700/50">
+          <button
+            onClick={generateCSVTemplate}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Download Sample
+          </button>
+          <div className="flex gap-3">
+            {!state.uploadComplete && (
+              <button
+                onClick={onClose}
+                className="px-6 py-2 rounded-lg font-medium text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              >
+                Cancel
+              </button>
+            )}
+            {state.uploadComplete && (
+              <button
+                onClick={onClose}
+                className="px-6 py-2 rounded-lg font-medium text-white bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-700 dark:hover:bg-cyan-600 transition-colors"
+              >
+                Close
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

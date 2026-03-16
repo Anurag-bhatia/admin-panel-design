@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Calendar, Clock, ChevronDown, MoreVertical, Eye, Phone, MapPin, Truck, Building2 } from 'lucide-react'
-import type { MyLeadsProps, Lead } from '@/../product/sections/sales-crm/my-leads-types'
+import type { MyLeadsProps, Lead } from '../types'
 import { LeadDetailView } from './LeadDetailView'
 import { EditLeadModal } from './EditLeadModal'
 import { AddFollowUpModal } from './AddFollowUpModal'
@@ -103,6 +103,17 @@ export function MyLeads({
       lost: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
     }
     return `${baseClasses} ${variants[status]}`
+  }
+
+  const STATUS_LABELS: Record<Lead['status'], string> = {
+    new: 'New',
+    assigned: 'Assigned',
+    'follow-up': 'Follow-up',
+    quotations: 'Quotations',
+    projected: 'Projected',
+    invoiced: 'Ready to Invoice',
+    sales: 'Converted',
+    lost: 'Lost',
   }
 
   const getUserName = (userId: string | null) => {
@@ -366,7 +377,7 @@ export function MyLeads({
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => setSelectedLeadId(lead.id)}>
                           <span className={getStatusBadgeClasses(lead.status)}>
-                            {lead.status.charAt(0).toUpperCase() + lead.status.slice(1).replace('-', ' ')}
+                            {STATUS_LABELS[lead.status]}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => setSelectedLeadId(lead.id)}>
@@ -419,7 +430,7 @@ export function MyLeads({
                         <div className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">{lead.companyAlias}</div>
                       </div>
                       <span className={getStatusBadgeClasses(lead.status)}>
-                        {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
+                        {STATUS_LABELS[lead.status]}
                       </span>
                     </div>
 

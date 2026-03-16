@@ -1,25 +1,29 @@
-# Customers
+# Customers (Registered Visitors)
 
 ## Overview
 
-The Customers module manages D2C customers who use the platform independently, providing a unified view of vehicles, incidents, challans, and payment history.
+Centralized D2C visitor management system providing a unified view of each visitor, their vehicles, incidents, challans, and payment history. Acts as the single source of truth for all retail visitor interactions with a detail page featuring 5 tabs.
 
 ## Components Provided
 
 - `CustomerList` — Main list view
-- `CustomerTable` — Customer table with search
-- `CustomerRow` — Individual customer row
-- `BulkUploadCustomers` — Bulk upload modal
-- `CustomerDetailView` — Detail page with 5 tabs
+- `CustomerListHeader` — Search, Add/Bulk Upload buttons
+- `CustomerTable` — Data table
+- `CustomerRow` — Table row with visitor data
+- `BulkUploadCustomers` — CSV/Excel upload modal
+- `CustomerDetailView` — Full detail page with 5 tabs
 
 ## Callback Props
 
 | Callback | Description |
 |----------|-------------|
-| `onViewCustomer` | View customer details |
-| `onAddCustomer` | Add new customer |
-| `onBulkUpload` | Bulk upload customers |
-| `onEditCustomer` | Edit customer |
-| `onCreateIncident` | Create incident for customer |
-| `onViewIncident` | View incident details |
-| `onUpdateIncidentStatus` | Quick status update |
+| `onAddCustomer` | Create new visitor |
+| `onBulkUpload` | Upload visitors via CSV/Excel |
+| `onViewDetail` | Open visitor detail |
+| `onEdit` | Edit visitor profile |
+| `onSearch` | Search visitors |
+| `onExport` | Export visitor data |
+
+## Data Used
+
+**Entities:** Customer, Vehicle, Incident, Challan, FinancialSummary, ActivityLog

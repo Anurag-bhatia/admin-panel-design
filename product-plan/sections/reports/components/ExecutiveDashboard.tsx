@@ -1,11 +1,11 @@
 import {
   AlertCircle,
+  UserPlus,
   Users,
-  UserCircle,
   Scale,
   Handshake,
   CreditCard,
-  MessageSquare
+  MessageSquare,
 } from 'lucide-react'
 import type { ExecutiveSummary } from '../types'
 
@@ -14,147 +14,158 @@ interface ExecutiveDashboardProps {
   onCardClick?: (domain: string) => void
 }
 
+function OverviewCard({
+  icon: Icon,
+  title,
+  metrics,
+  accent,
+  onClick,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  metrics: { label: string; value: string | number }[]
+  accent: string
+  onClick?: () => void
+}) {
+  const accentMap: Record<string, { bg: string; icon: string }> = {
+    cyan: { bg: 'bg-cyan-50 dark:bg-cyan-950/40', icon: 'text-cyan-600 dark:text-cyan-400' },
+    violet: { bg: 'bg-violet-50 dark:bg-violet-950/40', icon: 'text-violet-600 dark:text-violet-400' },
+    emerald: { bg: 'bg-emerald-50 dark:bg-emerald-950/40', icon: 'text-emerald-600 dark:text-emerald-400' },
+    amber: { bg: 'bg-amber-50 dark:bg-amber-950/40', icon: 'text-amber-600 dark:text-amber-400' },
+    blue: { bg: 'bg-blue-50 dark:bg-blue-950/40', icon: 'text-blue-600 dark:text-blue-400' },
+    green: { bg: 'bg-green-50 dark:bg-green-950/40', icon: 'text-green-600 dark:text-green-400' },
+    rose: { bg: 'bg-rose-50 dark:bg-rose-950/40', icon: 'text-rose-600 dark:text-rose-400' },
+  }
+  const a = accentMap[accent] || accentMap.cyan
+
+  return (
+    <button
+      onClick={onClick}
+      className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 text-left transition-all hover:border-cyan-300 dark:hover:border-cyan-700 hover:shadow-lg hover:shadow-cyan-500/5 hover:-translate-y-0.5"
+    >
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className={`p-2.5 rounded-lg ${a.bg}`}>
+          <Icon className={`w-5 h-5 ${a.icon}`} />
+        </div>
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h3>
+      </div>
+
+      {/* Metrics */}
+      <div className="space-y-3">
+        {metrics.map((m, i) => {
+          const isFirst = i === 0
+          return (
+            <div key={m.label} className="flex items-center justify-between">
+              <span className="text-sm text-slate-500 dark:text-slate-400">{m.label}</span>
+              <span
+                className={`tabular-nums font-semibold ${
+                  isFirst
+                    ? 'text-lg text-slate-900 dark:text-white'
+                    : 'text-sm text-slate-700 dark:text-slate-300'
+                }`}
+              >
+                {typeof m.value === 'number' ? m.value.toLocaleString('en-IN') : m.value}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </button>
+  )
+}
+
 export function ExecutiveDashboard({ data, onCardClick }: ExecutiveDashboardProps) {
-  const domains = [
+  const cards = [
     {
       key: 'incidents',
       icon: AlertCircle,
       title: 'Incidents',
-      color: 'cyan',
+      accent: 'cyan',
       metrics: [
         { label: 'Total', value: data.incidents.total },
-        { label: 'Resolved', value: data.incidents.resolved },
-        { label: 'Pending', value: data.incidents.pending },
+        { label: 'Settled', value: data.incidents.resolved ?? 0 },
+        { label: 'Not Settled', value: data.incidents.pending ?? 0 },
       ],
     },
     {
       key: 'leads',
-      icon: Users,
+      icon: UserPlus,
       title: 'Leads',
-      color: 'violet',
+      accent: 'violet',
       metrics: [
         { label: 'Total', value: data.leads.total },
-        { label: 'Converted', value: data.leads.converted },
-        { label: 'Conversion', value: `${data.leads.conversionRate}%` },
+        { label: 'Converted', value: data.leads.converted ?? 0 },
+        { label: 'Lost', value: data.leads.lost ?? (data.leads.total - (data.leads.converted ?? 0)) },
       ],
     },
     {
       key: 'subscribers',
-      icon: UserCircle,
+      icon: Users,
       title: 'Subscribers',
-      color: 'emerald',
+      accent: 'emerald',
       metrics: [
         { label: 'Total', value: data.subscribers.total },
-        { label: 'Active', value: data.subscribers.active },
-        { label: 'New', value: data.subscribers.newThisMonth },
+        { label: 'Active', value: data.subscribers.active ?? 0 },
+        { label: 'New', value: data.subscribers.newThisMonth ?? 0 },
       ],
     },
     {
       key: 'lawyers',
       icon: Scale,
       title: 'Lawyers',
-      color: 'amber',
+      accent: 'amber',
       metrics: [
         { label: 'Total', value: data.lawyers.total },
-        { label: 'Active', value: data.lawyers.active },
-        { label: 'Success Rate', value: `${data.lawyers.avgSuccessRate}%` },
+        { label: 'Active', value: data.lawyers.active ?? 0 },
       ],
     },
     {
       key: 'partners',
       icon: Handshake,
       title: 'Partners',
-      color: 'blue',
+      accent: 'blue',
       metrics: [
         { label: 'Total', value: data.partners.total },
-        { label: 'Active', value: data.partners.active },
-        { label: 'Subscribers', value: data.partners.subscribersOnboarded },
+        { label: 'Active', value: data.partners.active ?? 0 },
       ],
     },
     {
       key: 'payments',
       icon: CreditCard,
       title: 'Payments',
-      color: 'green',
+      accent: 'green',
       metrics: [
-        { label: 'Collections', value: `₹${(data.payments.totalCollections / 100000).toFixed(1)}L` },
-        { label: 'Pending', value: `₹${(data.payments.pendingPayments / 100000).toFixed(1)}L` },
-        { label: 'Payouts', value: `₹${(data.payments.payoutsProcessed / 100000).toFixed(1)}L` },
+        { label: 'Payout', value: `\u20B9${((data.payments.payoutsProcessed ?? 0) / 100000).toFixed(1)}L` },
+        { label: 'Refund Amount', value: `\u20B9${((data.payments.refundsIssued ?? 0) / 100000).toFixed(1)}L` },
       ],
     },
     {
       key: 'disputes',
       icon: MessageSquare,
       title: 'Disputes',
-      color: 'rose',
+      accent: 'rose',
       metrics: [
         { label: 'Total', value: data.disputes.total },
-        { label: 'Open', value: data.disputes.open },
-        { label: 'Resolved', value: data.disputes.resolved },
+        { label: 'Open', value: data.disputes.open ?? 0 },
+        { label: 'Settled', value: data.disputes.resolved ?? 0 },
       ],
     },
   ]
 
   return (
-    <div className="px-6 pb-6">
-      {/* Grid of domain cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {domains.map((domain) => {
-          const Icon = domain.icon
-          const trend = (data as any)[domain.key].trend
-
-          return (
-            <button
-              key={domain.key}
-              onClick={() => onCardClick?.(domain.key)}
-              className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-left transition-all hover:border-cyan-300 dark:hover:border-cyan-700 hover:shadow-xl hover:shadow-cyan-500/10 hover:-translate-y-1"
-            >
-              {/* Background gradient on hover */}
-              <div className={`absolute inset-0 bg-gradient-to-br from-${domain.color}-500/0 via-${domain.color}-500/0 to-${domain.color}-500/0 group-hover:from-${domain.color}-500/5 group-hover:to-transparent rounded-2xl transition-all duration-300`} />
-
-              <div className="relative">
-                {/* Icon and title */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2.5 bg-${domain.color}-100 dark:bg-${domain.color}-900/30 rounded-xl`}>
-                      <Icon className={`w-5 h-5 text-${domain.color}-600 dark:text-${domain.color}-400`} />
-                    </div>
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-                      {domain.title}
-                    </h3>
-                  </div>
-
-                  {/* Trend badge */}
-                  <div className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                    trend > 0
-                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                      : trend < 0
-                      ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400'
-                  }`}>
-                    {trend > 0 ? '+' : ''}{trend}%
-                  </div>
-                </div>
-
-                {/* Metrics */}
-                <div className="space-y-3">
-                  {domain.metrics.map((metric, idx) => (
-                    <div key={idx} className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600 dark:text-slate-400">
-                        {metric.label}
-                      </span>
-                      <span className="text-base font-semibold text-slate-900 dark:text-white">
-                        {typeof metric.value === 'number' && metric.value >= 1000
-                          ? metric.value.toLocaleString()
-                          : metric.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </button>
-          )
-        })}
+    <div className="px-8 lg:px-12 pb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        {cards.map((card) => (
+          <OverviewCard
+            key={card.key}
+            icon={card.icon}
+            title={card.title}
+            accent={card.accent}
+            metrics={card.metrics}
+            onClick={() => onCardClick?.(card.key)}
+          />
+        ))}
       </div>
     </div>
   )

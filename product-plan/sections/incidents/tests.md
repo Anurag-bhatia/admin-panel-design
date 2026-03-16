@@ -1,344 +1,174 @@
 # Test Instructions: Incidents
 
-These test-writing instructions are **framework-agnostic**. Adapt them to your testing setup (Jest, Vitest, Playwright, Cypress, React Testing Library, etc.).
+These test-writing instructions are **framework-agnostic**. Adapt them to your testing setup.
 
 ## Overview
 
-The Incidents module manages challan processing through queue-based workflows. Test the queue navigation, bulk operations, incident creation, and detail view functionality.
+Test the queue-driven challan management system including queue navigation, CRUD operations, bulk actions, detail view with tabs, 45-day TAT enforcement, and export functionality.
 
 ---
 
 ## User Flow Tests
 
-### Flow 1: Navigate Queue Tabs
+### Flow 1: Add New Challan
 
-**Scenario:** User switches between different queue tabs to view incidents by stage.
+**Success Path**
 
-#### Success Path
-
-**Setup:**
-- Incidents exist across multiple queues
-- User has permission to view all incidents
-
-**Steps:**
-1. User navigates to `/incidents`
-2. User sees queue tabs: "New Incidents", "Screening", "Lawyer Assigned", "Settled", "Not Settled", "Refund"
-3. User clicks "Screening" tab
-4. Table updates to show only incidents in Screening queue
-
-**Expected Results:**
-- [ ] Queue tabs display with accurate counts (e.g., "New Incidents (12)")
-- [ ] Clicking tab updates table content
-- [ ] Active tab is visually highlighted
-- [ ] URL may update to reflect selected queue
-
----
-
-### Flow 2: Add New Challan
-
-**Scenario:** User creates a new challan incident.
-
-#### Success Path
-
-**Setup:**
-- User has "add challan" permission
-- Subscribers exist for selection
+**Setup:** User on Incidents page, "New Incidents" tab active
 
 **Steps:**
 1. User clicks "Add Challan" button
 2. Modal opens with form fields
-3. User selects subscriber from dropdown
-4. User enters challan number, vehicle number
-5. User selects type (Pay & Close / Contest)
-6. User selects source
-7. User clicks "Save"
+3. User fills subscriber, vehicle, type (Pay & Close / Contest), source
+4. User clicks submit
 
 **Expected Results:**
-- [ ] Modal opens with title "Add Challan"
-- [ ] Subscriber dropdown shows available subscribers
-- [ ] Form validates required fields (shows error if empty)
-- [ ] Success toast: "Challan created successfully"
-- [ ] New challan appears in "New Incidents" queue
-- [ ] Modal closes after success
+- [ ] Modal closes after submission
+- [ ] New challan appears in "New Incidents" queue tab
+- [ ] Queue count increments by 1
+- [ ] Success toast/notification appears
 
-#### Failure Path: Missing Required Field
+**Failure Path: Missing Required Fields**
+- [ ] Submit button disabled or shows validation errors when required fields empty
+- [ ] Form data preserved (not cleared) on validation error
 
-**Setup:**
-- User leaves challan number empty
+### Flow 2: Validate Challans
 
-**Steps:**
-1. User fills form but leaves "Challan Number" empty
-2. User clicks "Save"
-
-**Expected Results:**
-- [ ] Error message: "Challan number is required"
-- [ ] Form not submitted
-- [ ] Focus moves to invalid field
-
----
-
-### Flow 3: Bulk Assign Lawyer
-
-**Scenario:** User assigns a lawyer to multiple incidents at once.
-
-#### Success Path
-
-**Setup:**
-- Multiple incidents exist in "Screening" queue
-- Lawyers exist for assignment
+**Setup:** Multiple challans exist in New Incidents queue
 
 **Steps:**
-1. User selects 3 incidents via checkboxes
+1. User selects 3 challans via checkboxes
 2. Bulk actions bar appears showing "3 selected"
-3. User clicks "Assign Lawyer" button
-4. Modal opens with lawyer dropdown
-5. User selects lawyer "Adv. Priya Sharma"
-6. User clicks "Assign"
+3. User clicks "Validate"
+4. System processes validation
 
 **Expected Results:**
-- [ ] Bulk actions bar shows "3 selected"
-- [ ] "Assign Lawyer" button is enabled
-- [ ] Modal shows lawyer list with name and state
-- [ ] Success toast: "3 incidents assigned to Adv. Priya Sharma"
-- [ ] Incidents move to "Lawyer Assigned" queue
-- [ ] Selection is cleared
+- [ ] ValidateResultsView displays
+- [ ] Per-challan status shown (exists / already disposed / other)
+- [ ] User can dismiss results and return to list
 
-#### Failure Path: No Incidents Selected
+**Failure Path: API Error**
+- [ ] Error message displayed: "Validation failed. Please try again."
+- [ ] Selected challans remain selected
 
-**Setup:**
-- No incidents selected
+### Flow 3: Assign Lawyer
 
-**Expected Results:**
-- [ ] Bulk actions bar not visible
-- [ ] "Assign Lawyer" action not accessible
-
----
-
-### Flow 4: View Incident Details
-
-**Scenario:** User opens incident detail page to view full information.
-
-#### Success Path
-
-**Setup:**
-- Incident exists with follow-ups, timeline, documents
+**Setup:** Challans in New Incidents or Screening queue
 
 **Steps:**
-1. User clicks on incident row "IRN-12345"
+1. User selects challans
+2. Clicks "Assign Lawyer" from bulk actions
+3. Modal shows available lawyers
+4. User selects a lawyer and confirms
+
+**Expected Results:**
+- [ ] Challans move to "Lawyer Assigned" queue
+- [ ] Previous queue count decreases
+- [ ] "Lawyer Assigned" count increases
+- [ ] Assignment logged in timeline
+
+### Flow 4: View Challan Detail
+
+**Setup:** Challan with follow-ups and documents exists
+
+**Steps:**
+1. User clicks a challan row
 2. Detail page opens
-3. User sees header with Incident ID and action buttons
-4. User sees tabs: "Activity", "Notes", "Details"
-5. User clicks "Activity" tab
-6. User sees follow-ups and timeline
+3. User navigates between tabs (Activity, Notes, Details, Call Summary)
+4. User clicks "+ Add Follow-Up"
+5. Fills follow-up form (notes, outcome, next date)
 
 **Expected Results:**
-- [ ] Header shows "IRN-12345"
-- [ ] TAT countdown displays (e.g., "32 days remaining")
-- [ ] Subscriber info shown in sidebar
-- [ ] Tabs are clickable and load content
-- [ ] Activity tab shows chronological history
-- [ ] Back button returns to list
-
----
-
-### Flow 5: Add Follow-Up
-
-**Scenario:** User adds a follow-up note to an incident.
-
-#### Success Path
-
-**Setup:**
-- User is on incident detail page
-
-**Steps:**
-1. User clicks "+ Add Follow-Up" button
-2. Modal opens with form
-3. User enters notes: "Called subscriber, confirmed payment pending"
-4. User selects outcome: "Awaiting Payment"
-5. User sets next follow-up date
-6. User clicks "Save"
-
-**Expected Results:**
-- [ ] Modal opens with title "Add Follow-Up"
-- [ ] Notes field accepts multi-line text
-- [ ] Outcome dropdown shows options
-- [ ] Date picker works for next follow-up
-- [ ] Success toast: "Follow-up added"
-- [ ] New follow-up appears in Activity tab
-- [ ] Timeline shows "Follow-up added by [User Name]"
+- [ ] Header shows Incident ID (e.g., "IRN-12345")
+- [ ] Left sidebar shows TAT countdown, subscriber info, assignments
+- [ ] All tabs render with correct data
+- [ ] Follow-up appears in Activity tab after saving
+- [ ] TAT overdue shown in red when past 45 days
 
 ---
 
 ## Empty State Tests
 
 ### No Incidents in Queue
-
-**Scenario:** Queue has no incidents
-
-**Setup:**
-- "Refund" queue has 0 incidents
+**Setup:** Queue tab has 0 incidents
 
 **Expected Results:**
-- [ ] Tab shows "Refund (0)"
-- [ ] Table area shows empty state message
-- [ ] Message: "No incidents in this queue"
-- [ ] No broken layout or errors
+- [ ] Helpful message displayed (not blank screen)
+- [ ] Queue tab shows count "0"
 
-### No Follow-Ups Yet
-
-**Scenario:** Incident has no follow-up activities
-
-**Setup:**
-- Incident exists but `followUps` is empty array
+### No Follow-Ups
+**Setup:** Incident has no follow-ups
 
 **Expected Results:**
-- [ ] Activity tab shows "No follow-ups recorded"
-- [ ] "+ Add Follow-Up" button is visible
-- [ ] Clicking CTA opens add follow-up modal
+- [ ] Activity tab shows empty state message
+- [ ] "+ Add Follow-Up" button visible and functional
 
-### No Documents Attached
-
-**Scenario:** Incident has no documents
-
-**Setup:**
-- Incident exists but `documents` is empty array
+### No Documents
+**Setup:** Incident has no uploaded documents
 
 **Expected Results:**
-- [ ] Details tab shows "No documents uploaded"
-- [ ] "Upload Document" button is visible
-- [ ] Clicking CTA opens file upload
-
-### Search Returns No Results
-
-**Scenario:** User searches for non-existent incident
-
-**Setup:**
-- Search query matches nothing
-
-**Steps:**
-1. User enters "INVALID-ID-999" in search
-2. User presses Enter
-
-**Expected Results:**
-- [ ] Table shows "No incidents found"
-- [ ] "Clear search" link is visible
-- [ ] Clicking clears search and shows all incidents
+- [ ] Details tab documents section shows empty state
+- [ ] Upload button/area visible
 
 ---
 
 ## Component Interaction Tests
 
 ### IncidentRow
-
-**Renders correctly:**
-- [ ] Displays incident ID (e.g., "IRN-12345")
-- [ ] Shows subscriber name with ID beneath
-- [ ] Shows vehicle number
-- [ ] Shows type badge (Pay & Close / Contest)
-- [ ] Shows status badge with appropriate color
-- [ ] Shows formatted dates
-- [ ] Shows assigned agent/lawyer names or "Unassigned"
-
-**User interactions:**
-- [ ] Checkbox toggles selection
-- [ ] Clicking row (not checkbox) opens detail view
-- [ ] Actions menu shows context-appropriate options
+- [ ] Checkbox toggles selection state
+- [ ] Row click opens detail view
+- [ ] Action menu shows correct options for current queue
+- [ ] Status badge displays correct color
 
 ### QueueTabs
-
-**Renders correctly:**
-- [ ] All 6 queue tabs visible
-- [ ] Each tab shows count in parentheses
-- [ ] Active tab has different styling
-
-**User interactions:**
-- [ ] Clicking tab triggers `onQueueChange` callback
-- [ ] Keyboard navigation works (Tab, Enter)
+- [ ] Tabs show correct counts
+- [ ] Clicking tab switches displayed data
+- [ ] Active tab visually distinguished
 
 ### BulkActionsBar
-
-**Renders correctly:**
-- [ ] Shows selected count: "X selected"
-- [ ] Shows action buttons: Validate, Screen, Assign Agent, Assign Lawyer, Move Queue
-
-**User interactions:**
-- [ ] Each button triggers appropriate modal or action
-- [ ] "Clear selection" clears all checkboxes
+- [ ] Appears when 1+ challans selected
+- [ ] Shows selected count
+- [ ] Disappears when all deselected
 
 ---
 
 ## Edge Cases
 
-- [ ] Handles very long incident IDs with truncation
-- [ ] Works with 1 incident and 1000+ incidents
-- [ ] TAT shows "Overdue" in red when past deadline
-- [ ] Preserves filters when navigating back from detail
-- [ ] Bulk actions disabled when no items selected
-- [ ] Transition: first incident created → list renders correctly
-- [ ] Transition: last incident moved → empty state appears
+- [ ] Selecting challans across queue tabs (should only select within current queue)
+- [ ] TAT at exactly 45 days boundary
+- [ ] Very long subscriber names truncate properly
+- [ ] Pagination works with 1 item and 100+ items
+- [ ] Moving last challan from queue shows empty state
 
 ---
 
 ## Accessibility Checks
 
-- [ ] Queue tabs are keyboard navigable
-- [ ] Checkboxes have accessible labels
-- [ ] Modals trap focus appropriately
-- [ ] Screen reader announces selected count
-- [ ] Error messages are announced
+- [ ] Checkbox selection keyboard accessible
+- [ ] Tab navigation works with keyboard
+- [ ] Action menu accessible via keyboard
+- [ ] Modal focus trapped correctly
 
 ---
 
 ## Sample Test Data
 
 ```typescript
-// Populated state
 const mockIncident = {
-  id: "inc-001",
-  incidentId: "IRN-12345",
-  challanNumber: "MH012024001234",
-  subscriberId: "LWD-1160523",
-  subscriberName: "ABC Logistics Pvt Ltd",
-  vehicle: "MH01AB1234",
-  type: "contest",
-  category: "challan",
-  status: "pending_screening",
+  id: "IRN-12345",
+  subscriberName: "Fleet Corp Pvt Ltd",
+  subscriberId: "SUB-001",
+  vehicleNumber: "DL-01-AB-1234",
+  challanType: "contest",
+  status: "new",
   queue: "newIncidents",
-  createdAt: "2024-01-15T10:30:00Z",
-  lastUpdatedAt: "2024-01-15T14:45:00Z",
-  tatDeadline: "2024-03-01T10:30:00Z",
-  assignedAgentId: null,
-  assignedLawyerId: null,
+  assignedAgent: null,
+  assignedLawyer: null,
   source: "API",
-  state: "Maharashtra",
-  offence: "Signal Violation",
-  amount: 2500
+  createdAt: "2025-12-01T10:00:00Z",
+  updatedAt: "2025-12-01T10:00:00Z",
 };
 
-const mockIncidents = [mockIncident, /* ... more incidents */];
-
-// Empty states
-const mockEmptyQueue = [];
-
-const mockIncidentNoFollowUps = {
-  ...mockIncident,
-  followUps: []
-};
-
-// Error scenarios
-const mockApiError = {
-  status: 500,
-  message: "Failed to create incident"
-};
+const mockIncidents = [mockIncident];
+const mockEmptyList = [];
 ```
-
----
-
-## Notes for Test Implementation
-
-- Mock API calls for validation/screening operations
-- Test queue counts update after bulk operations
-- Verify TAT calculations are accurate
-- Test filter persistence across navigation
-- Ensure bulk selection works across paginated data
-- Test permission-based action visibility

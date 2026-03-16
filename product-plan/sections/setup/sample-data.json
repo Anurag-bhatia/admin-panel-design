@@ -1,0 +1,986 @@
+{
+  "_meta": {
+    "models": {
+      "services": "A service or product offering on the platform (e.g., CaaS, Bsafe, Udrive) with its type, vehicle category, slug, and credit cost.",
+      "priceCategories": "A pricing tier that defines markup or GST percentage applied to service charges (e.g., LOTS Secure, Class G variants).",
+      "departments": "An organizational unit within the company (e.g., Operations, Finance, Legal Operations).",
+      "designations": "A job title or role mapped to a specific department (e.g., Operations Manager under Operations).",
+      "masters": "A configurable dropdown category that groups related values used across modules (e.g., 'Lead Sources' contains Website, Referral, Cold Call, etc.).",
+      "masterValues": "An individual value belonging to a master category (e.g., 'Website' under Lead Sources).",
+      "geographicValues": "A location-based configuration value — states, cities, or countries used in forms and filters.",
+      "auditEntries": "A log record capturing who changed what configuration, in which area, and when."
+    },
+    "relationships": [
+      "Each Designation belongs to a Department",
+      "Each Master Value belongs to a Master category",
+      "Each Master is linked to one or more usage modules (Incidents, Leads, etc.)",
+      "Each Service has a type (Against Vehicle / Topup Service) and vehicle category",
+      "Geographic Values are grouped by level (country, state, city) with parent references",
+      "Audit Entries reference the config area and specific record that was changed"
+    ]
+  },
+  "services": [
+    {
+      "id": "svc-001",
+      "name": "Court Challan",
+      "type": "Against Vehicle",
+      "category": "Private Vehicles",
+      "slug": "court-challan",
+      "credits": 1,
+      "status": "active",
+      "description": "Resolution of court-issued traffic challans for private vehicle owners.",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-02-18T10:30:00Z"
+    },
+    {
+      "id": "svc-002",
+      "name": "Online Challan",
+      "type": "Against Vehicle",
+      "category": "Private Vehicles",
+      "slug": "online-challan",
+      "credits": 1,
+      "status": "active",
+      "description": "Resolution of e-challans issued via traffic cameras and online portals.",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-02-15T09:00:00Z"
+    },
+    {
+      "id": "svc-003",
+      "name": "VCare (Aggregator)",
+      "type": "Topup Service",
+      "category": "Commercial Vehicle",
+      "slug": "vcare-aggregator",
+      "credits": 50,
+      "status": "active",
+      "description": "Vehicle care and compliance monitoring for commercial fleet aggregators.",
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-02-10T14:20:00Z"
+    },
+    {
+      "id": "svc-004",
+      "name": "BSafe (Aggregator)",
+      "type": "Topup Service",
+      "category": "Commercial Vehicle",
+      "slug": "bsafe-aggregator",
+      "credits": 50,
+      "status": "active",
+      "description": "Safety compliance and driver behaviour tracking for aggregator fleets.",
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-02-10T14:25:00Z"
+    },
+    {
+      "id": "svc-005",
+      "name": "Challan-as-a-Service",
+      "type": "Against Vehicle",
+      "category": "Private Vehicles",
+      "slug": "challan-as-a-service",
+      "credits": 1,
+      "status": "active",
+      "description": "End-to-end challan resolution offered as a managed service to individuals.",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-28T11:00:00Z"
+    },
+    {
+      "id": "svc-006",
+      "name": "WShare",
+      "type": "Topup Service",
+      "category": "Commercial Vehicle",
+      "slug": "wshare",
+      "credits": 50,
+      "status": "active",
+      "description": "Shared fleet compliance management for commercial vehicle sharing platforms.",
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-01-20T16:00:00Z"
+    },
+    {
+      "id": "svc-007",
+      "name": "TollFree",
+      "type": "Against Vehicle",
+      "category": "Commercial Vehicle",
+      "slug": "tollfree",
+      "credits": 10,
+      "status": "active",
+      "description": "Toll-related dispute and challan resolution for commercial vehicles.",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-15T09:30:00Z"
+    },
+    {
+      "id": "svc-008",
+      "name": "VCare",
+      "type": "Topup Service",
+      "category": "Commercial Vehicle",
+      "slug": "vcare",
+      "credits": 500,
+      "status": "active",
+      "description": "Premium vehicle care and compliance package for enterprise commercial fleets.",
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-01-12T10:00:00Z"
+    },
+    {
+      "id": "svc-009",
+      "name": "BSafe",
+      "type": "Against Vehicle",
+      "category": "Commercial Vehicle",
+      "slug": "bsafe",
+      "credits": 100,
+      "status": "inactive",
+      "description": "Legacy safety compliance product — replaced by BSafe (Aggregator).",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T08:00:00Z"
+    },
+    {
+      "id": "svc-010",
+      "name": "UDrive",
+      "type": "Against Vehicle",
+      "category": "Commercial Vehicle",
+      "slug": "udrive",
+      "credits": 10,
+      "status": "active",
+      "description": "Driver-specific challan management and resolution for commercial operators.",
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-02-22T13:45:00Z"
+    }
+  ],
+  "priceCategories": [
+    {
+      "id": "pc-001",
+      "name": "LOTS Secure (Two Wheelers)",
+      "increaseBy": 18.0,
+      "description": "Standard GST-inclusive pricing tier for two-wheeler challan services.",
+      "status": "active",
+      "isProtected": false,
+      "modifiedBy": "Ankit Verma",
+      "modifiedAt": "2026-02-20T11:00:00Z"
+    },
+    {
+      "id": "pc-002",
+      "name": "LOTS Secure (PV)",
+      "increaseBy": 18.0,
+      "description": "Standard GST-inclusive pricing tier for private vehicle challan services.",
+      "status": "active",
+      "isProtected": false,
+      "modifiedBy": "Ankit Verma",
+      "modifiedAt": "2026-02-20T11:05:00Z"
+    },
+    {
+      "id": "pc-003",
+      "name": "Class G - Cabs + 18% (GST)",
+      "increaseBy": 18.0,
+      "description": "Cab and ride-hailing fleet pricing with 18% GST markup.",
+      "status": "active",
+      "isProtected": false,
+      "modifiedBy": "Ankit Verma",
+      "modifiedAt": "2026-02-18T09:30:00Z"
+    },
+    {
+      "id": "pc-004",
+      "name": "Class A - Base Price - HH+ (AITWA)",
+      "increaseBy": 0.0,
+      "description": "Base price tier with no markup for AITWA affiliated heavy haulage operators.",
+      "status": "active",
+      "isProtected": true,
+      "modifiedBy": "Ankit Verma",
+      "modifiedAt": "2026-01-10T08:00:00Z"
+    },
+    {
+      "id": "pc-005",
+      "name": "Class G - RTO + 18% (GST)",
+      "increaseBy": 18.0,
+      "description": "RTO-related challan resolution with 18% GST markup.",
+      "status": "active",
+      "isProtected": false,
+      "modifiedBy": "Ankit Verma",
+      "modifiedAt": "2026-02-15T10:00:00Z"
+    },
+    {
+      "id": "pc-006",
+      "name": "Class G - Priority Challans + 18% (GST)",
+      "increaseBy": 18.0,
+      "description": "Priority/expedited challan resolution with 18% GST markup.",
+      "status": "active",
+      "isProtected": false,
+      "modifiedBy": "Ankit Verma",
+      "modifiedAt": "2026-02-15T10:10:00Z"
+    },
+    {
+      "id": "pc-007",
+      "name": "Class G - Lok Adalat + 18% (GST)",
+      "increaseBy": 18.0,
+      "description": "Lok Adalat court appearance cases with 18% GST markup.",
+      "status": "active",
+      "isProtected": false,
+      "modifiedBy": "Ankit Verma",
+      "modifiedAt": "2026-02-12T14:00:00Z"
+    },
+    {
+      "id": "pc-008",
+      "name": "Class G - Trip + 18% (GST)",
+      "increaseBy": 18.0,
+      "description": "Per-trip challan resolution pricing for fleet operators.",
+      "status": "inactive",
+      "isProtected": false,
+      "modifiedBy": "Ankit Verma",
+      "modifiedAt": "2025-11-20T16:00:00Z"
+    }
+  ],
+  "departments": [
+    {
+      "id": "dept-001",
+      "name": "Business Operations",
+      "icon": "briefcase",
+      "status": "active",
+      "headCount": 14,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T09:00:00Z"
+    },
+    {
+      "id": "dept-002",
+      "name": "Customer Success",
+      "icon": "heart-handshake",
+      "status": "active",
+      "headCount": 8,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T09:05:00Z"
+    },
+    {
+      "id": "dept-003",
+      "name": "Marketing",
+      "icon": "megaphone",
+      "status": "active",
+      "headCount": 5,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T09:10:00Z"
+    },
+    {
+      "id": "dept-004",
+      "name": "Finance",
+      "icon": "indian-rupee",
+      "status": "active",
+      "headCount": 4,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T09:15:00Z"
+    },
+    {
+      "id": "dept-005",
+      "name": "Product and Strategy",
+      "icon": "lightbulb",
+      "status": "active",
+      "headCount": 3,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T09:20:00Z"
+    },
+    {
+      "id": "dept-006",
+      "name": "Sales & Business Development",
+      "icon": "trending-up",
+      "status": "active",
+      "headCount": 7,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T09:25:00Z"
+    },
+    {
+      "id": "dept-007",
+      "name": "Management",
+      "icon": "crown",
+      "status": "active",
+      "headCount": 3,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T09:30:00Z"
+    },
+    {
+      "id": "dept-008",
+      "name": "Legal Operations",
+      "icon": "scale",
+      "status": "active",
+      "headCount": 6,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T09:35:00Z"
+    },
+    {
+      "id": "dept-009",
+      "name": "Founder's Office",
+      "icon": "star",
+      "status": "active",
+      "headCount": 2,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T09:40:00Z"
+    }
+  ],
+  "designations": [
+    {
+      "id": "desg-001",
+      "title": "Data Analyst",
+      "departmentId": "dept-001",
+      "departmentName": "Business Operations",
+      "icon": "bar-chart",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-06T10:00:00Z"
+    },
+    {
+      "id": "desg-002",
+      "title": "Executive",
+      "departmentId": "dept-002",
+      "departmentName": "Customer Success",
+      "icon": "user",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-06T10:05:00Z"
+    },
+    {
+      "id": "desg-003",
+      "title": "Executive",
+      "departmentId": "dept-003",
+      "departmentName": "Marketing",
+      "icon": "user",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-06T10:10:00Z"
+    },
+    {
+      "id": "desg-004",
+      "title": "Manager",
+      "departmentId": "dept-002",
+      "departmentName": "Customer Success",
+      "icon": "user-check",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-06T10:15:00Z"
+    },
+    {
+      "id": "desg-005",
+      "title": "Sr. Manager",
+      "departmentId": "dept-001",
+      "departmentName": "Business Operations",
+      "icon": "user-cog",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-06T10:20:00Z"
+    },
+    {
+      "id": "desg-006",
+      "title": "Sales Officer",
+      "departmentId": "dept-006",
+      "departmentName": "Sales & Business Development",
+      "icon": "phone",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-06T10:25:00Z"
+    },
+    {
+      "id": "desg-007",
+      "title": "Finance Manager",
+      "departmentId": "dept-004",
+      "departmentName": "Finance",
+      "icon": "calculator",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-06T10:30:00Z"
+    },
+    {
+      "id": "desg-008",
+      "title": "Legal Coordinator",
+      "departmentId": "dept-008",
+      "departmentName": "Legal Operations",
+      "icon": "scale",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-06T10:35:00Z"
+    },
+    {
+      "id": "desg-009",
+      "title": "Operations Executive",
+      "departmentId": "dept-001",
+      "departmentName": "Business Operations",
+      "icon": "clipboard",
+      "status": "inactive",
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2025-12-15T14:00:00Z"
+    }
+  ],
+  "masters": [
+    {
+      "id": "mstr-001",
+      "name": "Incident Sources",
+      "description": "Origin channels for incoming incident/challan records.",
+      "usageModules": ["Incidents"],
+      "icon": "radio",
+      "status": "active",
+      "valueCount": 4,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-02-01T10:00:00Z"
+    },
+    {
+      "id": "mstr-002",
+      "name": "Lead Sources",
+      "description": "Channels and origins from which new sales leads are captured.",
+      "usageModules": ["Leads"],
+      "icon": "funnel",
+      "status": "active",
+      "valueCount": 8,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-02-05T11:00:00Z"
+    },
+    {
+      "id": "mstr-003",
+      "name": "Offence Types",
+      "description": "Types of traffic violations and offences used across incidents and challans.",
+      "usageModules": ["Incidents", "Customers"],
+      "icon": "alert-triangle",
+      "status": "active",
+      "valueCount": 10,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-28T09:00:00Z"
+    },
+    {
+      "id": "mstr-004",
+      "name": "Dispute Types",
+      "description": "Classification of customer disputes by nature of complaint.",
+      "usageModules": ["Disputes"],
+      "icon": "message-square-warning",
+      "status": "active",
+      "valueCount": 4,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-02-10T14:00:00Z"
+    },
+    {
+      "id": "mstr-005",
+      "name": "Dispute Sources",
+      "description": "Channels through which disputes are raised by customers or internally.",
+      "usageModules": ["Disputes"],
+      "icon": "inbox",
+      "status": "active",
+      "valueCount": 4,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-02-10T14:10:00Z"
+    },
+    {
+      "id": "mstr-006",
+      "name": "Legal Categories",
+      "description": "Areas of legal expertise for lawyer classification and matching.",
+      "usageModules": ["Lawyers"],
+      "icon": "scale",
+      "status": "active",
+      "valueCount": 12,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-20T10:00:00Z"
+    },
+    {
+      "id": "mstr-007",
+      "name": "Partner Kind",
+      "description": "Classification of partner types for relationship management.",
+      "usageModules": ["Partners"],
+      "icon": "handshake",
+      "status": "active",
+      "valueCount": 2,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-01-15T09:00:00Z"
+    },
+    {
+      "id": "mstr-008",
+      "name": "Subscriber Types",
+      "description": "Classification of subscriber accounts by business type.",
+      "usageModules": ["Subscribers", "Leads"],
+      "icon": "users",
+      "status": "active",
+      "valueCount": 3,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-10T08:30:00Z"
+    },
+    {
+      "id": "mstr-009",
+      "name": "Vehicle Types",
+      "description": "Types of vehicles tracked across partners, subscribers, and incidents.",
+      "usageModules": ["Partners", "Subscribers", "Customers"],
+      "icon": "truck",
+      "status": "active",
+      "valueCount": 6,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-01-08T11:00:00Z"
+    },
+    {
+      "id": "mstr-010",
+      "name": "KYC Document Types",
+      "description": "Types of identity and verification documents for lawyers and employees.",
+      "usageModules": ["Lawyers", "Team"],
+      "icon": "file-check",
+      "status": "active",
+      "valueCount": 6,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-05T10:00:00Z"
+    },
+    {
+      "id": "mstr-011",
+      "name": "Business Entity Types",
+      "description": "Legal entity classifications for partner onboarding.",
+      "usageModules": ["Partners"],
+      "icon": "building",
+      "status": "active",
+      "valueCount": 5,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-01-05T10:30:00Z"
+    },
+    {
+      "id": "mstr-012",
+      "name": "Banks",
+      "description": "Supported banking institutions for payouts and financial operations.",
+      "usageModules": ["Partners", "Lawyers", "Payments"],
+      "icon": "landmark",
+      "status": "active",
+      "valueCount": 7,
+      "modifiedBy": "Ankit Verma",
+      "modifiedAt": "2026-01-03T09:00:00Z"
+    },
+    {
+      "id": "mstr-013",
+      "name": "Evidence Types",
+      "description": "Types of supporting documents that can be attached to disputes.",
+      "usageModules": ["Disputes"],
+      "icon": "paperclip",
+      "status": "active",
+      "valueCount": 6,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-02-08T15:00:00Z"
+    },
+    {
+      "id": "mstr-014",
+      "name": "Languages",
+      "description": "Preferred languages for lawyer communication and case handling.",
+      "usageModules": ["Lawyers"],
+      "icon": "languages",
+      "status": "active",
+      "valueCount": 7,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-20T10:00:00Z"
+    },
+    {
+      "id": "mstr-015",
+      "name": "UTM Sources",
+      "description": "UTM tracking sources for subscribers and incident attribution.",
+      "usageModules": ["Subscribers", "Incidents"],
+      "icon": "link",
+      "status": "active",
+      "valueCount": 4,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-02-01T12:00:00Z"
+    },
+    {
+      "id": "mstr-016",
+      "name": "Incident Sub Titles",
+      "description": "Sub-classification labels for incident records.",
+      "usageModules": ["Incidents"],
+      "icon": "tag",
+      "status": "active",
+      "valueCount": 5,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-25T11:00:00Z"
+    },
+    {
+      "id": "mstr-017",
+      "name": "Customer Type",
+      "description": "Classification of end-user customers by account type.",
+      "usageModules": ["Customers"],
+      "icon": "user-circle",
+      "status": "active",
+      "valueCount": 3,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-01-18T09:00:00Z"
+    },
+    {
+      "id": "mstr-018",
+      "name": "Departments Involved",
+      "description": "Departments that can be tagged on cross-functional issues or disputes.",
+      "usageModules": ["Disputes", "Support"],
+      "icon": "network",
+      "status": "active",
+      "valueCount": 4,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2026-01-12T10:00:00Z"
+    },
+    {
+      "id": "mstr-019",
+      "name": "Support Submission Types",
+      "description": "Classification of incoming support tickets by nature.",
+      "usageModules": ["Support"],
+      "icon": "headphones",
+      "status": "active",
+      "valueCount": 4,
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2026-01-08T14:00:00Z"
+    },
+    {
+      "id": "mstr-020",
+      "name": "Location Types",
+      "description": "Classification of geographic locations for partner outlets and service areas.",
+      "usageModules": ["Partners"],
+      "icon": "map-pin",
+      "status": "inactive",
+      "valueCount": 3,
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-11-10T09:00:00Z"
+    }
+  ],
+  "masterValues": {
+    "mstr-001": [
+      { "id": "mv-001", "value": "API", "status": "active", "sortOrder": 1 },
+      { "id": "mv-002", "value": "Manual", "status": "active", "sortOrder": 2 },
+      { "id": "mv-003", "value": "Bulk Upload", "status": "active", "sortOrder": 3 },
+      { "id": "mv-004", "value": "Partner", "status": "active", "sortOrder": 4 }
+    ],
+    "mstr-002": [
+      { "id": "mv-005", "value": "Website", "status": "active", "sortOrder": 1 },
+      { "id": "mv-006", "value": "Referral", "status": "active", "sortOrder": 2 },
+      { "id": "mv-007", "value": "Cold Call", "status": "active", "sortOrder": 3 },
+      { "id": "mv-008", "value": "LinkedIn", "status": "active", "sortOrder": 4 },
+      { "id": "mv-009", "value": "Trade Show", "status": "active", "sortOrder": 5 },
+      { "id": "mv-010", "value": "Partner", "status": "active", "sortOrder": 6 },
+      { "id": "mv-011", "value": "Email Campaign", "status": "active", "sortOrder": 7 },
+      { "id": "mv-012", "value": "Other", "status": "active", "sortOrder": 8 }
+    ],
+    "mstr-003": [
+      { "id": "mv-013", "value": "Over Speeding", "status": "active", "sortOrder": 1 },
+      { "id": "mv-014", "value": "Red Light Violation", "status": "active", "sortOrder": 2 },
+      { "id": "mv-015", "value": "No Parking", "status": "active", "sortOrder": 3 },
+      { "id": "mv-016", "value": "Overloading", "status": "active", "sortOrder": 4 },
+      { "id": "mv-017", "value": "Dangerous Driving", "status": "active", "sortOrder": 5 },
+      { "id": "mv-018", "value": "Without Helmet", "status": "active", "sortOrder": 6 },
+      { "id": "mv-019", "value": "Document Violation", "status": "active", "sortOrder": 7 },
+      { "id": "mv-020", "value": "Lane Violation", "status": "active", "sortOrder": 8 },
+      { "id": "mv-021", "value": "Signal Jumping", "status": "active", "sortOrder": 9 },
+      { "id": "mv-022", "value": "Wrong Way Driving", "status": "inactive", "sortOrder": 10 }
+    ],
+    "mstr-004": [
+      { "id": "mv-023", "value": "Refund", "status": "active", "sortOrder": 1 },
+      { "id": "mv-024", "value": "Service", "status": "active", "sortOrder": 2 },
+      { "id": "mv-025", "value": "Payment", "status": "active", "sortOrder": 3 },
+      { "id": "mv-026", "value": "Legal Escalation", "status": "active", "sortOrder": 4 }
+    ],
+    "mstr-006": [
+      { "id": "mv-027", "value": "Criminal Law", "status": "active", "sortOrder": 1 },
+      { "id": "mv-028", "value": "Motor Vehicle Act", "status": "active", "sortOrder": 2 },
+      { "id": "mv-029", "value": "Corporate Litigation", "status": "active", "sortOrder": 3 },
+      { "id": "mv-030", "value": "Consumer Protection Law", "status": "active", "sortOrder": 4 },
+      { "id": "mv-031", "value": "Intellectual Property", "status": "active", "sortOrder": 5 },
+      { "id": "mv-032", "value": "Employment and Labour Laws", "status": "active", "sortOrder": 6 },
+      { "id": "mv-033", "value": "Startup and Corporate Compliance", "status": "active", "sortOrder": 7 },
+      { "id": "mv-034", "value": "Taxation", "status": "active", "sortOrder": 8 },
+      { "id": "mv-035", "value": "ADR", "status": "active", "sortOrder": 9 },
+      { "id": "mv-036", "value": "Family Law", "status": "inactive", "sortOrder": 10 },
+      { "id": "mv-037", "value": "Insolvency and Bankruptcy Law", "status": "active", "sortOrder": 11 },
+      { "id": "mv-038", "value": "Other", "status": "active", "sortOrder": 12 }
+    ],
+    "mstr-009": [
+      { "id": "mv-039", "value": "Truck", "status": "active", "sortOrder": 1 },
+      { "id": "mv-040", "value": "Bus", "status": "active", "sortOrder": 2 },
+      { "id": "mv-041", "value": "Car", "status": "active", "sortOrder": 3 },
+      { "id": "mv-042", "value": "Van", "status": "active", "sortOrder": 4 },
+      { "id": "mv-043", "value": "Auto", "status": "active", "sortOrder": 5 },
+      { "id": "mv-044", "value": "Two-Wheeler", "status": "active", "sortOrder": 6 }
+    ],
+    "mstr-012": [
+      { "id": "mv-045", "value": "HDFC Bank", "status": "active", "sortOrder": 1 },
+      { "id": "mv-046", "value": "ICICI Bank", "status": "active", "sortOrder": 2 },
+      { "id": "mv-047", "value": "Axis Bank", "status": "active", "sortOrder": 3 },
+      { "id": "mv-048", "value": "Kotak Mahindra Bank", "status": "active", "sortOrder": 4 },
+      { "id": "mv-049", "value": "SBI", "status": "active", "sortOrder": 5 },
+      { "id": "mv-050", "value": "Yes Bank", "status": "active", "sortOrder": 6 },
+      { "id": "mv-051", "value": "Federal Bank", "status": "active", "sortOrder": 7 }
+    ]
+  },
+  "geographicValues": [
+    {
+      "id": "geo-001",
+      "name": "India",
+      "level": "country",
+      "parentId": null,
+      "code": "IN",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T09:00:00Z"
+    },
+    {
+      "id": "geo-002",
+      "name": "Maharashtra",
+      "level": "state",
+      "parentId": "geo-001",
+      "code": "MH",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T09:05:00Z"
+    },
+    {
+      "id": "geo-003",
+      "name": "Karnataka",
+      "level": "state",
+      "parentId": "geo-001",
+      "code": "KA",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T09:10:00Z"
+    },
+    {
+      "id": "geo-004",
+      "name": "Delhi",
+      "level": "state",
+      "parentId": "geo-001",
+      "code": "DL",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T09:15:00Z"
+    },
+    {
+      "id": "geo-005",
+      "name": "Tamil Nadu",
+      "level": "state",
+      "parentId": "geo-001",
+      "code": "TN",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T09:20:00Z"
+    },
+    {
+      "id": "geo-006",
+      "name": "Gujarat",
+      "level": "state",
+      "parentId": "geo-001",
+      "code": "GJ",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T09:25:00Z"
+    },
+    {
+      "id": "geo-007",
+      "name": "Rajasthan",
+      "level": "state",
+      "parentId": "geo-001",
+      "code": "RJ",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T09:30:00Z"
+    },
+    {
+      "id": "geo-008",
+      "name": "Uttar Pradesh",
+      "level": "state",
+      "parentId": "geo-001",
+      "code": "UP",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T09:35:00Z"
+    },
+    {
+      "id": "geo-009",
+      "name": "West Bengal",
+      "level": "state",
+      "parentId": "geo-001",
+      "code": "WB",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T09:40:00Z"
+    },
+    {
+      "id": "geo-010",
+      "name": "Mumbai",
+      "level": "city",
+      "parentId": "geo-002",
+      "code": "MUM",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T10:00:00Z"
+    },
+    {
+      "id": "geo-011",
+      "name": "Pune",
+      "level": "city",
+      "parentId": "geo-002",
+      "code": "PUN",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T10:05:00Z"
+    },
+    {
+      "id": "geo-012",
+      "name": "Bangalore",
+      "level": "city",
+      "parentId": "geo-003",
+      "code": "BLR",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T10:10:00Z"
+    },
+    {
+      "id": "geo-013",
+      "name": "New Delhi",
+      "level": "city",
+      "parentId": "geo-004",
+      "code": "NDEL",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T10:15:00Z"
+    },
+    {
+      "id": "geo-014",
+      "name": "Chennai",
+      "level": "city",
+      "parentId": "geo-005",
+      "code": "CHN",
+      "status": "active",
+      "modifiedBy": "Rahul Sharma",
+      "modifiedAt": "2025-12-01T10:20:00Z"
+    },
+    {
+      "id": "geo-015",
+      "name": "Ahmedabad",
+      "level": "city",
+      "parentId": "geo-006",
+      "code": "AMD",
+      "status": "active",
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2025-12-01T10:25:00Z"
+    },
+    {
+      "id": "geo-016",
+      "name": "Hyderabad",
+      "level": "city",
+      "parentId": null,
+      "code": "HYD",
+      "status": "inactive",
+      "modifiedBy": "Priya Kapoor",
+      "modifiedAt": "2025-11-15T10:00:00Z"
+    }
+  ],
+  "auditEntries": [
+    {
+      "id": "aud-001",
+      "area": "Services",
+      "action": "created",
+      "recordName": "UDrive",
+      "field": null,
+      "oldValue": null,
+      "newValue": null,
+      "performedBy": "Priya Kapoor",
+      "performedAt": "2026-02-22T13:45:00Z"
+    },
+    {
+      "id": "aud-002",
+      "area": "Price Categories",
+      "action": "updated",
+      "recordName": "Class G - Trip + 18% (GST)",
+      "field": "status",
+      "oldValue": "active",
+      "newValue": "inactive",
+      "performedBy": "Ankit Verma",
+      "performedAt": "2026-02-20T16:00:00Z"
+    },
+    {
+      "id": "aud-003",
+      "area": "Masters",
+      "action": "value_added",
+      "recordName": "Offence Types",
+      "field": "values",
+      "oldValue": null,
+      "newValue": "Wrong Way Driving",
+      "performedBy": "Rahul Sharma",
+      "performedAt": "2026-02-18T11:30:00Z"
+    },
+    {
+      "id": "aud-004",
+      "area": "Designations",
+      "action": "updated",
+      "recordName": "Operations Executive",
+      "field": "status",
+      "oldValue": "active",
+      "newValue": "inactive",
+      "performedBy": "Priya Kapoor",
+      "performedAt": "2026-02-15T14:00:00Z"
+    },
+    {
+      "id": "aud-005",
+      "area": "Masters",
+      "action": "created",
+      "recordName": "UTM Sources",
+      "field": null,
+      "oldValue": null,
+      "newValue": null,
+      "performedBy": "Priya Kapoor",
+      "performedAt": "2026-02-01T12:00:00Z"
+    },
+    {
+      "id": "aud-006",
+      "area": "Geographic",
+      "action": "updated",
+      "recordName": "Hyderabad",
+      "field": "status",
+      "oldValue": "active",
+      "newValue": "inactive",
+      "performedBy": "Priya Kapoor",
+      "performedAt": "2026-01-28T10:00:00Z"
+    },
+    {
+      "id": "aud-007",
+      "area": "Services",
+      "action": "updated",
+      "recordName": "BSafe",
+      "field": "status",
+      "oldValue": "active",
+      "newValue": "inactive",
+      "performedBy": "Rahul Sharma",
+      "performedAt": "2026-01-25T08:00:00Z"
+    },
+    {
+      "id": "aud-008",
+      "area": "Masters",
+      "action": "value_deactivated",
+      "recordName": "Legal Categories",
+      "field": "values",
+      "oldValue": "Family Law (active)",
+      "newValue": "Family Law (inactive)",
+      "performedBy": "Rahul Sharma",
+      "performedAt": "2026-01-20T10:30:00Z"
+    },
+    {
+      "id": "aud-009",
+      "area": "Departments",
+      "action": "created",
+      "recordName": "Legal Operations",
+      "field": null,
+      "oldValue": null,
+      "newValue": null,
+      "performedBy": "Rahul Sharma",
+      "performedAt": "2026-01-05T09:35:00Z"
+    },
+    {
+      "id": "aud-010",
+      "area": "Masters",
+      "action": "reordered",
+      "recordName": "Lead Sources",
+      "field": "sortOrder",
+      "oldValue": "LinkedIn at position 6",
+      "newValue": "LinkedIn at position 4",
+      "performedBy": "Priya Kapoor",
+      "performedAt": "2026-01-03T15:20:00Z"
+    },
+    {
+      "id": "aud-011",
+      "area": "Price Categories",
+      "action": "updated",
+      "recordName": "Class A - Base Price - HH+ (AITWA)",
+      "field": "isProtected",
+      "oldValue": "false",
+      "newValue": "true",
+      "performedBy": "Ankit Verma",
+      "performedAt": "2026-01-10T08:00:00Z"
+    },
+    {
+      "id": "aud-012",
+      "area": "Masters",
+      "action": "updated",
+      "recordName": "Location Types",
+      "field": "status",
+      "oldValue": "active",
+      "newValue": "inactive",
+      "performedBy": "Rahul Sharma",
+      "performedAt": "2025-11-10T09:00:00Z"
+    }
+  ]
+}

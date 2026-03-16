@@ -111,9 +111,9 @@ export function AppShell({
               <Menu className="w-6 h-6" />
             </button>
 
-            {/* Breadcrumbs */}
-            {breadcrumbs && breadcrumbs.length > 0 && (
-              <nav className="hidden lg:flex items-center space-x-2 text-sm">
+            {/* Breadcrumbs - Hidden for now */}
+            {/* {breadcrumbs && breadcrumbs.length > 0 && (
+              <nav className="flex items-center space-x-2 text-sm">
                 {breadcrumbs.map((crumb, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     {index > 0 && (
@@ -134,7 +134,7 @@ export function AppShell({
                   </div>
                 ))}
               </nav>
-            )}
+            )} */}
           </div>
 
           {user && <UserMenu user={user} onLogout={onLogout} />}

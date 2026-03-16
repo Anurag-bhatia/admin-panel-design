@@ -1,50 +1,68 @@
 # Test Instructions: Team
 
+These test-writing instructions are **framework-agnostic**. Adapt them to your testing setup.
+
 ## Overview
 
-Test employee/team lists, 2-step onboarding, permissions management, and status toggles.
+Test employee and team management including 3-step onboarding wizard, employee detail with permissions, status lifecycle, and team CRUD.
 
 ---
 
 ## User Flow Tests
 
-### Flow 1: Add Employee (2-Step Onboarding)
+### Flow 1: Add Employee (3-Step Wizard)
 
 **Steps:**
 1. Click "Add Employee"
-2. Step 1: Fill profile info
-3. Step 2: Set up login credentials
-4. Submit
+2. Step 1: Profile Info (photo, name, email, mobile, department, designation, reporting managers)
+3. Step 2: Credentials (official email, password)
+4. Step 3: Permissions (module/flow toggles)
+5. Submit
 
 **Expected Results:**
-- [ ] Progress shows "Step 1 of 2"
-- [ ] Password has security rules
-- [ ] Employee created with active status
-- [ ] Appears in employee list
+- [ ] Step indicator shows 1/2/3 progress
+- [ ] Each step validates before next
+- [ ] Employee appears in list with active status
+- [ ] Credentials ready for login
+
+**Failure Path:** Weak password shows error, step 2 blocks
 
 ### Flow 2: Manage Permissions
 
 **Steps:**
-1. Click "Manage Permissions" on employee
-2. Check Module Access checkboxes
-3. Check Flow Access checkboxes per module
-4. Save
+1. Click employee row → Detail page
+2. Navigate to Permissions tab
+3. Toggle a module switch off
+4. Observe child flows greyed out
+5. Click "Save"
 
 **Expected Results:**
-- [ ] Dedicated permissions page opens
-- [ ] Module Access shows all sections
-- [ ] Flow Access shows actions per enabled module
-- [ ] Permissions applied instantly
+- [ ] Module switch disables all child flows visually
+- [ ] Re-enabling module re-enables child flows
+- [ ] Save persists changes
+- [ ] Change logged in audit trail
 
-### Flow 3: Deactivate Employee
+### Flow 3: Create Team
 
 **Steps:**
-1. Click "Deactivate" on employee
-2. Confirm
+1. Switch to Teams tab
+2. Click "Create Team"
+3. Fill name, department, team lead, members
+4. Submit
 
 **Expected Results:**
-- [ ] Confirmation dialog appears
-- [ ] Employee deactivated
+- [ ] Team appears in teams table
+- [ ] Member count correct
+
+### Flow 4: Deactivate Employee
+
+**Steps:**
+1. Open employee detail
+2. Click "Deactivate"
+3. Confirm in dialog
+
+**Expected Results:**
+- [ ] Employee status changes to inactive
 - [ ] Access revoked
 - [ ] Removed from active assignments
 - [ ] Historical data preserved
@@ -53,8 +71,8 @@ Test employee/team lists, 2-step onboarding, permissions management, and status 
 
 ## Empty State Tests
 
-- [ ] No employees: "No employees added yet"
-- [ ] No teams: "No teams created yet"
+- [ ] No employees: "No employees yet" with add CTA
+- [ ] No teams: "No teams yet" with create CTA
 
 ---
 
@@ -62,10 +80,26 @@ Test employee/team lists, 2-step onboarding, permissions management, and status 
 
 ```typescript
 const mockEmployee = {
-  id: "emp-001",
-  fullName: "Priya Sharma",
+  id: "EMP-001",
+  firstName: "Ankit",
+  lastName: "Verma",
+  email: "ankit@company.com",
+  mobile: "+91-9876543210",
   department: "Operations",
-  designation: "Team Lead",
-  status: "active"
+  designation: "Manager",
+  status: "active",
+  permissions: {
+    moduleAccess: { incidents: true, leads: true, subscribers: false },
+    flowAccess: { validate: true, screen: true, assignLawyer: true },
+  },
+};
+
+const mockTeam = {
+  id: "TEAM-001",
+  name: "Operations Alpha",
+  department: "Operations",
+  teamLead: "Ankit Verma",
+  memberCount: 8,
+  status: "active",
 };
 ```

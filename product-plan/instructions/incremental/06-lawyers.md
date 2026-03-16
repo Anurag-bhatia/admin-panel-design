@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist (first-time users, after deletions)
+- **DO** implement empty states when no records exist
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,21 +34,20 @@
 
 ## Goal
 
-Implement the Lawyers feature — the central system for managing the platform's external legal network with onboarding, credentialing, and compliance tracking.
+Implement the Lawyers module — the central system for managing the platform's external legal network.
 
 ## Overview
 
 The Lawyers module replaces manual Excel tracking with a structured system for onboarding, credentialing, and managing lawyers who resolve challans and legal cases. It provides full visibility into credentials, compliance status, expertise, and lifecycle management.
 
 **Key Functionality:**
-- View lawyer list with Active/Inactive tabs and counts
-- Search and filter by name, email, category, KYC status
-- Add lawyers via multi-step onboarding wizard (7 steps)
-- View lawyer profiles with all credentials and details
-- Edit lawyer information
-- Review and verify KYC documents
+- Lawyer list table with Active/Inactive tabs and real-time counts
+- Multi-step onboarding wizard (7 steps): Basic Info → Address → Qualifications/Experience → KYC Documents → Bank Details → Expertise/Preferences → Company Details
+- Dedicated profile page with 4 tabs: Details, Incidents, Invoicing, Transactions
+- Edit lawyer profile through the same multi-step wizard
+- KYC document management (Aadhaar, PAN, DL, cancelled cheque, Bar ID, BALLB)
 - Deactivate/reactivate lawyers
-- Track assigned incidents, pending invoices, and payment history
+- Search by name/email/ID, filter by state/category
 
 ## Recommended Approach: Test-Driven Development
 
@@ -58,125 +57,56 @@ See `product-plan/sections/lawyers/tests.md` for detailed test-writing instructi
 
 ### Components
 
-Copy from `product-plan/sections/lawyers/components/`:
-
-- `Lawyers.tsx` — Main lawyers management view
-- `LawyerList.tsx` — Lawyer list with tabs
-- `LawyerTable.tsx` — Lawyer data table
-- `LawyerRow.tsx` — Individual lawyer row
-- `LawyerForm.tsx` — Multi-step onboarding wizard
-- `LawyerProfile.tsx` — Full lawyer profile with tabs
-
-### Data Layer
-
-```typescript
-interface Lawyer {
-  id: string
-  lawyerId: string
-  photo: string
-  firstName: string
-  lastName: string
-  email: string
-  mobile: string
-  gender: 'Male' | 'Female' | 'Other'
-  dateOfBirth: string
-  category: string
-  subCategory: string
-  currentAddress: Address
-  permanentAddress: Address
-  qualifications: Qualification[]
-  experience: Experience[]
-  kycDocuments: KYCDocuments
-  bankDetails: BankDetails
-  expertise: Expertise
-  company: CompanyDetails | null
-  onboardingStatus: 'Complete' | 'Incomplete'
-  kycStatus: 'Verified' | 'Pending' | 'Missing'
-  activityState: 'Active' | 'Inactive'
-  source: string
-}
-
-interface KYCDocuments {
-  aadhaar: { number: string; documentUrl: string | null }
-  pan: { number: string; documentUrl: string | null }
-  drivingLicence: { documentUrl: string | null }
-  cancelledCheque: { documentUrl: string | null }
-  barId: { number: string; documentUrl: string | null }
-  ballbCertificate: { documentUrl: string | null }
-}
-```
-
-### Callbacks
-
-| Callback | Description |
-|----------|-------------|
-| `onView` | User views lawyer profile |
-| `onEdit` | User edits lawyer details |
-| `onDeactivate` | User deactivates lawyer |
-| `onReactivate` | User reactivates lawyer |
-| `onAdd` | User adds new lawyer |
-| `onViewDocument` | User views/downloads KYC document |
-| `onSearch` | User searches lawyers |
-| `onFilterByActivity` | User filters by Active/Inactive |
-| `onFilterByKYC` | User filters by KYC status |
-| `onRaiseInvoice` | User raises invoice for lawyer |
+- `Lawyers` — Main view with table and tabs
+- `LawyerTable` — Data table with Active/Inactive tabs
+- `LawyerProfile` — Full profile page with 4 tabs
+- `LawyerForm` — Multi-step onboarding/edit wizard
 
 ### Empty States
 
-- **No lawyers:** "No lawyers in your network yet"
-- **No active lawyers:** "No active lawyers"
-- **No inactive lawyers:** "No inactive lawyers"
-- **No assigned incidents:** "No incidents assigned to this lawyer yet"
-- **No pending invoices:** "No payments pending to invoice"
-- **No transactions:** "No payment transactions yet"
+- **No lawyers yet:** CTA to add first lawyer
+- **No incidents assigned:** Empty Incidents tab
+- **No invoices:** Empty Invoicing tab
+- **No transactions:** Empty Transactions tab
+
+## Files to Reference
+
+- `product-plan/sections/lawyers/README.md` — Feature overview
+- `product-plan/sections/lawyers/tests.md` — Test-writing instructions
+- `product-plan/sections/lawyers/components/` — React components
+- `product-plan/sections/lawyers/types.ts` — TypeScript interfaces
+- `product-plan/sections/lawyers/sample-data.json` — Test data
 
 ## Expected User Flows
 
-### Flow 1: Add New Lawyer (Onboarding)
-
-1. User clicks "Add Lawyer" button
-2. Step 1: Enter basic info (category, name, email, mobile, DOB)
-3. Step 2: Enter current and permanent address
-4. Step 3: Add qualifications and experience
-5. Step 4: Upload KYC documents (Aadhaar, PAN, DL, etc.)
-6. Step 5: Enter bank account details
-7. Step 6: Set expertise and preferences
-8. Step 7: Add company details (if applicable)
-9. User clicks "Submit"
-10. **Outcome:** Lawyer created with Incomplete onboarding status, pending KYC verification
+### Flow 1: Onboard New Lawyer
+1. User clicks "Add Lawyer"
+2. 7-step wizard opens with progress indicator
+3. User completes each step: Basic Info → Address → Qualifications → KYC → Bank → Expertise → Company
+4. **Outcome:** Lawyer created, appears in Active tab with onboarding/KYC status badges
 
 ### Flow 2: View Lawyer Profile
-
-1. User clicks on lawyer row or "View Profile" action
-2. Profile page opens with header showing status badges
-3. User navigates tabs: Details, Incidents, Invoicing, Transactions
-4. **Outcome:** All lawyer information accessible
+1. User clicks a lawyer row in the table
+2. Profile page opens with header (photo, name, status, ID, contact)
+3. User navigates 4 tabs: Details, Incidents, Invoicing, Transactions
+4. **Outcome:** Complete lawyer information accessible
 
 ### Flow 3: Deactivate Lawyer
-
-1. User clicks "Deactivate" action on lawyer
+1. User clicks Actions dropdown → "Deactivate" on a lawyer row
 2. Confirmation dialog appears
 3. User confirms deactivation
-4. **Outcome:** Lawyer moved to Inactive tab, removed from assignment pool
-
-### Flow 4: Raise Invoice
-
-1. User navigates to lawyer's Invoicing tab
-2. User sees pending commissions table
-3. User clicks "Raise Invoice" button
-4. **Outcome:** Invoice generated for pending amounts
+4. **Outcome:** Lawyer moves to Inactive tab, removed from assignment pool, historical data preserved
 
 ## Done When
 
 - [ ] Tests written and passing
-- [ ] Active/Inactive tabs display with counts
-- [ ] Lawyer table renders with status badges
-- [ ] 7-step onboarding wizard works
-- [ ] Profile view shows all 4 tabs
-- [ ] KYC documents can be viewed/downloaded
-- [ ] Deactivate/Reactivate works
-- [ ] Raise Invoice functionality works
-- [ ] Only lawyers with completed KYC can be active
+- [ ] Lawyer list with Active/Inactive tabs and counts
+- [ ] 7-step onboarding wizard works with validation per step
+- [ ] Profile page renders with all 4 tabs
+- [ ] KYC documents can be uploaded and previewed
+- [ ] Status badges show (Onboarding Complete/Incomplete, KYC Verified/Pending)
+- [ ] Deactivate/reactivate works
+- [ ] Search and filters work
+- [ ] Only active lawyers with verified KYC eligible for assignment
 - [ ] Empty states display properly
-- [ ] Search and filter work
 - [ ] Responsive on mobile

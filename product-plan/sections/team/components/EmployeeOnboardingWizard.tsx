@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight, Check, Upload, X } from 'lucide-react'
-import type { Employee, EmployeeFormData } from '../types'
+import { ArrowLeft, ArrowRight, Check, Upload, X, Shield, FileText, Trash2, Plus } from 'lucide-react'
+import type { Employee, EmployeeFormData, EmployeeDocument, Permissions } from '../types'
 
 interface EmployeeOnboardingWizardProps {
   departments: string[]
   designations: string[]
   employees: Employee[]
+  modules: string[]
+  flows: { [module: string]: string[] }
   onSubmit: (data: EmployeeFormData) => void
   onCancel: () => void
   initialData?: Employee
@@ -22,11 +24,27 @@ interface StepOneData {
   department: string
   designation: string
   dateOfJoining: string
+  company: string
   primaryReportingManager: string
   secondaryReportingManager: string
 }
 
-interface StepTwoData {
+interface AddressFields {
+  country: string
+  state: string
+  city: string
+  area: string
+  address: string
+  pincode: string
+}
+
+interface StepAddressData {
+  currentAddress: AddressFields
+  permanentAddress: AddressFields
+  sameAsCurrent: boolean
+}
+
+interface StepCredentialsData {
   officialEmail: string
   password: string
   confirmPassword: string
@@ -36,6 +54,8 @@ export function EmployeeOnboardingWizard({
   departments,
   designations,
   employees,
+  modules,
+  flows,
   onSubmit,
   onCancel,
   initialData,
@@ -53,6 +73,7 @@ export function EmployeeOnboardingWizard({
       department: initialData.department,
       designation: initialData.designation,
       dateOfJoining: initialData.dateOfJoining,
+      company: 'Lawyered',
       primaryReportingManager: initialData.primaryReportingManager,
       secondaryReportingManager: initialData.secondaryReportingManager || '',
     } : {
@@ -66,15 +87,31 @@ export function EmployeeOnboardingWizard({
       department: '',
       designation: '',
       dateOfJoining: '',
+      company: 'Lawyered',
       primaryReportingManager: '',
       secondaryReportingManager: '',
     }
   )
-  const [stepTwoData, setStepTwoData] = useState<StepTwoData>({
+  const emptyAddress: AddressFields = { country: 'India', state: '', city: '', area: '', address: '', pincode: '' }
+  const [stepAddressData, setStepAddressData] = useState<StepAddressData>({
+    currentAddress: { ...emptyAddress },
+    permanentAddress: { ...emptyAddress },
+    sameAsCurrent: true,
+  })
+  const [stepCredentialsData, setStepCredentialsData] = useState<StepCredentialsData>({
     officialEmail: initialData?.email || '',
     password: '',
     confirmPassword: '',
   })
+  const [stepPermissionsData, setStepPermissionsData] = useState<Permissions>(initialData ? {
+    moduleAccess: [...initialData.permissions.moduleAccess],
+    flowAccess: { ...initialData.permissions.flowAccess },
+  } : {
+    moduleAccess: [],
+    flowAccess: {},
+  })
+  const [expandedModule, setExpandedModule] = useState<string | null>(null)
+  const [stepDocumentsData, setStepDocumentsData] = useState<Array<{ id: string; name: string; type: EmployeeDocument['type']; fileName: string }>>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const activeManagers = employees.filter(emp => emp.status === 'active')
@@ -94,12 +131,23 @@ export function EmployeeOnboardingWizard({
     return Object.keys(newErrors).length === 0
   }
 
-  const validateStepTwo = () => {
+  const validateStepAddress = () => {
     const newErrors: Record<string, string> = {}
-    if (!stepTwoData.officialEmail.trim()) newErrors.officialEmail = 'Official email is required'
-    if (!stepTwoData.password.trim()) newErrors.password = 'Password is required'
-    if (stepTwoData.password.length < 8) newErrors.password = 'Password must be at least 8 characters'
-    if (stepTwoData.password !== stepTwoData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match'
+    if (!stepAddressData.currentAddress.country) newErrors['current.country'] = 'Country is required'
+    if (!stepAddressData.currentAddress.state) newErrors['current.state'] = 'State is required'
+    if (!stepAddressData.currentAddress.city) newErrors['current.city'] = 'City is required'
+    if (!stepAddressData.currentAddress.address.trim()) newErrors['current.address'] = 'Address is required'
+    if (!stepAddressData.currentAddress.pincode.trim()) newErrors['current.pincode'] = 'Pin code is required'
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const validateStepCredentials = () => {
+    const newErrors: Record<string, string> = {}
+    if (!stepCredentialsData.officialEmail.trim()) newErrors.officialEmail = 'Official email is required'
+    if (!stepCredentialsData.password.trim()) newErrors.password = 'Password is required'
+    if (stepCredentialsData.password.length < 8) newErrors.password = 'Password must be at least 8 characters'
+    if (stepCredentialsData.password !== stepCredentialsData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -107,41 +155,124 @@ export function EmployeeOnboardingWizard({
   const handleNext = () => {
     if (currentStep === 1 && validateStepOne()) {
       setCurrentStep(2)
+    } else if (currentStep === 2 && validateStepAddress()) {
+      setCurrentStep(3)
+    } else if (currentStep === 3) {
+      setCurrentStep(4)
+    } else if (currentStep === 4 && validateStepCredentials()) {
+      setCurrentStep(5)
     }
+  }
+
+  const addDocumentRow = () => {
+    setStepDocumentsData([
+      ...stepDocumentsData,
+      { id: `temp-doc-${Date.now()}`, name: '', type: 'other', fileName: '' },
+    ])
+  }
+
+  const updateDocumentRow = (index: number, field: string, value: string) => {
+    const updated = [...stepDocumentsData]
+    updated[index] = { ...updated[index], [field]: value }
+    setStepDocumentsData(updated)
+  }
+
+  const removeDocumentRow = (index: number) => {
+    setStepDocumentsData(stepDocumentsData.filter((_, i) => i !== index))
+  }
+
+  const updateCurrentAddress = (field: keyof AddressFields, value: string) => {
+    const updated = { ...stepAddressData, currentAddress: { ...stepAddressData.currentAddress, [field]: value } }
+    if (stepAddressData.sameAsCurrent) {
+      updated.permanentAddress = { ...updated.currentAddress }
+    }
+    setStepAddressData(updated)
+  }
+
+  const toggleSameAsCurrent = () => {
+    const newSame = !stepAddressData.sameAsCurrent
+    setStepAddressData({
+      ...stepAddressData,
+      sameAsCurrent: newSame,
+      permanentAddress: newSame ? { ...stepAddressData.currentAddress } : { ...emptyAddress },
+    })
   }
 
   const handleBack = () => {
-    if (currentStep === 2) {
-      setCurrentStep(1)
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
     }
   }
 
-  const handleSubmit = () => {
-    if (validateStepTwo()) {
-      onSubmit({
-        profilePicture: stepOneData.profilePicture,
-        firstName: stepOneData.firstName,
-        lastName: stepOneData.lastName,
-        mobile: stepOneData.mobile,
-        email: stepOneData.email,
-        gender: stepOneData.gender as 'Male' | 'Female' | 'Other',
-        dateOfBirth: stepOneData.dateOfBirth,
-        department: stepOneData.department,
-        designation: stepOneData.designation,
-        dateOfJoining: stepOneData.dateOfJoining,
-        primaryReportingManager: stepOneData.primaryReportingManager || null,
-        secondaryReportingManager: stepOneData.secondaryReportingManager || null,
-        officialEmail: stepTwoData.officialEmail,
-        password: stepTwoData.password,
+  const toggleModuleAccess = (module: string) => {
+    const hasAccess = stepPermissionsData.moduleAccess.includes(module)
+    if (hasAccess) {
+      setStepPermissionsData({
+        moduleAccess: stepPermissionsData.moduleAccess.filter(m => m !== module),
+        flowAccess: { ...stepPermissionsData.flowAccess, [module]: [] },
+      })
+    } else {
+      setStepPermissionsData({
+        moduleAccess: [...stepPermissionsData.moduleAccess, module],
+        flowAccess: { ...stepPermissionsData.flowAccess, [module]: [] },
       })
     }
+  }
+
+  const toggleFlowAccess = (module: string, flow: string) => {
+    const currentFlows = stepPermissionsData.flowAccess[module] || []
+    const hasFlow = currentFlows.includes(flow)
+    setStepPermissionsData({
+      ...stepPermissionsData,
+      flowAccess: {
+        ...stepPermissionsData.flowAccess,
+        [module]: hasFlow ? currentFlows.filter(f => f !== flow) : [...currentFlows, flow],
+      },
+    })
+  }
+
+  const selectAllFlows = (module: string) => {
+    setStepPermissionsData({
+      ...stepPermissionsData,
+      flowAccess: { ...stepPermissionsData.flowAccess, [module]: [...(flows[module] || [])] },
+    })
+  }
+
+  const deselectAllFlows = (module: string) => {
+    setStepPermissionsData({
+      ...stepPermissionsData,
+      flowAccess: { ...stepPermissionsData.flowAccess, [module]: [] },
+    })
+  }
+
+  const formatFlowName = (flow: string) => {
+    return flow.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+  }
+
+  const handleSubmit = () => {
+    onSubmit({
+      profilePicture: stepOneData.profilePicture,
+      firstName: stepOneData.firstName,
+      lastName: stepOneData.lastName,
+      mobile: stepOneData.mobile,
+      email: stepOneData.email,
+      gender: stepOneData.gender as 'Male' | 'Female' | 'Other',
+      dateOfBirth: stepOneData.dateOfBirth,
+      department: stepOneData.department,
+      designation: stepOneData.designation,
+      dateOfJoining: stepOneData.dateOfJoining,
+      primaryReportingManager: stepOneData.primaryReportingManager || null,
+      secondaryReportingManager: stepOneData.secondaryReportingManager || null,
+      officialEmail: stepCredentialsData.officialEmail,
+      password: stepCredentialsData.password,
+    })
   }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -155,63 +286,48 @@ export function EmployeeOnboardingWizard({
                   Add New Employee
                 </h1>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Step {currentStep} of 2
+                  Step {currentStep} of 5
                 </p>
               </div>
             </div>
 
             {/* Step Indicator */}
-            <div className="hidden sm:flex items-center gap-3">
-              <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-cyan-600' : 'text-slate-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep > 1 ? 'bg-cyan-600 text-white' : currentStep === 1 ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600' : 'bg-slate-200 dark:bg-slate-700'
-                }`}>
-                  {currentStep > 1 ? <Check className="w-4 h-4" /> : '1'}
+            <div className="hidden sm:flex items-center gap-2 ml-12">
+              {[
+                { num: 1, label: 'Profile' },
+                { num: 2, label: 'Address' },
+                { num: 3, label: 'Documents' },
+                { num: 4, label: 'Credentials' },
+                { num: 5, label: 'Permissions' },
+              ].map((step, idx) => (
+                <div key={step.num} className="flex items-center gap-2">
+                  <div className={`flex items-center gap-2 ${currentStep >= step.num ? 'text-cyan-600' : 'text-slate-400'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                      currentStep > step.num ? 'bg-cyan-600 text-white' : currentStep === step.num ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                    }`}>
+                      {currentStep > step.num ? <Check className="w-4 h-4" /> : step.num}
+                    </div>
+                    <span className="text-sm font-medium">{step.label}</span>
+                  </div>
+                  {idx < 4 && (
+                    <div className={`w-8 h-0.5 ${currentStep > step.num ? 'bg-cyan-600' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                  )}
                 </div>
-                <span className="text-sm font-medium">Profile</span>
-              </div>
-              <div className={`w-12 h-0.5 ${currentStep > 1 ? 'bg-cyan-600' : 'bg-slate-200 dark:bg-slate-700'}`} />
-              <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-cyan-600' : 'text-slate-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep === 2 ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
-                }`}>
-                  2
-                </div>
-                <span className="text-sm font-medium">Access</span>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {currentStep === 1 ? (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        {currentStep === 1 && (
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 lg:p-8">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">
               Profile Information
             </h2>
 
             <div className="space-y-6">
-              {/* Profile Photo */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Profile Photo
-                </label>
-                <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                    {stepOneData.profilePicture ? (
-                      <img src={stepOneData.profilePicture} alt="Profile" className="w-full h-full rounded-full object-cover" />
-                    ) : (
-                      <Upload className="w-8 h-8 text-slate-400" />
-                    )}
-                  </div>
-                  <button className="px-4 py-2 text-sm font-medium text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors">
-                    Upload Photo
-                  </button>
-                </div>
-              </div>
-
               {/* Name Fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -308,6 +424,19 @@ export function EmployeeOnboardingWizard({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Company *
+                  </label>
+                  <input
+                    type="text"
+                    value={stepOneData.company}
+                    onChange={(e) => setStepOneData({ ...stepOneData, company: e.target.value })}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors.company ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
+                    placeholder="Enter company name"
+                  />
+                  {errors.company && <p className="text-red-500 text-sm mt-1">{errors.company}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Department *
                   </label>
                   <select
@@ -338,20 +467,18 @@ export function EmployeeOnboardingWizard({
                   </select>
                   {errors.designation && <p className="text-red-500 text-sm mt-1">{errors.designation}</p>}
                 </div>
-              </div>
-
-              {/* Date of Joining */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Date of Joining *
-                </label>
-                <input
-                  type="date"
-                  value={stepOneData.dateOfJoining}
-                  onChange={(e) => setStepOneData({ ...stepOneData, dateOfJoining: e.target.value })}
-                  className={`w-full sm:w-1/2 px-4 py-2.5 rounded-lg border ${errors.dateOfJoining ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
-                />
-                {errors.dateOfJoining && <p className="text-red-500 text-sm mt-1">{errors.dateOfJoining}</p>}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Date of Joining *
+                  </label>
+                  <input
+                    type="date"
+                    value={stepOneData.dateOfJoining}
+                    onChange={(e) => setStepOneData({ ...stepOneData, dateOfJoining: e.target.value })}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors.dateOfJoining ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
+                  />
+                  {errors.dateOfJoining && <p className="text-red-500 text-sm mt-1">{errors.dateOfJoining}</p>}
+                </div>
               </div>
 
               {/* Reporting Managers */}
@@ -389,10 +516,225 @@ export function EmployeeOnboardingWizard({
               </div>
             </div>
           </div>
-        ) : (
+        )}
+
+        {currentStep === 2 && (
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 lg:p-8">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">
+              Current Address
+            </h2>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Country *</label>
+                  <select
+                    value={stepAddressData.currentAddress.country}
+                    onChange={(e) => updateCurrentAddress('country', e.target.value)}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors['current.country'] ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
+                  >
+                    <option value="">Select country</option>
+                    <option value="India">India</option>
+                    <option value="United States">United States</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                  </select>
+                  {errors['current.country'] && <p className="text-red-500 text-sm mt-1">{errors['current.country']}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">State *</label>
+                  <select
+                    value={stepAddressData.currentAddress.state}
+                    onChange={(e) => updateCurrentAddress('state', e.target.value)}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors['current.state'] ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
+                  >
+                    <option value="">Select state</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Gujarat">Gujarat</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="West Bengal">West Bengal</option>
+                  </select>
+                  {errors['current.state'] && <p className="text-red-500 text-sm mt-1">{errors['current.state']}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">City *</label>
+                  <select
+                    value={stepAddressData.currentAddress.city}
+                    onChange={(e) => updateCurrentAddress('city', e.target.value)}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors['current.city'] ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
+                  >
+                    <option value="">Select city</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Ahmedabad">Ahmedabad</option>
+                    <option value="Kolkata">Kolkata</option>
+                  </select>
+                  {errors['current.city'] && <p className="text-red-500 text-sm mt-1">{errors['current.city']}</p>}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Area</label>
+                <input
+                  type="text"
+                  value={stepAddressData.currentAddress.area}
+                  onChange={(e) => updateCurrentAddress('area', e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                  placeholder="e.g. Andheri West"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Address *</label>
+                <textarea
+                  value={stepAddressData.currentAddress.address}
+                  onChange={(e) => updateCurrentAddress('address', e.target.value)}
+                  rows={3}
+                  className={`w-full px-4 py-2.5 rounded-lg border ${errors['current.address'] ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500 resize-none`}
+                  placeholder="Full address"
+                />
+                {errors['current.address'] && <p className="text-red-500 text-sm mt-1">{errors['current.address']}</p>}
+              </div>
+
+              <div className="sm:w-1/3">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Pin Code *</label>
+                <input
+                  type="text"
+                  value={stepAddressData.currentAddress.pincode}
+                  onChange={(e) => updateCurrentAddress('pincode', e.target.value)}
+                  className={`w-full px-4 py-2.5 rounded-lg border ${errors['current.pincode'] ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
+                  placeholder="400001"
+                />
+                {errors['current.pincode'] && <p className="text-red-500 text-sm mt-1">{errors['current.pincode']}</p>}
+              </div>
+            </div>
+
+            {/* Same as Permanent Address */}
+            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={stepAddressData.sameAsCurrent}
+                  onChange={toggleSameAsCurrent}
+                  className="w-4 h-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+                />
+                <span className="text-sm text-slate-700 dark:text-slate-300">Same as permanent address</span>
+              </label>
+            </div>
+
+            {/* Permanent Address - only shown when NOT same as current */}
+            {!stepAddressData.sameAsCurrent && (
+              <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">
+                  Permanent Address
+                </h2>
+
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Country</label>
+                      <select
+                        value={stepAddressData.permanentAddress.country}
+                        onChange={(e) => setStepAddressData({ ...stepAddressData, permanentAddress: { ...stepAddressData.permanentAddress, country: e.target.value } })}
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                      >
+                        <option value="">Select country</option>
+                        <option value="India">India</option>
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">State</label>
+                      <select
+                        value={stepAddressData.permanentAddress.state}
+                        onChange={(e) => setStepAddressData({ ...stepAddressData, permanentAddress: { ...stepAddressData.permanentAddress, state: e.target.value } })}
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                      >
+                        <option value="">Select state</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="West Bengal">West Bengal</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">City</label>
+                      <select
+                        value={stepAddressData.permanentAddress.city}
+                        onChange={(e) => setStepAddressData({ ...stepAddressData, permanentAddress: { ...stepAddressData.permanentAddress, city: e.target.value } })}
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                      >
+                        <option value="">Select city</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Pune">Pune</option>
+                        <option value="Bangalore">Bangalore</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Chennai">Chennai</option>
+                        <option value="Hyderabad">Hyderabad</option>
+                        <option value="Ahmedabad">Ahmedabad</option>
+                        <option value="Kolkata">Kolkata</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Area</label>
+                    <input
+                      type="text"
+                      value={stepAddressData.permanentAddress.area}
+                      onChange={(e) => setStepAddressData({ ...stepAddressData, permanentAddress: { ...stepAddressData.permanentAddress, area: e.target.value } })}
+                      className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                      placeholder="e.g. Andheri West"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Address</label>
+                    <textarea
+                      value={stepAddressData.permanentAddress.address}
+                      onChange={(e) => setStepAddressData({ ...stepAddressData, permanentAddress: { ...stepAddressData.permanentAddress, address: e.target.value } })}
+                      rows={3}
+                      className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500 resize-none"
+                      placeholder="Full address"
+                    />
+                  </div>
+
+                  <div className="sm:w-1/3">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Pin Code</label>
+                    <input
+                      type="text"
+                      value={stepAddressData.permanentAddress.pincode}
+                      onChange={(e) => setStepAddressData({ ...stepAddressData, permanentAddress: { ...stepAddressData.permanentAddress, pincode: e.target.value } })}
+                      className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                      placeholder="400001"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {currentStep === 4 && (
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 lg:p-8">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-              System Access
+              Create Credentials
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
               Set up login credentials for {stepOneData.firstName} {stepOneData.lastName}
@@ -405,8 +747,8 @@ export function EmployeeOnboardingWizard({
                 </label>
                 <input
                   type="email"
-                  value={stepTwoData.officialEmail}
-                  onChange={(e) => setStepTwoData({ ...stepTwoData, officialEmail: e.target.value })}
+                  value={stepCredentialsData.officialEmail}
+                  onChange={(e) => setStepCredentialsData({ ...stepCredentialsData, officialEmail: e.target.value })}
                   className={`w-full px-4 py-2.5 rounded-lg border ${errors.officialEmail ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
                   placeholder="employee@company.com"
                 />
@@ -419,8 +761,8 @@ export function EmployeeOnboardingWizard({
                 </label>
                 <input
                   type="password"
-                  value={stepTwoData.password}
-                  onChange={(e) => setStepTwoData({ ...stepTwoData, password: e.target.value })}
+                  value={stepCredentialsData.password}
+                  onChange={(e) => setStepCredentialsData({ ...stepCredentialsData, password: e.target.value })}
                   className={`w-full px-4 py-2.5 rounded-lg border ${errors.password ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
                   placeholder="Minimum 8 characters"
                 />
@@ -433,8 +775,8 @@ export function EmployeeOnboardingWizard({
                 </label>
                 <input
                   type="password"
-                  value={stepTwoData.confirmPassword}
-                  onChange={(e) => setStepTwoData({ ...stepTwoData, confirmPassword: e.target.value })}
+                  value={stepCredentialsData.confirmPassword}
+                  onChange={(e) => setStepCredentialsData({ ...stepCredentialsData, confirmPassword: e.target.value })}
                   className={`w-full px-4 py-2.5 rounded-lg border ${errors.confirmPassword ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500`}
                   placeholder="Re-enter password"
                 />
@@ -454,6 +796,228 @@ export function EmployeeOnboardingWizard({
           </div>
         )}
 
+        {currentStep === 5 && (
+          <div className="space-y-6">
+            {/* Module Access */}
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-cyan-600" />
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Module Access</h2>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Select which sections {stepOneData.firstName} can view</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {modules.map(module => {
+                    const hasAccess = stepPermissionsData.moduleAccess.includes(module)
+                    return (
+                      <button
+                        key={module}
+                        onClick={() => toggleModuleAccess(module)}
+                        className={`flex items-center justify-between px-4 py-3 rounded-lg border transition-colors ${
+                          hasAccess
+                            ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300'
+                            : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <span className="text-sm font-medium">{module}</span>
+                        {hasAccess && <Check className="w-4 h-4" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Flow Access */}
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-cyan-600" />
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Flow Access</h2>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Select specific actions within each enabled module</p>
+                  </div>
+                </div>
+              </div>
+              <div className="divide-y divide-slate-200 dark:divide-slate-800">
+                {stepPermissionsData.moduleAccess.length === 0 ? (
+                  <div className="p-6 text-center">
+                    <p className="text-slate-500 dark:text-slate-400">Enable at least one module above to configure flow access</p>
+                  </div>
+                ) : (
+                  stepPermissionsData.moduleAccess.map(module => {
+                    const moduleFlows = flows[module] || []
+                    const enabledFlows = stepPermissionsData.flowAccess[module] || []
+                    const isExpanded = expandedModule === module
+
+                    return (
+                      <div key={module} className="p-4">
+                        <button
+                          onClick={() => setExpandedModule(isExpanded ? null : module)}
+                          className="w-full flex items-center justify-between p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="font-medium text-slate-900 dark:text-white">{module}</span>
+                            <span className="text-sm text-slate-500 dark:text-slate-400">
+                              {enabledFlows.length} of {moduleFlows.length} flows enabled
+                            </span>
+                          </div>
+                          <span className={`transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                            <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </span>
+                        </button>
+
+                        {isExpanded && moduleFlows.length > 0 && (
+                          <div className="mt-4 ml-2">
+                            <div className="flex items-center gap-4 mb-4">
+                              <button onClick={() => selectAllFlows(module)} className="text-sm text-cyan-600 hover:text-cyan-700 font-medium">Select All</button>
+                              <button onClick={() => deselectAllFlows(module)} className="text-sm text-slate-600 hover:text-slate-700 dark:text-slate-400 font-medium">Deselect All</button>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                              {moduleFlows.map(flow => {
+                                const hasFlow = enabledFlows.includes(flow)
+                                return (
+                                  <button
+                                    key={flow}
+                                    onClick={() => toggleFlowAccess(module, flow)}
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+                                      hasFlow
+                                        ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300'
+                                        : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                    }`}
+                                  >
+                                    <div className={`w-4 h-4 rounded flex items-center justify-center ${
+                                      hasFlow ? 'bg-cyan-600 text-white' : 'border border-slate-300 dark:border-slate-600'
+                                    }`}>
+                                      {hasFlow && <Check className="w-3 h-3" />}
+                                    </div>
+                                    <span>{formatFlowName(flow)}</span>
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 3 && (
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-cyan-600" />
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Documents</h2>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">Upload identity, address, and other documents for {stepOneData.firstName}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={addDocumentRow}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors text-sm shadow-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Document
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6">
+                {stepDocumentsData.length === 0 ? (
+                  <div className="text-center py-12">
+                    <FileText className="w-12 h-12 text-slate-200 dark:text-slate-700 mx-auto mb-4" />
+                    <p className="text-base font-medium text-slate-500 dark:text-slate-400 mb-1">No documents added yet</p>
+                    <p className="text-sm text-slate-400 dark:text-slate-500 mb-4">Add documents like Aadhaar card, PAN card, offer letter, etc.</p>
+                    <button
+                      onClick={addDocumentRow}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-medium transition-colors text-sm"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add First Document
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {stepDocumentsData.map((doc, index) => (
+                      <div key={doc.id} className="flex items-start gap-4 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                        <div className="w-10 h-10 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <FileText className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                        </div>
+                        <div className="flex-1 min-w-0 space-y-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Document Name *</label>
+                              <input
+                                type="text"
+                                value={doc.name}
+                                onChange={(e) => updateDocumentRow(index, 'name', e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                                placeholder="e.g. Aadhaar Card"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Document Type *</label>
+                              <select
+                                value={doc.type}
+                                onChange={(e) => updateDocumentRow(index, 'type', e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-50 focus:border-cyan-600 dark:focus:border-cyan-500"
+                              >
+                                <option value="aadhaar">Aadhaar Card</option>
+                                <option value="pan">PAN Card</option>
+                                <option value="offer_letter">Offer Letter</option>
+                                <option value="resume">Resume / CV</option>
+                                <option value="address_proof">Address Proof</option>
+                                <option value="bank_details">Bank Details</option>
+                                <option value="education">Education Certificate</option>
+                                <option value="other">Other</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Upload File</label>
+                            <div className="flex items-center gap-3">
+                              <label className="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-cyan-400 dark:hover:border-cyan-600 cursor-pointer transition-colors">
+                                <Upload className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                                <span className="text-sm text-slate-500 dark:text-slate-400">
+                                  {doc.fileName || 'Choose file or drag and drop'}
+                                </span>
+                                <input type="file" className="hidden" onChange={(e) => {
+                                  const file = e.target.files?.[0]
+                                  if (file) updateDocumentRow(index, 'fileName', file.name)
+                                }} />
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removeDocumentRow(index)}
+                          className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex-shrink-0 mt-0.5"
+                          title="Remove document"
+                        >
+                          <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Footer Actions */}
         <div className="flex items-center justify-between mt-6">
           <button
@@ -464,7 +1028,7 @@ export function EmployeeOnboardingWizard({
             <span>{currentStep === 1 ? 'Cancel' : 'Back'}</span>
           </button>
 
-          {currentStep === 1 ? (
+          {currentStep < 5 ? (
             <button
               onClick={handleNext}
               className="flex items-center gap-2 px-6 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors"

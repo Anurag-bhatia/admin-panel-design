@@ -11,6 +11,23 @@ export interface Permissions {
   flowAccess: PermissionFlowAccess
 }
 
+export interface EmployeeDocument {
+  id: string
+  name: string
+  type: 'aadhaar' | 'pan' | 'offer_letter' | 'resume' | 'address_proof' | 'bank_details' | 'education' | 'other'
+  fileName: string
+  fileSize: string
+  uploadedAt: string
+  status: 'verified' | 'pending' | 'rejected'
+}
+
+export interface ActivityItem {
+  id: string
+  action: string
+  target: string
+  timestamp: string
+}
+
 export interface Employee {
   id: string
   profilePicture: string | null
@@ -28,6 +45,8 @@ export interface Employee {
   secondaryReportingManager: string | null
   status: 'active' | 'inactive'
   permissions: Permissions
+  documents: EmployeeDocument[]
+  recentActivity: ActivityItem[]
 }
 
 export interface Team {

@@ -17,7 +17,7 @@
   "partners": [
     {
       "id": "partner-001",
-      "partnerId": "PTR-001",
+      "partnerId": "RSP-1213401",
       "firstName": "Rajesh",
       "lastName": "Kumar",
       "email": "rajesh.kumar@fleetpro.com",
@@ -31,46 +31,408 @@
       "city": "New Delhi",
       "pinCode": "110001",
       "website": "www.fleetpro.com",
-      "productsAllowed": ["Challan Resolution", "Legal Consultation"],
-      "subscriberTypesAllowed": ["Fleet Operators", "Enterprise"],
+      "productsAllowed": [
+        "Challan Resolution",
+        "Legal Consultation"
+      ],
+      "subscriberTypesAllowed": [
+        "Fleet Operators",
+        "Enterprise"
+      ],
       "bankAccountNumber": "1234567890123456",
       "bankName": "HDFC Bank",
+      "partnerType": "challanPay",
+      "stage": "activation",
+      "activationActivity": "trained",
+      "assignedTo": "Arun Kumar",
+      "utmSource": "Google Ads",
+      "outlets": 4,
+      "linkedOutlets": [
+        {
+          "id": "outlet-001",
+          "outletId": "OLT-100001",
+          "name": "FleetPro Karol Bagh",
+          "address": "45 Ajmal Khan Road, Karol Bagh",
+          "city": "New Delhi",
+          "state": "Delhi",
+          "pinCode": "110005",
+          "contactPerson": "Manoj Tiwari",
+          "contactPhone": "+919812345001",
+          "status": "active",
+          "subscriberCount": 38,
+          "vehicleCount": 12,
+          "openedDate": "2023-05-20"
+        },
+        {
+          "id": "outlet-002",
+          "outletId": "OLT-100002",
+          "name": "FleetPro Dwarka",
+          "address": "Sector 12, Dwarka",
+          "city": "New Delhi",
+          "state": "Delhi",
+          "pinCode": "110075",
+          "contactPerson": "Sanjay Gupta",
+          "contactPhone": "+919812345002",
+          "status": "active",
+          "subscriberCount": 32,
+          "vehicleCount": 8,
+          "openedDate": "2023-07-10"
+        },
+        {
+          "id": "outlet-003",
+          "outletId": "OLT-100003",
+          "name": "FleetPro Noida",
+          "address": "Block B, Sector 62",
+          "city": "Noida",
+          "state": "Uttar Pradesh",
+          "pinCode": "201301",
+          "contactPerson": "Rakesh Yadav",
+          "contactPhone": "+919812345003",
+          "status": "active",
+          "subscriberCount": 30,
+          "vehicleCount": 6,
+          "openedDate": "2023-09-15"
+        },
+        {
+          "id": "outlet-004",
+          "outletId": "OLT-100004",
+          "name": "FleetPro Ghaziabad",
+          "address": "Raj Nagar Extension",
+          "city": "Ghaziabad",
+          "state": "Uttar Pradesh",
+          "pinCode": "201017",
+          "contactPerson": "Deepak Sharma",
+          "contactPhone": "+919812345004",
+          "status": "inactive",
+          "subscriberCount": 26,
+          "vehicleCount": 3,
+          "openedDate": "2024-01-05"
+        }
+      ],
+      "registeredVisitorsCount": 342,
+      "registeredVisitors": [
+        {
+          "id": "vis-001",
+          "visitorId": "VIS232122",
+          "visitorToken": "www.challanpay.in/VIS232122/",
+          "visitDate": "2026-01-15T10:30:00Z",
+          "visitors": 3
+        },
+        {
+          "id": "vis-002",
+          "visitorId": "VIS384729",
+          "visitorToken": "www.challanpay.in/VIS384729/",
+          "visitDate": "2026-01-20T14:15:00Z",
+          "visitors": 1
+        },
+        {
+          "id": "vis-003",
+          "visitorId": "VIS759301",
+          "visitorToken": "www.challanpay.in/VIS759301/",
+          "visitDate": "2026-02-05T09:45:00Z",
+          "visitors": 5
+        },
+        {
+          "id": "vis-004",
+          "visitorId": "VIS402816",
+          "visitorToken": "www.challanpay.in/VIS402816/",
+          "visitDate": "2026-02-18T16:00:00Z",
+          "visitors": 2
+        },
+        {
+          "id": "vis-005",
+          "visitorId": "VIS618472",
+          "visitorToken": "www.challanpay.in/VIS618472/",
+          "visitDate": "2026-03-01T11:20:00Z",
+          "visitors": 4
+        },
+        {
+          "id": "vis-006",
+          "visitorId": "VIS937150",
+          "visitorToken": "www.challanpay.in/VIS937150/",
+          "visitDate": "2026-03-03T13:50:00Z",
+          "visitors": 1
+        }
+      ],
+      "registeredVisitorDetails": [
+        {
+          "id": "rvd-001",
+          "visitorId": "RV748201312",
+          "visitorName": "Ramesh Kumar",
+          "subscriberId": "LWD-1160523",
+          "pendingChallansAmount": 4500,
+          "contactNumber": "9876543210",
+          "pendingCourtChallans": 1,
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 2700,
+          "pendingOnlineChallansAmount": 1800
+        },
+        {
+          "id": "rvd-002",
+          "visitorId": "RV513084729",
+          "visitorName": "Suresh Patel",
+          "subscriberId": "LWD-1160523",
+          "pendingChallansAmount": 1500,
+          "contactNumber": "9812345678",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 900,
+          "pendingOnlineChallansAmount": 600
+        },
+        {
+          "id": "rvd-003",
+          "visitorId": "RV291638405",
+          "visitorName": "Amit Sharma",
+          "subscriberId": "LWD-1160524",
+          "pendingChallansAmount": 7200,
+          "contactNumber": "9988776655",
+          "pendingCourtChallans": 2,
+          "pendingOnlineChallans": 3,
+          "pendingCourtChallansAmount": 4320,
+          "pendingOnlineChallansAmount": 2880
+        },
+        {
+          "id": "rvd-004",
+          "visitorId": "RV604312187",
+          "visitorName": "Vikas Singh",
+          "subscriberId": "LWD-1160524",
+          "pendingChallansAmount": 0,
+          "contactNumber": "9871234560",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
+        },
+        {
+          "id": "rvd-005",
+          "visitorId": "RV837592064",
+          "visitorName": "Deepak Verma",
+          "subscriberId": "LWD-1160525",
+          "pendingChallansAmount": 3000,
+          "contactNumber": "9654321098",
+          "pendingCourtChallans": 1,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1800,
+          "pendingOnlineChallansAmount": 1200
+        },
+        {
+          "id": "rvd-006",
+          "visitorId": "RV109456823",
+          "visitorName": "Manoj Tiwari",
+          "subscriberId": "LWD-1160525",
+          "pendingChallansAmount": 6800,
+          "contactNumber": "9765432109",
+          "pendingCourtChallans": 2,
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 4080,
+          "pendingOnlineChallansAmount": 2720
+        },
+        {
+          "id": "rvd-007",
+          "visitorId": "RV472806951",
+          "visitorName": "Rajesh Gupta",
+          "subscriberId": "LWD-1160523",
+          "pendingChallansAmount": 2000,
+          "contactNumber": "9543210987",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1200,
+          "pendingOnlineChallansAmount": 800
+        }
+      ],
+      "outletQRs": [
+        {
+          "id": "qr-001",
+          "qrId": "QR-3e93c4bc72",
+          "outletId": "outlet-001",
+          "outletName": "FleetPro Karol Bagh",
+          "totalScans": 342,
+          "status": "active",
+          "createdDate": "2023-05-22"
+        },
+        {
+          "id": "qr-002",
+          "qrId": "QR-a7f1d8e504",
+          "outletId": "outlet-002",
+          "outletName": "FleetPro Dwarka",
+          "totalScans": 218,
+          "status": "active",
+          "createdDate": "2023-07-12"
+        },
+        {
+          "id": "qr-003",
+          "qrId": "QR-5b2c9f1a38",
+          "outletId": "outlet-003",
+          "outletName": "FleetPro Noida",
+          "totalScans": 156,
+          "status": "active",
+          "createdDate": "2023-09-17"
+        },
+        {
+          "id": "qr-004",
+          "qrId": "QR-d4e6b7c091",
+          "outletId": "outlet-004",
+          "outletName": "FleetPro Ghaziabad",
+          "totalScans": 89,
+          "status": "inactive",
+          "createdDate": "2024-01-07"
+        }
+      ],
+      "followUps": [
+        {
+          "id": "fu-001",
+          "activityType": "onboarding",
+          "subActivityType": "call",
+          "notes": "Completed partner onboarding for Gurugram region. Documents verified and account activated.",
+          "createdAt": "2026-03-10T10:30:00Z",
+          "createdBy": "Rohit Sharma"
+        },
+        {
+          "id": "fu-002",
+          "activityType": "activation",
+          "subActivityType": "visit",
+          "notes": "Activated 3 outlets in Delhi NCR. QR codes deployed and tested successfully.",
+          "createdAt": "2026-03-05T14:00:00Z",
+          "createdBy": "Amit Verma"
+        },
+        {
+          "id": "fu-003",
+          "activityType": "training",
+          "subActivityType": "meeting",
+          "notes": "Conducted staff training at Karol Bagh outlet. Covered challan processing and customer handling.",
+          "createdAt": "2026-02-28T09:15:00Z",
+          "createdBy": "Rohit Sharma"
+        },
+        {
+          "id": "fu-004",
+          "activityType": "mobilisation",
+          "subActivityType": "whatsapp",
+          "notes": "Mobilised field team for Dwarka and Noida outlets. Partner confirmed readiness.",
+          "createdAt": "2026-02-20T16:45:00Z",
+          "createdBy": "Priya Singh"
+        },
+        {
+          "id": "fu-005",
+          "activityType": "training",
+          "subActivityType": "visit",
+          "notes": "Refresher training for outlet staff on updated challan process and new QR flow.",
+          "createdAt": "2026-02-15T11:00:00Z",
+          "createdBy": "Amit Verma"
+        }
+      ],
+      "vehicles": 126,
+      "linkedVehicles": [
+        {
+          "id": "veh-001",
+          "registrationNumber": "DL01AB1234",
+          "ownerName": "ABC Logistics Pvt Ltd",
+          "vehicleType": "truck",
+          "make": "Tata",
+          "model": "Prima 4028",
+          "year": 2022,
+          "status": "active",
+          "incidentCount": 5,
+          "lastIncidentDate": "2026-02-10",
+          "subscriberId": "LWD-1160523",
+          "subscriberName": "ABC Logistics"
+        },
+        {
+          "id": "veh-002",
+          "registrationNumber": "DL04CD5678",
+          "ownerName": "ABC Logistics Pvt Ltd",
+          "vehicleType": "truck",
+          "make": "Ashok Leyland",
+          "model": "Captain 2523",
+          "year": 2021,
+          "status": "active",
+          "incidentCount": 3,
+          "lastIncidentDate": "2026-01-18",
+          "subscriberId": "LWD-1160523",
+          "subscriberName": "ABC Logistics"
+        },
+        {
+          "id": "veh-003",
+          "registrationNumber": "DL10EF9012",
+          "ownerName": "XYZ Transport Services",
+          "vehicleType": "van",
+          "make": "Mahindra",
+          "model": "Bolero Pickup",
+          "year": 2023,
+          "status": "active",
+          "incidentCount": 2,
+          "lastIncidentDate": "2026-02-25",
+          "subscriberId": "LWD-1160524",
+          "subscriberName": "XYZ Transport"
+        },
+        {
+          "id": "veh-004",
+          "registrationNumber": "DL08GH3456",
+          "ownerName": "Delhi Couriers Co",
+          "vehicleType": "van",
+          "make": "Tata",
+          "model": "Ace Gold",
+          "year": 2020,
+          "status": "inactive",
+          "incidentCount": 1,
+          "lastIncidentDate": "2025-11-05",
+          "subscriberId": "LWD-1160525",
+          "subscriberName": "Delhi Couriers"
+        }
+      ],
       "status": "active",
       "dateOnboarded": "2023-05-15",
       "linkedSubscribers": [
         {
           "id": "LWD-1160523",
-          "name": "ABC Logistics",
+          "name": "Ramesh Verma",
           "company": "ABC Logistics Pvt Ltd",
           "mobile": "+919111111111",
           "status": "active",
           "dateSubscribed": "2023-06-01",
-          "incidentCount": 12
+          "incidentCount": 12,
+          "submittedCourtChallans": 4,
+          "submittedOnlineChallans": 4,
+          "submittedCourtAmount": 7440,
+          "submittedOnlineAmount": 4960
         },
         {
           "id": "LWD-1160524",
-          "name": "XYZ Transport",
+          "name": "Sunil Mehra",
           "company": "XYZ Transport Services",
           "mobile": "+919111111112",
           "status": "active",
           "dateSubscribed": "2023-07-10",
-          "incidentCount": 8
+          "incidentCount": 8,
+          "submittedCourtChallans": 2,
+          "submittedOnlineChallans": 3,
+          "submittedCourtAmount": 4500,
+          "submittedOnlineAmount": 3000
         },
         {
           "id": "LWD-1160525",
-          "name": "Delhi Couriers",
+          "name": "Arvind Joshi",
           "company": "Delhi Couriers Co",
           "mobile": "+919111111113",
           "status": "paused",
           "dateSubscribed": "2023-08-20",
-          "incidentCount": 3
+          "incidentCount": 3,
+          "submittedCourtChallans": 1,
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 1920,
+          "submittedOnlineAmount": 1280
         }
       ],
       "earnings": 45000,
+      "totalCommission": 35000,
+      "totalRspBenefit": 10000,
+      "totalIncidentsSubmitted": 156,
+      "totalOnlineChallansSubmitted": 120,
+      "totalCourtChallansSubmitted": 36,
       "totalPayouts": 40000,
       "payoutHistory": [
         {
           "id": "payout-001",
+          "transactionId": "TXN240115001",
           "amount": 20000,
           "date": "2024-01-15",
           "status": "completed",
@@ -78,6 +440,7 @@
         },
         {
           "id": "payout-002",
+          "transactionId": "TXN240215002",
           "amount": 20000,
           "date": "2024-02-15",
           "status": "completed",
@@ -117,11 +480,12 @@
           "timestamp": "2023-05-20T09:15:00Z",
           "details": "GST certificate uploaded"
         }
-      ]
+      ],
+      "onboardingActivity": "profileVerification"
     },
     {
       "id": "partner-002",
-      "partnerId": "PTR-002",
+      "partnerId": "RSP-1213402",
       "firstName": "Priya",
       "lastName": "Singh",
       "email": "priya.singh@transportnet.in",
@@ -135,37 +499,277 @@
       "city": "Mumbai",
       "pinCode": "400020",
       "website": "www.transportnet.in",
-      "productsAllowed": ["Challan Resolution"],
-      "subscriberTypesAllowed": ["Fleet Operators"],
+      "productsAllowed": [
+        "Challan Resolution"
+      ],
+      "subscriberTypesAllowed": [
+        "Fleet Operators"
+      ],
       "bankAccountNumber": "9876543210123456",
       "bankName": "ICICI Bank",
+      "partnerType": "challanPay",
+      "stage": "mobilisation",
+      "activationActivity": "trained",
+      "assignedTo": "Neha Patel",
+      "utmSource": "Referral",
+      "outlets": 2,
+      "linkedOutlets": [
+        {
+          "id": "outlet-005",
+          "outletId": "OLT-100005",
+          "name": "TransportNet Andheri",
+          "address": "702 Link Road, Andheri West",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "pinCode": "400053",
+          "contactPerson": "Anil Patil",
+          "contactPhone": "+919822345001",
+          "status": "active",
+          "subscriberCount": 52,
+          "vehicleCount": 10,
+          "openedDate": "2023-08-28"
+        },
+        {
+          "id": "outlet-006",
+          "outletId": "OLT-100006",
+          "name": "TransportNet Thane",
+          "address": "Ghodbunder Road, Thane West",
+          "city": "Thane",
+          "state": "Maharashtra",
+          "pinCode": "400607",
+          "contactPerson": "Prashant Deshmukh",
+          "contactPhone": "+919822345002",
+          "status": "active",
+          "subscriberCount": 32,
+          "vehicleCount": 5,
+          "openedDate": "2023-11-15"
+        }
+      ],
+      "registeredVisitorsCount": 218,
+      "registeredVisitors": [
+        {
+          "id": "vis-007",
+          "visitorId": "VIS205837",
+          "visitorToken": "www.challanpay.in/VIS205837/",
+          "visitDate": "2026-02-01T10:00:00Z",
+          "visitors": 2
+        },
+        {
+          "id": "vis-008",
+          "visitorId": "VIS846301",
+          "visitorToken": "www.challanpay.in/VIS846301/",
+          "visitDate": "2026-02-10T15:30:00Z",
+          "visitors": 6
+        },
+        {
+          "id": "vis-009",
+          "visitorId": "VIS512974",
+          "visitorToken": "www.challanpay.in/VIS512974/",
+          "visitDate": "2026-02-22T11:45:00Z",
+          "visitors": 1
+        },
+        {
+          "id": "vis-010",
+          "visitorId": "VIS370618",
+          "visitorToken": "www.challanpay.in/VIS370618/",
+          "visitDate": "2026-03-04T09:15:00Z",
+          "visitors": 3
+        }
+      ],
+      "registeredVisitorDetails": [
+        {
+          "id": "rvd-008",
+          "visitorId": "RV385120946",
+          "visitorName": "Anil Mehta",
+          "subscriberId": "LWD-1160526",
+          "pendingChallansAmount": 3200,
+          "contactNumber": "9876012345",
+          "pendingCourtChallans": 1,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1920,
+          "pendingOnlineChallansAmount": 1280
+        },
+        {
+          "id": "rvd-009",
+          "visitorId": "RV729463508",
+          "visitorName": "Sanjay Reddy",
+          "subscriberId": "LWD-1160526",
+          "pendingChallansAmount": 0,
+          "contactNumber": "9812098765",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
+        },
+        {
+          "id": "rvd-010",
+          "visitorId": "RV105782631",
+          "visitorName": "Pradeep Joshi",
+          "subscriberId": "LWD-1160527",
+          "pendingChallansAmount": 9100,
+          "contactNumber": "9945678901",
+          "pendingCourtChallans": 3,
+          "pendingOnlineChallans": 3,
+          "pendingCourtChallansAmount": 5460,
+          "pendingOnlineChallansAmount": 3640
+        },
+        {
+          "id": "rvd-011",
+          "visitorId": "RV648103274",
+          "visitorName": "Karan Malhotra",
+          "subscriberId": "LWD-1160527",
+          "pendingChallansAmount": 1800,
+          "contactNumber": "9734561230",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1080,
+          "pendingOnlineChallansAmount": 720
+        },
+        {
+          "id": "rvd-012",
+          "visitorId": "RV920357148",
+          "visitorName": "Nitin Agarwal",
+          "subscriberId": "LWD-1160526",
+          "pendingChallansAmount": 4200,
+          "contactNumber": "9623456789",
+          "pendingCourtChallans": 1,
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 2520,
+          "pendingOnlineChallansAmount": 1680
+        }
+      ],
+      "outletQRs": [
+        {
+          "id": "qr-005",
+          "qrId": "QR-8c12ef4a67",
+          "outletId": "outlet-005",
+          "outletName": "TransportNet Andheri",
+          "totalScans": 485,
+          "status": "active",
+          "createdDate": "2023-08-30"
+        },
+        {
+          "id": "qr-006",
+          "qrId": "QR-f0a3b59d21",
+          "outletId": "outlet-006",
+          "outletName": "TransportNet Thane",
+          "totalScans": 210,
+          "status": "active",
+          "createdDate": "2023-11-17"
+        }
+      ],
+      "followUps": [
+        {
+          "id": "fu-006",
+          "activityType": "onboarding",
+          "subActivityType": "email",
+          "notes": "Onboarding process initiated for Mumbai partner. KYC documents collected and verified.",
+          "createdAt": "2026-03-08T11:30:00Z",
+          "createdBy": "Sanjay Mehta"
+        },
+        {
+          "id": "fu-007",
+          "activityType": "activation",
+          "subActivityType": "visit",
+          "notes": "Activated Andheri outlet. High footfall observed, suggested adding second QR station.",
+          "createdAt": "2026-02-25T10:00:00Z",
+          "createdBy": "Sanjay Mehta"
+        },
+        {
+          "id": "fu-008",
+          "activityType": "mobilisation",
+          "subActivityType": "call",
+          "notes": "Mobilised support team for Thane expansion. Resources allocated for next quarter.",
+          "createdAt": "2026-02-10T09:00:00Z",
+          "createdBy": "Priya Singh"
+        }
+      ],
+      "vehicles": 84,
+      "linkedVehicles": [
+        {
+          "id": "veh-005",
+          "registrationNumber": "MH01KL7890",
+          "ownerName": "Mumbai Freight Express",
+          "vehicleType": "truck",
+          "make": "BharatBenz",
+          "model": "1617R",
+          "year": 2023,
+          "status": "active",
+          "incidentCount": 8,
+          "lastIncidentDate": "2026-03-01",
+          "subscriberId": "LWD-1160526",
+          "subscriberName": "Mumbai Freight"
+        },
+        {
+          "id": "veh-006",
+          "registrationNumber": "MH04MN2345",
+          "ownerName": "Mumbai Freight Express",
+          "vehicleType": "truck",
+          "make": "Eicher",
+          "model": "Pro 3019",
+          "year": 2022,
+          "status": "active",
+          "incidentCount": 4,
+          "lastIncidentDate": "2026-02-14",
+          "subscriberId": "LWD-1160526",
+          "subscriberName": "Mumbai Freight"
+        },
+        {
+          "id": "veh-007",
+          "registrationNumber": "MH12OP6789",
+          "ownerName": "West India Roads Ltd",
+          "vehicleType": "bus",
+          "make": "Tata",
+          "model": "Starbus Ultra",
+          "year": 2021,
+          "status": "active",
+          "incidentCount": 3,
+          "lastIncidentDate": "2026-01-28",
+          "subscriberId": "LWD-1160527",
+          "subscriberName": "West India Roads"
+        }
+      ],
       "status": "active",
       "dateOnboarded": "2023-08-22",
       "linkedSubscribers": [
         {
           "id": "LWD-1160526",
-          "name": "Mumbai Freight",
+          "name": "Nikhil Patil",
           "company": "Mumbai Freight Express",
           "mobile": "+919222222221",
           "status": "active",
           "dateSubscribed": "2023-09-05",
-          "incidentCount": 18
+          "incidentCount": 18,
+          "submittedCourtChallans": 7,
+          "submittedOnlineChallans": 7,
+          "submittedCourtAmount": 12600,
+          "submittedOnlineAmount": 8400
         },
         {
           "id": "LWD-1160527",
-          "name": "West India Roads",
+          "name": "Pradeep Kulkarni",
           "company": "West India Roads Ltd",
           "mobile": "+919222222222",
           "status": "active",
           "dateSubscribed": "2023-10-12",
-          "incidentCount": 7
+          "incidentCount": 7,
+          "submittedCourtChallans": 2,
+          "submittedOnlineChallans": 2,
+          "submittedCourtAmount": 3720,
+          "submittedOnlineAmount": 2480
         }
       ],
       "earnings": 32500,
+      "totalCommission": 25000,
+      "totalRspBenefit": 7500,
+      "totalIncidentsSubmitted": 98,
+      "totalOnlineChallansSubmitted": 72,
+      "totalCourtChallansSubmitted": 26,
       "totalPayouts": 25000,
       "payoutHistory": [
         {
           "id": "payout-003",
+          "transactionId": "TXN240210003",
           "amount": 25000,
           "date": "2024-02-10",
           "status": "completed",
@@ -193,11 +797,13 @@
           "timestamp": "2024-01-10T16:20:00Z",
           "details": "Partner status set to active"
         }
-      ]
+      ],
+      "onboardingActivity": "profileVerification",
+      "mobilisationActivity": "dispatch"
     },
     {
       "id": "partner-003",
-      "partnerId": "PTR-003",
+      "partnerId": "LWD-1213403",
       "firstName": "Vikram",
       "lastName": "Patel",
       "email": "vikram@roadsafety.net",
@@ -211,28 +817,76 @@
       "city": "Ahmedabad",
       "pinCode": "380015",
       "website": "www.roadsafety.net",
-      "productsAllowed": ["Challan Resolution", "Legal Consultation"],
-      "subscriberTypesAllowed": ["Fleet Operators", "Individual"],
+      "productsAllowed": [
+        "Challan Resolution",
+        "Legal Consultation"
+      ],
+      "subscriberTypesAllowed": [
+        "Fleet Operators",
+        "Individual"
+      ],
       "bankAccountNumber": "5555666677778888",
       "bankName": "Axis Bank",
+      "partnerType": "lots247",
+      "vehicles": 58,
+      "linkedVehicles": [
+        {
+          "id": "veh-008",
+          "registrationNumber": "GJ01QR0123",
+          "ownerName": "Gujarat Fleet Services Pvt",
+          "vehicleType": "truck",
+          "make": "Tata",
+          "model": "Signa 3518",
+          "year": 2022,
+          "status": "active",
+          "incidentCount": 3,
+          "lastIncidentDate": "2026-02-20",
+          "subscriberId": "LWD-1160528",
+          "subscriberName": "Gujarat Fleet Services"
+        },
+        {
+          "id": "veh-009",
+          "registrationNumber": "GJ05ST4567",
+          "ownerName": "Gujarat Fleet Services Pvt",
+          "vehicleType": "van",
+          "make": "Mahindra",
+          "model": "Supro Profit Truck",
+          "year": 2023,
+          "status": "active",
+          "incidentCount": 2,
+          "lastIncidentDate": "2026-01-10",
+          "subscriberId": "LWD-1160528",
+          "subscriberName": "Gujarat Fleet Services"
+        }
+      ],
       "status": "active",
       "dateOnboarded": "2023-11-10",
       "linkedSubscribers": [
         {
           "id": "LWD-1160528",
-          "name": "Gujarat Fleet Services",
+          "name": "Hitesh Shah",
           "company": "Gujarat Fleet Services Pvt",
           "mobile": "+919333333331",
           "status": "active",
           "dateSubscribed": "2023-11-20",
-          "incidentCount": 5
+          "incidentCount": 5,
+          "submittedCourtChallans": 1,
+          "submittedOnlineChallans": 2,
+          "submittedCourtAmount": 2880,
+          "submittedOnlineAmount": 1920
         }
       ],
       "earnings": 12000,
+      "totalCommission": 12000,
+      "totalRspBenefit": 0,
+      "totalIncidentsSubmitted": 45,
+      "totalOnlineChallansSubmitted": 45,
+      "totalCourtChallansSubmitted": 0,
       "totalPayouts": 10000,
       "payoutHistory": [
         {
           "id": "payout-004",
+          "transactionId": "TXN240120004",
           "amount": 10000,
           "date": "2024-01-20",
           "status": "completed",
@@ -251,7 +905,7 @@
     },
     {
       "id": "partner-004",
-      "partnerId": "PTR-004",
+      "partnerId": "LWD-1213404",
       "firstName": "Amit",
       "lastName": "Desai",
       "email": "amit@legalsolutions.com",
@@ -265,28 +919,61 @@
       "city": "Bangalore",
       "pinCode": "560001",
       "website": "www.legalsolutions.com",
-      "productsAllowed": ["Legal Consultation"],
-      "subscriberTypesAllowed": ["Fleet Operators", "Enterprise"],
+      "productsAllowed": [
+        "Legal Consultation"
+      ],
+      "subscriberTypesAllowed": [
+        "Fleet Operators",
+        "Enterprise"
+      ],
       "bankAccountNumber": "1111222233334444",
       "bankName": "Kotak Mahindra Bank",
+      "partnerType": "lots247",
+      "vehicles": 31,
+      "linkedVehicles": [
+        {
+          "id": "veh-010",
+          "registrationNumber": "KA01UV8901",
+          "ownerName": "Bangalore Express Logistics",
+          "vehicleType": "car",
+          "make": "Maruti Suzuki",
+          "model": "Eeco Cargo",
+          "year": 2021,
+          "status": "inactive",
+          "incidentCount": 1,
+          "lastIncidentDate": "2025-08-15",
+          "subscriberId": "LWD-1160529",
+          "subscriberName": "Bangalore Express"
+        }
+      ],
       "status": "inactive",
       "dateOnboarded": "2023-03-05",
       "linkedSubscribers": [
         {
           "id": "LWD-1160529",
-          "name": "Bangalore Express",
+          "name": "Kiran Rao",
           "company": "Bangalore Express Logistics",
           "mobile": "+919444444441",
           "status": "inactive",
           "dateSubscribed": "2023-03-20",
-          "incidentCount": 2
+          "incidentCount": 2,
+          "submittedCourtChallans": 0,
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 900,
+          "submittedOnlineAmount": 600
         }
       ],
       "earnings": 5000,
+      "totalCommission": 5000,
+      "totalRspBenefit": 0,
+      "totalIncidentsSubmitted": 18,
+      "totalOnlineChallansSubmitted": 18,
+      "totalCourtChallansSubmitted": 0,
       "totalPayouts": 5000,
       "payoutHistory": [
         {
           "id": "payout-005",
+          "transactionId": "TXN231215005",
           "amount": 5000,
           "date": "2023-12-15",
           "status": "completed",
@@ -318,7 +1005,7 @@
     },
     {
       "id": "partner-005",
-      "partnerId": "PTR-005",
+      "partnerId": "RSP-1213405",
       "firstName": "Sneha",
       "lastName": "Chopra",
       "email": "sneha@commerce-hub.in",
@@ -332,33 +1019,194 @@
       "city": "Gurgaon",
       "pinCode": "122002",
       "website": "www.commerce-hub.in",
-      "productsAllowed": ["Challan Resolution"],
-      "subscriberTypesAllowed": ["Fleet Operators", "Individual", "Enterprise"],
+      "productsAllowed": [
+        "Challan Resolution"
+      ],
+      "subscriberTypesAllowed": [
+        "Fleet Operators",
+        "Individual",
+        "Enterprise"
+      ],
       "bankAccountNumber": "3333444455556666",
       "bankName": "HDFC Bank",
+      "partnerType": "challanPay",
+      "stage": "onboarding",
+      "onboardingActivity": "registration",
+      "assignedTo": null,
+      "utmSource": "Facebook",
+      "outlets": 1,
+      "linkedOutlets": [
+        {
+          "id": "outlet-007",
+          "outletId": "OLT-100007",
+          "name": "Commerce Hub NH-8",
+          "address": "654 Business Complex, NH-8",
+          "city": "Gurgaon",
+          "state": "Haryana",
+          "pinCode": "122002",
+          "contactPerson": "Naveen Chopra",
+          "contactPhone": "+919812345010",
+          "status": "active",
+          "subscriberCount": 42,
+          "vehicleCount": 4,
+          "openedDate": "2024-01-10"
+        }
+      ],
+      "registeredVisitorsCount": 127,
+      "registeredVisitors": [
+        {
+          "id": "vis-011",
+          "visitorId": "VIS694720",
+          "visitorToken": "www.challanpay.in/VIS694720/",
+          "visitDate": "2026-03-01T10:30:00Z",
+          "visitors": 2
+        },
+        {
+          "id": "vis-012",
+          "visitorId": "VIS183506",
+          "visitorToken": "www.challanpay.in/VIS183506/",
+          "visitDate": "2026-03-05T14:00:00Z",
+          "visitors": 4
+        }
+      ],
+      "registeredVisitorDetails": [
+        {
+          "id": "rvd-013",
+          "visitorId": "RV452089173",
+          "visitorName": "Harish Nair",
+          "subscriberId": "LWD-1160530",
+          "pendingChallansAmount": 2800,
+          "contactNumber": "9876543201",
+          "pendingCourtChallans": 1,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1680,
+          "pendingOnlineChallansAmount": 1120
+        },
+        {
+          "id": "rvd-014",
+          "visitorId": "RV813609425",
+          "visitorName": "Vivek Pandey",
+          "subscriberId": "LWD-1160530",
+          "pendingChallansAmount": 5600,
+          "contactNumber": "9812345097",
+          "pendingCourtChallans": 2,
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 3360,
+          "pendingOnlineChallansAmount": 2240
+        },
+        {
+          "id": "rvd-015",
+          "visitorId": "RV670941382",
+          "visitorName": "Ajay Chauhan",
+          "subscriberId": "LWD-1160531",
+          "pendingChallansAmount": 0,
+          "contactNumber": "9945670123",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
+        },
+        {
+          "id": "rvd-016",
+          "visitorId": "RV238470596",
+          "visitorName": "Rohit Saxena",
+          "subscriberId": "LWD-1160531",
+          "pendingChallansAmount": 1500,
+          "contactNumber": "9723456780",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 900,
+          "pendingOnlineChallansAmount": 600
+        }
+      ],
+      "outletQRs": [
+        {
+          "id": "qr-007",
+          "qrId": "QR-1d7e0c3b95",
+          "outletId": "outlet-007",
+          "outletName": "Commerce Hub NH-8",
+          "totalScans": 127,
+          "status": "active",
+          "createdDate": "2024-01-12"
+        }
+      ],
+      "followUps": [
+        {
+          "id": "fu-009",
+          "activityType": "onboarding",
+          "subActivityType": "meeting",
+          "notes": "Onboarding kickoff for Gurugram partner. Discussed setup requirements and timelines.",
+          "createdAt": "2026-03-02T15:00:00Z",
+          "createdBy": "Amit Verma"
+        }
+      ],
+      "vehicles": 42,
+      "linkedVehicles": [
+        {
+          "id": "veh-011",
+          "registrationNumber": "HR26WX2345",
+          "ownerName": "Delhi Traders Association",
+          "vehicleType": "truck",
+          "make": "Ashok Leyland",
+          "model": "Boss 1616",
+          "year": 2024,
+          "status": "active",
+          "incidentCount": 1,
+          "lastIncidentDate": "2026-02-05",
+          "subscriberId": "LWD-1160530",
+          "subscriberName": "Delhi Traders"
+        },
+        {
+          "id": "veh-012",
+          "registrationNumber": "DL12YZ6789",
+          "ownerName": "NCR Logistics Hub",
+          "vehicleType": "van",
+          "make": "Tata",
+          "model": "Intra V30",
+          "year": 2023,
+          "status": "active",
+          "incidentCount": 2,
+          "lastIncidentDate": "2026-03-02",
+          "subscriberId": "LWD-1160531",
+          "subscriberName": "NCR Logistics"
+        }
+      ],
       "status": "active",
       "dateOnboarded": "2024-01-08",
       "linkedSubscribers": [
         {
           "id": "LWD-1160530",
-          "name": "Delhi Traders",
+          "name": "Mohit Taneja",
           "company": "Delhi Traders Association",
           "mobile": "+919555555551",
           "status": "active",
           "dateSubscribed": "2024-01-15",
-          "incidentCount": 1
+          "incidentCount": 1,
+          "submittedCourtChallans": 0,
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 720,
+          "submittedOnlineAmount": 480
         },
         {
           "id": "LWD-1160531",
-          "name": "NCR Logistics",
+          "name": "Gaurav Bhalla",
           "company": "NCR Logistics Hub",
           "mobile": "+919555555552",
           "status": "active",
           "dateSubscribed": "2024-01-20",
-          "incidentCount": 4
+          "incidentCount": 4,
+          "submittedCourtChallans": 1,
+          "submittedOnlineChallans": 2,
+          "submittedCourtAmount": 2700,
+          "submittedOnlineAmount": 1800
         }
       ],
       "earnings": 8500,
+      "totalCommission": 6000,
+      "totalRspBenefit": 2500,
+      "totalIncidentsSubmitted": 42,
+      "totalOnlineChallansSubmitted": 30,
+      "totalCourtChallansSubmitted": 12,
       "totalPayouts": 0,
       "payoutHistory": [],
       "documents": [
@@ -386,7 +1234,7 @@
     },
     {
       "id": "partner-006",
-      "partnerId": "PTR-006",
+      "partnerId": "RSP-1213406",
       "firstName": "Rohit",
       "lastName": "Mishra",
       "email": "rohit.mishra@speedway.co.in",
@@ -400,46 +1248,238 @@
       "city": "Hyderabad",
       "pinCode": "500081",
       "website": "www.speedway.co.in",
-      "productsAllowed": ["Challan Resolution"],
-      "subscriberTypesAllowed": ["Fleet Operators"],
+      "productsAllowed": [
+        "Challan Resolution"
+      ],
+      "subscriberTypesAllowed": [
+        "Fleet Operators"
+      ],
       "bankAccountNumber": "7777888899990000",
       "bankName": "Yes Bank",
+      "partnerType": "challanPay",
+      "stage": "activation",
+      "activationActivity": "assigned",
+      "assignedTo": "Rajesh Verma",
+      "utmSource": "Google Ads",
+      "outlets": 6,
+      "registeredVisitorsCount": 485,
+      "registeredVisitors": [
+        {
+          "id": "vis-013",
+          "visitorId": "VIS429165",
+          "visitorToken": "www.challanpay.in/VIS429165/",
+          "visitDate": "2026-01-10T09:00:00Z",
+          "visitors": 7
+        },
+        {
+          "id": "vis-014",
+          "visitorId": "VIS753018",
+          "visitorToken": "www.challanpay.in/VIS753018/",
+          "visitDate": "2026-01-15T12:30:00Z",
+          "visitors": 1
+        },
+        {
+          "id": "vis-015",
+          "visitorId": "VIS086249",
+          "visitorToken": "www.challanpay.in/VIS086249/",
+          "visitDate": "2026-01-20T16:45:00Z",
+          "visitors": 3
+        },
+        {
+          "id": "vis-016",
+          "visitorId": "VIS314807",
+          "visitorToken": "www.challanpay.in/VIS314807/",
+          "visitDate": "2026-02-05T10:15:00Z",
+          "visitors": 2
+        },
+        {
+          "id": "vis-017",
+          "visitorId": "VIS597031",
+          "visitorToken": "www.challanpay.in/VIS597031/",
+          "visitDate": "2026-02-20T14:30:00Z",
+          "visitors": 5
+        }
+      ],
+      "registeredVisitorDetails": [
+        {
+          "id": "rvd-017",
+          "visitorId": "RV750318642",
+          "visitorName": "Sunil Yadav",
+          "subscriberId": "LWD-1160532",
+          "pendingChallansAmount": 5100,
+          "contactNumber": "9865432107",
+          "pendingCourtChallans": 1,
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 3060,
+          "pendingOnlineChallansAmount": 2040
+        },
+        {
+          "id": "rvd-018",
+          "visitorId": "RV214830957",
+          "visitorName": "Ashok Dubey",
+          "subscriberId": "LWD-1160533",
+          "pendingChallansAmount": 0,
+          "contactNumber": "9754321098",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
+        },
+        {
+          "id": "rvd-019",
+          "visitorId": "RV967240183",
+          "visitorName": "Pawan Mishra",
+          "subscriberId": "LWD-1160532",
+          "pendingChallansAmount": 3400,
+          "contactNumber": "9643210987",
+          "pendingCourtChallans": 1,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 2040,
+          "pendingOnlineChallansAmount": 1360
+        },
+        {
+          "id": "rvd-024",
+          "visitorId": "RV481295730",
+          "visitorName": "Rajesh Nair",
+          "subscriberId": "LWD-1160534",
+          "pendingChallansAmount": 1800,
+          "contactNumber": "9532109876",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1080,
+          "pendingOnlineChallansAmount": 720
+        },
+        {
+          "id": "rvd-025",
+          "visitorId": "RV603172849",
+          "visitorName": "Kiran Prasad",
+          "subscriberId": "LWD-1160533",
+          "pendingChallansAmount": 7200,
+          "contactNumber": "9421098765",
+          "pendingCourtChallans": 2,
+          "pendingOnlineChallans": 2,
+          "pendingCourtChallansAmount": 4320,
+          "pendingOnlineChallansAmount": 2880
+        }
+      ],
+      "outletQRs": [],
+      "followUps": [
+        {
+          "id": "fu-010",
+          "activityType": "activation",
+          "subActivityType": "call",
+          "notes": "Activated partner account for Hyderabad. 2 outlets configured and QR codes generated.",
+          "createdAt": "2026-03-06T10:00:00Z",
+          "createdBy": "Rohit Sharma"
+        },
+        {
+          "id": "fu-011",
+          "activityType": "training",
+          "subActivityType": "whatsapp",
+          "notes": "Conducted training session for outlet staff. Covered onboarding checklist and challan workflow.",
+          "createdAt": "2026-03-01T14:30:00Z",
+          "createdBy": "Priya Singh"
+        }
+      ],
+      "vehicles": 210,
+      "linkedVehicles": [
+        {
+          "id": "veh-013",
+          "registrationNumber": "TS09AB3456",
+          "ownerName": "Hyderabad Movers Ltd",
+          "vehicleType": "truck",
+          "make": "BharatBenz",
+          "model": "2823R",
+          "year": 2023,
+          "status": "active",
+          "incidentCount": 4,
+          "lastIncidentDate": "2026-02-28",
+          "subscriberId": "LWD-1160532",
+          "subscriberName": "Hyderabad Movers"
+        },
+        {
+          "id": "veh-014",
+          "registrationNumber": "TS14CD7890",
+          "ownerName": "Telangana Express Services",
+          "vehicleType": "bus",
+          "make": "Tata",
+          "model": "LP 913",
+          "year": 2022,
+          "status": "active",
+          "incidentCount": 3,
+          "lastIncidentDate": "2026-01-15",
+          "subscriberId": "LWD-1160533",
+          "subscriberName": "Telangana Express"
+        },
+        {
+          "id": "veh-015",
+          "registrationNumber": "AP07EF1234",
+          "ownerName": "South India Cargo Co",
+          "vehicleType": "truck",
+          "make": "Eicher",
+          "model": "Pro 6049",
+          "year": 2021,
+          "status": "inactive",
+          "incidentCount": 0,
+          "lastIncidentDate": null,
+          "subscriberId": "LWD-1160534",
+          "subscriberName": "South India Cargo"
+        }
+      ],
       "status": "active",
       "dateOnboarded": "2023-09-18",
       "linkedSubscribers": [
         {
           "id": "LWD-1160532",
-          "name": "Hyderabad Movers",
+          "name": "Venkat Reddy",
           "company": "Hyderabad Movers Ltd",
           "mobile": "+919666666661",
           "status": "active",
           "dateSubscribed": "2023-10-05",
-          "incidentCount": 9
+          "incidentCount": 9,
+          "submittedCourtChallans": 3,
+          "submittedOnlineChallans": 4,
+          "submittedCourtAmount": 6300,
+          "submittedOnlineAmount": 4200
         },
         {
           "id": "LWD-1160533",
-          "name": "Telangana Express",
+          "name": "Srinivas Rao",
           "company": "Telangana Express Services",
           "mobile": "+919666666662",
           "status": "active",
           "dateSubscribed": "2023-11-10",
-          "incidentCount": 6
+          "incidentCount": 6,
+          "submittedCourtChallans": 2,
+          "submittedOnlineChallans": 2,
+          "submittedCourtAmount": 4080,
+          "submittedOnlineAmount": 2720
         },
         {
           "id": "LWD-1160534",
-          "name": "South India Cargo",
+          "name": "Arun Nair",
           "company": "South India Cargo Co",
           "mobile": "+919666666663",
           "status": "inactive",
           "dateSubscribed": "2023-12-01",
-          "incidentCount": 0
+          "incidentCount": 0,
+          "submittedCourtChallans": 0,
+          "submittedOnlineChallans": 0,
+          "submittedCourtAmount": 0,
+          "submittedOnlineAmount": 0
         }
       ],
       "earnings": 38000,
+      "totalCommission": 28000,
+      "totalRspBenefit": 10000,
+      "totalIncidentsSubmitted": 134,
+      "totalOnlineChallansSubmitted": 98,
+      "totalCourtChallansSubmitted": 36,
       "totalPayouts": 30000,
       "payoutHistory": [
         {
           "id": "payout-006",
+          "transactionId": "TXN240110006",
           "amount": 15000,
           "date": "2024-01-10",
           "status": "completed",
@@ -447,6 +1487,7 @@
         },
         {
           "id": "payout-007",
+          "transactionId": "TXN240210007",
           "amount": 15000,
           "date": "2024-02-10",
           "status": "completed",
@@ -492,11 +1533,12 @@
           "timestamp": "2023-10-05T12:45:00Z",
           "details": "Hyderabad Movers linked to partner"
         }
-      ]
+      ],
+      "onboardingActivity": "profileVerification"
     },
     {
       "id": "partner-007",
-      "partnerId": "PTR-007",
+      "partnerId": "LWD-1213407",
       "firstName": "Anjali",
       "lastName": "Verma",
       "email": "anjali@corporatefleet.com",
@@ -510,24 +1552,71 @@
       "city": "Lucknow",
       "pinCode": "226001",
       "website": "www.corporatefleet.com",
-      "productsAllowed": ["Challan Resolution", "Legal Consultation"],
-      "subscriberTypesAllowed": ["Fleet Operators", "Enterprise"],
+      "productsAllowed": [
+        "Challan Resolution",
+        "Legal Consultation"
+      ],
+      "subscriberTypesAllowed": [
+        "Fleet Operators",
+        "Enterprise"
+      ],
       "bankAccountNumber": "4444555566667777",
       "bankName": "Federal Bank",
+      "partnerType": "lots247",
+      "vehicles": 73,
+      "linkedVehicles": [
+        {
+          "id": "veh-016",
+          "registrationNumber": "UP32GH5678",
+          "ownerName": "Lucknow Transport Pvt Ltd",
+          "vehicleType": "truck",
+          "make": "Tata",
+          "model": "Ultra 1918",
+          "year": 2022,
+          "status": "active",
+          "incidentCount": 2,
+          "lastIncidentDate": "2026-02-12",
+          "subscriberId": "LWD-1160535",
+          "subscriberName": "Lucknow Transport"
+        },
+        {
+          "id": "veh-017",
+          "registrationNumber": "UP32IJ9012",
+          "ownerName": "Lucknow Transport Pvt Ltd",
+          "vehicleType": "van",
+          "make": "Ashok Leyland",
+          "model": "Dost+",
+          "year": 2023,
+          "status": "active",
+          "incidentCount": 1,
+          "lastIncidentDate": "2026-01-20",
+          "subscriberId": "LWD-1160535",
+          "subscriberName": "Lucknow Transport"
+        }
+      ],
       "status": "active",
       "dateOnboarded": "2023-12-01",
       "linkedSubscribers": [
         {
           "id": "LWD-1160535",
-          "name": "Lucknow Transport",
+          "name": "Deepak Tiwari",
           "company": "Lucknow Transport Pvt Ltd",
           "mobile": "+919777777771",
           "status": "active",
           "dateSubscribed": "2023-12-10",
-          "incidentCount": 3
+          "incidentCount": 3,
+          "submittedCourtChallans": 1,
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 2160,
+          "submittedOnlineAmount": 1440
         }
       ],
       "earnings": 6000,
+      "totalCommission": 6000,
+      "totalRspBenefit": 0,
+      "totalIncidentsSubmitted": 22,
+      "totalOnlineChallansSubmitted": 22,
+      "totalCourtChallansSubmitted": 0,
       "totalPayouts": 0,
       "payoutHistory": [],
       "documents": [],
@@ -542,7 +1631,7 @@
     },
     {
       "id": "partner-008",
-      "partnerId": "PTR-008",
+      "partnerId": "RSP-1213408",
       "firstName": "Suresh",
       "lastName": "Reddy",
       "email": "suresh.reddy@innovate.in",
@@ -556,37 +1645,200 @@
       "city": "Kolkata",
       "pinCode": "700001",
       "website": "www.innovate.in",
-      "productsAllowed": ["Challan Resolution"],
-      "subscriberTypesAllowed": ["Individual", "Fleet Operators"],
+      "productsAllowed": [
+        "Challan Resolution"
+      ],
+      "subscriberTypesAllowed": [
+        "Individual",
+        "Fleet Operators"
+      ],
       "bankAccountNumber": "8888999900001111",
       "bankName": "SBI",
+      "partnerType": "challanPay",
+      "stage": "mobilisation",
+      "activationActivity": "trained",
+      "assignedTo": "Kavita Sharma",
+      "utmSource": "Referral",
+      "outlets": 3,
+      "registeredVisitorsCount": 156,
+      "registeredVisitors": [
+        {
+          "id": "vis-018",
+          "visitorId": "VIS821463",
+          "visitorToken": "www.challanpay.in/VIS821463/",
+          "visitDate": "2026-01-15T11:00:00Z",
+          "visitors": 2
+        },
+        {
+          "id": "vis-019",
+          "visitorId": "VIS267905",
+          "visitorToken": "www.challanpay.in/VIS267905/",
+          "visitDate": "2026-02-01T13:20:00Z",
+          "visitors": 4
+        },
+        {
+          "id": "vis-020",
+          "visitorId": "VIS405389",
+          "visitorToken": "www.challanpay.in/VIS405389/",
+          "visitDate": "2026-02-15T10:45:00Z",
+          "visitors": 1
+        }
+      ],
+      "registeredVisitorDetails": [
+        {
+          "id": "rvd-020",
+          "visitorId": "RV508134267",
+          "visitorName": "Mukesh Bhatt",
+          "subscriberId": "LWD-1160536",
+          "pendingChallansAmount": 2000,
+          "contactNumber": "9876501234",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 1200,
+          "pendingOnlineChallansAmount": 800
+        },
+        {
+          "id": "rvd-021",
+          "visitorId": "RV372960514",
+          "visitorName": "Dinesh Rawat",
+          "subscriberId": "LWD-1160536",
+          "pendingChallansAmount": 7500,
+          "contactNumber": "9812340567",
+          "pendingCourtChallans": 2,
+          "pendingOnlineChallans": 3,
+          "pendingCourtChallansAmount": 4500,
+          "pendingOnlineChallansAmount": 3000
+        },
+        {
+          "id": "rvd-022",
+          "visitorId": "RV846015398",
+          "visitorName": "Girish Kapoor",
+          "subscriberId": "LWD-1160537",
+          "pendingChallansAmount": 0,
+          "contactNumber": "9945670012",
+          "pendingCourtChallans": 0,
+          "pendingOnlineChallans": 0,
+          "pendingCourtChallansAmount": 0,
+          "pendingOnlineChallansAmount": 0
+        },
+        {
+          "id": "rvd-023",
+          "visitorId": "RV159372046",
+          "visitorName": "Hemant Thakur",
+          "subscriberId": "LWD-1160537",
+          "pendingChallansAmount": 3600,
+          "contactNumber": "9734560189",
+          "pendingCourtChallans": 1,
+          "pendingOnlineChallans": 1,
+          "pendingCourtChallansAmount": 2160,
+          "pendingOnlineChallansAmount": 1440
+        }
+      ],
+      "outletQRs": [],
+      "followUps": [
+        {
+          "id": "fu-012",
+          "activityType": "mobilisation",
+          "subActivityType": "visit",
+          "notes": "Mobilised field team for Kolkata region. Reviewed infrastructure and staff readiness.",
+          "createdAt": "2026-02-20T11:00:00Z",
+          "createdBy": "Amit Verma"
+        },
+        {
+          "id": "fu-013",
+          "activityType": "activation",
+          "subActivityType": "call",
+          "notes": "Activation completed for Kolkata partner. Partner reported smooth operations.",
+          "createdAt": "2026-03-09T16:00:00Z",
+          "createdBy": "Sanjay Mehta"
+        }
+      ],
+      "vehicles": 97,
+      "linkedVehicles": [
+        {
+          "id": "veh-018",
+          "registrationNumber": "WB06KL3456",
+          "ownerName": "Kolkata Couriers Express",
+          "vehicleType": "van",
+          "make": "Mahindra",
+          "model": "Supro Van",
+          "year": 2022,
+          "status": "active",
+          "incidentCount": 6,
+          "lastIncidentDate": "2026-03-03",
+          "subscriberId": "LWD-1160536",
+          "subscriberName": "Kolkata Couriers"
+        },
+        {
+          "id": "veh-019",
+          "registrationNumber": "WB10MN7890",
+          "ownerName": "Kolkata Couriers Express",
+          "vehicleType": "truck",
+          "make": "Tata",
+          "model": "407 Gold",
+          "year": 2021,
+          "status": "active",
+          "incidentCount": 3,
+          "lastIncidentDate": "2026-01-25",
+          "subscriberId": "LWD-1160536",
+          "subscriberName": "Kolkata Couriers"
+        },
+        {
+          "id": "veh-020",
+          "registrationNumber": "WB14OP1234",
+          "ownerName": "Eastern Roads Transport",
+          "vehicleType": "truck",
+          "make": "Eicher",
+          "model": "Pro 2114",
+          "year": 2020,
+          "status": "inactive",
+          "incidentCount": 2,
+          "lastIncidentDate": "2025-10-08",
+          "subscriberId": "LWD-1160537",
+          "subscriberName": "Eastern Roads"
+        }
+      ],
       "status": "active",
       "dateOnboarded": "2023-10-25",
       "linkedSubscribers": [
         {
           "id": "LWD-1160536",
-          "name": "Kolkata Couriers",
+          "name": "Soumya Das",
           "company": "Kolkata Couriers Express",
           "mobile": "+919888888881",
           "status": "active",
           "dateSubscribed": "2023-11-01",
-          "incidentCount": 11
+          "incidentCount": 11,
+          "submittedCourtChallans": 4,
+          "submittedOnlineChallans": 5,
+          "submittedCourtAmount": 8100,
+          "submittedOnlineAmount": 5400
         },
         {
           "id": "LWD-1160537",
-          "name": "Eastern Roads",
+          "name": "Rajib Chatterjee",
           "company": "Eastern Roads Transport",
           "mobile": "+919888888882",
           "status": "paused",
           "dateSubscribed": "2023-11-15",
-          "incidentCount": 2
+          "incidentCount": 2,
+          "submittedCourtChallans": 0,
+          "submittedOnlineChallans": 1,
+          "submittedCourtAmount": 1080,
+          "submittedOnlineAmount": 720
         }
       ],
       "earnings": 28500,
+      "totalCommission": 20000,
+      "totalRspBenefit": 8500,
+      "totalIncidentsSubmitted": 112,
+      "totalOnlineChallansSubmitted": 82,
+      "totalCourtChallansSubmitted": 30,
       "totalPayouts": 20000,
       "payoutHistory": [
         {
           "id": "payout-008",
+          "transactionId": "TXN240205008",
           "amount": 20000,
           "date": "2024-02-05",
           "status": "completed",
@@ -614,7 +1866,9 @@
           "timestamp": "2023-10-28T14:20:00Z",
           "details": "GST certificate uploaded"
         }
-      ]
+      ],
+      "onboardingActivity": "profileVerification",
+      "mobilisationActivity": "welcomeLetterCreated"
     }
   ]
 }

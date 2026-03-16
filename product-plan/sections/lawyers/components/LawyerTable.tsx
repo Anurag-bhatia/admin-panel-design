@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
-import { Search, Plus, Filter, MoreHorizontal, Eye, Pencil, UserX, UserCheck } from 'lucide-react'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { Search, Plus, Filter, MoreHorizontal, Eye, Pencil, UserX, UserCheck, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Lawyer } from '../types'
 
 interface LawyerTableProps {
@@ -27,6 +27,8 @@ export function LawyerTable({
     category: '',
   })
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
   const menuRef = useRef<HTMLDivElement>(null)
 
   const activeLawyers = lawyers.filter((l) => l.activityState === 'Active')
@@ -58,6 +60,18 @@ export function LawyerTable({
   if (filters.category) {
     filteredLawyers = filteredLawyers.filter((l) => l.category === filters.category)
   }
+
+  const totalPages = Math.max(1, Math.ceil(filteredLawyers.length / pageSize))
+  const safeCurrentPage = Math.min(currentPage, totalPages)
+  const paginatedLawyers = filteredLawyers.slice(
+    (safeCurrentPage - 1) * pageSize,
+    safeCurrentPage * pageSize
+  )
+
+  // Reset to page 1 when filters/tab change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [activeTab, searchQuery, filters.state, filters.category])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -219,7 +233,7 @@ export function LawyerTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-              {filteredLawyers.length === 0 ? (
+              {paginatedLawyers.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center">
                     <p className="text-slate-500 dark:text-slate-400">
@@ -230,19 +244,24 @@ export function LawyerTable({
                   </td>
                 </tr>
               ) : (
-                filteredLawyers.map((lawyer) => (
+                paginatedLawyers.map((lawyer) => (
                   <tr
                     key={lawyer.id}
-                    className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                    onClick={(e) => {
+                      if (!(e.target as HTMLElement).closest('[data-actions]')) {
+                        onView(lawyer.id)
+                      }
+                    }}
+                    className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
                   >
                     {/* Lawyer Info */}
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <img
-                          src={lawyer.photo}
-                          alt={`${lawyer.firstName} ${lawyer.lastName}`}
-                          className="w-10 h-10 rounded-full object-cover bg-slate-100 dark:bg-slate-700"
-                        />
+                        <div className="w-9 h-9 rounded-full bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-semibold text-cyan-700 dark:text-cyan-400">
+                            {lawyer.firstName[0]}{lawyer.lastName[0]}
+                          </span>
+                        </div>
                         <div className="min-w-0">
                           <p className="font-medium text-slate-900 dark:text-white truncate">
                             {lawyer.firstName} {lawyer.lastName}
@@ -287,8 +306,6 @@ export function LawyerTable({
                         className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
                           lawyer.kycStatus === 'Verified'
                             ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
-                            : lawyer.kycStatus === 'Pending'
-                            ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
                             : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                         }`}
                       >
@@ -297,7 +314,7 @@ export function LawyerTable({
                     </td>
 
                     {/* Actions */}
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-4 py-4 text-right" data-actions>
                       <div className="relative" ref={openMenuId === lawyer.id ? menuRef : null}>
                         <button
                           onClick={() =>
@@ -366,11 +383,44 @@ export function LawyerTable({
         </div>
       </div>
 
-      {/* Results count */}
+      {/* Pagination */}
       {filteredLawyers.length > 0 && (
-        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 text-center">
-          Showing {filteredLawyers.length} of {currentLawyers.length} {activeTab} lawyers
-        </p>
+        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Showing {(safeCurrentPage - 1) * pageSize + 1}–{Math.min(safeCurrentPage * pageSize, filteredLawyers.length)} of {filteredLawyers.length}
+          </p>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={safeCurrentPage === 1}
+                className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                    page === safeCurrentPage
+                      ? 'bg-cyan-600 text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safeCurrentPage === totalPages}
+                className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )

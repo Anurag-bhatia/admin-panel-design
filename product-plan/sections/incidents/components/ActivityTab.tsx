@@ -19,9 +19,8 @@ interface ActivityTabProps {
   followUps: FollowUp[]
   activities: TimelineActivity[]
   onAddFollowUp?: (followUp: {
-    notes: string
     outcome: string
-    nextFollowUpDate: string | null
+    activity: string
   }) => void
 }
 
@@ -83,14 +82,27 @@ const ACTION_CONFIG: Record<
   },
 }
 
-const OUTCOME_OPTIONS = [
-  'In Progress',
-  'Scheduled',
-  'Assigned',
-  'Resolved',
-  'Not Resolved',
-  'Pending',
-  'Escalated',
+const STAGE_OPTIONS = [
+  'New Incidents',
+  'Screening',
+  'Lawyer Assigned',
+  'Settled',
+  'Not Settled',
+  'Refund',
+]
+
+const ACTIVITY_OPTIONS = [
+  'Challan sent to court',
+  'Our lawyer is working on challan',
+  'Challan contested in court',
+  'Hearing date scheduled',
+  'Fine payment completed',
+  'Documents submitted to RTO',
+  'Waiting for court order',
+  'Challan disposed successfully',
+  'Refund initiated to subscriber',
+  'Subscriber contacted for details',
+  'Escalated to senior lawyer',
 ]
 
 function formatDate(dateString: string): string {
@@ -128,24 +140,21 @@ function getRelativeTime(dateString: string): string {
 export function ActivityTab({ followUps, activities, onAddFollowUp }: ActivityTabProps) {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('followUp')
   const [showForm, setShowForm] = useState(false)
-  const [notes, setNotes] = useState('')
-  const [outcome, setOutcome] = useState('')
-  const [nextFollowUpDate, setNextFollowUpDate] = useState('')
+  const [stage, setStage] = useState('')
+  const [activity, setActivity] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!notes.trim() || !outcome) return
+    if (!stage || !activity) return
 
     onAddFollowUp?.({
-      notes: notes.trim(),
-      outcome,
-      nextFollowUpDate: nextFollowUpDate || null,
+      outcome: stage,
+      activity,
     })
 
     setShowForm(false)
-    setNotes('')
-    setOutcome('')
-    setNextFollowUpDate('')
+    setStage('')
+    setActivity('')
   }
 
   const sortedFollowUps = [...followUps].sort(
@@ -211,7 +220,7 @@ export function ActivityTab({ followUps, activities, onAddFollowUp }: ActivityTa
             <div className="mb-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-base font-medium text-slate-900 dark:text-white">
-                  Log New Follow-Up
+                  Add Follow-Up
                 </h3>
                 <button
                   onClick={() => setShowForm(false)}
@@ -222,33 +231,19 @@ export function ActivityTab({ followUps, activities, onAddFollowUp }: ActivityTa
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Notes <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Describe the follow-up activity, outcome of calls, meetings, etc."
-                    rows={3}
-                    className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white resize-none"
-                    required
-                  />
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      Outcome <span className="text-red-500">*</span>
+                      Stage <span className="text-red-500">*</span>
                     </label>
                     <select
-                      value={outcome}
-                      onChange={(e) => setOutcome(e.target.value)}
+                      value={stage}
+                      onChange={(e) => setStage(e.target.value)}
                       className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
                       required
                     >
-                      <option value="">Select outcome</option>
-                      {OUTCOME_OPTIONS.map((opt) => (
+                      <option value="">Select stage</option>
+                      {STAGE_OPTIONS.map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}
                         </option>
@@ -258,14 +253,21 @@ export function ActivityTab({ followUps, activities, onAddFollowUp }: ActivityTa
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      Next Follow-Up Date
+                      Activity <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="datetime-local"
-                      value={nextFollowUpDate}
-                      onChange={(e) => setNextFollowUpDate(e.target.value)}
+                    <select
+                      value={activity}
+                      onChange={(e) => setActivity(e.target.value)}
                       className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                    />
+                      required
+                    >
+                      <option value="">Select activity</option>
+                      {ACTIVITY_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
@@ -323,37 +325,29 @@ export function ActivityTab({ followUps, activities, onAddFollowUp }: ActivityTa
                       <div className="flex items-center gap-2 flex-wrap">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                            followUp.outcome === 'Resolved'
+                            followUp.outcome === 'Settled'
                               ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                              : followUp.outcome === 'Not Resolved'
+                              : followUp.outcome === 'Not Settled'
                               ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                              : followUp.outcome === 'In Progress'
+                              : followUp.outcome === 'Lawyer Assigned'
+                              ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+                              : followUp.outcome === 'Screening'
                               ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                              : followUp.outcome === 'Refund'
+                              ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
                               : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                           }`}
                         >
                           {followUp.outcome}
                         </span>
-                        {followUp.nextFollowUpDate && (
-                          <span className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                            <Calendar className="h-3 w-3" />
-                            Next: {formatDate(followUp.nextFollowUpDate)}
-                          </span>
-                        )}
                       </div>
                       <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
                         {formatDate(followUp.createdAt)} at {formatTime(followUp.createdAt)}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">
+                    <p className="text-sm text-slate-700 dark:text-slate-300">
                       {followUp.notes}
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                      <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-medium">
-                        {followUp.createdByName.charAt(0)}
-                      </div>
-                      <span>{followUp.createdByName}</span>
-                    </div>
                   </div>
                 </div>
               ))}
@@ -422,9 +416,6 @@ export function ActivityTab({ followUps, activities, onAddFollowUp }: ActivityTa
                                   <span>{formatTime(activity.createdAt)}</span>
                                 </div>
                               </div>
-                              <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
-                                {getRelativeTime(activity.createdAt)}
-                              </span>
                             </div>
                           </div>
                         </div>

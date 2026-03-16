@@ -1,38 +1,48 @@
 # One-Shot Implementation Prompt
 
-Copy and paste this prompt into your coding agent (Claude, Cursor, etc.) to implement the full product in one session.
+I need you to implement a complete web application based on detailed design specifications and UI components I'm providing.
 
----
+## Instructions
 
-## Prompt
+Please carefully read and analyze the following files:
 
-I need you to implement a complete admin panel application based on the design specifications I'll provide.
+1. **@product-plan/product-overview.md** — Product summary with sections and data model overview
+2. **@product-plan/instructions/one-shot-instructions.md** — Complete implementation instructions for all milestones
 
-**Before we begin, please ask me about:**
-1. **Authentication**: What auth provider should we use? (e.g., NextAuth, Clerk, Firebase Auth, custom)
-2. **User Model**: How should user data be structured and stored?
-3. **Tech Stack**: What framework? (Next.js, Vite + React, etc.) What database? (PostgreSQL, MongoDB, Supabase, etc.)
-4. **Deployment**: Where will this be deployed? (Vercel, AWS, self-hosted, etc.)
+After reading these, also review:
+- **@product-plan/design-system/** — Color and typography tokens
+- **@product-plan/data-model/** — Entity types and relationships
+- **@product-plan/shell/** — Application shell components
+- **@product-plan/sections/** — All section components, types, sample data, and test instructions
 
-**Once I answer those questions, please:**
-1. Review the `product-overview.md` for context
-2. Follow the instructions in `instructions/one-shot-instructions.md`
-3. Use the components in `shell/` and `sections/` as reference implementations
-4. Apply the design system from `design-system/`
-5. Use the types and sample data from each section's folder
+## Before You Begin
 
-**Implementation approach:**
-- Start with the foundation (project setup, design system, routing)
-- Implement the shell (navigation, layout)
-- Build each section incrementally
-- Write tests using the `tests.md` files in each section
-- Ensure dark mode and mobile responsiveness throughout
+Please ask me clarifying questions about:
 
-**Key files to reference:**
-- `product-overview.md` — Product context and section list
-- `instructions/one-shot-instructions.md` — Complete implementation guide
-- `design-system/` — Colors, typography, tokens
-- `shell/components/` — Navigation and layout components
-- `sections/[name]/` — Components, types, sample data, tests
+1. **Authentication & Authorization**
+   - How should users sign up and log in? (email/password, OAuth providers, magic links?)
+   - Are there different user roles with different permissions?
+   - Should there be an admin interface?
 
-Let's begin! Please ask your clarifying questions first.
+2. **User & Account Modeling**
+   - Is this a single-user app or multi-user?
+   - Do users belong to organizations/teams/workspaces?
+   - How should user profiles be structured?
+
+3. **Tech Stack Preferences**
+   - What backend framework/language should I use?
+   - What database do you prefer?
+   - Any specific hosting/deployment requirements?
+
+4. **Backend Business Logic**
+   - Any server-side logic, validations or processes needed beyond what's shown in the UI?
+   - Background processes, notifications, or other processes to trigger?
+
+5. **Any Other Clarifications**
+   - Questions about specific features or user flows
+   - Edge cases that need clarification
+   - Integration requirements
+
+Lastly, be sure to ask me if I have any other notes to add for this implementation.
+
+Once I answer your questions, create a comprehensive implementation plan before coding.

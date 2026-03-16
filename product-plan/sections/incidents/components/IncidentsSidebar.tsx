@@ -29,17 +29,13 @@ export function IncidentsSidebar({
                 onViewChange?.('all')
                 onWorkTypeChange?.('cases')
               }}
-              disabled
               className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${
                 view === 'all' && workType === 'cases'
                   ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
-                  : 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
               <span>Cases</span>
-              <span className="ml-auto text-xs text-slate-400 dark:text-slate-500">
-                Coming soon
-              </span>
             </button>
 
             <button
@@ -76,17 +72,13 @@ export function IncidentsSidebar({
                 onViewChange?.('my')
                 onWorkTypeChange?.('cases')
               }}
-              disabled
               className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${
                 view === 'my' && workType === 'cases'
                   ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
-                  : 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
               <span>Cases</span>
-              <span className="ml-auto text-xs text-slate-400 dark:text-slate-500">
-                Coming soon
-              </span>
             </button>
 
             <button

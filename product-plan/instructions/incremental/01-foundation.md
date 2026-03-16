@@ -44,85 +44,80 @@ Configure your styling system with these tokens:
 
 - See `product-plan/design-system/tokens.css` for CSS custom properties
 - See `product-plan/design-system/tailwind-colors.md` for Tailwind configuration
-- See `product-plan/design-system/fonts.md` for Google Fonts setup
+- See `product-plan/design-system/fonts.md` for typography setup
 
-**Color Palette:**
-- Primary: `cyan` — buttons, links, key accents
-- Secondary: `zinc` — tags, highlights, secondary elements
-- Neutral: `slate` — backgrounds, text, borders
-
-**Typography:**
-- Heading: Geist
-- Body: Geist
-- Mono: Geist Mono
+**Summary:**
+- Primary: `cyan` — Actions, active states, links
+- Secondary: `zinc` — Sidebar, borders, secondary elements
+- Neutral: `slate` — Backgrounds, text, surfaces
 
 ### 2. Data Model Types
 
 Create TypeScript interfaces for your core entities:
 
-- See `product-plan/data-model/types.ts` for interface definitions
-- See `product-plan/data-model/README.md` for entity relationships
+- See `product-plan/data-model/README.md` for entity definitions and relationships
+- Each section in `product-plan/sections/[section-id]/types.ts` has detailed interfaces
 
-**Core Entities:**
-- Lead, Subscriber, Incident, Lawyer, Partner
-- Assignment, Commission, Refund, Dispute
-- Support Ticket, Payment, Audit Log
+**Core entities:** Lead, Subscriber, Incident, Lawyer, Partner, Assignment, Commission, Refund, Dispute, Support Ticket, Payment, Audit Log
 
 ### 3. Routing Structure
 
-Create routes for each section:
+Create placeholder routes for each section:
 
-| Route | Section |
-|-------|---------|
-| `/incidents` | Incidents (default landing) |
-| `/sales-crm` | Sales CRM — All Leads |
-| `/sales-crm/my-leads` | Sales CRM — My Leads |
-| `/subscribers` | Subscribers |
-| `/customers` | Customers |
-| `/lawyers` | Lawyers |
-| `/partners` | Partners |
-| `/support` | Support |
-| `/reports` | Reports |
-| `/team` | Team |
+- `/login` — Authentication page
+- `/incidents` — Incidents (default after login)
+- `/sales-crm` — Sales CRM
+- `/sales-crm/all-leads` — All Leads
+- `/sales-crm/my-leads` — My Leads
+- `/subscribers` — Subscribers
+- `/customers` — Customers (Registered Visitors)
+- `/lawyers` — Lawyers
+- `/partners` — Partners
+- `/payments` — Payments
+- `/disputes` — Disputes
+- `/support` — Support
+- `/reports` — Reports
+- `/team` — Team
+- `/setup` — Setup (Admin Control)
+- `/cms` — CMS
+- `/settled-challans` — Settled Challans
 
 ### 4. Application Shell
 
 Copy the shell components from `product-plan/shell/components/` to your project:
 
-- `AppShell.tsx` — Main layout wrapper with sidebar navigation
-- `MainNav.tsx` — Navigation component with collapsible sidebar
-- `UserMenu.tsx` — User menu with avatar and dropdown
+- `AppShell.tsx` — Main layout wrapper with sidebar + header + content
+- `MainNav.tsx` — Sidebar navigation with collapsible sub-items
+- `UserMenu.tsx` — User avatar dropdown with logout
 
 **Wire Up Navigation:**
 
-Connect navigation to your routing:
+| Nav Item | Route | Icon |
+|----------|-------|------|
+| Incidents | /incidents | AlertTriangle |
+| Sales CRM | /sales-crm | TrendingUp |
+| → All Leads | /sales-crm/all-leads | — |
+| → My Leads | /sales-crm/my-leads | — |
+| Subscribers | /subscribers | Users |
+| Customers | /customers | UserCheck |
+| Lawyers | /lawyers | Scale |
+| Partners | /partners | Handshake |
+| Payments | /payments | CreditCard |
+| Disputes | /disputes | ShieldAlert |
+| Support | /support | HeadphonesIcon |
+| Reports | /reports | BarChart3 |
+| Team | /team | UsersRound |
 
-- **Incidents** → `/incidents` (Core challan workflow)
-- **Sales CRM** → `/sales-crm` (with sub-nav for All Leads, My Leads)
-- **Subscribers** → `/subscribers`
-- **Customers** → `/customers`
-- **Lawyers** → `/lawyers`
-- **Partners** → `/partners`
-- **Support** → `/support`
-- **Reports** → `/reports`
-- **Team** → `/team`
+**Sidebar Behavior:**
+- Dark background (#212121)
+- Collapsed by default (64px width), expands on hover (240px)
+- Active items highlighted with `bg-cyan-600 text-white`
+- Smooth 300ms transition animation
 
 **User Menu:**
-
-The user menu expects:
-- User name
-- Avatar URL (optional)
-- Logout callback
-
-**Layout Pattern:**
-- Sidebar navigation on left (240px width, collapsible to 64px)
-- Content area fills remaining space
-- User menu in top right of content header
-- Breadcrumbs between mobile menu button and user menu
-
-**Responsive Behavior:**
-- Desktop: Full sidebar visible
-- Mobile: Sidebar converts to bottom tab navigation
+- Located in top-right of header
+- Displays user name, email, avatar
+- Dropdown with logout action
 
 ## Files to Reference
 
@@ -133,13 +128,14 @@ The user menu expects:
 
 ## Done When
 
-- [ ] Design tokens are configured (colors, typography)
-- [ ] Data model types are defined
-- [ ] Routes exist for all sections (can be placeholder pages)
-- [ ] Shell renders with sidebar navigation
+- [ ] Design tokens are configured (cyan/zinc/slate)
+- [ ] Data model types are defined for core entities
+- [ ] Routes exist for all 14 sections (can be placeholder pages)
+- [ ] Login page renders
+- [ ] Shell renders with dark sidebar navigation
+- [ ] Sidebar collapses/expands on hover
 - [ ] Navigation links to correct routes
-- [ ] Active navigation state shows correctly (cyan-600 background)
-- [ ] Sidebar collapse/expand works
+- [ ] Active nav item highlighted in cyan
+- [ ] Sales CRM sub-nav (All Leads / My Leads) works
 - [ ] User menu shows user info and logout
-- [ ] Breadcrumbs display current location
-- [ ] Responsive on mobile (bottom tab navigation)
+- [ ] Responsive on mobile (bottom tab nav + hamburger overlay)

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Search } from 'lucide-react'
-import type { AddChallanFormProps, IncidentType, IncidentCategory, IncidentSource } from '../types'
+import type { AddChallanFormProps, IncidentType, ChallanType, IncidentSource } from '../types'
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -16,8 +16,9 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
   const [subscriberId, setSubscriberId] = useState('')
   const [subscriberSearch, setSubscriberSearch] = useState('')
   const [vehicle, setVehicle] = useState('')
+  const [mobileNumber, setMobileNumber] = useState('')
   const [type, setType] = useState<IncidentType>('payAndClose')
-  const [category, setCategory] = useState<IncidentCategory>('challan')
+  const [challanType, setChallanType] = useState<ChallanType>('court')
   const [source, setSource] = useState<IncidentSource>('Manual')
   const [state, setState] = useState('')
   const [amount, setAmount] = useState('')
@@ -36,12 +37,13 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
     }
 
     onSubmit?.({
+      workType: 'challan',
       challanNumber,
       subscriberId,
       subscriberName: subscribers.find((s) => s.id === subscriberId)?.name || '',
       vehicle,
       type,
-      category,
+      challanType,
       source,
       state,
       amount: parseFloat(amount),
@@ -59,7 +61,7 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-900 z-10">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Add New Challan
+            Add New Incident
           </h2>
           <button
             onClick={onCancel}
@@ -71,6 +73,36 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {/* Vehicle Number and Mobile Number */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Vehicle Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={vehicle}
+                onChange={(e) => setVehicle(e.target.value.toUpperCase())}
+                placeholder="UP32MM11113"
+                className="w-full px-4 py-2.5 text-sm font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white uppercase"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Mobile Number
+              </label>
+              <input
+                type="tel"
+                value={mobileNumber}
+                onChange={(e) => setMobileNumber(e.target.value)}
+                placeholder="+91 98765 43210"
+                className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+              />
+            </div>
+          </div>
+
           {/* Challan Number */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -80,7 +112,7 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
               type="text"
               value={challanNumber}
               onChange={(e) => setChallanNumber(e.target.value)}
-              placeholder="Enter challan number"
+              placeholder="CH1213131312121"
               className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
               required
             />
@@ -144,22 +176,7 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
             )}
           </div>
 
-          {/* Vehicle Number */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Vehicle Number <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={vehicle}
-              onChange={(e) => setVehicle(e.target.value.toUpperCase())}
-              placeholder="DL01AB1234"
-              className="w-full px-4 py-2.5 text-sm font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white uppercase"
-              required
-            />
-          </div>
-
-          {/* Type and Category */}
+          {/* Type and Challan Type */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -178,15 +195,14 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Category <span className="text-red-500">*</span>
+                Challan <span className="text-red-500">*</span>
               </label>
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value as IncidentCategory)}
+                value={challanType}
+                onChange={(e) => setChallanType(e.target.value as ChallanType)}
                 className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
                 required
               >
-                <option value="challan">Challan</option>
                 <option value="court">Court</option>
                 <option value="online">Online</option>
               </select>
@@ -255,16 +271,16 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
             </div>
           </div>
 
-          {/* Offence (Optional) */}
+          {/* Offence */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Offence <span className="text-slate-400 text-xs">(Optional)</span>
+              Offence
             </label>
             <input
               type="text"
               value={offence}
               onChange={(e) => setOffence(e.target.value)}
-              placeholder="e.g., Speeding, Red Light Violation"
+              placeholder="e.g., Driving without seat belt, Over speeding..."
               className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
             />
           </div>
@@ -283,7 +299,7 @@ export function AddChallanModal({ subscribers, sources, onSubmit, onCancel }: Ad
               disabled={!challanNumber || !subscriberId || !vehicle || !state || !amount}
               className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg transition-colors"
             >
-              Add Challan
+              Add Incident
             </button>
           </div>
         </form>

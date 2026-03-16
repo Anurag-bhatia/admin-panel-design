@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Calendar, MessageSquare } from 'lucide-react'
+import { X, MessageSquare } from 'lucide-react'
 import type { FollowUpFormData } from '../types'
 
 interface AddFollowUpModalProps {
@@ -121,32 +121,6 @@ export function AddFollowUpModal({ leadId, leadName, activityTypes, onSubmit, on
               {errors.outcome && <p className="mt-1 text-xs text-red-500">{errors.outcome}</p>}
             </div>
 
-            {/* Next Follow-up Date */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Next Follow-up Date <span className="text-slate-500 text-xs">(Optional)</span>
-              </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="date"
-                  value={formData.nextFollowUpDate || ''}
-                  onChange={e => setFormData({ ...formData, nextFollowUpDate: e.target.value })}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full pl-10 pr-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
-              </div>
-              <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
-                Schedule when you should follow up with this lead next
-              </p>
-            </div>
-
-            {/* Info Box */}
-            <div className="bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-lg p-3 sm:p-4">
-              <p className="text-xs text-cyan-800 dark:text-cyan-200">
-                This activity will be recorded in the lead's timeline and will help track your engagement history.
-              </p>
-            </div>
           </div>
 
           {/* Footer */}

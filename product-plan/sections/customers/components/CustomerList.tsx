@@ -7,11 +7,9 @@ import { CustomerTable } from './CustomerTable'
 export function CustomerList({
   customers,
   onSearch,
-  onAddCustomer,
 }: Omit<CustomerListProps, 'onViewCustomer'>) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
-  const [selectedCustomers, setSelectedCustomers] = useState<Set<string>>(new Set())
   const [filters, setFilters] = useState({
     paymentStatus: '',
     vehicleCount: '',
@@ -21,24 +19,6 @@ export function CustomerList({
     const query = e.target.value
     setSearchQuery(query)
     onSearch?.(query)
-  }
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedCustomers(new Set(filteredCustomers.map(c => c.id)))
-    } else {
-      setSelectedCustomers(new Set())
-    }
-  }
-
-  const handleSelectCustomer = (customerId: string, checked: boolean) => {
-    const newSelected = new Set(selectedCustomers)
-    if (checked) {
-      newSelected.add(customerId)
-    } else {
-      newSelected.delete(customerId)
-    }
-    setSelectedCustomers(newSelected)
   }
 
   // Filter customers
@@ -80,9 +60,7 @@ export function CustomerList({
         <div className="max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8">
           {/* Header */}
           <div className="mb-6">
-            <CustomerListHeader
-              onAddCustomer={onAddCustomer}
-            />
+            <CustomerListHeader />
           </div>
 
           {/* Search and Filters */}
@@ -166,22 +144,14 @@ export function CustomerList({
           {/* Visitor Table */}
           <CustomerTable
             customers={filteredCustomers}
-            selectedCustomers={selectedCustomers}
-            onSelectAll={handleSelectAll}
-            onSelectCustomer={handleSelectCustomer}
           />
 
           {/* Footer with Summary */}
-          <div className="mt-4 flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
+          <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
             <p>
               Showing <span className="font-medium text-slate-900 dark:text-slate-100">{filteredCustomers.length}</span>{' '}
               visitor{filteredCustomers.length !== 1 ? 's' : ''}
             </p>
-            {selectedCustomers.size > 0 && (
-              <p>
-                <span className="font-medium text-slate-900 dark:text-slate-100">{selectedCustomers.size}</span> selected
-              </p>
-            )}
           </div>
         </div>
       </div>

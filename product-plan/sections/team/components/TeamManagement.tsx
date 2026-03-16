@@ -170,6 +170,8 @@ export function TeamManagement({
         departments={departments}
         designations={designations}
         employees={employees}
+        modules={modules}
+        flows={flows}
         initialData={employeeToEdit}
         onSubmit={viewState.type === 'edit-employee' ?
           (data) => handleEditEmployeeSubmit(viewState.employeeId, data) :
@@ -246,39 +248,37 @@ export function TeamManagement({
   // Main List View
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-6 lg:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <div className="flex-1">
-              <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex-1 flex items-center gap-3">
+              <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
                 Team
               </h1>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
+                <Users className="w-4 h-4 text-cyan-600" />
+                <span className="text-xs font-medium text-slate-900 dark:text-white">
+                  {activeEmployeeCount} Active Employee{activeEmployeeCount !== 1 ? 's' : ''}
+                </span>
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:flex-shrink-0">
               <button
                 onClick={() => setViewState({ type: 'add-employee' })}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
               >
-                <UserPlus className="w-5 h-5" />
+                <UserPlus className="w-4 h-4" />
                 <span>Add Employee</span>
               </button>
               <button
                 onClick={() => setViewState({ type: 'create-team' })}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap"
               >
-                <UserPlus className="w-5 h-5" />
+                <UserPlus className="w-4 h-4" />
                 <span>Create Team</span>
               </button>
             </div>
-          </div>
-
-          {/* Employee Count Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
-            <Users className="w-5 h-5 text-cyan-600" />
-            <span className="text-sm font-medium text-slate-900 dark:text-white">
-              {activeEmployeeCount} Active Employee{activeEmployeeCount !== 1 ? 's' : ''}
-            </span>
           </div>
         </div>
 

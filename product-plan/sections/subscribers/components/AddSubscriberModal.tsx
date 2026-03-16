@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { X, Check, ChevronRight, ChevronLeft, Upload, FileText, Trash2 } from 'lucide-react'
 import type { Subscriber, User, Partner } from '../types'
 
 interface AddSubscriberModalProps {
@@ -10,7 +10,37 @@ interface AddSubscriberModalProps {
   subscriberSubTypes: Record<string, string[]>
   onSubmit: (data: Omit<Subscriber, 'id' | 'createdDate' | 'lastUpdated' | 'lastLogin' | 'subscriptionId' | 'status'>) => void
   onClose: () => void
+  mode?: 'add' | 'edit'
+  initialData?: Partial<Subscriber> & Record<string, any>
 }
+
+interface UploadedDocument {
+  id: string
+  file: File
+  category: string
+}
+
+const STEPS = [
+  { id: 'classification', label: 'Classification' },
+  { id: 'contact', label: 'POC' },
+  { id: 'location', label: 'Address' },
+  { id: 'documents', label: 'Documents' },
+  { id: 'assignment', label: 'Partner' },
+]
+
+const DOCUMENT_CATEGORIES = ['Vehicle', 'Company', 'Driver']
+
+const inputClass = (hasError: boolean) =>
+  `w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
+    hasError ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
+  } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`
+
+const selectClass = (hasError: boolean) =>
+  `w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border ${
+    hasError ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
+  } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`
+
+const labelClass = 'block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2'
 
 export function AddSubscriberModal({
   users,
@@ -19,73 +49,136 @@ export function AddSubscriberModal({
   subscriberTypes,
   subscriberSubTypes,
   onSubmit,
-  onClose
+  onClose,
+  mode = 'add',
+  initialData
 }: AddSubscriberModalProps) {
+  const [currentStep, setCurrentStep] = useState(0)
+  const [isCompany, setIsCompany] = useState(initialData ? !!(initialData.companyAlias || initialData.gstNumber) : false)
   const [formData, setFormData] = useState({
-    source: '',
-    type: '',
-    subType: '',
-    lotsFor: '',
-    numberOfTrucks: 0,
-    phoneNumber: '',
-    country: 'India',
-    state: '',
-    city: '',
-    companyAlias: '',
-    subscriberName: '',
-    emailId: '',
-    contactPerson: '',
-    gstNumber: '',
-    area: '',
-    addressLane: '',
-    pinCode: '',
-    assignedOwner: '',
-    partnerId: null as string | null,
-    drivingLicenseNumber: null as string | null,
+    source: initialData?.source || '',
+    type: initialData?.type || '',
+    subType: initialData?.subType || '',
+    serviceType: initialData?.serviceType || '',
+    numberOfVehicles: initialData?.numberOfTrucks || initialData?.numberOfVehicles || 0,
+    subscriberEmail: initialData?.subscriberEmail || initialData?.emailId || '',
+    subscriberPhone: initialData?.subscriberPhone || initialData?.phoneNumber || '',
+    subscription: initialData?.subscription || '',
+    phoneNumber: initialData?.phoneNumber || '',
+    country: initialData?.country || 'India',
+    state: initialData?.state || '',
+    city: initialData?.city || '',
+    companyAlias: initialData?.companyAlias || '',
+    subscriberName: initialData?.subscriberName || '',
+    emailId: initialData?.emailId || '',
+    contactPerson: initialData?.contactPerson || '',
+    gstNumber: initialData?.gstNumber || '',
+    area: initialData?.area || '',
+    addressLane: initialData?.addressLane || '',
+    pinCode: initialData?.pinCode || '',
+    assignedOwner: initialData?.assignedOwner || '',
+    partnerId: initialData?.partnerId || null as string | null,
+    drivingLicenseNumber: initialData?.drivingLicenseNumber || null as string | null,
   })
 
+  const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([])
+  const [docCategory, setDocCategory] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const REQUIRED_FIELDS: Record<string, string> = {
+    source: 'Source is required',
+    type: 'Type is required',
+    subType: 'Sub Type is required',
+    serviceType: 'Service Type is required',
+    numberOfVehicles: 'Number of Vehicles must be greater than 0',
+    subscriberEmail: 'Subscriber Email is required',
+    subscriberPhone: 'Subscriber Phone Number is required',
+    subscription: 'Subscription is required',
+    phoneNumber: 'Phone Number is required',
+    country: 'Country is required',
+    state: 'State is required',
+    city: 'City is required',
+    companyAlias: 'Company Name is required',
+    subscriberName: 'Subscriber Name is required',
+    emailId: 'Email ID is required',
+    contactPerson: 'Contact Person is required',
+    gstNumber: 'GST Number is required',
+    area: 'Area is required',
+    addressLane: 'Address Lane is required',
+    pinCode: 'Pin Code is required',
+    assignedOwner: 'Assigned Owner is required',
+  }
 
-    // Validate required fields
-    const newErrors: Record<string, string> = {}
-    if (!formData.source) newErrors.source = 'Source is required'
-    if (!formData.type) newErrors.type = 'Type is required'
-    if (!formData.subType) newErrors.subType = 'Sub Type is required'
-    if (!formData.lotsFor) newErrors.lotsFor = 'LOTS For is required'
-    if (!formData.numberOfTrucks || formData.numberOfTrucks <= 0) newErrors.numberOfTrucks = 'Number of Trucks must be greater than 0'
-    if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone Number is required'
-    if (!formData.country) newErrors.country = 'Country is required'
-    if (!formData.state) newErrors.state = 'State is required'
-    if (!formData.city) newErrors.city = 'City is required'
-    if (!formData.companyAlias) newErrors.companyAlias = 'Company Alias is required'
-    if (!formData.subscriberName) newErrors.subscriberName = 'Subscriber Name is required'
-    if (!formData.emailId) newErrors.emailId = 'Email ID is required'
-    if (!formData.contactPerson) newErrors.contactPerson = 'Contact Person is required'
-    if (!formData.gstNumber) newErrors.gstNumber = 'GST Number is required'
-    if (!formData.area) newErrors.area = 'Area is required'
-    if (!formData.addressLane) newErrors.addressLane = 'Address Lane is required'
-    if (!formData.pinCode) newErrors.pinCode = 'Pin Code is required'
-    if (!formData.assignedOwner) newErrors.assignedOwner = 'Assigned Owner is required'
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+  const getStepFields = (stepId: string): string[] => {
+    switch (stepId) {
+      case 'classification': {
+        const base = ['subscriberName', 'source', 'type', 'subType', 'serviceType', 'numberOfVehicles', 'subscriberEmail', 'subscriberPhone', 'subscription']
+        return isCompany ? [...base, 'companyAlias', 'gstNumber'] : base
+      }
+      case 'contact':
+        return ['contactPerson', 'phoneNumber', 'emailId']
+      case 'location':
+        return ['country', 'state', 'city', 'area', 'addressLane', 'pinCode']
+      case 'documents':
+        return []
+      case 'assignment':
+        return ['assignedOwner']
+      default:
+        return []
     }
+  }
 
-    onSubmit(formData)
+  const validateStep = (stepIndex: number): boolean => {
+    const stepId = STEPS[stepIndex].id
+    const fields = getStepFields(stepId)
+    const newErrors: Record<string, string> = {}
+
+    fields.forEach((field) => {
+      const value = (formData as any)[field]
+      if (field === 'numberOfVehicles') {
+        if (!value || value <= 0) newErrors[field] = REQUIRED_FIELDS[field]
+      } else if (REQUIRED_FIELDS[field] && !value) {
+        newErrors[field] = REQUIRED_FIELDS[field]
+      }
+    })
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep((s) => Math.min(s + 1, STEPS.length - 1))
+    }
+  }
+
+  const handleBack = () => {
+    setErrors({})
+    setCurrentStep((s) => Math.max(s - 1, 0))
+  }
+
+  const handleSubmit = () => {
+    if (validateStep(currentStep)) {
+      onSubmit(formData)
+    }
+  }
+
+  const handleStepClick = (index: number) => {
+    if (index < currentStep) {
+      setErrors({})
+      setCurrentStep(index)
+    }
   }
 
   const availableSubTypes = formData.type ? subscriberSubTypes[formData.type] || [] : []
+  const isLastStep = currentStep === STEPS.length - 1
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl max-w-4xl w-full my-8">
         {/* Header */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-800">
-          <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white">Add New Subscriber</h2>
+          <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white">{mode === 'edit' ? 'Edit Subscriber' : 'Add New Subscriber'}</h2>
           <button
             onClick={onClose}
             className="p-1.5 sm:p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
@@ -94,23 +187,78 @@ export function AddSubscriberModal({
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(100vh-200px)]">
-          <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-            {/* Classification */}
+        {/* Stepper */}
+        <div className="px-4 sm:px-6 pt-5 pb-2">
+          <div className="flex items-center">
+            {STEPS.map((step, index) => (
+              <div key={step.id} className="flex items-center flex-1 last:flex-none">
+                <button
+                  type="button"
+                  onClick={() => handleStepClick(index)}
+                  className={`flex items-center gap-2 ${index < currentStep ? 'cursor-pointer' : 'cursor-default'}`}
+                >
+                  <div
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold shrink-0 transition-colors ${
+                      index < currentStep
+                        ? 'bg-cyan-600 text-white'
+                        : index === currentStep
+                        ? 'bg-cyan-600 text-white ring-4 ring-cyan-100 dark:ring-cyan-900/40'
+                        : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                    }`}
+                  >
+                    {index < currentStep ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : index + 1}
+                  </div>
+                  <span
+                    className={`hidden sm:block text-xs sm:text-sm font-medium whitespace-nowrap ${
+                      index <= currentStep
+                        ? 'text-slate-900 dark:text-white'
+                        : 'text-slate-400 dark:text-slate-500'
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                </button>
+                {index < STEPS.length - 1 && (
+                  <div
+                    className={`flex-1 h-px mx-3 ${
+                      index < currentStep ? 'bg-cyan-600' : 'bg-slate-200 dark:bg-slate-700'
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Step Content */}
+        <div className="px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto max-h-[calc(100vh-320px)]">
+          {/* Step 1: Classification */}
+          {currentStep === 0 && (
             <div>
               <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Subscriber Classification</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
+                    Subscriber Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.subscriberName}
+                    onChange={e => setFormData({ ...formData, subscriberName: e.target.value })}
+                    placeholder="e.g., Fastlane Logistics Pvt. Ltd."
+                    className={inputClass(!!errors.subscriberName)}
+                  />
+                  {errors.subscriberName && <p className="text-xs text-red-500 mt-1">{errors.subscriberName}</p>}
+                </div>
+
+                <div>
+                  <label className={labelClass}>
                     Source <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formData.source}
                     onChange={e => setFormData({ ...formData, source: e.target.value })}
-                    className={`w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.source ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={selectClass(!!errors.source)}
                   >
                     <option value="">Select Source</option>
                     {subscriberSources.map((source) => (
@@ -121,17 +269,15 @@ export function AddSubscriberModal({
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    Type <span className="text-red-500">*</span>
+                  <label className={labelClass}>
+                    Subscriber Type <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formData.type}
                     onChange={e => setFormData({ ...formData, type: e.target.value, subType: '' })}
-                    className={`w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.type ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={selectClass(!!errors.type)}
                   >
-                    <option value="">Select Type</option>
+                    <option value="">Select Subscriber Type</option>
                     {subscriberTypes.map((type) => (
                       <option key={type} value={type}>{type}</option>
                     ))}
@@ -140,16 +286,14 @@ export function AddSubscriberModal({
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     Sub Type <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formData.subType}
                     onChange={e => setFormData({ ...formData, subType: e.target.value })}
                     disabled={!formData.type}
-                    className={`w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.subType ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed`}
+                    className={`${selectClass(!!errors.subType)} disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     <option value="">Select Sub Type</option>
                     {availableSubTypes.map((subType) => (
@@ -160,100 +304,148 @@ export function AddSubscriberModal({
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    LOTS For <span className="text-red-500">*</span>
+                  <label className={labelClass}>
+                    Service Type <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={formData.lotsFor}
-                    onChange={e => setFormData({ ...formData, lotsFor: e.target.value })}
-                    placeholder="e.g., Commercial Vehicles"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.lotsFor ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
-                  />
-                  {errors.lotsFor && <p className="text-xs text-red-500 mt-1">{errors.lotsFor}</p>}
+                  <select
+                    value={formData.serviceType}
+                    onChange={e => setFormData({ ...formData, serviceType: e.target.value })}
+                    className={selectClass(!!errors.serviceType)}
+                  >
+                    <option value="">Select Service Type</option>
+                    <option value="CaaS">CaaS</option>
+                    <option value="LaaS">LaaS</option>
+                    <option value="Wills">Wills</option>
+                    <option value="LOTS247">LOTS247</option>
+                  </select>
+                  {errors.serviceType && <p className="text-xs text-red-500 mt-1">{errors.serviceType}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    Number of Trucks <span className="text-red-500">*</span>
+                  <label className={labelClass}>
+                    Number of Vehicles <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
                     min="1"
-                    value={formData.numberOfTrucks || ''}
-                    onChange={e => setFormData({ ...formData, numberOfTrucks: parseInt(e.target.value) || 0 })}
+                    value={formData.numberOfVehicles || ''}
+                    onChange={e => setFormData({ ...formData, numberOfVehicles: parseInt(e.target.value) || 0 })}
                     placeholder="0"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.numberOfTrucks ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={inputClass(!!errors.numberOfVehicles)}
                   />
-                  {errors.numberOfTrucks && <p className="text-xs text-red-500 mt-1">{errors.numberOfTrucks}</p>}
+                  {errors.numberOfVehicles && <p className="text-xs text-red-500 mt-1">{errors.numberOfVehicles}</p>}
+                </div>
+
+                <div>
+                  <label className={labelClass}>
+                    Subscriber Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.subscriberEmail}
+                    onChange={e => setFormData({ ...formData, subscriberEmail: e.target.value })}
+                    placeholder="e.g., info@fastlane.com"
+                    className={inputClass(!!errors.subscriberEmail)}
+                  />
+                  {errors.subscriberEmail && <p className="text-xs text-red-500 mt-1">{errors.subscriberEmail}</p>}
+                </div>
+
+                <div>
+                  <label className={labelClass}>
+                    Subscriber Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.subscriberPhone}
+                    onChange={e => setFormData({ ...formData, subscriberPhone: e.target.value })}
+                    placeholder="e.g., +919876543210"
+                    className={inputClass(!!errors.subscriberPhone)}
+                  />
+                  {errors.subscriberPhone && <p className="text-xs text-red-500 mt-1">{errors.subscriberPhone}</p>}
+                </div>
+
+                <div>
+                  <label className={labelClass}>
+                    Subscription <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={formData.subscription}
+                    onChange={e => setFormData({ ...formData, subscription: e.target.value })}
+                    className={selectClass(!!errors.subscription)}
+                  >
+                    <option value="">Choose Subscription</option>
+                    <option value="Udrive">Udrive</option>
+                    <option value="Bsafe">Bsafe</option>
+                    <option value="Vcare">Vcare</option>
+                  </select>
+                  {errors.subscription && <p className="text-xs text-red-500 mt-1">{errors.subscription}</p>}
                 </div>
               </div>
-            </div>
 
-            {/* Company Information */}
-            <div>
-              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Company Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    Company Alias <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.companyAlias}
-                    onChange={e => setFormData({ ...formData, companyAlias: e.target.value })}
-                    placeholder="e.g., Fastlane Logistics"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.companyAlias ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
-                  />
-                  {errors.companyAlias && <p className="text-xs text-red-500 mt-1">{errors.companyAlias}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    Subscriber Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.subscriberName}
-                    onChange={e => setFormData({ ...formData, subscriberName: e.target.value })}
-                    placeholder="e.g., Fastlane Logistics Pvt. Ltd."
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.subscriberName ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
-                  />
-                  {errors.subscriberName && <p className="text-xs text-red-500 mt-1">{errors.subscriberName}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    GST Number <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.gstNumber}
-                    onChange={e => setFormData({ ...formData, gstNumber: e.target.value })}
-                    placeholder="e.g., 27AABCF1234M1Z5"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.gstNumber ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
-                  />
-                  {errors.gstNumber && <p className="text-xs text-red-500 mt-1">{errors.gstNumber}</p>}
-                </div>
+              {/* Company Checkbox */}
+              <div className="mt-5 pt-5 border-t border-slate-200 dark:border-slate-700">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div
+                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                      isCompany
+                        ? 'bg-cyan-600 border-cyan-600'
+                        : 'border-slate-300 dark:border-slate-600 group-hover:border-slate-400 dark:group-hover:border-slate-500'
+                    }`}
+                    onClick={() => setIsCompany(!isCompany)}
+                  >
+                    {isCompany && <Check className="w-3.5 h-3.5 text-white" />}
+                  </div>
+                  <span
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                    onClick={() => setIsCompany(!isCompany)}
+                  >
+                    Subscriber is operating as a company
+                  </span>
+                </label>
               </div>
-            </div>
 
-            {/* Contact Information */}
+              {/* Company Fields (conditional) */}
+              {isCompany && (
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelClass}>
+                      Company Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.companyAlias}
+                      onChange={e => setFormData({ ...formData, companyAlias: e.target.value })}
+                      placeholder="e.g., Fastlane Logistics"
+                      className={inputClass(!!errors.companyAlias)}
+                    />
+                    {errors.companyAlias && <p className="text-xs text-red-500 mt-1">{errors.companyAlias}</p>}
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>
+                      GST Number <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.gstNumber}
+                      onChange={e => setFormData({ ...formData, gstNumber: e.target.value })}
+                      placeholder="e.g., 27AABCF1234M1Z5"
+                      className={inputClass(!!errors.gstNumber)}
+                    />
+                    {errors.gstNumber && <p className="text-xs text-red-500 mt-1">{errors.gstNumber}</p>}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 2: Contact Information */}
+          {currentStep === 1 && (
             <div>
-              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Contact Information</h3>
+              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">POC Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     Contact Person <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -261,31 +453,27 @@ export function AddSubscriberModal({
                     value={formData.contactPerson}
                     onChange={e => setFormData({ ...formData, contactPerson: e.target.value })}
                     placeholder="e.g., Rajesh Kumar"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.contactPerson ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={inputClass(!!errors.contactPerson)}
                   />
                   {errors.contactPerson && <p className="text-xs text-red-500 mt-1">{errors.contactPerson}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     Phone Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
                     value={formData.phoneNumber}
                     onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-                    placeholder="+919876543210"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.phoneNumber ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    placeholder="+918306712275"
+                    className={inputClass(!!errors.phoneNumber)}
                   />
                   {errors.phoneNumber && <p className="text-xs text-red-500 mt-1">{errors.phoneNumber}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     Email ID <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -293,36 +481,34 @@ export function AddSubscriberModal({
                     value={formData.emailId}
                     onChange={e => setFormData({ ...formData, emailId: e.target.value })}
                     placeholder="operations@company.com"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.emailId ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={inputClass(!!errors.emailId)}
                   />
                   {errors.emailId && <p className="text-xs text-red-500 mt-1">{errors.emailId}</p>}
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Location Information */}
+          {/* Step 3: Location Information */}
+          {currentStep === 2 && (
             <div>
-              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Location Information</h3>
+              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Address Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     Country <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.country}
                     onChange={e => setFormData({ ...formData, country: e.target.value })}
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.country ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={inputClass(!!errors.country)}
                   />
                   {errors.country && <p className="text-xs text-red-500 mt-1">{errors.country}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     State <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -330,15 +516,13 @@ export function AddSubscriberModal({
                     value={formData.state}
                     onChange={e => setFormData({ ...formData, state: e.target.value })}
                     placeholder="e.g., Maharashtra"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.state ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={inputClass(!!errors.state)}
                   />
                   {errors.state && <p className="text-xs text-red-500 mt-1">{errors.state}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     City <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -346,15 +530,13 @@ export function AddSubscriberModal({
                     value={formData.city}
                     onChange={e => setFormData({ ...formData, city: e.target.value })}
                     placeholder="e.g., Mumbai"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.city ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={inputClass(!!errors.city)}
                   />
                   {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     Area <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -362,15 +544,13 @@ export function AddSubscriberModal({
                     value={formData.area}
                     onChange={e => setFormData({ ...formData, area: e.target.value })}
                     placeholder="e.g., Andheri East"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.area ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={inputClass(!!errors.area)}
                   />
                   {errors.area && <p className="text-xs text-red-500 mt-1">{errors.area}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     Address Lane <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -378,15 +558,13 @@ export function AddSubscriberModal({
                     value={formData.addressLane}
                     onChange={e => setFormData({ ...formData, addressLane: e.target.value })}
                     placeholder="Plot No., Building Name"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.addressLane ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={inputClass(!!errors.addressLane)}
                   />
                   {errors.addressLane && <p className="text-xs text-red-500 mt-1">{errors.addressLane}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     Pin Code <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -394,40 +572,116 @@ export function AddSubscriberModal({
                     value={formData.pinCode}
                     onChange={e => setFormData({ ...formData, pinCode: e.target.value })}
                     placeholder="400069"
-                    className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.pinCode ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                    className={inputClass(!!errors.pinCode)}
                   />
                   {errors.pinCode && <p className="text-xs text-red-500 mt-1">{errors.pinCode}</p>}
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Assignment & Additional */}
+          {/* Step 4: Documents */}
+          {currentStep === 3 && (
+            <div>
+              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-4">Upload Documents</h3>
+
+              {/* Upload area */}
+              <div className="mb-5">
+                <div className="flex items-end gap-3 mb-3">
+                  <div className="flex-1">
+                    <label className={labelClass}>Document Category</label>
+                    <select
+                      value={docCategory}
+                      onChange={e => setDocCategory(e.target.value)}
+                      className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    >
+                      <option value="">Select category</option>
+                      {DOCUMENT_CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-1">
+                    <label className={labelClass}>File</label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.doc,.docx"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file && docCategory) {
+                            setUploadedDocs(prev => [...prev, {
+                              id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                              file,
+                              category: docCategory
+                            }])
+                            setDocCategory('')
+                            e.target.value = ''
+                          }
+                        }}
+                        disabled={!docCategory}
+                        className="hidden"
+                        id="add-subscriber-doc-input"
+                      />
+                      <label
+                        htmlFor="add-subscriber-doc-input"
+                        className={`flex items-center gap-2 px-3 py-2 border border-dashed rounded-lg text-xs sm:text-sm transition-colors ${
+                          docCategory
+                            ? 'border-cyan-400 dark:border-cyan-600 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 cursor-pointer hover:bg-cyan-100 dark:hover:bg-cyan-900/30'
+                            : 'border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <Upload className="w-4 h-4" />
+                        {docCategory ? 'Choose file...' : 'Select category first'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Uploaded documents list */}
+              {uploadedDocs.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">{uploadedDocs.length} document{uploadedDocs.length !== 1 ? 's' : ''} added</p>
+                  {uploadedDocs.map((doc) => (
+                    <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FileText className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-900 dark:text-slate-50 truncate">{doc.file.name}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="inline-flex px-2 py-0.5 bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 rounded text-xs font-medium">{doc.category}</span>
+                            <span className="text-xs text-slate-400">{(doc.file.size / 1024).toFixed(1)} KB</span>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setUploadedDocs(prev => prev.filter(d => d.id !== doc.id))}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex-shrink-0"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg">
+                  <FileText className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No documents added yet</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Select a category and upload a file above</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 5: Assignment & Additional */}
+          {currentStep === 4 && (
             <div>
               <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Assignment & Additional</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    Assigned Owner <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={formData.assignedOwner}
-                    onChange={e => setFormData({ ...formData, assignedOwner: e.target.value })}
-                    className={`w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border ${
-                      errors.assignedOwner ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
-                    } rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500`}
-                  >
-                    <option value="">Select Owner</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>{user.fullName}</option>
-                    ))}
-                  </select>
-                  {errors.assignedOwner && <p className="text-xs text-red-500 mt-1">{errors.assignedOwner}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                  <label className={labelClass}>
                     Partner (Optional)
                   </label>
                   <select
@@ -441,25 +695,26 @@ export function AddSubscriberModal({
                     ))}
                   </select>
                 </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    Driving License Number (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.drivingLicenseNumber || ''}
-                    onChange={e => setFormData({ ...formData, drivingLicenseNumber: e.target.value || null })}
-                    placeholder="MH01-20230012345"
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
               </div>
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Footer */}
-          <div className="flex items-center justify-end gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-200 dark:border-slate-800">
+        {/* Footer */}
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-200 dark:border-slate-800">
+          <div>
+            {currentStep > 0 && (
+              <button
+                type="button"
+                onClick={handleBack}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onClose}
@@ -467,14 +722,26 @@ export function AddSubscriberModal({
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors"
-            >
-              Add Subscriber
-            </button>
+            {isLastStep ? (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors"
+              >
+                {mode === 'edit' ? 'Save Changes' : 'Add Subscriber'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        </form>
+        </div>
       </div>
     </div>
   )

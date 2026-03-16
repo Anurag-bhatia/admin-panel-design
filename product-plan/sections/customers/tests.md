@@ -1,42 +1,58 @@
-# Test Instructions: Customers
+# Test Instructions: Customers (Registered Visitors)
+
+These test-writing instructions are **framework-agnostic**. Adapt them to your testing setup.
 
 ## Overview
 
-Test customer list, search, add/edit, and detail view with incident management.
+Test D2C visitor management including list view, add/bulk upload, and 5-tab detail page (Details, Incidents, Challans, Vehicles, Financials).
 
 ---
 
 ## User Flow Tests
 
-### Flow 1: Search Customers
+### Flow 1: Add New Visitor
 
 **Steps:**
-1. Enter mobile number in search
-2. Press Enter
+1. Click "Add New Visitor"
+2. Fill name, mobile, email
+3. Submit
 
 **Expected Results:**
-- [ ] Matching customers displayed
-- [ ] No results shows empty state with clear option
+- [ ] Visitor appears in list
+- [ ] Visitor ID auto-generated
+- [ ] Success notification shown
 
-### Flow 2: Create Incident for Customer
+### Flow 2: View Visitor Detail
 
 **Steps:**
-1. Open customer detail
-2. Click "Create Incident"
-3. Fill incident details
-4. Save
+1. Click visitor row
+2. Navigate 5 tabs
 
 **Expected Results:**
-- [ ] Incident created and linked to customer
-- [ ] Appears in customer's Incidents tab
+- [ ] Details tab: name, contact, account dates, vehicle/incident counts
+- [ ] Incidents tab: linked incidents with status
+- [ ] Challans tab: challan records with payment status
+- [ ] Vehicles tab: associated vehicles
+- [ ] Financials tab: read-only financial summary (payments, refunds, spend)
+
+### Flow 3: Bulk Upload
+
+**Steps:**
+1. Click "Bulk Upload Visitors"
+2. Upload CSV/Excel file
+
+**Expected Results:**
+- [ ] Visitors created from file
+- [ ] Validation feedback shown
 
 ---
 
 ## Empty State Tests
 
-- [ ] No customers: "No customers registered yet"
-- [ ] No incidents: "No incidents for this customer"
-- [ ] No vehicles: "No vehicles linked"
+- [ ] No visitors: "No registered visitors yet" with add CTA
+- [ ] No incidents for visitor: empty Incidents tab
+- [ ] No vehicles: empty Vehicles tab
+- [ ] Empty financials: "No financial activity yet"
 
 ---
 
@@ -44,11 +60,12 @@ Test customer list, search, add/edit, and detail view with incident management.
 
 ```typescript
 const mockCustomer = {
-  id: "cust-001",
-  customerId: "CUST-12345",
-  name: "Rajesh Kumar",
-  mobile: "+91 98765 43210",
-  totalVehicles: 2,
-  totalIncidents: 3
+  id: "VIS-001",
+  name: "Rahul Sharma",
+  mobile: "+91-9876543210",
+  email: "rahul@gmail.com",
+  vehicleCount: 2,
+  incidentCount: 3,
+  createdAt: "2025-11-15T10:00:00Z",
 };
 ```

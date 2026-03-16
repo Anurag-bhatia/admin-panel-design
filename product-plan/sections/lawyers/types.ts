@@ -73,6 +73,11 @@ export interface CompanyDetails {
   branchOffices: string[]
 }
 
+export interface LawyerActivity {
+  label: string
+  date: string
+}
+
 export interface Lawyer {
   id: string
   lawyerId: string
@@ -94,9 +99,10 @@ export interface Lawyer {
   expertise: Expertise
   company: CompanyDetails | null
   onboardingStatus: 'Complete' | 'Incomplete'
-  kycStatus: 'Verified' | 'Pending' | 'Missing'
+  kycStatus: 'Verified' | 'Unverified'
   activityState: 'Active' | 'Inactive'
   source: string
+  activity: LawyerActivity[]
   createdAt: string
   lastUpdatedAt: string
 }
@@ -125,5 +131,5 @@ export interface LawyersProps {
   /** Called when user filters by activity state */
   onFilterByActivity?: (state: 'Active' | 'Inactive' | 'All') => void
   /** Called when user filters by KYC status */
-  onFilterByKYC?: (status: 'Verified' | 'Pending' | 'Missing' | 'All') => void
+  onFilterByKYC?: (status: 'Verified' | 'Unverified' | 'All') => void
 }

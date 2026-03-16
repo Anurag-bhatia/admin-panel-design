@@ -1,43 +1,62 @@
 # Test Instructions: Partners
 
+These test-writing instructions are **framework-agnostic**. Adapt them to your testing setup.
+
 ## Overview
 
-Test partner list, 4-step onboarding, detail view, and status management.
+Test partner management including list, 4-step onboarding, detail page with 5 tabs, status toggle, and linked subscriber/incident views.
 
 ---
 
 ## User Flow Tests
 
-### Flow 1: Add Partner (4-Step Onboarding)
+### Flow 1: Onboard New Partner (4-Step Stepper)
 
 **Steps:**
 1. Click "Add Partner"
-2. Step 1: Personal identity & login
-3. Step 2: Company details
-4. Step 3: Service scope
-5. Step 4: Permissions & bank account
+2. Step 1: Personal (first name, last name, email, mobile, password)
+3. Step 2: Company (company name, email, phone, address)
+4. Step 3: Service Scope (products/services, subscriber types)
+5. Step 4: Permissions & Bank (bank details, system permissions)
 6. Submit
 
 **Expected Results:**
-- [ ] Each step validates before proceeding
-- [ ] Partner created with active status
+- [ ] Stepper shows progress
+- [ ] Partner appears in list as active
+- [ ] Success notification shown
 
-### Flow 2: Toggle Partner Status
+### Flow 2: View Partner Detail
 
 **Steps:**
-1. Click "Deactivate" on active partner
+1. Click partner row
+2. Navigate 5 tabs
+
+**Expected Results:**
+- [ ] Profile tab: personal and company info
+- [ ] Subscribers tab: linked subscribers table
+- [ ] Financial tab: earnings, payout history
+- [ ] Documents tab: GST, PAN, etc.
+- [ ] Activity tab: chronological log
+
+### Flow 3: Toggle Status
+
+**Steps:**
+1. Click deactivate on active partner
 2. Confirm
 
 **Expected Results:**
-- [ ] Partner moved to inactive
+- [ ] Status changes to inactive
 - [ ] Cannot onboard new subscribers
+- [ ] Historical data preserved
 
 ---
 
 ## Empty State Tests
 
-- [ ] No partners: "No partners onboarded yet"
-- [ ] No linked subscribers: "No subscribers linked to this partner"
+- [ ] No partners: "No partners yet" with add CTA
+- [ ] No subscribers for partner: empty Subscribers tab
+- [ ] No payouts: empty Financial tab
+- [ ] No documents: empty Documents tab
 
 ---
 
@@ -45,10 +64,13 @@ Test partner list, 4-step onboarding, detail view, and status management.
 
 ```typescript
 const mockPartner = {
-  id: "par-001",
-  partnerId: "PAR-12345",
-  firstName: "Amit",
-  companyName: "Fleet Solutions",
-  status: "active"
+  id: "PTR-001",
+  firstName: "Vikram",
+  lastName: "Patel",
+  email: "vikram@partner.com",
+  mobile: "+91-9876543210",
+  companyName: "Partner Solutions",
+  status: "active",
+  subscriberCount: 12,
 };
 ```

@@ -1,0 +1,133 @@
+{
+  "_meta": {
+    "models": {
+      "settledChallans": "Each record represents a traffic challan that has been successfully settled/resolved. This is a read-only view of settled incidents from the Incidents module."
+    },
+    "relationships": [
+      "Each Settled Challan belongs to a Subscriber (the B2B client who submitted it)",
+      "Settled Challans are a filtered subset of Incidents with a resolved/settled status"
+    ]
+  },
+  "settledChallans": [
+    {
+      "id": "irn-1042",
+      "vehicleNo": "DL01AB1234",
+      "subscriber": "BlueDart Logistics",
+      "subscriberEmail": "ops@bluedart.com",
+      "subscriberPhone": "+91 98100 45678",
+      "challanNo": "CH-2025-00847",
+      "offenceName": "Overspeeding",
+      "state": "Delhi",
+      "amount": 2000,
+      "settledDate": "2026-03-10"
+    },
+    {
+      "id": "irn-1038",
+      "vehicleNo": "MH12CD5678",
+      "subscriber": "Rivigo Freight",
+      "subscriberEmail": "fleet@rivigo.com",
+      "subscriberPhone": "+91 98200 12345",
+      "challanNo": "CH-2025-00839",
+      "offenceName": "Red Light Violation",
+      "state": "Maharashtra",
+      "amount": 5000,
+      "settledDate": "2026-03-09"
+    },
+    {
+      "id": "irn-1035",
+      "vehicleNo": "KA05EF9012",
+      "subscriber": "Delhivery Pvt Ltd",
+      "subscriberEmail": "transport@delhivery.com",
+      "subscriberPhone": "+91 80500 67890",
+      "challanNo": "CH-2025-00831",
+      "offenceName": "Driving Without Seatbelt",
+      "state": "Karnataka",
+      "amount": 1000,
+      "settledDate": "2026-03-08"
+    },
+    {
+      "id": "irn-1029",
+      "vehicleNo": "RJ14GH3456",
+      "subscriber": "Ecom Express",
+      "subscriberEmail": "logistics@ecomexpress.in",
+      "subscriberPhone": "+91 14100 23456",
+      "challanNo": "CH-2025-00822",
+      "offenceName": "Using Mobile Phone While Driving",
+      "state": "Rajasthan",
+      "amount": 5000,
+      "settledDate": "2026-03-07"
+    },
+    {
+      "id": "irn-1024",
+      "vehicleNo": "UP32JK7890",
+      "subscriber": "BlueDart Logistics",
+      "subscriberEmail": "ops@bluedart.com",
+      "subscriberPhone": "+91 98100 45678",
+      "challanNo": "CH-2025-00815",
+      "offenceName": "No Parking",
+      "state": "Uttar Pradesh",
+      "amount": 500,
+      "settledDate": "2026-03-06"
+    },
+    {
+      "id": "irn-1019",
+      "vehicleNo": "GJ01LM2345",
+      "subscriber": "TCI Freight",
+      "subscriberEmail": "admin@tcifreight.com",
+      "subscriberPhone": "+91 79400 34567",
+      "challanNo": "CH-2025-00808",
+      "offenceName": "Overloading",
+      "state": "Gujarat",
+      "amount": 20000,
+      "settledDate": "2026-03-05"
+    },
+    {
+      "id": "irn-1015",
+      "vehicleNo": "HR26NP6789",
+      "subscriber": "Shadowfax Technologies",
+      "subscriberEmail": "fleet@shadowfax.in",
+      "subscriberPhone": "+91 12400 56789",
+      "challanNo": "CH-2025-00799",
+      "offenceName": "Driving Without Helmet",
+      "state": "Haryana",
+      "amount": 1000,
+      "settledDate": "2026-03-04"
+    },
+    {
+      "id": "irn-1010",
+      "vehicleNo": "TN09QR1234",
+      "subscriber": "Rivigo Freight",
+      "subscriberEmail": "fleet@rivigo.com",
+      "subscriberPhone": "+91 98200 12345",
+      "challanNo": "CH-2025-00790",
+      "offenceName": "Wrong Side Driving",
+      "state": "Tamil Nadu",
+      "amount": 5000,
+      "settledDate": "2026-03-02"
+    },
+    {
+      "id": "irn-1006",
+      "vehicleNo": "MP09ST5678",
+      "subscriber": "XpressBees Logistics",
+      "subscriberEmail": "ops@xpressbees.com",
+      "subscriberPhone": "+91 75500 78901",
+      "challanNo": "CH-2025-00782",
+      "offenceName": "Expired Registration Certificate",
+      "state": "Madhya Pradesh",
+      "amount": 10000,
+      "settledDate": "2026-02-28"
+    },
+    {
+      "id": "irn-0998",
+      "vehicleNo": "PB10UV9012",
+      "subscriber": "Gati Ltd",
+      "subscriberEmail": "dispatch@gati.com",
+      "subscriberPhone": "+91 16100 89012",
+      "challanNo": "CH-2025-00773",
+      "offenceName": "Overspeeding",
+      "state": "Punjab",
+      "amount": 2000,
+      "settledDate": "2026-02-25"
+    }
+  ]
+}

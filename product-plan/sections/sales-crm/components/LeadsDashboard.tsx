@@ -6,7 +6,7 @@ import { AddLeadModal } from './AddLeadModal'
 import { BulkUploadModal } from './BulkUploadModal'
 import { LeadDetailView } from './LeadDetailView'
 import { AssignLeadModal } from './AssignLeadModal'
-import { BulkMoveLead } from './BulkMoveLead'
+import { BulkActionsBar } from './BulkActionsBar'
 import { LeadsListHeader } from './LeadsListHeader'
 import { EditLeadModal } from './EditLeadModal'
 import { AddFollowUpModal } from './AddFollowUpModal'
@@ -43,7 +43,6 @@ export function LeadsDashboard({
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false)
-  const [showBulkMoveModal, setShowBulkMoveModal] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
   const [assignLeadId, setAssignLeadId] = useState<string | null>(null)
@@ -51,6 +50,7 @@ export function LeadsDashboard({
   const [followUpLeadId, setFollowUpLeadId] = useState<string | null>(null)
   const [uploadDocLeadId, setUploadDocLeadId] = useState<string | null>(null)
   const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set())
+  const [bulkAssignMode, setBulkAssignMode] = useState(false)
   const [filters, setFilters] = useState({
     source: '',
     owner: '',
@@ -82,11 +82,17 @@ export function LeadsDashboard({
     }
   }
 
-  const handleBulkMove = (field: string, value: string) => {
+  const handleBulkMoveStatus = (status: Lead['status']) => {
     const leadIds = Array.from(selectedLeads)
-    console.log(`Bulk update leads:`, { leadIds, field, value })
+    leadIds.forEach(id => onChangeStatus?.(id, status))
     setSelectedLeads(new Set())
-    setShowBulkMoveModal(false)
+  }
+
+  const handleBulkAssignOwner = () => {
+    // Open a "bulk assign" modal by setting a sentinel assignLeadId
+    // We'll use a special ID to indicate bulk mode
+    setBulkAssignMode(true)
+    setAssignLeadId('__bulk__')
   }
 
   // Calculate metrics
@@ -172,7 +178,7 @@ export function LeadsDashboard({
     { key: 'follow-up', label: 'Follow-up' },
     { key: 'quotations', label: 'Quotations' },
     { key: 'projected', label: 'Projected' },
-    { key: 'invoiced', label: 'Invoiced' },
+    { key: 'invoiced', label: 'Ready to Invoice' },
     { key: 'sales', label: 'Converted' },
     { key: 'lost', label: 'Lost' },
   ]
@@ -209,7 +215,8 @@ export function LeadsDashboard({
             leadName={assignLead.companyAlias}
             currentAssignee={assignLead.assignedTo}
             users={users}
-            onAssign={userId => {
+            onAssign={(userId, notes) => {
+              console.log('Assign lead:', assignLead.id, 'to user:', userId, 'notes:', notes)
               onAssignLead?.(assignLead.id, userId)
               setAssignLeadId(null)
             }}
@@ -267,11 +274,8 @@ export function LeadsDashboard({
         <div className="mb-6 lg:mb-8">
           <div className="mb-6">
             <LeadsListHeader
-              selectedCount={selectedLeads.size}
               onCreateLead={() => setShowAddModal(true)}
               onBulkUpload={() => setShowBulkUploadModal(true)}
-              onBulkMove={() => setShowBulkMoveModal(true)}
-              onBulkUpdate={() => setShowBulkMoveModal(true)}
             />
           </div>
 
@@ -487,28 +491,52 @@ export function LeadsDashboard({
           />
         )}
 
-        {/* Bulk Move Modal */}
-        {showBulkMoveModal && (
-          <BulkMoveLead
+        {/* Floating Bulk Actions Bar */}
+        {selectedLeads.size > 0 && (
+          <BulkActionsBar
             selectedCount={selectedLeads.size}
-            users={users}
-            onMove={handleBulkMove}
-            onClose={() => setShowBulkMoveModal(false)}
+            onClearSelection={() => setSelectedLeads(new Set())}
+            onMoveStatus={handleBulkMoveStatus}
+            onAssignOwner={handleBulkAssignOwner}
+            onBulkUpdate={() => setShowBulkUploadModal(true)}
           />
         )}
 
         {/* Assign Lead Modal (from table actions) */}
-        {assignLead && !selectedLeadId && (
+        {assignLead && !selectedLeadId && !bulkAssignMode && (
           <AssignLeadModal
             leadId={assignLead.id}
             leadName={assignLead.companyAlias}
             currentAssignee={assignLead.assignedTo}
             users={users}
-            onAssign={userId => {
+            onAssign={(userId, notes) => {
+              console.log('Assign lead:', assignLead.id, 'to user:', userId, 'notes:', notes)
               onAssignLead?.(assignLead.id, userId)
               setAssignLeadId(null)
             }}
             onClose={() => setAssignLeadId(null)}
+          />
+        )}
+
+        {/* Assign Lead Modal (from bulk actions) */}
+        {bulkAssignMode && assignLeadId === '__bulk__' && (
+          <AssignLeadModal
+            leadId="__bulk__"
+            leadName={`${selectedLeads.size} leads selected`}
+            currentAssignee={null}
+            users={users}
+            onAssign={(userId, notes) => {
+              const leadIds = Array.from(selectedLeads)
+              console.log('Bulk assign leads:', leadIds, 'to user:', userId, 'notes:', notes)
+              leadIds.forEach(id => onAssignLead?.(id, userId))
+              setSelectedLeads(new Set())
+              setBulkAssignMode(false)
+              setAssignLeadId(null)
+            }}
+            onClose={() => {
+              setBulkAssignMode(false)
+              setAssignLeadId(null)
+            }}
           />
         )}
       </div>

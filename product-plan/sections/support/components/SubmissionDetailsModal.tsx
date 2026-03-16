@@ -1,11 +1,16 @@
+import { useState } from 'react'
 import type { SupportSubmission } from '../types'
 
 interface SubmissionDetailsModalProps {
   submission: SupportSubmission
   onClose: () => void
+  onConvertToLead?: (id: string) => void
+  onConvertToDispute?: (id: string) => void
+  onConvertToPartnership?: (id: string) => void
 }
 
-export function SubmissionDetailsModal({ submission, onClose }: SubmissionDetailsModalProps) {
+export function SubmissionDetailsModal({ submission, onClose, onConvertToLead, onConvertToDispute, onConvertToPartnership }: SubmissionDetailsModalProps) {
+  const [convertOpen, setConvertOpen] = useState(false)
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return new Intl.DateTimeFormat('en-IN', {
@@ -145,14 +150,57 @@ export function SubmissionDetailsModal({ submission, onClose }: SubmissionDetail
           </div>
         </div>
 
-        {/* Footer with note */}
-        <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-          <p className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Use the Convert dropdown in the table to route this submission to the appropriate workflow.
-          </p>
+        {/* Footer with Convert dropdown */}
+        <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-end">
+          <div className="relative">
+            <button
+              onClick={() => setConvertOpen(!convertOpen)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+            >
+              Convert
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {convertOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setConvertOpen(false)}
+                />
+                <div className="absolute right-0 bottom-full mb-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 py-2 z-20">
+                  <button
+                    onClick={() => { onConvertToLead?.(submission.id); onClose() }}
+                    className="w-full px-4 py-2.5 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors flex items-center gap-3"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Convert to Lead
+                  </button>
+                  <button
+                    onClick={() => { onConvertToDispute?.(submission.id); onClose() }}
+                    className="w-full px-4 py-2.5 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-950/30 hover:text-amber-700 dark:hover:text-amber-400 transition-colors flex items-center gap-3"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Convert to Dispute
+                  </button>
+                  <button
+                    onClick={() => { onConvertToPartnership?.(submission.id); onClose() }}
+                    className="w-full px-4 py-2.5 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors flex items-center gap-3"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Convert to Partnership
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

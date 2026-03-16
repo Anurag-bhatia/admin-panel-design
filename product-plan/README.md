@@ -1,128 +1,89 @@
-# Challan Resolution Admin Panel - Export Package
+# Admin Panel — Design Handoff
 
-This package contains everything needed to implement the Challan Resolution Admin Panel application.
+This folder contains everything needed to implement Admin Panel — a B2B operations platform that manages the complete lifecycle of traffic challan resolution services for fleet operators and corporate clients.
 
-## Quick Start
+## What's Included
 
-### Option 1: One-Shot Implementation
+**Ready-to-Use Prompts:**
+- `prompts/one-shot-prompt.md` — Prompt for full implementation
+- `prompts/section-prompt.md` — Prompt template for section-by-section
 
-For implementing the full application in one session:
+**Instructions:**
+- `product-overview.md` — Product summary (always provide with instructions)
+- `instructions/one-shot-instructions.md` — All milestones combined
+- `instructions/incremental/` — 15 milestone instructions (foundation + 14 sections)
 
-1. Open `prompts/one-shot-prompt.md`
-2. Copy the prompt into your coding agent (Claude, Cursor, etc.)
-3. Answer the clarifying questions about auth, tech stack, etc.
-4. Follow along as the agent implements the application
+**Design Assets:**
+- `design-system/` — Colors, fonts, tokens
+- `data-model/` — Entity types and relationships
+- `shell/` — Application shell components
+- `sections/` — 14 section component packages with test instructions
 
-### Option 2: Incremental Implementation
+## How to Use This
 
-For implementing section by section:
+### Option A: Incremental (Recommended)
 
-1. Start with `instructions/incremental/01-foundation.md` (project setup)
-2. Then `instructions/incremental/02-shell.md` (navigation/layout)
-3. Use `prompts/section-prompt.md` as a template for each section
-4. Implement sections in order (03-incidents through 11-team)
+Build your app milestone by milestone for better control:
 
-## Package Contents
+1. Copy the `product-plan/` folder to your codebase
+2. Start with Foundation (`instructions/incremental/01-foundation.md`) — includes design tokens, data model, routing, and application shell
+3. For each section:
+   - Open `prompts/section-prompt.md`
+   - Fill in the section variables at the top (SECTION_NAME, SECTION_ID, NN)
+   - Copy/paste into your coding agent
+   - Answer questions and implement
+4. Review and test after each milestone
 
-```
-product-plan/
-├── README.md                      # This file
-├── product-overview.md            # Product context and section list
-│
-├── prompts/                       # Ready-to-use prompts
-│   ├── one-shot-prompt.md         # Full implementation prompt
-│   └── section-prompt.md          # Section-by-section template
-│
-├── instructions/                  # Implementation guides
-│   ├── one-shot-instructions.md   # All milestones combined
-│   └── incremental/               # Step-by-step guides
-│       ├── 01-foundation.md       # Project setup
-│       ├── 02-shell.md            # Navigation & layout
-│       ├── 03-incidents.md        # Incidents section
-│       ├── 04-sales-crm.md        # Sales CRM section
-│       ├── 05-subscribers.md      # Subscribers section
-│       ├── 06-customers.md        # Customers section
-│       ├── 07-lawyers.md          # Lawyers section
-│       ├── 08-partners.md         # Partners section
-│       ├── 09-support.md          # Support section
-│       ├── 10-reports.md          # Reports section
-│       └── 11-team.md             # Team section
-│
-├── design-system/                 # Design tokens
-│   ├── tokens.css                 # CSS custom properties
-│   ├── tailwind-colors.md         # Tailwind color guide
-│   └── fonts.md                   # Typography configuration
-│
-├── data-model/                    # Core data types
-│   ├── README.md                  # Entity descriptions
-│   └── types.ts                   # TypeScript interfaces
-│
-├── shell/                         # Application shell
-│   └── components/                # Navigation components
-│       ├── AppShell.tsx
-│       ├── MainNav.tsx
-│       ├── UserMenu.tsx
-│       └── index.ts
-│
-└── sections/                      # Feature sections
-    ├── incidents/
-    ├── sales-crm/
-    ├── subscribers/
-    ├── customers/
-    ├── lawyers/
-    ├── partners/
-    ├── support/
-    ├── reports/
-    └── team/
-        ├── README.md              # Section overview
-        ├── tests.md               # Test specifications
-        ├── types.ts               # Section types
-        ├── sample-data.json       # Test data
-        └── components/            # UI components
-```
+### Option B: One-Shot
 
-## Design System
+Build the entire app in one session:
 
-### Colors
-- **Primary:** Cyan (buttons, links, active states)
-- **Secondary:** Zinc (tags, sidebar, secondary elements)
-- **Neutral:** Slate (backgrounds, text, borders)
+1. Copy the `product-plan/` folder to your codebase
+2. Open `prompts/one-shot-prompt.md`
+3. Add any additional notes to the prompt
+4. Copy/paste the prompt into your coding agent
+5. Answer the agent's clarifying questions
+6. Let the agent plan and implement everything
 
-### Typography
-- **Font:** Geist (headings and body), Geist Mono (code/IDs)
-- **Weights:** 400 (body), 500 (medium), 600 (semibold), 700 (bold)
+## Implementation Order
 
-See `design-system/` for complete tokens and usage examples.
+| Milestone | Section | Description |
+|-----------|---------|-------------|
+| 01 | Foundation | Design tokens, data model, routing, application shell |
+| 02 | Incidents | Challan and case queue management |
+| 03 | Sales CRM | Lead capture and pipeline management |
+| 04 | Subscribers | Active client account management |
+| 05 | Customers | D2C registered visitor management |
+| 06 | Lawyers | Legal professional network management |
+| 07 | Partners | Partner relationship management |
+| 08 | Payments | Commission and refund processing |
+| 09 | Disputes | Customer dispute resolution |
+| 10 | Support | Support ticket intake and triage |
+| 11 | Reports | Analytics and reporting dashboards |
+| 12 | Team | Employee and team administration |
+| 13 | Setup | System configuration management |
+| 14 | CMS | Content management (blogs, events) |
+| 15 | Settled Challans | Settled challan archive |
 
-## Sections Overview
+## Test-Driven Development
 
-| Section | Description |
-|---------|-------------|
-| Incidents | Queue-based challan management with screening, assignment, and resolution |
-| Sales CRM | Lead tracking and pipeline management |
-| Subscribers | B2B client account management |
-| Customers | Individual customer records and history |
-| Lawyers | External lawyer profiles, commissions, and invoicing |
-| Partners | External organization management |
-| Support | Ticket management and customer service |
-| Reports | Analytics dashboards and data exports |
-| Team | Employee management, onboarding, and permissions |
+Each section includes a `tests.md` file with test-writing instructions. For best results:
 
-## Key Principles
+1. Read `sections/[section-id]/tests.md` before implementing
+2. Write failing tests based on the instructions
+3. Implement the feature to make tests pass
+4. Refactor while keeping tests green
 
-1. **Props-Based Components**: All components accept data and callbacks via props
-2. **Dark Mode Support**: Use Tailwind's `dark:` variants throughout
-3. **Mobile Responsive**: Use responsive prefixes (`sm:`, `md:`, `lg:`)
-4. **Type Safety**: Use TypeScript interfaces from `types.ts` files
-5. **Test-Driven**: Write tests following `tests.md` specifications
+The test instructions are **framework-agnostic** — they describe WHAT to test, not HOW. Adapt to your testing setup (Jest, Vitest, Playwright, Cypress, RSpec, Minitest, PHPUnit, etc.).
 
-## Notes
+## Tips
 
-- Components are framework-agnostic React (can adapt to Next.js, Vite, etc.)
-- Sample data is provided for development and testing
-- Each section can be implemented independently after foundation + shell
-- Authentication and database choices are left to the implementer
+- **Use the pre-written prompts** — They include important clarifying questions about auth and data modeling.
+- **Add your own notes** — Customize prompts with project-specific context when needed.
+- **Build on your designs** — Use completed sections as the starting point for future feature development.
+- **Review thoroughly** — Check plans and implementations carefully to catch details and inconsistencies.
+- **Fill in the gaps** — Backend business logic may need manual additions. Incremental implementation helps you identify these along the way.
 
 ---
 
-Generated by Design OS
+*Generated by Design OS*

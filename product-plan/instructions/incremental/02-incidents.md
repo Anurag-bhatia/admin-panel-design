@@ -34,29 +34,29 @@
 
 ## Goal
 
-Implement the Incidents feature — the core queue-driven ticket management system for handling challan and case-related work with strict 45-day TAT enforcement.
+Implement the Incidents feature — the core queue-driven ticket management system for handling challan and case resolution with strict 45-day TAT enforcement.
 
 ## Overview
 
-The Incidents module replaces manual tracking with structured workflows featuring clear ownership, stage-based progression, and complete audit trails. Every challan lives in exactly one execution queue at a time, with rule-based movement between stages.
+The Incidents module replaces manual challan tracking with structured workflows featuring clear ownership, stage-based progression, and complete audit trails. Every challan lives in exactly one execution queue at a time, with rule-based movement between stages. The module includes a collapsible sidebar for switching between All Incidents and My Incidents, with sub-sections for Cases and Challans.
 
 **Key Functionality:**
-- Navigate between All Incidents and My Incidents views
-- View challans organized by queue tabs (New, Screening, Lawyer Assigned, Settled, Not Settled, Refund)
-- Add new challans with subscriber/customer link
+- View challan queues with tab-based navigation (New Incidents, Screening, Lawyer Assigned, Settled, Not Settled, Refund)
+- Collapsible sidebar navigation (All Incidents / My Incidents, Cases / Challans)
+- Add new challans via form modal
 - Validate and screen challans against external sources
-- Bulk operations: assign agent, assign lawyer, move queue, update
-- View detailed incident information with follow-ups, timeline, and documents
-- Track 45-day TAT with visual indicators
+- Bulk operations: assign agent/lawyer, move queue, bulk update via Excel upload
+- Single-ticket operations via row action menu
+- Full challan detail view with tabs: Follow Up, Timeline, Activity, Notes, Details, Call Summary
+- 45-day TAT enforcement with visual countdown
+- Add expense modal for financial tracking
+- Export filtered/selected challans to Excel/CSV
 
 ## Recommended Approach: Test-Driven Development
 
 Before implementing this section, **write tests first** based on the test specifications provided.
 
-See `product-plan/sections/incidents/tests.md` for detailed test-writing instructions including:
-- Key user flows to test (success and failure paths)
-- Specific UI elements, button labels, and interactions to verify
-- Expected behaviors and assertions
+See `product-plan/sections/incidents/tests.md` for detailed test-writing instructions.
 
 **TDD Workflow:**
 1. Read `tests.md` and write failing tests for the key user flows
@@ -69,143 +69,92 @@ See `product-plan/sections/incidents/tests.md` for detailed test-writing instruc
 
 Copy the section components from `product-plan/sections/incidents/components/`:
 
-- `IncidentList.tsx` — Main list view with queue tabs and table
-- `IncidentRow.tsx` — Individual row in the incidents table
-- `IncidentsTableHeader.tsx` — Table header with search, filters, actions
-- `IncidentsSidebar.tsx` — Collapsible sidebar for All/My Incidents toggle
-- `QueueTabs.tsx` — Queue tab navigation with counts
-- `BulkActionsBar.tsx` — Actions bar when incidents are selected
-- `Pagination.tsx` — Pagination controls
-- `AddChallanModal.tsx` — Modal for adding new challans
-- `AssignAgentModal.tsx` — Modal for assigning agents
-- `AssignLawyerModal.tsx` — Modal for assigning lawyers
-- `MoveQueueModal.tsx` — Modal for moving incidents between queues
-- `BulkUpdateModal.tsx` — Modal for bulk updates via Excel
-- `ValidateResultsView.tsx` — Results view after bulk validation
-- `ScreenResultsView.tsx` — Results view after bulk screening
-- `IncidentDetailHeader.tsx` — Detail page header
-- `DetailsTab.tsx` — Incident details tab
-- `FollowUpTab.tsx` — Follow-up management tab
-- `TimelineTab.tsx` — Activity timeline tab
-- `NotesTab.tsx` — Internal notes tab
-- `ActivityTab.tsx` — Combined activity view
-- `CallSummaryTab.tsx` — Call recordings and summaries
+- `IncidentList` — Main list view with table
+- `IncidentsSidebar` — Collapsible sidebar (All/My, Cases/Challans)
+- `QueueTabs` — Horizontal queue stage tabs with counts
+- `IncidentsTableHeader` — Search, filters, Add Challan, Export buttons
+- `IncidentRow` — Table row with checkbox, data columns, action menu
+- `BulkActionsBar` — Appears on selection (Validate, Screen, Assign Agent/Lawyer, Move Queue, Bulk Update)
+- `Pagination` — Page navigation with items per page
+- `IncidentDetailHeader` — Detail page header with back arrow, ID, action buttons
+- `FollowUpTab` — Follow-up logging and history
+- `TimelineTab` — Chronological action history
+- `ActivityTab` — Activity sub-tabs (Follow-Up and Activity Log)
+- `NotesTab` — Free-form internal notes
+- `DetailsTab` — Challan information and documents
+- `CallSummaryTab` — Call recordings with summaries
+- `AddChallanModal` — New challan form
+- `AssignAgentModal` — Agent assignment
+- `AssignLawyerModal` — Lawyer assignment
+- `MoveQueueModal` — Queue transfer
+- `BulkUpdateModal` — Excel/CSV bulk update
+- `ValidateResultsView` — Post-validation results display
+- `ScreenResultsView` — Post-screening results with filters
+- `AddExpenseModal` — Financial expense recording
+- `AddCaseModal` — New case form
 
 ### Data Layer
 
-The components expect these data shapes:
-
-```typescript
-interface Incident {
-  id: string
-  incidentId: string
-  challanNumber: string
-  subscriberId: string
-  subscriberName: string
-  vehicle: string
-  type: 'payAndClose' | 'contest'
-  category: 'challan' | 'court' | 'online'
-  status: IncidentStatus
-  queue: IncidentQueue
-  createdAt: string
-  lastUpdatedAt: string
-  tatDeadline: string
-  assignedAgentId: string | null
-  assignedLawyerId: string | null
-  source: 'API' | 'Manual' | 'Bulk Upload' | 'Partner'
-  state: string
-  offence: string | null
-  amount: number
-}
-
-type IncidentQueue = 'newIncidents' | 'screening' | 'agentAssigned' | 'lawyerAssigned' | 'settled' | 'notSettled' | 'hold' | 'refund'
-```
-
-### Callbacks
-
-Wire up these user actions:
-
-| Callback | Description |
-|----------|-------------|
-| `onQueueChange` | User switches between queue tabs |
-| `onPageChange` | User navigates to different page |
-| `onViewIncident` | User clicks row to view details |
-| `onAddChallan` | User clicks Add Challan button |
-| `onValidate` | User triggers bulk validate |
-| `onScreen` | User triggers bulk screen |
-| `onAssignAgent` | User assigns agent to incidents |
-| `onAssignLawyer` | User assigns lawyer to incidents |
-| `onMoveQueue` | User moves incidents to different queue |
-| `onBulkUpdate` | User uploads file for bulk update |
-| `onExport` | User exports incidents |
-| `onSearch` | User searches incidents |
-| `onFilter` | User applies filters |
-| `onAddFollowUp` | User adds follow-up note |
-| `onUploadDocument` | User uploads document |
+The components expect data shapes defined in `product-plan/sections/incidents/types.ts`. You'll need to:
+- Create database tables for incidents, follow-ups, assignments, documents
+- Build API endpoints for CRUD operations, queue management, validation, screening
+- Implement 45-day TAT calculation and tracking
 
 ### Empty States
 
-Implement empty state UI for when no records exist yet:
-
-- **No incidents in queue:** Show message like "No incidents in this queue" with guidance
-- **No follow-ups yet:** Show "No follow-ups recorded" with Add Follow-Up CTA
-- **No documents attached:** Show "No documents uploaded" with Upload CTA
-- **Search/filter returns no results:** Show "No matching incidents found" with clear filters option
+- **No incidents yet:** Show helpful message when queue tabs are empty
+- **No follow-ups:** Empty state in Follow Up tab
+- **No documents:** Empty state in Details tab document section
+- **No call recordings:** Empty state in Call Summary tab
 
 ## Files to Reference
 
-- `product-plan/sections/incidents/README.md` — Feature overview and design intent
-- `product-plan/sections/incidents/tests.md` — Test-writing instructions (use TDD approach)
+- `product-plan/sections/incidents/README.md` — Feature overview
+- `product-plan/sections/incidents/tests.md` — Test-writing instructions
 - `product-plan/sections/incidents/components/` — React components
 - `product-plan/sections/incidents/types.ts` — TypeScript interfaces
 - `product-plan/sections/incidents/sample-data.json` — Test data
 
 ## Expected User Flows
 
-### Flow 1: View and Navigate Incident Queues
+### Flow 1: Add New Challan
+1. User clicks "Add Challan" button in table header
+2. Modal opens with form fields (subscriber, vehicle, type, source, challan details)
+3. User fills in required fields and submits
+4. **Outcome:** New challan appears in "New Incidents" queue tab, success confirmation shown
 
-1. User opens Incidents section
-2. User sees sidebar with All Incidents / My Incidents toggle
-3. User sees queue tabs with counts (New Incidents, Screening, etc.)
-4. User clicks different queue tab
-5. **Outcome:** Table updates to show incidents in selected queue
+### Flow 2: Validate Challans
+1. User selects one or more challans via checkboxes
+2. Bulk actions bar appears, user clicks "Validate"
+3. System checks challans against external source
+4. **Outcome:** Validate Results View shows per-challan status (exists, already disposed, other)
 
-### Flow 2: Add New Challan
+### Flow 3: Assign Lawyer and Move Queue
+1. User selects challans in "New Incidents" or "Screening" queue
+2. User clicks "Assign Lawyer" from bulk actions
+3. Modal shows available lawyers, user selects one and confirms
+4. **Outcome:** Challans move to "Lawyer Assigned" queue, assignment logged in timeline
 
-1. User clicks "Add Challan" button
-2. User fills challan details (subscriber, vehicle, type, source)
-3. User clicks "Save" to submit
-4. **Outcome:** New challan appears in New Incidents queue, success message shown
-
-### Flow 3: Bulk Assign Lawyer
-
-1. User selects multiple incidents via checkboxes
-2. User clicks "Assign Lawyer" in bulk actions bar
-3. User selects lawyer from modal dropdown
-4. User confirms assignment
-5. **Outcome:** Selected incidents assigned to lawyer, moved to Lawyer Assigned queue
-
-### Flow 4: View Incident Details
-
-1. User clicks on incident row
-2. User sees full-page detail view with header and tabs
-3. User navigates between Follow Up, Timeline, Details tabs
-4. User adds a follow-up note
-5. **Outcome:** Follow-up saved and appears in timeline
+### Flow 4: View Challan Detail
+1. User clicks a challan row in the table
+2. Full detail page opens with header (back arrow, Incident ID, action buttons)
+3. Left sidebar shows TAT countdown, subscriber info, vehicle info, assignments
+4. Right area shows tabbed content (Activity, Notes, Details, Call Summary)
+5. User adds a follow-up with notes, outcome, and next follow-up date
+6. **Outcome:** Follow-up saved and visible in Activity tab, timeline updated
 
 ## Done When
 
 - [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Queue tabs display with accurate counts
-- [ ] Incidents table renders with real data
-- [ ] Bulk operations work (validate, screen, assign, move)
-- [ ] Add Challan form creates new incidents
-- [ ] Detail view displays all incident information
-- [ ] Follow-ups can be added and appear in timeline
-- [ ] Documents can be uploaded and viewed
-- [ ] 45-day TAT countdown displays correctly
-- [ ] Empty states display properly when no records exist
-- [ ] Search and filter work correctly
-- [ ] Pagination works
+- [ ] Sidebar navigation works (All/My Incidents, Cases/Challans toggle)
+- [ ] Queue tabs display with correct counts
+- [ ] Add Challan creates and lands in New Incidents
+- [ ] Validate and Screen show results
+- [ ] Bulk actions work (assign, move queue, bulk update)
+- [ ] Detail view renders with all tabs
+- [ ] TAT countdown displays correctly (overdue in red)
+- [ ] Follow-ups, notes, and documents can be added
+- [ ] Export works
+- [ ] Empty states display properly
 - [ ] Responsive on mobile

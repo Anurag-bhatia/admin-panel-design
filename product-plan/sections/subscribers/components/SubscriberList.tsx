@@ -174,10 +174,10 @@ export function SubscriberList({
   onBulkUpload,
   onSearch,
   onFilter,
-}: SubscribersProps) {
-  // Console log to verify updated version is loaded
-  console.log('🔄 Updated SubscriberList v3.0 loaded - Full-screen detail page navigation (no modal)')
-
+  utmSources = [],
+  vehicleTypes = [],
+  userTypes = [],
+}: SubscribersProps & { utmSources?: string[]; vehicleTypes?: string[]; userTypes?: string[] }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>('')
@@ -185,11 +185,41 @@ export function SubscriberList({
   const [ownerFilter, setOwnerFilter] = useState<string>('')
   const [planTypeFilter, setPlanTypeFilter] = useState<string>('')
   const [locationFilter, setLocationFilter] = useState<string>('')
+  const [partnerFilter, setPartnerFilter] = useState<string>('')
+  const [utmSourceFilter, setUtmSourceFilter] = useState<string>('')
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('')
+  const [userTypeFilter, setUserTypeFilter] = useState<string>('')
+  const [partnerSearch, setPartnerSearch] = useState('')
+  const [showPartnerDropdown, setShowPartnerDropdown] = useState(false)
+  const partnerDropdownRef = useRef<HTMLDivElement>(null)
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
 
   // Modal state
   const [showAddModal, setShowAddModal] = useState(false)
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false)
   const [notification, setNotification] = useState<string | null>(null)
+
+  // Close partner dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (partnerDropdownRef.current && !partnerDropdownRef.current.contains(event.target as Node)) {
+        setShowPartnerDropdown(false)
+      }
+    }
+    if (showPartnerDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showPartnerDropdown])
+
+  // Filtered partners for searchable dropdown
+  const filteredPartners = useMemo(() => {
+    if (!partnerSearch) return partners
+    return partners.filter(p => p.name.toLowerCase().includes(partnerSearch.toLowerCase()))
+  }, [partners, partnerSearch])
 
   // Create subscription lookup map
   const subscriptionMap = useMemo(() => {
@@ -237,12 +267,45 @@ export function SubscriberList({
       // Location filter
       if (locationFilter && !sub.state.toLowerCase().includes(locationFilter.toLowerCase())) return false
 
+      // Partner filter
+      if (partnerFilter && sub.partnerId !== partnerFilter) return false
+
+      // UTM Source filter (matches against source field)
+      if (utmSourceFilter && sub.source?.toLowerCase() !== utmSourceFilter.toLowerCase()) return false
+
+      // Vehicle type filter (matches against lotsFor field)
+      if (vehicleTypeFilter) {
+        const isCommercial = vehicleTypeFilter === 'Commercial Vehicle'
+        const lotsFor = (sub.lotsFor || '').toLowerCase()
+        if (isCommercial && !['commercial', 'heavy', 'delivery', 'distribution', 'express', 'rental', 'refrigerated'].some(k => lotsFor.includes(k))) return false
+        if (!isCommercial && !['private', 'personal', 'company fleet'].some(k => lotsFor.includes(k))) return false
+      }
+
+      // User type filter
+      if (userTypeFilter) {
+        if (userTypeFilter === 'Subscribers' && sub.status !== 'active') return false
+        if (userTypeFilter === 'Visitors' && sub.status !== 'inactive') return false
+      }
+
       return true
     })
-  }, [subscribers, subscriptionMap, searchQuery, statusFilter, sourceFilter, ownerFilter, planTypeFilter, locationFilter])
+  }, [subscribers, subscriptionMap, searchQuery, statusFilter, sourceFilter, ownerFilter, planTypeFilter, locationFilter, partnerFilter, utmSourceFilter, vehicleTypeFilter, userTypeFilter])
+
+  // Pagination
+  const totalPages = Math.ceil(filteredSubscribers.length / pageSize)
+  const paginatedSubscribers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredSubscribers.slice(start, start + pageSize)
+  }, [filteredSubscribers, currentPage, pageSize])
+
+  const startIndex = (currentPage - 1) * pageSize + 1
+  const endIndex = Math.min(currentPage * pageSize, filteredSubscribers.length)
+
+  // Reset to page 1 when filters change
+  const resetPage = () => setCurrentPage(1)
 
   // Active filter count
-  const activeFilterCount = [statusFilter, sourceFilter, ownerFilter, planTypeFilter, locationFilter].filter(Boolean).length
+  const activeFilterCount = [statusFilter, sourceFilter, ownerFilter, planTypeFilter, locationFilter, partnerFilter, utmSourceFilter, vehicleTypeFilter, userTypeFilter].filter(Boolean).length
 
   // Clear all filters
   const clearFilters = () => {
@@ -251,7 +314,13 @@ export function SubscriberList({
     setOwnerFilter('')
     setPlanTypeFilter('')
     setLocationFilter('')
+    setPartnerFilter('')
+    setPartnerSearch('')
+    setUtmSourceFilter('')
+    setVehicleTypeFilter('')
+    setUserTypeFilter('')
     setSearchQuery('')
+    resetPage()
   }
 
   // Modal handlers
@@ -331,6 +400,7 @@ export function SubscriberList({
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value)
+                  setCurrentPage(1)
                   onSearch?.(e.target.value)
                 }}
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-600"
@@ -354,7 +424,7 @@ export function SubscriberList({
           {/* Filter Panel */}
           {showFilters && (
             <div className="mt-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Status</label>
                   <select
@@ -384,21 +454,6 @@ export function SubscriberList({
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Spoke</label>
-                  <select
-                    value={ownerFilter}
-                    onChange={(e) => setOwnerFilter(e.target.value)}
-                    className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
-                  >
-                    <option value="">All Spokes</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.fullName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Location</label>
@@ -422,6 +477,110 @@ export function SubscriberList({
                     {planTypes.map((plan) => (
                       <option key={plan} value={plan}>
                         {plan}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Partner filter - searchable dropdown */}
+                <div ref={partnerDropdownRef} className="relative">
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Partner</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPartnerDropdown(!showPartnerDropdown)}
+                    className="w-full flex items-center justify-between pl-3 pr-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-left focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  >
+                    <span className={partnerFilter ? 'text-slate-900 dark:text-white' : 'text-slate-400'}>
+                      {partnerFilter ? partners.find(p => p.id === partnerFilter)?.name || 'Select' : 'Select'}
+                    </span>
+                    <svg className="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  </button>
+                  {showPartnerDropdown && (
+                    <div className="absolute z-20 mt-1 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden">
+                      <div className="p-2 border-b border-slate-200 dark:border-slate-700">
+                        <input
+                          type="text"
+                          value={partnerSearch}
+                          onChange={(e) => setPartnerSearch(e.target.value)}
+                          placeholder="Search partners..."
+                          className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                          autoFocus
+                        />
+                      </div>
+                      <div className="max-h-48 overflow-y-auto">
+                        <button
+                          onClick={() => { setPartnerFilter(''); setPartnerSearch(''); setShowPartnerDropdown(false) }}
+                          className={`w-full text-left px-3 py-2.5 text-xs sm:text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
+                            !partnerFilter ? 'text-cyan-600 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/20' : 'text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          All Partners
+                        </button>
+                        {filteredPartners.map((partner) => (
+                          <button
+                            key={partner.id}
+                            onClick={() => { setPartnerFilter(partner.id); setPartnerSearch(''); setShowPartnerDropdown(false) }}
+                            className={`w-full text-left px-3 py-2.5 text-xs sm:text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
+                              partnerFilter === partner.id ? 'text-cyan-600 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/20' : 'text-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            {partner.name}
+                          </button>
+                        ))}
+                        {filteredPartners.length === 0 && (
+                          <p className="px-3 py-2.5 text-xs text-slate-400">No partners found</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* UTM Source filter */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">UTM Source</label>
+                  <select
+                    value={utmSourceFilter}
+                    onChange={(e) => setUtmSourceFilter(e.target.value)}
+                    className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                  >
+                    <option value="">Select</option>
+                    {utmSources.map((source) => (
+                      <option key={source} value={source}>
+                        {source}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Vehicle Type filter */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Vehicle Type</label>
+                  <select
+                    value={vehicleTypeFilter}
+                    onChange={(e) => setVehicleTypeFilter(e.target.value)}
+                    className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                  >
+                    <option value="">Select</option>
+                    {vehicleTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* User Type filter */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">User Type</label>
+                  <select
+                    value={userTypeFilter}
+                    onChange={(e) => setUserTypeFilter(e.target.value)}
+                    className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                  >
+                    <option value="">Select</option>
+                    {userTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
                       </option>
                     ))}
                   </select>
@@ -450,16 +609,13 @@ export function SubscriberList({
                     Subscriber
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
-                    Contact
-                  </th>
-                  <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
-                    Spoke
+                    POC
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
                     Subscription
                   </th>
                   <th className="text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
-                    Fleet
+                    Vehicles
                   </th>
                   <th className="text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
                     Status
@@ -470,9 +626,8 @@ export function SubscriberList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                {filteredSubscribers.map((subscriber) => {
+                {paginatedSubscribers.map((subscriber) => {
                   const subscription = subscriptionMap.get(subscriber.id)
-                  const owner = userMap.get(subscriber.assignedOwner)
 
                   return (
                     <tr
@@ -492,7 +647,7 @@ export function SubscriberList({
                         </div>
                       </td>
 
-                      {/* Contact */}
+                      {/* POC */}
                       <td className="px-4 py-4">
                         <p className="text-sm text-slate-900 dark:text-white">
                           {subscriber.contactPerson}
@@ -502,16 +657,6 @@ export function SubscriberList({
                         </p>
                       </td>
 
-                      {/* Owner */}
-                      <td className="px-4 py-4">
-                        {owner ? (
-                          <span className="text-sm text-slate-900 dark:text-white">
-                            {owner.fullName}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-slate-400">Unassigned</span>
-                        )}
-                      </td>
 
                       {/* Subscription */}
                       <td className="px-4 py-4">
@@ -529,7 +674,7 @@ export function SubscriberList({
                         )}
                       </td>
 
-                      {/* Fleet */}
+                      {/* Vehicles */}
                       <td className="px-4 py-4 text-right">
                         <div className="inline-flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300">
                           <TruckIcon />
@@ -596,13 +741,41 @@ export function SubscriberList({
           )}
         </div>
 
-        {/* Footer Info */}
+        {/* Pagination */}
         {filteredSubscribers.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Showing {filteredSubscribers.length} subscriber{filteredSubscribers.length !== 1 ? 's' : ''}
-              {activeFilterCount > 0 && ` (filtered from ${subscribers.length})`}
+          <div className="mt-4 flex items-center justify-between px-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Showing <span className="font-semibold text-slate-700 dark:text-slate-300">{startIndex}</span> to <span className="font-semibold text-slate-700 dark:text-slate-300">{endIndex}</span> of <span className="font-semibold text-slate-700 dark:text-slate-300">{filteredSubscribers.length}</span> results
             </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === page
+                      ? 'bg-cyan-600 text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
           </div>
         )}
       </div>

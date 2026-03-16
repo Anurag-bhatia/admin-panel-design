@@ -1,13 +1,11 @@
 import { useState } from 'react'
-import { Plus, Calendar, MessageSquare, CheckCircle, Clock, X } from 'lucide-react'
+import { Plus, Calendar, MessageSquare, X } from 'lucide-react'
 import type { FollowUp } from '../types'
 
 interface FollowUpTabProps {
   followUps: FollowUp[]
   onAddFollowUp?: (followUp: {
-    notes: string
     outcome: string
-    nextFollowUpDate: string | null
   }) => void
 }
 
@@ -28,11 +26,6 @@ function formatTime(dateString: string): string {
   })
 }
 
-function formatDateTimeForInput(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toISOString().slice(0, 16)
-}
-
 const OUTCOME_OPTIONS = [
   'In Progress',
   'Scheduled',
@@ -45,24 +38,18 @@ const OUTCOME_OPTIONS = [
 
 export function FollowUpTab({ followUps, onAddFollowUp }: FollowUpTabProps) {
   const [showForm, setShowForm] = useState(false)
-  const [notes, setNotes] = useState('')
   const [outcome, setOutcome] = useState('')
-  const [nextFollowUpDate, setNextFollowUpDate] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!notes.trim() || !outcome) return
+    if (!outcome) return
 
     onAddFollowUp?.({
-      notes: notes.trim(),
       outcome,
-      nextFollowUpDate: nextFollowUpDate || null,
     })
 
     setShowForm(false)
-    setNotes('')
     setOutcome('')
-    setNextFollowUpDate('')
   }
 
   const sortedFollowUps = [...followUps].sort(
@@ -106,54 +93,24 @@ export function FollowUpTab({ followUps, onAddFollowUp }: FollowUpTabProps) {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Notes */}
+            {/* Outcome */}
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Notes <span className="text-red-500">*</span>
+                Outcome <span className="text-red-500">*</span>
               </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Describe the follow-up activity, outcome of calls, meetings, etc."
-                rows={3}
-                className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white resize-none"
+              <select
+                value={outcome}
+                onChange={(e) => setOutcome(e.target.value)}
+                className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
                 required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Outcome */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Outcome <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={outcome}
-                  onChange={(e) => setOutcome(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                  required
-                >
-                  <option value="">Select outcome</option>
-                  {OUTCOME_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Next Follow-Up Date */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Next Follow-Up Date
-                </label>
-                <input
-                  type="datetime-local"
-                  value={nextFollowUpDate}
-                  onChange={(e) => setNextFollowUpDate(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                />
-              </div>
+              >
+                <option value="">Select outcome</option>
+                {OUTCOME_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Actions */}

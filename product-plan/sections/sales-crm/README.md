@@ -2,57 +2,40 @@
 
 ## Overview
 
-The Sales CRM module is the central system for capturing, organizing, tracking, and converting all potential business opportunities. It replaces fragmented Excel-based lead tracking with a structured, real-time pipeline management system.
-
-## User Flows
-
-- View leads pipeline with tab-based lifecycle stages
-- Add single leads via structured form
-- Bulk upload leads via Excel with validation
-- Search and filter leads
-- Bulk update selected leads (status or owner)
-- View lead details with activity timeline
-- Assign/reassign leads to users
-- Add follow-up activities
-- Upload and manage documents
+Lead capture, qualification, and pipeline management system replacing fragmented Excel-based tracking. Provides a tab-based pipeline view with real-time counts per lifecycle stage, structured lead creation, bulk operations, and detailed lead tracking with activity timelines.
 
 ## Components Provided
 
-| Component | Description |
-|-----------|-------------|
-| `LeadsDashboard` | Main dashboard with tabs and metrics |
-| `LeadsTable` | Lead list table with selection |
-| `LeadsListHeader` | Header with search, filters, actions |
-| `AddLeadModal` | Modal for adding new leads |
-| `EditLeadModal` | Modal for editing leads |
-| `AssignLeadModal` | Modal for assigning leads |
-| `AddFollowUpModal` | Modal for follow-up activities |
-| `BulkUploadModal` | Modal for Excel upload |
-| `BulkMoveLead` | Modal for bulk status/owner updates |
-| `UploadDocumentModal` | Modal for document uploads |
-| `LeadDetailView` | Full lead detail page |
-| `MyLeads` | My assigned leads view |
+- `LeadsDashboard` — Main dashboard with summary cards
+- `LeadsTable` — Pipeline table with stage tabs
+- `LeadsListHeader` — Search, filters, Add Lead, Bulk Upload buttons
+- `AddLeadModal` — Lead creation form
+- `EditLeadModal` — Lead editing form
+- `BulkUploadModal` — Excel upload with template
+- `BulkMoveLead` — Bulk status/owner change
+- `BulkActionsBar` — Bulk operations bar
+- `LeadDetailView` — Full detail with timeline
+- `AssignLeadModal` — Lead assignment
+- `AddFollowUpModal` — Follow-up logging
+- `UploadDocumentModal` — Document attachment
+- `MyLeads` — Personal leads view
 
 ## Callback Props
 
 | Callback | Description |
 |----------|-------------|
-| `onViewLead` | View lead details |
-| `onAddLead` | Add new lead |
-| `onBulkUpload` | Upload Excel file |
-| `onDownloadTemplate` | Download template |
-| `onBulkUpdate` | Bulk update leads |
-| `onEditLead` | Edit lead info |
-| `onAssignLead` | Assign lead to user |
-| `onChangeStatus` | Change lead status |
-| `onAddFollowUp` | Add follow-up |
-| `onUploadDocument` | Upload document |
-| `onViewDocument` | View document |
-| `onDeleteDocument` | Delete document |
+| `onAddLead` | Create new lead |
+| `onEditLead` | Edit lead details |
+| `onViewDetail` | Open lead detail |
+| `onAssign` | Assign lead to user |
+| `onBulkUpload` | Upload leads via Excel |
+| `onBulkUpdate` | Bulk status/owner change |
+| `onAddFollowUp` | Log follow-up activity |
+| `onUploadDocument` | Attach document |
+| `onExport` | Export leads |
+| `onSearch` | Search leads |
+| `onFilter` | Apply filters |
 
-## Data Entities
+## Data Used
 
-- **Lead** — Main lead record
-- **TimelineActivity** — Activity history entry
-- **Document** — Attached file
-- **User** — Assignable user
+**Entities:** Lead, User, TimelineActivity, Document, FollowUp

@@ -18,7 +18,8 @@ import { Pagination } from './Pagination'
 
 export interface IncidentListProps {
   incidents: Incident[]
-  queueCounts: QueueCounts
+  challanQueueCounts: QueueCounts
+  caseQueueCounts: QueueCounts
   pagination: PaginationType
   users: User[]
   lawyers: Lawyer[]
@@ -26,10 +27,11 @@ export interface IncidentListProps {
   offenceTypes: string[]
   onViewIncident?: (incidentId: string) => void
   onAddChallan?: () => void
+  onAddCase?: () => void
   onValidate?: (incidentIds: string[]) => void
   onScreen?: (incidentIds: string[]) => void
-  onAssignAgent?: (incidentIds: string[], agentId: string) => void
-  onAssignLawyer?: (incidentIds: string[], lawyerId: string) => void
+  onAssignAgent?: (incidentIds: string[], agentId?: string) => void
+  onAssignLawyer?: (incidentIds: string[], lawyerId?: string) => void
   onMoveQueue?: (incidentIds: string[], targetQueue: IncidentQueue) => void
   onBulkUpdate?: (incidentIds: string[], file: File) => void
   onExport?: (incidentIds: string[] | 'all') => void
@@ -41,7 +43,8 @@ export interface IncidentListProps {
 
 export function IncidentList({
   incidents,
-  queueCounts,
+  challanQueueCounts,
+  caseQueueCounts,
   pagination,
   users,
   lawyers,
@@ -49,6 +52,7 @@ export function IncidentList({
   offenceTypes,
   onViewIncident,
   onAddChallan,
+  onAddCase,
   onValidate,
   onScreen,
   onAssignAgent,
@@ -77,17 +81,26 @@ export function IncidentList({
   // Current user ID (for demo, using first user)
   const currentUserId = 'usr-001'
 
-  // Filter incidents by active queue and view (all vs my)
-  const filteredIncidents = useMemo(() => {
-    let filtered = incidents.filter((incident) => incident.queue === activeQueue)
+  const isCases = workType === 'cases'
+  const queueCounts = isCases ? caseQueueCounts : challanQueueCounts
 
-    // If "My Incidents" view, filter by assigned agent
+  // Filter incidents by workType, active queue, and view (all vs my)
+  const filteredIncidents = useMemo(() => {
+    let filtered = incidents.filter(
+      (incident) => incident.queue === activeQueue && incident.workType === (isCases ? 'case' : 'challan')
+    )
+
+    // If "My Incidents" view, filter by assigned agent (for challans) or assigned lawyer (for cases)
     if (sidebarView === 'my') {
-      filtered = filtered.filter((incident) => incident.assignedAgentId === currentUserId)
+      if (isCases) {
+        filtered = filtered.filter((incident) => incident.assignedLawyerId !== null)
+      } else {
+        filtered = filtered.filter((incident) => incident.assignedAgentId === currentUserId)
+      }
     }
 
     return filtered
-  }, [incidents, activeQueue, sidebarView])
+  }, [incidents, activeQueue, sidebarView, isCases])
 
   // Search filtering (client-side demo)
   const displayedIncidents = useMemo(() => {
@@ -138,7 +151,10 @@ export function IncidentList({
     if (sidebarView === 'all') return queueCounts
 
     // For "My Incidents", compute counts for current user's incidents
-    const myIncidents = incidents.filter((inc) => inc.assignedAgentId === currentUserId)
+    const workTypeValue = isCases ? 'case' : 'challan'
+    const myIncidents = isCases
+      ? incidents.filter((inc) => inc.workType === workTypeValue && inc.assignedLawyerId !== null)
+      : incidents.filter((inc) => inc.workType === workTypeValue && inc.assignedAgentId === currentUserId)
     return {
       newIncidents: myIncidents.filter((inc) => inc.queue === 'newIncidents').length,
       screening: myIncidents.filter((inc) => inc.queue === 'screening').length,
@@ -149,7 +165,7 @@ export function IncidentList({
       hold: myIncidents.filter((inc) => inc.queue === 'hold').length,
       refund: myIncidents.filter((inc) => inc.queue === 'refund').length,
     }
-  }, [sidebarView, queueCounts, incidents])
+  }, [sidebarView, queueCounts, incidents, isCases])
 
   return (
     <div className="flex h-full bg-slate-100 dark:bg-slate-950">
@@ -159,12 +175,17 @@ export function IncidentList({
         workType={workType}
         onViewChange={(view) => {
           setSidebarView(view)
-          // If switching to "My Incidents" and currently on newIncidents or screening, switch to agentAssigned
+          // If switching to "My Incidents" and currently on newIncidents or screening, switch to appropriate queue
           if (view === 'my' && (activeQueue === 'newIncidents' || activeQueue === 'screening')) {
-            setActiveQueue('agentAssigned')
+            setActiveQueue(workType === 'cases' ? 'lawyerAssigned' : 'agentAssigned')
           }
         }}
-        onWorkTypeChange={setWorkType}
+        onWorkTypeChange={(type) => {
+          setWorkType(type)
+          setSelectedIds(new Set())
+          // Reset to newIncidents when switching workType
+          setActiveQueue('newIncidents')
+        }}
       />
 
       {/* Main Content */}
@@ -174,6 +195,7 @@ export function IncidentList({
           activeQueue={activeQueue}
           queueCounts={displayedQueueCounts}
           view={sidebarView}
+          workType={workType}
           onQueueChange={handleQueueChange}
         />
 
@@ -183,11 +205,13 @@ export function IncidentList({
           lawyers={lawyers}
           sources={sources}
           searchQuery={searchQuery}
+          workType={workType}
           onSearchChange={(query) => {
             setSearchQuery(query)
             onSearch?.(query)
           }}
           onAddChallan={onAddChallan}
+          onAddCase={onAddCase}
           onBulkUpdate={() => console.log('Bulk update clicked')}
           onExport={() => onExport?.(selectedIds.size > 0 ? selectedArray : 'all')}
           onFilter={onFilter}
@@ -210,7 +234,7 @@ export function IncidentList({
                   />
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Incident ID
+                  {isCases ? 'Case ID' : 'Incident ID'}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Subscriber
@@ -218,11 +242,14 @@ export function IncidentList({
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Vehicle
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 max-w-[180px]">
+                  Offence
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Type
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Challan
+                  {isCases ? 'Case Type' : 'Challan'}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Created
@@ -230,9 +257,11 @@ export function IncidentList({
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Updated
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Agent
-                </th>
+                {!isCases && (
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Agent
+                  </th>
+                )}
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Lawyer
                 </th>
@@ -245,7 +274,7 @@ export function IncidentList({
               {displayedIncidents.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={11}
+                    colSpan={isCases ? 11 : 12}
                     className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
@@ -264,11 +293,11 @@ export function IncidentList({
                           />
                         </svg>
                       </div>
-                      <p className="font-medium">No challans found</p>
+                      <p className="font-medium">No {isCases ? 'cases' : 'challans'} found</p>
                       <p className="text-sm">
                         {searchQuery
                           ? 'Try adjusting your search query'
-                          : 'No challans in this queue yet'}
+                          : `No ${isCases ? 'cases' : 'challans'} in this queue yet`}
                       </p>
                     </div>
                   </td>
@@ -281,6 +310,7 @@ export function IncidentList({
                     isSelected={selectedIds.has(incident.id)}
                     users={users}
                     lawyers={lawyers}
+                    workType={workType}
                     onSelect={(checked) => handleSelectOne(incident.id, checked)}
                     onView={() => onViewIncident?.(incident.id)}
                     onValidate={() => onValidate?.([incident.id])}
@@ -308,14 +338,13 @@ export function IncidentList({
       {selectedIds.size > 0 && (
         <BulkActionsBar
           selectedCount={selectedIds.size}
-          users={users}
-          lawyers={lawyers}
           activeQueue={activeQueue}
+          workType={workType}
           onClearSelection={() => setSelectedIds(new Set())}
           onValidate={() => onValidate?.(selectedArray)}
           onScreen={() => onScreen?.(selectedArray)}
-          onAssignAgent={(agentId) => onAssignAgent?.(selectedArray, agentId)}
-          onAssignLawyer={(lawyerId) => onAssignLawyer?.(selectedArray, lawyerId)}
+          onAssignAgent={() => onAssignAgent?.(selectedArray)}
+          onAssignLawyer={() => onAssignLawyer?.(selectedArray)}
           onMoveQueue={(queue) => onMoveQueue?.(selectedArray, queue)}
           onBulkUpdate={(file) => onBulkUpdate?.(selectedArray, file)}
         />

@@ -3,11 +3,9 @@ import type { Customer } from '../types'
 
 interface CustomerRowProps {
   customer: Customer
-  isSelected: boolean
-  onSelect: (checked: boolean) => void
 }
 
-export function CustomerRow({ customer, isSelected, onSelect }: CustomerRowProps) {
+export function CustomerRow({ customer }: CustomerRowProps) {
   // Mock data for pending challans - in real app, this would come from the customer object
   const pendingChallans = customer.totalIncidents || 0
   const pendingChallanAmount = (customer.totalIncidents || 0) * 1500 // Mock calculation
@@ -22,20 +20,8 @@ export function CustomerRow({ customer, isSelected, onSelect }: CustomerRowProps
 
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-4 border-b border-slate-200 dark:border-slate-700 ${
-        isSelected ? 'bg-cyan-50 dark:bg-cyan-900/20' : 'bg-white dark:bg-slate-800'
-      }`}
+      className="flex items-center gap-3 px-4 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
     >
-      {/* Checkbox */}
-      <div className="flex-shrink-0 w-4">
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={e => onSelect(e.target.checked)}
-          className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 cursor-pointer"
-        />
-      </div>
-
       {/* Visitor Name */}
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-slate-900 dark:text-slate-100 truncate text-sm">{customer.name}</p>

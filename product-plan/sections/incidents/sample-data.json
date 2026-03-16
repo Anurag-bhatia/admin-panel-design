@@ -18,10 +18,10 @@
       "Incidents have many FollowUps tracking communication and progress",
       "Incidents have many TimelineActivities logging all system events",
       "Incidents have many Documents attached for reference",
-      "Incidents move through queues: New Incidents → Screening → Lawyer Assigned → Settled / Not Settled / Refund"
+      "Incidents move through queues: New Incidents \u2192 Screening \u2192 Lawyer Assigned \u2192 Settled / Not Settled / Refund"
     ]
   },
-  "queueCounts": {
+  "challanQueueCounts": {
     "newIncidents": 5,
     "screening": 4,
     "agentAssigned": 3,
@@ -29,6 +29,16 @@
     "settled": 3,
     "notSettled": 1,
     "hold": 2,
+    "refund": 1
+  },
+  "caseQueueCounts": {
+    "newIncidents": 5,
+    "screening": 0,
+    "agentAssigned": 0,
+    "lawyerAssigned": 3,
+    "settled": 2,
+    "notSettled": 1,
+    "hold": 1,
     "refund": 1
   },
   "pagination": {
@@ -167,12 +177,13 @@
     {
       "id": "inc-001",
       "incidentId": "IRN-12345",
+      "workType": "challan",
       "challanNumber": "MH012024789456",
       "subscriberId": "LWD-1160523",
       "subscriberName": "BlueDart Logistics",
       "vehicle": "MH01AB1234",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "pending_screening",
       "queue": "newIncidents",
       "createdAt": "2024-01-15T09:30:00Z",
@@ -193,7 +204,7 @@
       "subscriberName": "SafeExpress Pvt Ltd",
       "vehicle": "UP32MM5678",
       "type": "payAndClose",
-      "category": "challan",
+      "challanType": "online",
       "status": "pending_screening",
       "queue": "newIncidents",
       "createdAt": "2024-01-15T10:15:00Z",
@@ -204,7 +215,8 @@
       "source": "Manual",
       "state": "Karnataka",
       "offence": null,
-      "amount": 1500
+      "amount": 1500,
+      "workType": "challan"
     },
     {
       "id": "inc-003",
@@ -214,7 +226,7 @@
       "subscriberName": "Gati Kintetsu Express",
       "vehicle": "DL03EF9012",
       "type": "contest",
-      "category": "online",
+      "challanType": "online",
       "status": "pending_screening",
       "queue": "newIncidents",
       "createdAt": "2024-01-15T11:00:00Z",
@@ -225,7 +237,8 @@
       "source": "Bulk Upload",
       "state": "Delhi",
       "offence": null,
-      "amount": 5000
+      "amount": 5000,
+      "workType": "challan"
     },
     {
       "id": "inc-004",
@@ -235,7 +248,7 @@
       "subscriberName": "Delhivery Ltd",
       "vehicle": "GJ04GH3456",
       "type": "payAndClose",
-      "category": "online",
+      "challanType": "online",
       "status": "pending_screening",
       "queue": "newIncidents",
       "createdAt": "2024-01-15T11:45:00Z",
@@ -246,7 +259,8 @@
       "source": "Partner",
       "state": "Gujarat",
       "offence": null,
-      "amount": 1000
+      "amount": 1000,
+      "workType": "challan"
     },
     {
       "id": "inc-005",
@@ -256,7 +270,7 @@
       "subscriberName": "XpressBees Logistics",
       "vehicle": "UP14KL7890",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "pending_screening",
       "queue": "newIncidents",
       "createdAt": "2024-01-15T14:20:00Z",
@@ -267,7 +281,8 @@
       "source": "API",
       "state": "Maharashtra",
       "offence": null,
-      "amount": 3500
+      "amount": 3500,
+      "workType": "challan"
     },
     {
       "id": "inc-006",
@@ -277,7 +292,7 @@
       "subscriberName": "BlueDart Logistics",
       "vehicle": "HR26DK2345",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "screening_in_progress",
       "queue": "screening",
       "createdAt": "2024-01-14T09:00:00Z",
@@ -288,7 +303,8 @@
       "source": "API",
       "state": "Maharashtra",
       "offence": "Over Speeding",
-      "amount": 2000
+      "amount": 2000,
+      "workType": "challan"
     },
     {
       "id": "inc-007",
@@ -298,7 +314,7 @@
       "subscriberName": "SafeExpress Pvt Ltd",
       "vehicle": "RJ14MN6789",
       "type": "payAndClose",
-      "category": "challan",
+      "challanType": "online",
       "status": "screening_in_progress",
       "queue": "screening",
       "createdAt": "2024-01-14T10:30:00Z",
@@ -309,7 +325,8 @@
       "source": "Manual",
       "state": "Karnataka",
       "offence": "Red Light Violation",
-      "amount": 1500
+      "amount": 1500,
+      "workType": "challan"
     },
     {
       "id": "inc-008",
@@ -319,7 +336,7 @@
       "subscriberName": "Gati Kintetsu Express",
       "vehicle": "DL08OP0123",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "screening_in_progress",
       "queue": "screening",
       "createdAt": "2024-01-14T14:00:00Z",
@@ -330,7 +347,8 @@
       "source": "Bulk Upload",
       "state": "Delhi",
       "offence": "No Parking",
-      "amount": 1000
+      "amount": 1000,
+      "workType": "challan"
     },
     {
       "id": "inc-009",
@@ -340,7 +358,7 @@
       "subscriberName": "Delhivery Ltd",
       "vehicle": "UP65QR4567",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "screening_in_progress",
       "queue": "screening",
       "createdAt": "2024-01-14T16:45:00Z",
@@ -351,7 +369,8 @@
       "source": "API",
       "state": "Gujarat",
       "offence": "Overloading",
-      "amount": 4000
+      "amount": 4000,
+      "workType": "challan"
     },
     {
       "id": "inc-021",
@@ -361,7 +380,7 @@
       "subscriberName": "BlueDart Logistics",
       "vehicle": "MH21AB4567",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "screening_in_progress",
       "queue": "agentAssigned",
       "createdAt": "2024-01-13T10:00:00Z",
@@ -372,7 +391,8 @@
       "source": "API",
       "state": "Maharashtra",
       "offence": "Signal Jump",
-      "amount": 2000
+      "amount": 2000,
+      "workType": "challan"
     },
     {
       "id": "inc-022",
@@ -382,7 +402,7 @@
       "subscriberName": "SafeExpress Pvt Ltd",
       "vehicle": "UP32CD8901",
       "type": "payAndClose",
-      "category": "challan",
+      "challanType": "online",
       "status": "screening_in_progress",
       "queue": "agentAssigned",
       "createdAt": "2024-01-13T11:30:00Z",
@@ -393,7 +413,8 @@
       "source": "Manual",
       "state": "Karnataka",
       "offence": "Wrong Lane Driving",
-      "amount": 1500
+      "amount": 1500,
+      "workType": "challan"
     },
     {
       "id": "inc-023",
@@ -403,7 +424,7 @@
       "subscriberName": "Gati Kintetsu Express",
       "vehicle": "DL23EF2345",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "screening_in_progress",
       "queue": "agentAssigned",
       "createdAt": "2024-01-13T14:00:00Z",
@@ -414,7 +435,8 @@
       "source": "Bulk Upload",
       "state": "Delhi",
       "offence": "Using Mobile While Driving",
-      "amount": 3000
+      "amount": 3000,
+      "workType": "challan"
     },
     {
       "id": "inc-010",
@@ -424,7 +446,7 @@
       "subscriberName": "BlueDart Logistics",
       "vehicle": "MH10ST8901",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "lawyer_working",
       "queue": "lawyerAssigned",
       "createdAt": "2024-01-10T09:00:00Z",
@@ -435,7 +457,8 @@
       "source": "API",
       "state": "Maharashtra",
       "offence": "Dangerous Driving",
-      "amount": 5000
+      "amount": 5000,
+      "workType": "challan"
     },
     {
       "id": "inc-011",
@@ -445,7 +468,7 @@
       "subscriberName": "SafeExpress Pvt Ltd",
       "vehicle": "UP32UV2345",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "lawyer_working",
       "queue": "lawyerAssigned",
       "createdAt": "2024-01-10T11:30:00Z",
@@ -456,7 +479,8 @@
       "source": "Manual",
       "state": "Karnataka",
       "offence": "Without Helmet",
-      "amount": 1000
+      "amount": 1000,
+      "workType": "challan"
     },
     {
       "id": "inc-012",
@@ -466,7 +490,7 @@
       "subscriberName": "Gati Kintetsu Express",
       "vehicle": "HR55WX6789",
       "type": "payAndClose",
-      "category": "challan",
+      "challanType": "online",
       "status": "lawyer_working",
       "queue": "lawyerAssigned",
       "createdAt": "2024-01-09T14:00:00Z",
@@ -477,7 +501,8 @@
       "source": "Partner",
       "state": "Delhi",
       "offence": "Document Violation",
-      "amount": 2500
+      "amount": 2500,
+      "workType": "challan"
     },
     {
       "id": "inc-013",
@@ -487,7 +512,7 @@
       "subscriberName": "Delhivery Ltd",
       "vehicle": "GJ13YZ0123",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "lawyer_working",
       "queue": "lawyerAssigned",
       "createdAt": "2024-01-08T10:15:00Z",
@@ -498,7 +523,8 @@
       "source": "Bulk Upload",
       "state": "Gujarat",
       "offence": "Lane Violation",
-      "amount": 1500
+      "amount": 1500,
+      "workType": "challan"
     },
     {
       "id": "inc-014",
@@ -508,7 +534,7 @@
       "subscriberName": "XpressBees Logistics",
       "vehicle": "UP78AB4567",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "court_hearing_scheduled",
       "queue": "lawyerAssigned",
       "createdAt": "2024-01-07T09:30:00Z",
@@ -519,7 +545,8 @@
       "source": "API",
       "state": "Maharashtra",
       "offence": "Signal Jumping",
-      "amount": 2000
+      "amount": 2000,
+      "workType": "challan"
     },
     {
       "id": "inc-015",
@@ -529,7 +556,7 @@
       "subscriberName": "BlueDart Logistics",
       "vehicle": "RJ27CD8901",
       "type": "payAndClose",
-      "category": "challan",
+      "challanType": "online",
       "status": "lawyer_working",
       "queue": "lawyerAssigned",
       "createdAt": "2024-01-06T15:00:00Z",
@@ -540,7 +567,8 @@
       "source": "Manual",
       "state": "Karnataka",
       "offence": "Wrong Way Driving",
-      "amount": 3000
+      "amount": 3000,
+      "workType": "challan"
     },
     {
       "id": "inc-016",
@@ -550,7 +578,7 @@
       "subscriberName": "SafeExpress Pvt Ltd",
       "vehicle": "MH16EF2345",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "resolved",
       "queue": "settled",
       "createdAt": "2023-12-20T10:00:00Z",
@@ -562,7 +590,8 @@
       "state": "Maharashtra",
       "offence": "Over Speeding",
       "amount": 2500,
-      "resolutionNotes": "Challan disposed by court. Fine reduced to Rs. 1000."
+      "resolutionNotes": "Challan disposed by court. Fine reduced to Rs. 1000.",
+      "workType": "challan"
     },
     {
       "id": "inc-017",
@@ -572,7 +601,7 @@
       "subscriberName": "Gati Kintetsu Express",
       "vehicle": "UP32GH6789",
       "type": "payAndClose",
-      "category": "challan",
+      "challanType": "online",
       "status": "resolved",
       "queue": "settled",
       "createdAt": "2023-12-18T11:30:00Z",
@@ -584,7 +613,8 @@
       "state": "Delhi",
       "offence": "No Parking",
       "amount": 1000,
-      "resolutionNotes": "Payment made online. Case closed."
+      "resolutionNotes": "Payment made online. Case closed.",
+      "workType": "challan"
     },
     {
       "id": "inc-018",
@@ -594,7 +624,7 @@
       "subscriberName": "Delhivery Ltd",
       "vehicle": "HR10IJ0123",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "resolved",
       "queue": "settled",
       "createdAt": "2023-12-15T14:45:00Z",
@@ -606,7 +636,8 @@
       "state": "Gujarat",
       "offence": "Document Violation",
       "amount": 2000,
-      "resolutionNotes": "Challan quashed due to procedural error by traffic police."
+      "resolutionNotes": "Challan quashed due to procedural error by traffic police.",
+      "workType": "challan"
     },
     {
       "id": "inc-019",
@@ -616,7 +647,7 @@
       "subscriberName": "XpressBees Logistics",
       "vehicle": "UP70KL4567",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "unresolved",
       "queue": "notSettled",
       "createdAt": "2023-12-10T09:00:00Z",
@@ -628,7 +659,8 @@
       "state": "Maharashtra",
       "offence": "Dangerous Driving",
       "amount": 5000,
-      "resolutionNotes": "Court upheld the challan. Full fine applicable."
+      "resolutionNotes": "Court upheld the challan. Full fine applicable.",
+      "workType": "challan"
     },
     {
       "id": "inc-024",
@@ -638,7 +670,7 @@
       "subscriberName": "SafeExpress Pvt Ltd",
       "vehicle": "MH24AB1234",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "unresolved",
       "queue": "hold",
       "createdAt": "2023-12-08T11:00:00Z",
@@ -650,7 +682,8 @@
       "state": "Maharashtra",
       "offence": "Driving Without License",
       "amount": 5000,
-      "resolutionNotes": "On hold - Awaiting additional documents from subscriber."
+      "resolutionNotes": "On hold - Awaiting additional documents from subscriber.",
+      "workType": "challan"
     },
     {
       "id": "inc-025",
@@ -660,7 +693,7 @@
       "subscriberName": "Delhivery Ltd",
       "vehicle": "DL25CD5678",
       "type": "payAndClose",
-      "category": "challan",
+      "challanType": "online",
       "status": "unresolved",
       "queue": "hold",
       "createdAt": "2023-12-06T14:30:00Z",
@@ -672,7 +705,8 @@
       "state": "Delhi",
       "offence": "Vehicle Fitness Expired",
       "amount": 3500,
-      "resolutionNotes": "On hold - Subscriber requested to pause proceedings."
+      "resolutionNotes": "On hold - Subscriber requested to pause proceedings.",
+      "workType": "challan"
     },
     {
       "id": "inc-020",
@@ -682,7 +716,7 @@
       "subscriberName": "BlueDart Logistics",
       "vehicle": "UP32MN8901",
       "type": "contest",
-      "category": "court",
+      "challanType": "court",
       "status": "refund_initiated",
       "queue": "refund",
       "createdAt": "2023-12-05T10:30:00Z",
@@ -694,16 +728,321 @@
       "state": "Karnataka",
       "offence": "Overloading",
       "amount": 4000,
-      "resolutionNotes": "Unable to resolve within TAT. Refund of Rs. 3500 initiated to subscriber."
+      "resolutionNotes": "Unable to resolve within TAT. Refund of Rs. 3500 initiated to subscriber.",
+      "workType": "challan"
+    },
+    {
+      "id": "case-001",
+      "incidentId": "IRN-12401",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160523",
+      "subscriberName": "BlueDart Logistics",
+      "vehicle": "MH01ZZ1111",
+      "type": "onSpot",
+      "challanType": "court",
+      "caseCategory": "litigation",
+      "status": "pending_screening",
+      "queue": "newIncidents",
+      "createdAt": "2024-01-16T14:30:00Z",
+      "lastUpdatedAt": "2024-01-16T14:30:00Z",
+      "tatDeadline": "2024-03-01T14:30:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": null,
+      "source": "Manual",
+      "state": "Maharashtra",
+      "offence": null,
+      "amount": 5000
+    },
+    {
+      "id": "case-002",
+      "incidentId": "IRN-12402",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160525",
+      "subscriberName": "Gati Kintetsu Express",
+      "vehicle": "DL03XX2222",
+      "type": "onCall",
+      "challanType": "court",
+      "caseCategory": "accident",
+      "status": "pending_screening",
+      "queue": "newIncidents",
+      "createdAt": "2024-01-16T16:00:00Z",
+      "lastUpdatedAt": "2024-01-16T16:00:00Z",
+      "tatDeadline": "2024-03-01T16:00:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": null,
+      "source": "API",
+      "state": "Delhi",
+      "offence": null,
+      "amount": 15000
+    },
+    {
+      "id": "case-003",
+      "incidentId": "IRN-12403",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160526",
+      "subscriberName": "Delhivery Ltd",
+      "vehicle": "GJ04YY3333",
+      "type": "onSpot",
+      "challanType": "court",
+      "caseCategory": "legalNotice",
+      "status": "pending_screening",
+      "queue": "newIncidents",
+      "createdAt": "2024-01-16T17:15:00Z",
+      "lastUpdatedAt": "2024-01-16T17:15:00Z",
+      "tatDeadline": "2024-03-01T17:15:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": null,
+      "source": "Partner",
+      "state": "Gujarat",
+      "offence": null,
+      "amount": 8000
+    },
+    {
+      "id": "case-004",
+      "incidentId": "IRN-12404",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160524",
+      "subscriberName": "SafeExpress Pvt Ltd",
+      "vehicle": "KA02WW4444",
+      "type": "onCall",
+      "challanType": "court",
+      "caseCategory": "iaStart",
+      "status": "pending_screening",
+      "queue": "newIncidents",
+      "createdAt": "2024-01-15T14:30:00Z",
+      "lastUpdatedAt": "2024-01-16T19:30:00Z",
+      "tatDeadline": "2024-03-01T14:30:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": null,
+      "source": "Manual",
+      "state": "Karnataka",
+      "offence": null,
+      "amount": 25000
+    },
+    {
+      "id": "case-005",
+      "incidentId": "IRN-12405",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160527",
+      "subscriberName": "XpressBees Logistics",
+      "vehicle": "UP32VV5555",
+      "type": "onSpot",
+      "challanType": "court",
+      "caseCategory": "employmentLabour",
+      "status": "pending_screening",
+      "queue": "newIncidents",
+      "createdAt": "2024-01-14T19:30:00Z",
+      "lastUpdatedAt": "2024-01-16T15:30:00Z",
+      "tatDeadline": "2024-03-01T19:30:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": null,
+      "source": "Bulk Upload",
+      "state": "Uttar Pradesh",
+      "offence": null,
+      "amount": 12000
+    },
+    {
+      "id": "case-006",
+      "incidentId": "IRN-12406",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160523",
+      "subscriberName": "BlueDart Logistics",
+      "vehicle": "MH10AA6666",
+      "type": "onCall",
+      "challanType": "court",
+      "caseCategory": "litigation",
+      "status": "lawyer_working",
+      "queue": "lawyerAssigned",
+      "createdAt": "2024-01-10T09:00:00Z",
+      "lastUpdatedAt": "2024-01-15T15:30:00Z",
+      "tatDeadline": "2024-02-24T09:00:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": "law-001",
+      "source": "API",
+      "state": "Maharashtra",
+      "offence": "Rash Driving",
+      "amount": 10000
+    },
+    {
+      "id": "case-007",
+      "incidentId": "IRN-12407",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160524",
+      "subscriberName": "SafeExpress Pvt Ltd",
+      "vehicle": "KA05BB7777",
+      "type": "onSpot",
+      "challanType": "court",
+      "caseCategory": "accident",
+      "status": "lawyer_working",
+      "queue": "lawyerAssigned",
+      "createdAt": "2024-01-09T11:30:00Z",
+      "lastUpdatedAt": "2024-01-14T10:00:00Z",
+      "tatDeadline": "2024-02-23T11:30:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": "law-002",
+      "source": "Manual",
+      "state": "Karnataka",
+      "offence": "Hit and Run",
+      "amount": 50000
+    },
+    {
+      "id": "case-008",
+      "incidentId": "IRN-12408",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160525",
+      "subscriberName": "Gati Kintetsu Express",
+      "vehicle": "DL08CC8888",
+      "type": "onCall",
+      "challanType": "court",
+      "caseCategory": "legalNotice",
+      "status": "court_hearing_scheduled",
+      "queue": "lawyerAssigned",
+      "createdAt": "2024-01-08T14:00:00Z",
+      "lastUpdatedAt": "2024-01-13T16:45:00Z",
+      "tatDeadline": "2024-02-22T14:00:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": "law-003",
+      "source": "Partner",
+      "state": "Delhi",
+      "offence": "Property Damage",
+      "amount": 35000
+    },
+    {
+      "id": "case-009",
+      "incidentId": "IRN-12409",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160526",
+      "subscriberName": "Delhivery Ltd",
+      "vehicle": "GJ13DD9999",
+      "type": "onSpot",
+      "challanType": "court",
+      "caseCategory": "ndps",
+      "status": "resolved",
+      "queue": "settled",
+      "createdAt": "2023-12-20T10:00:00Z",
+      "lastUpdatedAt": "2024-01-10T14:00:00Z",
+      "tatDeadline": "2024-02-03T10:00:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": "law-004",
+      "source": "API",
+      "state": "Gujarat",
+      "offence": "Substance Violation",
+      "amount": 20000,
+      "resolutionNotes": "Case resolved. Fine imposed by court."
+    },
+    {
+      "id": "case-010",
+      "incidentId": "IRN-12410",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160527",
+      "subscriberName": "XpressBees Logistics",
+      "vehicle": "UP70EE1010",
+      "type": "onCall",
+      "challanType": "court",
+      "caseCategory": "laas",
+      "status": "resolved",
+      "queue": "settled",
+      "createdAt": "2023-12-18T11:30:00Z",
+      "lastUpdatedAt": "2024-01-08T16:30:00Z",
+      "tatDeadline": "2024-02-01T11:30:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": "law-005",
+      "source": "Manual",
+      "state": "Uttar Pradesh",
+      "offence": "Vehicle Seizure",
+      "amount": 15000,
+      "resolutionNotes": "Case settled with reduced penalty."
+    },
+    {
+      "id": "case-011",
+      "incidentId": "IRN-12411",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160523",
+      "subscriberName": "BlueDart Logistics",
+      "vehicle": "MH19FF1111",
+      "type": "onSpot",
+      "challanType": "court",
+      "caseCategory": "litigation",
+      "status": "unresolved",
+      "queue": "notSettled",
+      "createdAt": "2023-12-10T09:00:00Z",
+      "lastUpdatedAt": "2024-01-12T11:30:00Z",
+      "tatDeadline": "2024-01-24T09:00:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": "law-001",
+      "source": "Bulk Upload",
+      "state": "Maharashtra",
+      "offence": "Commercial Vehicle Violation",
+      "amount": 30000,
+      "resolutionNotes": "Court upheld charges. Full penalty applicable."
+    },
+    {
+      "id": "case-012",
+      "incidentId": "IRN-12412",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160524",
+      "subscriberName": "SafeExpress Pvt Ltd",
+      "vehicle": "KA24GG1212",
+      "type": "onCall",
+      "challanType": "court",
+      "caseCategory": "accident",
+      "status": "unresolved",
+      "queue": "hold",
+      "createdAt": "2023-12-08T11:00:00Z",
+      "lastUpdatedAt": "2024-01-13T15:00:00Z",
+      "tatDeadline": "2024-01-22T11:00:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": "law-002",
+      "source": "Partner",
+      "state": "Karnataka",
+      "offence": "Accident Investigation",
+      "amount": 45000,
+      "resolutionNotes": "On hold - Awaiting police investigation report."
+    },
+    {
+      "id": "case-013",
+      "incidentId": "IRN-12413",
+      "workType": "case",
+      "challanNumber": "",
+      "subscriberId": "LWD-1160525",
+      "subscriberName": "Gati Kintetsu Express",
+      "vehicle": "DL25HH1313",
+      "type": "onSpot",
+      "challanType": "court",
+      "caseCategory": "legalNotice",
+      "status": "refund_initiated",
+      "queue": "refund",
+      "createdAt": "2023-12-05T10:30:00Z",
+      "lastUpdatedAt": "2024-01-14T09:00:00Z",
+      "tatDeadline": "2024-01-19T10:30:00Z",
+      "assignedAgentId": null,
+      "assignedLawyerId": "law-003",
+      "source": "API",
+      "state": "Delhi",
+      "offence": "Environmental Violation",
+      "amount": 18000,
+      "resolutionNotes": "Unable to resolve within TAT. Refund initiated."
     }
   ],
   "followUps": [
     {
       "id": "fu-013",
       "incidentId": "inc-001",
-      "notes": "Received challan via API. Initial validation pending.",
-      "outcome": "Pending",
-      "nextFollowUpDate": "2024-01-16T10:00:00Z",
+      "notes": "Subscriber contacted for details",
+      "outcome": "New Incidents",
+      "activity": "Subscriber contacted for details",
       "createdAt": "2024-01-15T09:45:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -711,9 +1050,9 @@
     {
       "id": "fu-014",
       "incidentId": "inc-001",
-      "notes": "Contacted subscriber to confirm vehicle ownership details.",
-      "outcome": "In Progress",
-      "nextFollowUpDate": "2024-01-17T11:00:00Z",
+      "notes": "Documents submitted to RTO",
+      "outcome": "Screening",
+      "activity": "Documents submitted to RTO",
       "createdAt": "2024-01-15T14:00:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -721,9 +1060,9 @@
     {
       "id": "fu-015",
       "incidentId": "inc-001",
-      "notes": "Subscriber confirmed ownership. RC copy received via email. Proceeding with validation on state portal.",
-      "outcome": "In Progress",
-      "nextFollowUpDate": "2024-01-18T10:00:00Z",
+      "notes": "Documents submitted to RTO",
+      "outcome": "Screening",
+      "activity": "Documents submitted to RTO",
       "createdAt": "2024-01-17T11:30:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -731,9 +1070,9 @@
     {
       "id": "fu-016",
       "incidentId": "inc-001",
-      "notes": "Challan validated on Maharashtra traffic portal. Offence confirmed as over speeding. Fine amount Rs. 2500. Recommending contest due to possible procedural issues.",
-      "outcome": "Screened",
-      "nextFollowUpDate": "2024-01-19T10:00:00Z",
+      "notes": "Our lawyer is working on challan",
+      "outcome": "Screening",
+      "activity": "Our lawyer is working on challan",
       "createdAt": "2024-01-18T14:00:00Z",
       "createdById": "usr-002",
       "createdByName": "Neha Patel"
@@ -741,9 +1080,9 @@
     {
       "id": "fu-017",
       "incidentId": "inc-001",
-      "notes": "Discussed case with Adv. Suresh Iyer. He confirmed availability and agreed to take up the case. Assignment pending team lead approval.",
-      "outcome": "Pending",
-      "nextFollowUpDate": "2024-01-20T11:00:00Z",
+      "notes": "Escalated to senior lawyer",
+      "outcome": "Lawyer Assigned",
+      "activity": "Escalated to senior lawyer",
       "createdAt": "2024-01-19T15:30:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -751,9 +1090,9 @@
     {
       "id": "fu-018",
       "incidentId": "inc-001",
-      "notes": "Team lead approved lawyer assignment. Case formally assigned to Adv. Suresh Iyer. Lawyer acknowledged and will file representation within 5 days.",
-      "outcome": "Assigned",
-      "nextFollowUpDate": "2024-01-25T10:00:00Z",
+      "notes": "Our lawyer is working on challan",
+      "outcome": "Lawyer Assigned",
+      "activity": "Our lawyer is working on challan",
       "createdAt": "2024-01-20T12:00:00Z",
       "createdById": "usr-003",
       "createdByName": "Rajesh Verma"
@@ -761,9 +1100,9 @@
     {
       "id": "fu-019",
       "incidentId": "inc-001",
-      "notes": "Lawyer submitted court representation. Case registered with court number MH-TRAF-2024-4521. Hearing date pending allocation.",
-      "outcome": "In Progress",
-      "nextFollowUpDate": "2024-01-28T10:00:00Z",
+      "notes": "Challan sent to court",
+      "outcome": "Lawyer Assigned",
+      "activity": "Challan sent to court",
       "createdAt": "2024-01-25T16:00:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -771,9 +1110,9 @@
     {
       "id": "fu-020",
       "incidentId": "inc-001",
-      "notes": "Court hearing date received: 5th February 2024 at 11:00 AM. Informed subscriber and lawyer. Both confirmed availability.",
-      "outcome": "Scheduled",
-      "nextFollowUpDate": "2024-02-05T11:00:00Z",
+      "notes": "Hearing date scheduled",
+      "outcome": "Lawyer Assigned",
+      "activity": "Hearing date scheduled",
       "createdAt": "2024-01-28T14:30:00Z",
       "createdById": "usr-002",
       "createdByName": "Neha Patel"
@@ -781,9 +1120,9 @@
     {
       "id": "fu-021",
       "incidentId": "inc-001",
-      "notes": "Pre-hearing call with lawyer. Reviewed all documents and evidence. Lawyer confident about getting fine reduced or case dismissed due to calibration certificate issue.",
-      "outcome": "In Progress",
-      "nextFollowUpDate": "2024-02-05T09:00:00Z",
+      "notes": "Challan contested in court",
+      "outcome": "Lawyer Assigned",
+      "activity": "Challan contested in court",
       "createdAt": "2024-02-03T11:00:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -791,9 +1130,9 @@
     {
       "id": "fu-022",
       "incidentId": "inc-001",
-      "notes": "Court hearing completed. Judge accepted our argument about missing calibration certificate. Fine reduced from Rs. 2500 to Rs. 500. Subscriber very satisfied with outcome.",
-      "outcome": "Resolved",
-      "nextFollowUpDate": null,
+      "notes": "Challan disposed successfully",
+      "outcome": "Settled",
+      "activity": "Challan disposed successfully",
       "createdAt": "2024-02-05T14:00:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -801,9 +1140,9 @@
     {
       "id": "fu-023",
       "incidentId": "inc-001",
-      "notes": "Payment of reduced fine Rs. 500 completed by subscriber. Court receipt uploaded to documents. Case successfully closed.",
-      "outcome": "Closed",
-      "nextFollowUpDate": null,
+      "notes": "Fine payment completed",
+      "outcome": "Settled",
+      "activity": "Fine payment completed",
       "createdAt": "2024-02-06T10:30:00Z",
       "createdById": "usr-003",
       "createdByName": "Rajesh Verma"
@@ -811,9 +1150,9 @@
     {
       "id": "fu-001",
       "incidentId": "inc-010",
-      "notes": "Called lawyer for status update. Hearing scheduled for next week.",
-      "outcome": "In Progress",
-      "nextFollowUpDate": "2024-01-18T10:00:00Z",
+      "notes": "Waiting for court order",
+      "outcome": "Lawyer Assigned",
+      "activity": "Waiting for court order",
       "createdAt": "2024-01-14T15:30:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -821,9 +1160,9 @@
     {
       "id": "fu-002",
       "incidentId": "inc-010",
-      "notes": "Initial screening complete. Assigned to Adv. Suresh Iyer.",
-      "outcome": "Assigned",
-      "nextFollowUpDate": "2024-01-14T10:00:00Z",
+      "notes": "Our lawyer is working on challan",
+      "outcome": "Lawyer Assigned",
+      "activity": "Our lawyer is working on challan",
       "createdAt": "2024-01-12T11:00:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -831,9 +1170,9 @@
     {
       "id": "fu-003",
       "incidentId": "inc-014",
-      "notes": "Court hearing scheduled for 20th Jan. Lawyer confirmed attendance.",
-      "outcome": "Scheduled",
-      "nextFollowUpDate": "2024-01-20T09:00:00Z",
+      "notes": "Hearing date scheduled",
+      "outcome": "Lawyer Assigned",
+      "activity": "Hearing date scheduled",
       "createdAt": "2024-01-14T11:00:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -841,9 +1180,9 @@
     {
       "id": "fu-004",
       "incidentId": "inc-016",
-      "notes": "Case successfully resolved. Fine reduced from Rs. 2500 to Rs. 1000.",
-      "outcome": "Resolved",
-      "nextFollowUpDate": null,
+      "notes": "Challan disposed successfully",
+      "outcome": "Settled",
+      "activity": "Challan disposed successfully",
       "createdAt": "2024-01-10T14:00:00Z",
       "createdById": "usr-002",
       "createdByName": "Neha Patel"
@@ -851,9 +1190,9 @@
     {
       "id": "fu-005",
       "incidentId": "inc-019",
-      "notes": "Court upheld challan. Informing subscriber about outcome and next steps.",
-      "outcome": "Not Resolved",
-      "nextFollowUpDate": "2024-01-13T10:00:00Z",
+      "notes": "Challan contested in court",
+      "outcome": "Not Settled",
+      "activity": "Challan contested in court",
       "createdAt": "2024-01-12T11:30:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -861,9 +1200,9 @@
     {
       "id": "fu-006",
       "incidentId": "inc-011",
-      "notes": "Contacted lawyer for update. Case is being prepared for court submission.",
-      "outcome": "In Progress",
-      "nextFollowUpDate": "2024-01-16T11:00:00Z",
+      "notes": "Challan sent to court",
+      "outcome": "Lawyer Assigned",
+      "activity": "Challan sent to court",
       "createdAt": "2024-01-14T10:00:00Z",
       "createdById": "usr-002",
       "createdByName": "Neha Patel"
@@ -871,9 +1210,9 @@
     {
       "id": "fu-007",
       "incidentId": "inc-012",
-      "notes": "Subscriber confirmed payment details. Proceeding with pay and close.",
-      "outcome": "Payment Pending",
-      "nextFollowUpDate": "2024-01-15T14:00:00Z",
+      "notes": "Fine payment completed",
+      "outcome": "Settled",
+      "activity": "Fine payment completed",
       "createdAt": "2024-01-13T16:45:00Z",
       "createdById": "usr-003",
       "createdByName": "Rajesh Verma"
@@ -881,9 +1220,9 @@
     {
       "id": "fu-008",
       "incidentId": "inc-021",
-      "notes": "Screening completed. Recommended to contest based on procedural issues.",
-      "outcome": "Screened",
-      "nextFollowUpDate": "2024-01-16T10:00:00Z",
+      "notes": "Documents submitted to RTO",
+      "outcome": "Screening",
+      "activity": "Documents submitted to RTO",
       "createdAt": "2024-01-15T14:30:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -891,9 +1230,9 @@
     {
       "id": "fu-009",
       "incidentId": "inc-022",
-      "notes": "Called subscriber to confirm vehicle details. Documents verified.",
-      "outcome": "Verified",
-      "nextFollowUpDate": "2024-01-16T12:00:00Z",
+      "notes": "Subscriber contacted for details",
+      "outcome": "Screening",
+      "activity": "Subscriber contacted for details",
       "createdAt": "2024-01-15T12:00:00Z",
       "createdById": "usr-002",
       "createdByName": "Neha Patel"
@@ -901,9 +1240,9 @@
     {
       "id": "fu-010",
       "incidentId": "inc-024",
-      "notes": "Waiting for subscriber to provide additional driving license documents.",
-      "outcome": "On Hold",
-      "nextFollowUpDate": "2024-01-17T10:00:00Z",
+      "notes": "Subscriber contacted for details",
+      "outcome": "New Incidents",
+      "activity": "Subscriber contacted for details",
       "createdAt": "2024-01-13T15:00:00Z",
       "createdById": "usr-003",
       "createdByName": "Rajesh Verma"
@@ -911,9 +1250,9 @@
     {
       "id": "fu-011",
       "incidentId": "inc-006",
-      "notes": "Started screening process. Checking challan validity on state portal.",
-      "outcome": "In Progress",
-      "nextFollowUpDate": "2024-01-16T09:00:00Z",
+      "notes": "Documents submitted to RTO",
+      "outcome": "Screening",
+      "activity": "Documents submitted to RTO",
       "createdAt": "2024-01-15T10:30:00Z",
       "createdById": "usr-001",
       "createdByName": "Arun Kumar"
@@ -921,9 +1260,9 @@
     {
       "id": "fu-012",
       "incidentId": "inc-017",
-      "notes": "Payment successfully processed. Challan marked as closed.",
-      "outcome": "Resolved",
-      "nextFollowUpDate": null,
+      "notes": "Refund initiated to subscriber",
+      "outcome": "Refund",
+      "activity": "Refund initiated to subscriber",
       "createdAt": "2024-01-08T16:30:00Z",
       "createdById": "usr-003",
       "createdByName": "Rajesh Verma"
@@ -1451,7 +1790,12 @@
       "disposed": true
     }
   ],
-  "sources": ["API", "Manual", "Bulk Upload", "Partner"],
+  "sources": [
+    "API",
+    "Manual",
+    "Bulk Upload",
+    "Partner"
+  ],
   "offenceTypes": [
     "Over Speeding",
     "Red Light Violation",

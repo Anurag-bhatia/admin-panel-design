@@ -1,83 +1,60 @@
-# Section-by-Section Implementation Prompt
+# Section Implementation Prompt
 
-Use this template to implement sections incrementally. Copy and customize for each section.
+## Define Section Variables
 
----
-
-## Template Prompt
-
-I need you to implement the **[SECTION_NAME]** section of an admin panel application.
-
-**Context:**
-- Review `product-overview.md` for the overall product context
-- This section is part of a larger application with [NUMBER] total sections
-
-**Before we begin, please confirm:**
-1. Has the foundation been set up? (project, routing, design system)
-2. Has the shell been implemented? (navigation, layout)
-3. Are there any dependencies on other sections?
-
-**For this section, please:**
-1. Read the section spec at `sections/[SECTION_ID]/README.md`
-2. Review the components in `sections/[SECTION_ID]/components/`
-3. Use the types from `sections/[SECTION_ID]/types.ts`
-4. Reference sample data from `sections/[SECTION_ID]/sample-data.json`
-5. Follow the milestone instructions at `instructions/incremental/[NN]-[SECTION_ID].md`
-
-**Implementation requirements:**
-- All components must accept data and callbacks via props
-- Support both light and dark mode
-- Ensure mobile responsiveness
-- Write tests following `sections/[SECTION_ID]/tests.md`
-
-**Key files:**
-- `sections/[SECTION_ID]/README.md` — Section overview
-- `sections/[SECTION_ID]/components/` — Reference implementations
-- `sections/[SECTION_ID]/types.ts` — TypeScript interfaces
-- `sections/[SECTION_ID]/sample-data.json` — Test data
-- `sections/[SECTION_ID]/tests.md` — Test specifications
-- `instructions/incremental/[NN]-[SECTION_ID].md` — Implementation guide
+- **SECTION_NAME** = [Human-readable name, e.g., "Incidents" or "Sales CRM"]
+- **SECTION_ID** = [Folder name in sections/, e.g., "incidents" or "sales-crm"]
+- **NN** = [Milestone number, e.g., "02" or "03" — sections start at 02 since 01 is Foundation]
 
 ---
 
-## Section List
+I need you to implement the **SECTION_NAME** section of my application.
 
-Use this list to fill in the template:
+## Instructions
 
-| Section | ID | Milestone |
-|---------|-----|-----------|
-| Incidents | incidents | 03-incidents |
-| Sales CRM | sales-crm | 04-sales-crm |
-| Subscribers | subscribers | 05-subscribers |
-| Customers | customers | 06-customers |
-| Lawyers | lawyers | 07-lawyers |
-| Partners | partners | 08-partners |
-| Support | support | 09-support |
-| Reports | reports | 10-reports |
-| Team | team | 11-team |
+Please carefully read and analyze the following files:
 
----
+1. **@product-plan/product-overview.md** — Product summary for overall context
+2. **@product-plan/instructions/incremental/NN-SECTION_ID.md** — Specific instructions for this section
 
-## Example: Implementing Incidents
+Also review the section assets:
+- **@product-plan/sections/SECTION_ID/README.md** — Feature overview and design intent
+- **@product-plan/sections/SECTION_ID/tests.md** — Test-writing instructions (use TDD approach)
+- **@product-plan/sections/SECTION_ID/components/** — React components to integrate
+- **@product-plan/sections/SECTION_ID/types.ts** — TypeScript interfaces
+- **@product-plan/sections/SECTION_ID/sample-data.json** — Test data
 
-```
-I need you to implement the **Incidents** section of an admin panel application.
+## Before You Begin
 
-**Context:**
-- Review `product-overview.md` for the overall product context
-- This section is part of a larger application with 9 total sections
+Please ask me clarifying questions about:
 
-**For this section, please:**
-1. Read the section spec at `sections/incidents/README.md`
-2. Review the components in `sections/incidents/components/`
-3. Use the types from `sections/incidents/types.ts`
-4. Reference sample data from `sections/incidents/sample-data.json`
-5. Follow the milestone instructions at `instructions/incremental/03-incidents.md`
+1. **Authentication & Authorization** (if not yet established)
+   - How should users authenticate?
+   - What permissions are needed for this section?
 
-**Key files:**
-- `sections/incidents/README.md` — Section overview
-- `sections/incidents/components/` — Reference implementations
-- `sections/incidents/types.ts` — TypeScript interfaces
-- `sections/incidents/sample-data.json` — Test data
-- `sections/incidents/tests.md` — Test specifications
-```
+2. **Data Relationships**
+   - How does this section's data relate to other entities?
+   - Are there any cross-section dependencies?
+
+3. **Integration Points**
+   - How should this section connect to existing features?
+   - Any API endpoints already built that this should use?
+
+4. **Backend Business Logic**
+   - Any server-side logic, validations or processes needed beyond what's shown in the UI?
+   - Background processes, notifications, or other processes to trigger?
+
+5. **Any Other Clarifications**
+   - Questions about specific user flows in this section
+   - Edge cases that need clarification
+
+## Implementation Approach
+
+Use test-driven development:
+1. Read the `tests.md` file and write failing tests first
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
+
+Lastly, be sure to ask me if I have any other notes to add for this implementation.
+
+Once I answer your questions, proceed with implementation.

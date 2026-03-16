@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   Search,
   Plus,
@@ -16,7 +16,7 @@ import type {
   IncidentSource,
   IncidentFilters,
   IncidentType,
-  IncidentCategory,
+  ChallanType,
 } from '../types'
 
 const INDIAN_STATES = [
@@ -56,8 +56,10 @@ interface IncidentsTableHeaderProps {
   lawyers: Lawyer[]
   sources: IncidentSource[]
   searchQuery: string
+  workType?: 'cases' | 'challans'
   onSearchChange: (query: string) => void
   onAddChallan?: () => void
+  onAddCase?: () => void
   onBulkUpdate?: () => void
   onExport?: () => void
   onFilter?: (filters: IncidentFilters) => void
@@ -68,16 +70,31 @@ export function IncidentsTableHeader({
   lawyers,
   sources,
   searchQuery,
+  workType = 'challans',
   onSearchChange,
   onAddChallan,
+  onAddCase,
   onBulkUpdate,
   onExport,
   onFilter,
 }: IncidentsTableHeaderProps) {
+  const isCases = workType === 'cases'
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState<IncidentFilters>({})
   const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [showAddMenu, setShowAddMenu] = useState(false)
+  const addIncidentRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (addIncidentRef.current && !addIncidentRef.current.contains(e.target as Node)) {
+        setShowAddMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -156,7 +173,7 @@ export function IncidentsTableHeader({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search by Incident ID, subscriber, vehicle..."
+            placeholder={isCases ? "Search by Case ID, subscriber, vehicle..." : "Search by Incident ID, subscriber, vehicle..."}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
@@ -201,14 +218,27 @@ export function IncidentsTableHeader({
             <span>Export</span>
           </button>
 
-          {/* Add Challan */}
-          <button
-            onClick={onAddChallan}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Challan</span>
-          </button>
+          {/* Add Incident Dropdown */}
+          <div className="relative" ref={addIncidentRef}>
+            <button
+              onClick={() => setShowAddMenu(!showAddMenu)}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Add Incident</span>
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showAddMenu ? 'rotate-180' : ''}`} />
+            </button>
+            {showAddMenu && (
+              <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-30 py-1">
+                <button
+                  onClick={() => { isCases ? onAddCase?.() : onAddChallan?.(); setShowAddMenu(false) }}
+                  className="w-full px-4 py-2 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  {isCases ? 'Case' : 'Challan'}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -229,29 +259,39 @@ export function IncidentsTableHeader({
                 className="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
               >
                 <option value="">All Types</option>
-                <option value="payAndClose">PPT</option>
-                <option value="contest">Bulk</option>
+                {isCases ? (
+                  <>
+                    <option value="onSpot">On Spot</option>
+                    <option value="onCall">On Call</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="payAndClose">PPT</option>
+                    <option value="contest">Bulk</option>
+                  </>
+                )}
               </select>
             </div>
 
-            {/* Category Filter */}
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Category
-              </label>
-              <select
-                value={filters.category || ''}
-                onChange={(e) =>
-                  handleFilterChange('category', e.target.value as IncidentCategory)
-                }
-                className="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-              >
-                <option value="">All Categories</option>
-                <option value="challan">Challan</option>
-                <option value="court">Court</option>
-                <option value="online">Online</option>
-              </select>
-            </div>
+            {/* Challan Type Filter - only for challans */}
+            {!isCases && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Challan
+                </label>
+                <select
+                  value={filters.challanType || ''}
+                  onChange={(e) =>
+                    handleFilterChange('challanType', e.target.value as ChallanType)
+                  }
+                  className="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                >
+                  <option value="">All Types</option>
+                  <option value="court">Court</option>
+                  <option value="online">Online</option>
+                </select>
+              </div>
+            )}
 
             {/* Source Filter */}
             <div className="flex flex-col gap-1">
@@ -293,26 +333,28 @@ export function IncidentsTableHeader({
               </select>
             </div>
 
-            {/* Assigned Agent Filter */}
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Assigned Agent
-              </label>
-              <select
-                value={filters.assignedAgentId || ''}
-                onChange={(e) =>
-                  handleFilterChange('assignedAgentId', e.target.value)
-                }
-                className="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white min-w-[160px]"
-              >
-                <option value="">All Agents</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Assigned Agent Filter - only for challans */}
+            {!isCases && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Assigned Agent
+                </label>
+                <select
+                  value={filters.assignedAgentId || ''}
+                  onChange={(e) =>
+                    handleFilterChange('assignedAgentId', e.target.value)
+                  }
+                  className="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white min-w-[160px]"
+                >
+                  <option value="">All Agents</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Assigned Lawyer Filter */}
             <div className="flex flex-col gap-1">
@@ -396,12 +438,12 @@ export function IncidentsTableHeader({
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Upload an Excel or CSV file to bulk update challans.
+                  Upload an Excel or CSV file to bulk update {isCases ? 'cases' : 'challans'}.
                 </p>
                 <button
                   onClick={() => {
                     // Create and download template
-                    const templateData = 'Challan Number,Type,Category,State,Amount,Offence\nDL012024123456,payAndClose,challan,Delhi,2500,Over Speeding'
+                    const templateData = 'Challan Number,Type,Challan Type,State,Amount,Offence\nDL012024123456,payAndClose,court,Delhi,2500,Over Speeding'
                     const blob = new Blob([templateData], { type: 'text/csv' })
                     const url = URL.createObjectURL(blob)
                     const a = document.createElement('a')

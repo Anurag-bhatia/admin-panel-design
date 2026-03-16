@@ -74,6 +74,14 @@ export function SupportDashboard({
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return new Intl.DateTimeFormat('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(date)
+  }
+
   const getTypeBadgeColor = (type: string) => {
     switch (type) {
       case 'query':
@@ -201,6 +209,9 @@ export function SupportDashboard({
                     <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider hidden sm:table-cell">
                       Source
                     </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">
+                      Submitted
+                    </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                       Type
                     </th>
@@ -229,6 +240,11 @@ export function SupportDashboard({
                       <td className="px-4 py-3 hidden sm:table-cell">
                         <span className="text-sm text-slate-600 dark:text-slate-400">
                           {submission.source}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {formatDate(submission.submittedAt)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -288,18 +304,6 @@ export function SupportDashboard({
                                   </svg>
                                   Convert to Dispute
                                 </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleConvert(submission.id, 'partnership')
-                                  }}
-                                  className="w-full px-4 py-2.5 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors flex items-center gap-3"
-                                >
-                                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                  </svg>
-                                  Convert to Partnership
-                                </button>
                               </div>
                             </>
                           )}
@@ -327,6 +331,9 @@ export function SupportDashboard({
         <SubmissionDetailsModal
           submission={selectedSubmission}
           onClose={() => setSelectedSubmission(null)}
+          onConvertToLead={onConvertToLead}
+          onConvertToDispute={onConvertToDispute}
+          onConvertToPartnership={onConvertToPartnership}
         />
       )}
     </div>

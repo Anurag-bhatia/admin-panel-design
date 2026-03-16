@@ -4,11 +4,12 @@ interface QueueTabsProps {
   activeQueue: IncidentQueue
   queueCounts: QueueCounts
   view?: 'all' | 'my'
+  workType?: 'cases' | 'challans'
   onQueueChange?: (queue: IncidentQueue) => void
 }
 
-const QUEUE_CONFIG: { key: IncidentQueue; label: string; color: string }[] = [
-  { key: 'newIncidents', label: 'New Incidents', color: 'cyan' },
+const QUEUE_CONFIG: { key: IncidentQueue; label: string; caseLabel?: string; color: string }[] = [
+  { key: 'newIncidents', label: 'New Incidents', caseLabel: 'New Cases', color: 'cyan' },
   { key: 'screening', label: 'Screening', color: 'amber' },
   { key: 'agentAssigned', label: 'Agent Assigned', color: 'orange' },
   { key: 'lawyerAssigned', label: 'Lawyer Assigned', color: 'blue' },
@@ -18,16 +19,28 @@ const QUEUE_CONFIG: { key: IncidentQueue; label: string; color: string }[] = [
   { key: 'refund', label: 'Refund', color: 'purple' },
 ]
 
+// Cases don't have screening or agentAssigned queues
+const CASE_HIDDEN_QUEUES: IncidentQueue[] = ['screening', 'agentAssigned']
+
 export function QueueTabs({
   activeQueue,
   queueCounts,
   view = 'all',
+  workType = 'challans',
   onQueueChange,
 }: QueueTabsProps) {
-  // Filter out newIncidents and screening for "My Incidents" view
-  const displayedQueues = view === 'my'
-    ? QUEUE_CONFIG.filter((q) => q.key !== 'newIncidents' && q.key !== 'screening')
-    : QUEUE_CONFIG
+  const isCases = workType === 'cases'
+
+  // Filter queues based on view and workType
+  let displayedQueues = QUEUE_CONFIG
+
+  if (isCases) {
+    displayedQueues = displayedQueues.filter((q) => !CASE_HIDDEN_QUEUES.includes(q.key))
+  }
+
+  if (view === 'my') {
+    displayedQueues = displayedQueues.filter((q) => q.key !== 'newIncidents' && q.key !== 'screening')
+  }
 
   return (
     <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
@@ -35,6 +48,14 @@ export function QueueTabs({
         {displayedQueues.map((queue, index) => {
           const isActive = activeQueue === queue.key
           const count = queueCounts[queue.key]
+
+          // Determine label
+          let label = queue.label
+          if (isCases && queue.caseLabel) {
+            label = queue.caseLabel
+          } else if (queue.key === 'agentAssigned' && view === 'my') {
+            label = 'Assigned to me'
+          }
 
           return (
             <button
@@ -53,11 +74,7 @@ export function QueueTabs({
                 </span>
               )}
 
-              <span>
-                {queue.key === 'agentAssigned' && view === 'my'
-                  ? 'Assigned to me'
-                  : queue.label}
-              </span>
+              <span>{label}</span>
 
               {/* Count badge */}
               <span

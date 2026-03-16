@@ -69,7 +69,7 @@
       "addressLane": "Survey No. 234, GIDC Estate",
       "pinCode": "382330",
       "assignedOwner": "USR-002",
-      "partnerId": "PTR-001",
+      "partnerId": "LWD-1213401",
       "drivingLicenseNumber": null,
       "status": "active",
       "subscriptionId": "SUB-002",
@@ -125,7 +125,7 @@
       "addressLane": "Tower C, 4th Floor, Cyber Park",
       "pinCode": "122016",
       "assignedOwner": "USR-003",
-      "partnerId": "PTR-002",
+      "partnerId": "LWD-1213402",
       "drivingLicenseNumber": null,
       "status": "active",
       "subscriptionId": "SUB-004",
@@ -209,7 +209,7 @@
       "addressLane": "Hosur Road, Phase I",
       "pinCode": "560100",
       "assignedOwner": "USR-003",
-      "partnerId": "PTR-001",
+      "partnerId": "LWD-1213401",
       "drivingLicenseNumber": null,
       "status": "active",
       "subscriptionId": "SUB-007",
@@ -293,7 +293,7 @@
       "addressLane": "Building No. 8, Hi-Tech City Road",
       "pinCode": "500032",
       "assignedOwner": "USR-003",
-      "partnerId": "PTR-003",
+      "partnerId": "LWD-1213403",
       "drivingLicenseNumber": null,
       "status": "active",
       "subscriptionId": "SUB-010",
@@ -306,7 +306,7 @@
     {
       "id": "SUB-001",
       "subscriberId": "LWD-1160523",
-      "subscriptionName": "Enterprise Fleet",
+      "subscriptionName": "Udrive",
       "planType": "Annual",
       "startDate": "2024-01-15",
       "endDate": "2025-01-14",
@@ -325,7 +325,7 @@
     {
       "id": "SUB-002",
       "subscriberId": "LWD-1160524",
-      "subscriptionName": "Corporate Standard",
+      "subscriptionName": "Bsafe",
       "planType": "Annual",
       "startDate": "2024-02-01",
       "endDate": "2025-01-31",
@@ -344,7 +344,7 @@
     {
       "id": "SUB-003",
       "subscriberId": "LWD-1160525",
-      "subscriptionName": "Enterprise Max",
+      "subscriptionName": "Vcare",
       "planType": "Annual",
       "startDate": "2023-11-10",
       "endDate": "2024-11-09",
@@ -363,7 +363,7 @@
     {
       "id": "SUB-004",
       "subscriberId": "LWD-1160526",
-      "subscriptionName": "Enterprise Unlimited",
+      "subscriptionName": "Udrive",
       "planType": "Annual",
       "startDate": "2023-08-20",
       "endDate": "2024-08-19",
@@ -382,7 +382,7 @@
     {
       "id": "SUB-005",
       "subscriberId": "LWD-1160527",
-      "subscriptionName": "Fleet Standard",
+      "subscriptionName": "Bsafe",
       "planType": "Annual",
       "startDate": "2023-06-15",
       "endDate": "2024-06-14",
@@ -401,7 +401,7 @@
     {
       "id": "SUB-006",
       "subscriberId": "LWD-1160528",
-      "subscriptionName": "Enterprise Fleet",
+      "subscriptionName": "Vcare",
       "planType": "Annual",
       "startDate": "2023-09-08",
       "endDate": "2024-09-07",
@@ -420,7 +420,7 @@
     {
       "id": "SUB-007",
       "subscriberId": "LWD-1160529",
-      "subscriptionName": "Enterprise Max",
+      "subscriptionName": "Udrive",
       "planType": "Annual",
       "startDate": "2023-07-12",
       "endDate": "2024-07-11",
@@ -439,7 +439,7 @@
     {
       "id": "SUB-008",
       "subscriberId": "LWD-1160530",
-      "subscriptionName": "Corporate Basic",
+      "subscriptionName": "Bsafe",
       "planType": "Quarterly",
       "startDate": "2024-01-05",
       "endDate": "2024-04-04",
@@ -458,7 +458,7 @@
     {
       "id": "SUB-009",
       "subscriberId": "LWD-1160531",
-      "subscriptionName": "Starter",
+      "subscriptionName": "Vcare",
       "planType": "Monthly",
       "startDate": "2023-12-01",
       "endDate": "2024-01-01",
@@ -477,7 +477,7 @@
     {
       "id": "SUB-010",
       "subscriberId": "LWD-1160532",
-      "subscriptionName": "Fleet Premium",
+      "subscriptionName": "Udrive",
       "planType": "Annual",
       "startDate": "2023-10-20",
       "endDate": "2024-10-19",
@@ -658,6 +658,7 @@
       "fileType": "application/pdf",
       "fileSize": 524288,
       "category": "Contract",
+      "companyName": "Fastlane Logistics Pvt. Ltd.",
       "uploadedBy": "USR-001",
       "uploadedByName": "Priya Sharma",
       "uploadedDate": "2024-01-15T10:00:00Z"
@@ -669,6 +670,9 @@
       "fileType": "application/pdf",
       "fileSize": 156789,
       "category": "KYC",
+      "vehicleNumber": "MH02AB1234",
+      "companyName": "Fastlane Logistics Pvt. Ltd.",
+      "driverName": "Suresh Yadav",
       "uploadedBy": "USR-001",
       "uploadedByName": "Priya Sharma",
       "uploadedDate": "2024-01-15T10:05:00Z"
@@ -735,17 +739,17 @@
   ],
   "partners": [
     {
-      "id": "PTR-001",
+      "id": "LWD-1213401",
       "name": "FleetConnect India",
       "type": "Referral Partner"
     },
     {
-      "id": "PTR-002",
+      "id": "LWD-1213402",
       "name": "LogiTech Solutions",
       "type": "Technology Partner"
     },
     {
-      "id": "PTR-003",
+      "id": "LWD-1213403",
       "name": "AutoLease Network",
       "type": "Referral Partner"
     }
@@ -811,5 +815,25 @@
     "Fleet Data",
     "Technical",
     "Other"
+  ],
+  "utmSources": [
+    "whatsapp",
+    "sms",
+    "social_media",
+    "google",
+    "fb",
+    "facebook",
+    "instagram",
+    "direct",
+    "organic",
+    "email"
+  ],
+  "vehicleTypes": [
+    "Commercial Vehicle",
+    "Private Vehicle"
+  ],
+  "userTypes": [
+    "Subscribers",
+    "Visitors"
   ]
 }

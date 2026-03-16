@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist (first-time users, after deletions)
+- **DO** implement empty states when no records exist
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,21 +34,23 @@
 
 ## Goal
 
-Implement the Subscribers feature — the system of record for all customers actively or historically subscribed to the platform's services.
+Implement the Subscribers module — the system of record for all customers actively or historically subscribed to the platform's services.
 
 ## Overview
 
-The Subscribers module manages the complete subscriber lifecycle from onboarding through service delivery, connecting sales, operations, and finance into a single traceable view. All operational activity—including challan submission—is gated by subscriber status.
+The Subscribers module manages the complete subscriber lifecycle from onboarding through service delivery, connecting sales, operations, and finance into a single traceable view. All operational activity — including challan submission — is gated by subscriber status.
 
 **Key Functionality:**
-- View subscriber list with status, subscription details, and metadata
-- Add subscribers via form or bulk upload
-- View detailed subscriber profiles with tabbed navigation
-- Manage subscriptions (plan, dates, vehicles, pricing)
-- Track challans and incidents linked to subscriber
-- Upload and manage documents
-- View wallet/financial information
-- Assign team members to accounts
+- Subscriber list table (Subs-ID, Source, Company, Contact, Owner, Services, Subscription, Status)
+- Add subscriber via structured form modal
+- Bulk upload subscribers via Excel with template download and validation
+- Full-screen detail page with 7 tabs: Details, Challans, Incidents, Documents, Subscription, Wallet, Team
+- Edit subscriber information
+- Manage subscriptions (plan, dates, vehicles, pricing, payment status)
+- View linked challans and incidents
+- Document upload and management
+- Financial tracking (wallet, payments, invoices)
+- Team member assignment
 
 ## Recommended Approach: Test-Driven Development
 
@@ -58,120 +60,55 @@ See `product-plan/sections/subscribers/tests.md` for detailed test-writing instr
 
 ### Components
 
-Copy from `product-plan/sections/subscribers/components/`:
-
-- `SubscribersDashboard.tsx` — Main subscriber list view
-- `SubscriberList.tsx` — Subscriber table with filters
-- `AddSubscriberModal.tsx` — Modal for adding subscribers
-- `BulkUploadModal.tsx` — Modal for bulk Excel upload
-- `ViewDetailsModal.tsx` — Quick view modal
-- `SubscriberDetail.tsx` — Full subscriber detail page with tabs
-
-### Data Layer
-
-```typescript
-interface Subscriber {
-  id: string
-  source: string
-  type: 'Fleet Operator' | 'Corporate' | 'Individual'
-  subType: string
-  lotsFor: string
-  numberOfTrucks: number
-  phoneNumber: string
-  country: string
-  state: string
-  city: string
-  companyAlias: string
-  subscriberName: string
-  emailId: string
-  contactPerson: string
-  gstNumber: string
-  area: string
-  addressLane: string
-  pinCode: string
-  assignedOwner: string
-  partnerId: string | null
-  drivingLicenseNumber: string | null
-  status: 'active' | 'inactive'
-  subscriptionId: string
-  createdDate: string
-  lastUpdated: string
-  lastLogin: string
-}
-
-interface Subscription {
-  id: string
-  subscriberId: string
-  subscriptionName: string
-  planType: 'Monthly' | 'Quarterly' | 'Annual'
-  startDate: string
-  endDate: string
-  vehiclesCount: number
-  priceCategory: 'Basic' | 'Standard' | 'Premium' | 'Enterprise'
-  subtotal: number
-  discountAmount: number
-  taxAmount: number
-  totalAmount: number
-  paymentStatus: 'paid' | 'on_credit' | 'overdue' | 'expired'
-  invoiceNumber: string
-}
-```
-
-### Callbacks
-
-| Callback | Description |
-|----------|-------------|
-| `onViewDetails` | User clicks to view subscriber details |
-| `onEdit` | User edits subscriber information |
-| `onAddSubscriber` | User adds new subscriber |
-| `onBulkUpload` | User bulk uploads subscribers |
-| `onSearch` | User searches subscribers |
-| `onFilter` | User applies filters |
-| `onManageSubscription` | User manages subscription details |
-| `onUploadDocument` | User uploads document |
-| `onViewIncidents` | User views linked incidents |
-| `onAssignTeam` | User assigns team members |
+- `SubscribersDashboard` — Main dashboard view
+- `SubscriberList` — Subscriber table with search, filters, actions
+- `SubscriberDetail` — Full-screen detail page with 7-tab navigation
 
 ### Empty States
 
-- **No subscribers:** "No subscribers yet. Add your first subscriber to get started."
-- **No challans:** "No challans for this subscriber"
-- **No incidents:** "No incidents linked to this subscriber"
-- **No documents:** "No documents uploaded"
+- **No subscribers yet:** CTA to add first subscriber
+- **No challans:** Empty Challans tab
+- **No incidents:** Empty Incidents tab
+- **No documents:** Empty Documents tab
+- **Empty wallet:** No transactions yet
+
+## Files to Reference
+
+- `product-plan/sections/subscribers/README.md` — Feature overview
+- `product-plan/sections/subscribers/tests.md` — Test-writing instructions
+- `product-plan/sections/subscribers/components/` — React components
+- `product-plan/sections/subscribers/types.ts` — TypeScript interfaces
+- `product-plan/sections/subscribers/sample-data.json` — Test data
 
 ## Expected User Flows
 
 ### Flow 1: Add Subscriber
+1. User clicks "Add Subscriber"
+2. Form captures Source, Type, Company details, Contact, Location, Owner, Partner (optional)
+3. User fills required fields and submits
+4. **Outcome:** Subscriber appears in list with Active status
 
-1. User clicks "Add Subscriber" button
-2. User fills form (source, type, company details, contact, owner)
-3. User clicks "Save"
-4. **Outcome:** Subscriber created with active status, appears in list
-
-### Flow 2: View Subscriber Details
-
-1. User clicks on subscriber row
-2. Full-page detail view opens with tabs
-3. User navigates between Details, Challans, Incidents, Documents, Subscription, Wallet, Team tabs
-4. **Outcome:** All subscriber information accessible in organized tabs
+### Flow 2: View Subscriber Detail
+1. User clicks a subscriber row
+2. Full-screen detail page opens with header (name, ID, status badge)
+3. User navigates between 7 tabs to view different aspects
+4. **Outcome:** All subscriber data accessible through tabbed navigation
 
 ### Flow 3: Bulk Upload Subscribers
-
 1. User clicks "Bulk Upload Subscriber"
-2. User downloads template, fills data
-3. User uploads Excel file
-4. System validates and reports errors
-5. **Outcome:** Valid subscribers imported
+2. Downloads template, fills it, uploads Excel
+3. System validates and creates subscribers
+4. **Outcome:** Multiple subscribers created, validation errors shown if any
 
 ## Done When
 
 - [ ] Tests written and passing
-- [ ] Subscriber list displays with status badges
-- [ ] Add Subscriber form works
-- [ ] Bulk upload works with validation
-- [ ] Detail view shows all 7 tabs
-- [ ] Subscription management works
-- [ ] Documents can be uploaded/viewed
+- [ ] Subscriber list displays with search and filters
+- [ ] Add subscriber form works with validation
+- [ ] Bulk upload works
+- [ ] Detail page renders with all 7 tabs
+- [ ] Status pills show Active (green) / Inactive (gray)
+- [ ] Edit subscriber works
+- [ ] Linked challans and incidents display
 - [ ] Empty states display properly
-- [ ] Search and filter work
 - [ ] Responsive on mobile

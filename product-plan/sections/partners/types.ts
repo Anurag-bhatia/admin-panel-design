@@ -10,10 +10,15 @@ export interface LinkedSubscriber {
   status: 'active' | 'inactive' | 'paused'
   dateSubscribed: string
   incidentCount: number
+  submittedCourtChallans?: number
+  submittedOnlineChallans?: number
+  submittedCourtAmount?: number
+  submittedOnlineAmount?: number
 }
 
 export interface Payout {
   id: string
+  transactionId: string
   amount: number
   date: string
   status: 'completed' | 'pending' | 'failed'
@@ -32,6 +37,77 @@ export interface ActivityLogEntry {
   action: string
   timestamp: string
   details: string
+}
+
+export interface Vehicle {
+  id: string
+  registrationNumber: string
+  ownerName: string
+  vehicleType: 'truck' | 'bus' | 'car' | 'van' | 'auto' | 'two-wheeler'
+  make: string
+  model: string
+  year: number
+  status: 'active' | 'inactive' | 'blacklisted'
+  incidentCount: number
+  lastIncidentDate: string | null
+  subscriberId: string
+  subscriberName: string
+}
+
+export interface RegisteredVisitor {
+  id: string
+  visitorId: string
+  visitorToken: string
+  visitDate: string
+  visitors: number
+}
+
+export interface RegisteredVisitorDetail {
+  id: string
+  visitorId: string
+  visitorName: string
+  subscriberId: string
+  pendingCourtChallans: number
+  pendingOnlineChallans: number
+  pendingChallansAmount: number
+  pendingCourtChallansAmount: number
+  pendingOnlineChallansAmount: number
+  contactNumber: string
+}
+
+export interface PartnerFollowUp {
+  id: string
+  activityType: 'onboarding' | 'activation' | 'training' | 'mobilisation'
+  subActivityType: 'call' | 'meeting' | 'email' | 'visit' | 'whatsapp'
+  notes: string
+  createdAt: string
+  createdBy: string
+}
+
+export interface OutletQR {
+  id: string
+  qrId: string
+  outletId: string
+  outletName: string
+  totalScans: number
+  status: 'active' | 'inactive'
+  createdDate: string
+}
+
+export interface Outlet {
+  id: string
+  outletId: string
+  name: string
+  address: string
+  city: string
+  state: string
+  pinCode: string
+  contactPerson: string
+  contactPhone: string
+  status: 'active' | 'inactive'
+  subscriberCount: number
+  vehicleCount: number
+  openedDate: string
 }
 
 export interface Partner {
@@ -54,10 +130,31 @@ export interface Partner {
   subscriberTypesAllowed: string[]
   bankAccountNumber: string
   bankName: string
+  partnerType: 'challanPay' | 'lots247'
+  outlets?: number
+  linkedOutlets?: Outlet[]
+  registeredVisitorsCount?: number
+  registeredVisitors?: RegisteredVisitor[]
+  registeredVisitorDetails?: RegisteredVisitorDetail[]
+  outletQRs?: OutletQR[]
+  followUps?: PartnerFollowUp[]
+  vehicles?: number
+  linkedVehicles: Vehicle[]
   status: 'active' | 'inactive'
+  stage?: 'onboarding' | 'activation' | 'mobilisation'
+  onboardingActivity?: 'registration' | 'qrCreation' | 'profileVerification'
+  activationActivity?: 'assigned' | 'trained'
+  mobilisationActivity?: 'posterCreated' | 'welcomeLetterCreated' | 'keychainCreated' | 'dispatch' | 'delivered'
+  assignedTo?: string
+  utmSource?: string
   dateOnboarded: string
   linkedSubscribers: LinkedSubscriber[]
   earnings: number
+  totalCommission: number
+  totalRspBenefit: number
+  totalIncidentsSubmitted: number
+  totalOnlineChallansSubmitted: number
+  totalCourtChallansSubmitted: number
   totalPayouts: number
   payoutHistory: Payout[]
   documents: Document[]
@@ -89,6 +186,9 @@ export interface PartnerListProps {
 
   /** Called when user sorts by a column */
   onSort?: (column: string, direction: 'asc' | 'desc') => void
+
+  /** Called when user clicks "Export" button */
+  onExport?: () => void
 }
 
 export interface PartnerDetailProps {
@@ -109,6 +209,18 @@ export interface PartnerDetailProps {
 
   /** Called when user deletes a document */
   onDeleteDocument?: (id: string, documentId: string) => void
+
+  /** Called when user clicks "Add Subscriber" on the subscribers tab (LOTS247 only) */
+  onAddSubscriber?: () => void
+
+  /** Called when user clicks "Bulk Import" on the subscribers tab (LOTS247 only) */
+  onBulkImportSubscribers?: () => void
+
+  /** Called when user adds a follow-up (ChallanPay only) */
+  onAddFollowUp?: (partnerId: string, followUp: { activityType: string; subActivityType: string; notes: string }) => void
+
+  /** Optional list of tabs to show. If not provided, shows all tabs for the partner type. */
+  allowedTabs?: ('profile' | 'visitors' | 'registeredVisitors' | 'customers' | 'vehicles' | 'outlets' | 'qrs' | 'followUps' | 'financial' | 'documents' | 'summary' | 'reports')[]
 }
 
 export interface AddPartnerProps {
@@ -120,4 +232,23 @@ export interface AddPartnerProps {
 
   /** Current step in the stepper (1-4) */
   currentStep?: number
+}
+
+export interface AddPartnerChallanPayProps {
+  /** Called when user submits the 3-step ChallanPay partner form */
+  onSubmit?: (data: {
+    primaryContact: string
+    entityType: 'business' | 'individual' | ''
+    businessType: string
+    state: string
+    pincode: string
+    email: string
+    permissions: string[]
+    dashboardPermissions: string[]
+    bankName: string
+    bankAccountNumber: string
+  }) => void
+
+  /** Called when user cancels the form */
+  onCancel?: () => void
 }

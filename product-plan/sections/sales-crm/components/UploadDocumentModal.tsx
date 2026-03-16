@@ -89,21 +89,6 @@ export function UploadDocumentModal({ leadId, leadName, documentCategories, onUp
 
         {/* Content */}
         <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-5">
-          {/* Info Box */}
-          <div className="bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-lg p-4">
-            <div className="flex gap-3">
-              <AlertCircle className="w-5 h-5 text-cyan-600 dark:text-cyan-400 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-cyan-900 dark:text-cyan-100 mb-1">Document Guidelines</h3>
-                <ul className="text-xs sm:text-sm text-cyan-800 dark:text-cyan-200 space-y-1">
-                  <li>• Maximum file size: 10 MB</li>
-                  <li>• Supported formats: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, JPG, PNG</li>
-                  <li>• Files will be associated with this lead's timeline</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
           {/* Category Selection */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">

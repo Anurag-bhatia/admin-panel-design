@@ -129,7 +129,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
                 <button
                   type="button"
                   onClick={() => goToStep(step.id)}
-                  className={`flex items-center gap-2 ${step.id < currentStep ? 'cursor-pointer' : 'cursor-default'}`}
+                  className={`flex items-center gap-2 ${step.id < currentStep ? 'cursor-pointer' : step.id === currentStep ? 'cursor-default' : 'cursor-default'}`}
                 >
                   <div
                     className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold shrink-0 transition-colors ${
@@ -164,6 +164,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
               </div>
             ))}
           </div>
+          {/* Mobile step label */}
           <p className="sm:hidden text-xs text-slate-500 dark:text-slate-400 mt-2">
             Step {currentStep + 1} of {STEPS.length}: {STEPS[currentStep].title}
           </p>
@@ -171,6 +172,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
 
         {/* Step Content */}
         <div className="px-4 sm:px-6 py-4 sm:py-5">
+          {/* Step 1: Lead Classification */}
           {currentStep === 0 && (
             <div>
               <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Lead Classification</h3>
@@ -263,6 +265,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
             </div>
           )}
 
+          {/* Step 2: Company Information */}
           {currentStep === 1 && (
             <div>
               <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Company Information</h3>
@@ -312,6 +315,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
             </div>
           )}
 
+          {/* Step 3: Contact Information */}
           {currentStep === 2 && (
             <div>
               <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">POC Information</h3>
@@ -361,6 +365,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
             </div>
           )}
 
+          {/* Step 4: Location Information */}
           {currentStep === 3 && (
             <div>
               <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Location Information</h3>

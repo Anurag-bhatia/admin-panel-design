@@ -2,18 +2,23 @@
 
 ## Overview
 
-The Support module is an intake and triage system for inbound messages from public touchpoints, routing them to Leads, Disputes, or Partnerships.
+Centralized intake and triage system for all inbound messages from public touchpoints (landing pages, contact forms, campaigns). Acts as a structured gateway converting raw customer communication into actionable system records — does not resolve issues directly.
 
 ## Components Provided
 
-- `SupportDashboard` — Main intake view
-- `SubmissionDetailsModal` — Read-only details modal
+- `SupportDashboard` — Main table view with filters and conversion actions
+- `SubmissionDetailsModal` — Read-only detail popup
 
 ## Callback Props
 
 | Callback | Description |
 |----------|-------------|
-| `onView` | View submission details |
-| `onConvertToLead` | Convert to lead |
-| `onConvertToDispute` | Convert to dispute |
-| `onConvertToPartnership` | Convert to partnership |
+| `onConvertToLead` | Convert submission to Lead |
+| `onConvertToDispute` | Convert submission to Dispute |
+| `onConvertToPartnership` | Convert submission to Partnership |
+| `onViewDetails` | Open read-only detail modal |
+| `onFilter` | Filter by Source/Type |
+
+## Data Used
+
+**Entities:** SupportSubmission

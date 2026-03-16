@@ -1,9 +1,5 @@
 # Data Model
 
-## Overview
-
-This document describes the core entities and relationships in the Challan Resolution Admin Panel.
-
 ## Entities
 
 ### Lead
@@ -44,40 +40,24 @@ Record of who did what and when across the entire system.
 
 ## Relationships
 
-```
-Lead ──converts to──▶ Subscriber
+- Lead converts to Subscriber
+- Subscriber has many Incidents
+- Subscriber has many Disputes
+- Subscriber has many Support Tickets
+- Subscriber has many Refunds
+- Incident has many Assignments (for tracking reassignments and resolution attempts)
+- Incident may have one Commission (when successfully resolved)
+- Incident may have one Refund (when resolution fails)
+- Assignment connects Incident and Lawyer
+- Lawyer has many Assignments
+- Lawyer has many Commissions
+- Commission belongs to Lawyer and Incident
+- Refund belongs to Subscriber and Incident
+- Dispute belongs to Subscriber
+- Support Ticket belongs to Subscriber
+- Payment can be for Commission or Refund
+- Audit Log tracks changes to any entity in the system
 
-Subscriber ──has many──▶ Incidents
-Subscriber ──has many──▶ Disputes
-Subscriber ──has many──▶ Support Tickets
-Subscriber ──has many──▶ Refunds
+## Type Definitions
 
-Incident ──has many──▶ Assignments (for reassignments/resolution attempts)
-Incident ──may have one──▶ Commission (when resolved)
-Incident ──may have one──▶ Refund (when resolution fails)
-
-Assignment ──connects──▶ Incident ◀──▶ Lawyer
-
-Lawyer ──has many──▶ Assignments
-Lawyer ──has many──▶ Commissions
-
-Commission ──belongs to──▶ Lawyer
-Commission ──belongs to──▶ Incident
-
-Refund ──belongs to──▶ Subscriber
-Refund ──belongs to──▶ Incident
-
-Dispute ──belongs to──▶ Subscriber
-Support Ticket ──belongs to──▶ Subscriber
-
-Payment ──can be for──▶ Commission | Refund
-
-Audit Log ──tracks changes to──▶ Any Entity
-```
-
-## Implementation Notes
-
-- Each entity should have a unique identifier (ID)
-- Timestamps (createdAt, updatedAt) should be tracked for all entities
-- Status fields should use enums for type safety
-- Consider soft deletes for data that needs to be preserved for audit purposes
+Type definitions for each section are located in `../sections/[section-id]/types.ts`. These define the TypeScript interfaces for all entities used in each section's components.

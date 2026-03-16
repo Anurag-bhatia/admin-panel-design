@@ -35,8 +35,7 @@ const TYPE_LABELS: Record<string, string> = {
   contest: 'Bulk',
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  challan: 'Challan',
+const CHALLAN_TYPE_LABELS: Record<string, string> = {
   court: 'Court',
   online: 'Online',
 }
@@ -244,14 +243,14 @@ export function IncidentDetailHeader({
               </span>
               <span
                 className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                  incident.category === 'court'
+                  incident.challanType === 'court'
                     ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
-                    : incident.category === 'online'
+                    : incident.challanType === 'online'
                     ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
                     : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
                 }`}
               >
-                {CATEGORY_LABELS[incident.category]}
+                {CHALLAN_TYPE_LABELS[incident.challanType]}
               </span>
             </div>
             <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">

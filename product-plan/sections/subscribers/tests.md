@@ -1,8 +1,10 @@
 # Test Instructions: Subscribers
 
+These test-writing instructions are **framework-agnostic**. Adapt them to your testing setup.
+
 ## Overview
 
-Test subscriber list, add/edit, bulk upload, and detail view with all 7 tabs.
+Test subscriber lifecycle management including list view, CRUD operations, bulk upload, and the 7-tab detail page (Details, Challans, Incidents, Documents, Subscription, Wallet, Team).
 
 ---
 
@@ -11,37 +13,53 @@ Test subscriber list, add/edit, bulk upload, and detail view with all 7 tabs.
 ### Flow 1: Add Subscriber
 
 **Steps:**
-1. Click "Add Subscriber"
-2. Fill required fields
-3. Click "Save"
+1. User clicks "Add Subscriber"
+2. Fills Source, Type, Company Name, Contact Person, Phone, Email, State, City, Owner
+3. Submits
 
 **Expected Results:**
-- [ ] Form validates required fields
-- [ ] Success toast shown
-- [ ] Subscriber appears in list with Active status
+- [ ] Subscriber appears in list with Active status (green pill)
+- [ ] Subs-ID auto-generated
+- [ ] Success notification shown
 
-### Flow 2: View Subscriber Details
+**Failure Path:** Required fields missing shows validation errors
+
+### Flow 2: View Detail Page with 7 Tabs
 
 **Steps:**
-1. Click subscriber row
-2. Navigate through all 7 tabs
+1. User clicks subscriber row
+2. Full-screen detail opens
+3. User navigates all 7 tabs
 
 **Expected Results:**
-- [ ] Details tab shows company info
-- [ ] Challans tab shows linked challans
-- [ ] Incidents tab shows linked incidents
-- [ ] Documents tab shows uploaded files
-- [ ] Subscription tab shows plan details
-- [ ] Wallet tab shows financial info
-- [ ] Team tab shows assigned members
+- [ ] Header shows subscriber name, ID, status badge, "Edit Details" button
+- [ ] Details tab: company info, contact, address
+- [ ] Challans tab: linked challans with status
+- [ ] Incidents tab: linked incidents
+- [ ] Documents tab: uploaded files
+- [ ] Subscription tab: plan details, billing
+- [ ] Wallet tab: payments, credits, invoices
+- [ ] Team tab: assigned team members
+
+### Flow 3: Bulk Upload
+
+**Steps:**
+1. Click "Bulk Upload Subscriber"
+2. Download template, fill, upload
+
+**Expected Results:**
+- [ ] Template downloads
+- [ ] Subscribers created from file
+- [ ] Validation errors per row shown
 
 ---
 
 ## Empty State Tests
 
-- [ ] No subscribers: "No subscribers yet"
-- [ ] No challans: "No challans for this subscriber"
-- [ ] No documents: "No documents uploaded"
+- [ ] No subscribers: "No subscribers yet" with add CTA
+- [ ] No challans for subscriber: empty Challans tab
+- [ ] No documents: empty Documents tab with upload prompt
+- [ ] Empty wallet: "No transactions yet"
 
 ---
 
@@ -49,9 +67,15 @@ Test subscriber list, add/edit, bulk upload, and detail view with all 7 tabs.
 
 ```typescript
 const mockSubscriber = {
-  id: "LWD-1160523",
-  subscriberName: "ABC Logistics",
+  id: "SUB-001",
+  source: "Sales",
+  companyName: "Fleet Corp",
+  contactPerson: "Amit Singh",
+  phone: "+91-9876543210",
+  email: "amit@fleetcorp.com",
   status: "active",
-  subscriptionId: "subscription-001"
+  owner: "Sales Team",
+  subscription: { plan: "Enterprise", status: "active" },
+  vehicleCount: 45,
 };
 ```

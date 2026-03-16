@@ -32,8 +32,7 @@ const TYPE_LABELS: Record<string, string> = {
   contest: 'Bulk',
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  challan: 'Challan',
+const CHALLAN_TYPE_LABELS: Record<string, string> = {
   court: 'Court',
   online: 'Online',
 }
@@ -191,10 +190,10 @@ export function DetailsTab({
 
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  Category
+                  Challan
                 </label>
                 <p className="text-sm text-slate-900 dark:text-white">
-                  {CATEGORY_LABELS[incident.category]}
+                  {CHALLAN_TYPE_LABELS[incident.challanType]}
                 </p>
               </div>
 

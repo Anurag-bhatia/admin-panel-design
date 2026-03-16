@@ -4,7 +4,7 @@ These test-writing instructions are **framework-agnostic**. Adapt them to your t
 
 ## Overview
 
-The Sales CRM manages the lead pipeline from capture to conversion. Test pipeline navigation, lead creation, bulk operations, and follow-up tracking.
+Test the lead pipeline management including stage navigation, lead CRUD, bulk operations, detail view with timeline, follow-up tracking, and My Leads view.
 
 ---
 
@@ -12,124 +12,87 @@ The Sales CRM manages the lead pipeline from capture to conversion. Test pipelin
 
 ### Flow 1: Add New Lead
 
-**Scenario:** User creates a new lead
-
-#### Success Path
+**Success Path**
 
 **Steps:**
 1. User clicks "Add Lead" button
-2. User fills Source, Type, Company Name, Contact Person, Phone, Email
-3. User clicks "Save"
+2. Modal opens with form
+3. User fills Source, Type, Company Name, Contact Person, Phone, Email, State, City
+4. User submits
 
 **Expected Results:**
-- [ ] Modal opens with title "Add Lead"
-- [ ] All required fields have validation
-- [ ] Success toast: "Lead created successfully"
-- [ ] New lead appears in "New" tab
+- [ ] Lead appears in "New" tab
+- [ ] Tab count increments
+- [ ] Success notification shown
 
-#### Failure Path: Invalid Email
-
-**Steps:**
-1. User enters invalid email "notanemail"
-2. User clicks "Save"
-
-**Expected Results:**
-- [ ] Error: "Please enter a valid email address"
-- [ ] Form not submitted
-
----
+**Failure Path: Validation**
+- [ ] Phone number format validated
+- [ ] Required fields (Source, Type, Phone) show error messages
+- [ ] Form data preserved on error
 
 ### Flow 2: Bulk Upload Leads
 
-**Scenario:** User uploads multiple leads via Excel
-
-#### Success Path
-
 **Steps:**
 1. User clicks "Bulk Upload Leads"
-2. User downloads template
-3. User fills template with 10 leads
-4. User uploads file
-5. System validates and imports
+2. Downloads template via "Download Template" link
+3. Uploads filled Excel file
 
 **Expected Results:**
-- [ ] Template downloads as Excel file
-- [ ] Upload accepts .xlsx, .xls, .csv
-- [ ] Progress indicator during upload
-- [ ] Success: "10 leads imported successfully"
-- [ ] Leads appear in list
+- [ ] Template downloads successfully
+- [ ] Upload shows progress
+- [ ] Created leads appear in list
+- [ ] Validation errors shown per row if any
 
-#### Failure Path: Validation Errors
-
-**Setup:**
-- Excel has rows with missing required fields
-
-**Expected Results:**
-- [ ] Error summary shows: "3 rows have errors"
-- [ ] Each error shows row number and field
-- [ ] Valid rows can still be imported
-- [ ] User can fix and re-upload
-
----
-
-### Flow 3: Bulk Update Status
-
-**Scenario:** User moves multiple leads to new status
+### Flow 3: View Lead Detail and Add Follow-Up
 
 **Steps:**
-1. User selects 5 leads via checkboxes
-2. User clicks "Bulk Update"
-3. User selects "Status" toggle
-4. User selects "Follow-up" from dropdown
-5. User clicks "Update"
+1. User clicks a lead row
+2. Detail view opens with timeline
+3. User clicks "Add Follow-Up"
+4. Fills activity type, notes, next follow-up date, outcome
+5. Submits
 
 **Expected Results:**
-- [ ] Selection shows "5 leads selected"
-- [ ] Toggle between Status/Owner update
-- [ ] Success: "5 leads updated to Follow-up"
-- [ ] Leads move to Follow-up tab
+- [ ] Detail shows lead info, timeline, documents
+- [ ] Follow-up appears in timeline
+- [ ] Next follow-up date tracked
 
----
-
-### Flow 4: Add Follow-Up Activity
-
-**Scenario:** User logs a follow-up interaction
+### Flow 4: Bulk Update
 
 **Steps:**
-1. User opens lead detail view
-2. User clicks "Add Follow-Up"
-3. User selects Activity Type: "Call"
-4. User enters notes
-5. User sets next follow-up date
-6. User selects Outcome: "Interested"
-7. User clicks "Save"
+1. User selects multiple leads
+2. Clicks "Bulk Update"
+3. Chooses Status change, selects new status
+4. Confirms
 
 **Expected Results:**
-- [ ] Modal has all required fields
-- [ ] Date picker for next follow-up
-- [ ] Success: "Follow-up added"
-- [ ] Activity appears in timeline
+- [ ] All selected leads move to new status
+- [ ] Tab counts update
+- [ ] Confirmation shown
 
 ---
 
 ## Empty State Tests
 
-### No Leads Yet
-
-**Setup:** Lead list is empty
-
-**Expected Results:**
-- [ ] Shows "No leads in your pipeline"
-- [ ] "Add Lead" CTA visible
-- [ ] Clicking CTA opens add modal
+### No Leads
+- [ ] Shows "No leads yet" with CTA to add lead
+- [ ] "Add Lead" button functional
 
 ### No Leads in Stage
+- [ ] Empty tab shows helpful message
+- [ ] Other tabs still show counts
 
-**Setup:** "Quotations" tab has no leads
+### No Follow-Ups
+- [ ] Timeline shows "No activity yet"
 
-**Expected Results:**
-- [ ] Tab shows "Quotations (0)"
-- [ ] Empty state: "No leads in Quotations"
+---
+
+## Edge Cases
+
+- [ ] Lead with very long company name truncates
+- [ ] Duplicate phone number handling
+- [ ] Switching between All Leads and My Leads preserves filters
+- [ ] Tab counts update in real-time after operations
 
 ---
 
@@ -137,16 +100,20 @@ The Sales CRM manages the lead pipeline from capture to conversion. Test pipelin
 
 ```typescript
 const mockLead = {
-  id: "lead-001",
+  id: "LD-001",
   source: "Website",
-  type: "Fleet Services",
-  subType: "Full Management",
-  companyName: "Metro Transport Co",
-  contactPerson: "Rahul Verma",
-  phoneNumber: "+91 98765 43210",
-  emailId: "rahul@metrotransport.com",
+  type: "B2B",
+  subType: "Fleet",
+  companyName: "Transport Solutions Ltd",
+  contactPerson: "Rajesh Kumar",
+  phone: "+91-9876543210",
+  email: "rajesh@transport.com",
   status: "new",
-  assignedTo: null,
-  createdDate: "2024-01-15T10:30:00Z"
+  owner: "John Doe",
+  state: "Delhi",
+  city: "New Delhi",
+  createdAt: "2025-12-01T10:00:00Z",
 };
+
+const mockEmptyList = [];
 ```

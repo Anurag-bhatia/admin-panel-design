@@ -4,64 +4,61 @@
 
 The Admin Panel shell provides a sidebar navigation layout optimized for operations management. The sidebar displays all major sections with clear visual hierarchy, while the content area provides maximum space for data tables, forms, and dashboards.
 
-## Components
+## Layout Pattern
 
-### AppShell
-
-Main layout wrapper that provides:
-- Collapsible sidebar navigation (expands on hover)
-- Mobile-responsive layout with bottom tab navigation
-- Header with breadcrumbs and user menu
-- Content area for page content
-
-**Props:**
-- `children` — Page content to render
-- `navigationItems` — Array of navigation items with icons
-- `user` — Current user info (name, email, avatar)
-- `breadcrumbs` — Current navigation path
-- `onNavigate` — Callback when navigation item clicked
-- `onLogout` — Callback when logout clicked
-
-### MainNav
-
-Navigation component with:
-- Collapsible/expandable sidebar
-- Active state highlighting (cyan-600)
-- Sub-navigation support
-- Dark mode styling
-
-### UserMenu
-
-User menu component with:
-- Avatar or initials display
-- Dropdown with user info
-- Logout action
+- **Desktop:** Dark sidebar (#212121) on the left, collapsed by default (64px), expands on hover (240px). Content area fills remaining space with header bar containing user menu.
+- **Mobile:** Bottom tab navigation showing 5 primary sections. Hamburger menu opens full sidebar overlay.
 
 ## Navigation Structure
 
-| Route | Label | Icon |
-|-------|-------|------|
-| `/incidents` | Incidents | AlertTriangle |
-| `/sales-crm` | Sales CRM | TrendingUp |
-| `/sales-crm/all-leads` | All Leads | — |
-| `/sales-crm/my-leads` | My Leads | — |
-| `/subscribers` | Subscribers | Users |
-| `/customers` | Customers | UserCheck |
-| `/lawyers` | Lawyers | Scale |
-| `/partners` | Partners | Handshake |
-| `/support` | Support | Headphones |
-| `/reports` | Reports | BarChart3 |
-| `/team` | Team | UsersRound |
+| Nav Item | Route | Sub-items |
+|----------|-------|-----------|
+| Incidents | /incidents | — |
+| Sales CRM | /sales-crm | All Leads, My Leads |
+| Subscribers | /subscribers | — |
+| Customers | /customers | — |
+| Lawyers | /lawyers | — |
+| Partners | /partners | — |
+| Payments | /payments | — |
+| Disputes | /disputes | — |
+| Support | /support | — |
+| Reports | /reports | — |
+| Team | /team | — |
 
-## Layout Pattern
+## Components Provided
 
-- **Desktop:** Sidebar on left (240px expanded, 64px collapsed), content fills remaining space
-- **Tablet:** Similar to desktop
-- **Mobile:** Bottom tab navigation with first 5 sections, hamburger menu for sidebar
+### `AppShell`
+Root layout wrapper. Renders sidebar, header, content area, and mobile bottom nav.
+
+**Props:**
+- `children` — Page content
+- `navigationItems` — Array of nav items with label, href, icon, isActive, children
+- `user` — Current user (name, email, avatarUrl, designation)
+- `breadcrumbs` — Breadcrumb path (currently disabled)
+- `onNavigate` — Called when user clicks a nav item
+- `onLogout` — Called when user clicks logout
+
+### `MainNav`
+Sidebar navigation with collapsible sub-items.
+
+**Props:**
+- `items` — Navigation items array
+- `onNavigate` — Navigation callback
+- `isCollapsed` — Whether sidebar is collapsed
+- `darkMode` — Use dark color scheme
+
+### `UserMenu`
+User avatar with dropdown containing logout.
+
+**Props:**
+- `user` — User object (name, email, avatarUrl, designation)
+- `onLogout` — Logout callback
 
 ## Design Notes
 
-- Sidebar has dark background (#212121) with zinc borders
-- Active items use cyan-600 background with white text
-- Collapse/expand uses smooth 300ms transition
-- Logo shows "L" when collapsed, full logo when expanded
+- Active nav items use `bg-cyan-600 text-white`
+- Collapsed sidebar shows icons only with hover tooltips
+- Sub-navigation items (e.g., Sales CRM children) auto-expand when a child is active
+- Smooth 300ms transition when hovering to expand sidebar
+- Logo shows "L" when collapsed, full logo image when expanded
+- Mobile bottom nav shows first 5 items from navigation
