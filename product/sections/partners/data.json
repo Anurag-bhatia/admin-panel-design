@@ -45,6 +45,7 @@
       "stage": "activation",
       "activationActivity": "trained",
       "assignedTo": "Arun Kumar",
+      "profileCompletion": 30,
       "utmSource": "Google Ads",
       "outlets": 4,
       "linkedOutlets": [
@@ -511,6 +512,7 @@
       "stage": "mobilisation",
       "activationActivity": "trained",
       "assignedTo": "Neha Patel",
+      "profileCompletion": 75,
       "utmSource": "Referral",
       "outlets": 2,
       "linkedOutlets": [
@@ -1033,6 +1035,7 @@
       "stage": "onboarding",
       "onboardingActivity": "registration",
       "assignedTo": null,
+      "profileCompletion": 50,
       "utmSource": "Facebook",
       "outlets": 1,
       "linkedOutlets": [
@@ -1260,6 +1263,7 @@
       "stage": "activation",
       "activationActivity": "assigned",
       "assignedTo": "Rajesh Verma",
+      "profileCompletion": 100,
       "utmSource": "Google Ads",
       "outlets": 6,
       "registeredVisitorsCount": 485,
@@ -1658,6 +1662,7 @@
       "stage": "mobilisation",
       "activationActivity": "trained",
       "assignedTo": "Kavita Sharma",
+      "profileCompletion": 60,
       "utmSource": "Referral",
       "outlets": 3,
       "registeredVisitorsCount": 156,

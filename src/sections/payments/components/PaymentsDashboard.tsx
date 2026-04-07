@@ -38,7 +38,7 @@ const PARTNER_TABS = [
   { key: 'to_pay', label: 'To Pay' },
   { key: 'completed', label: 'Completed' },
   { key: 'hold', label: 'Hold' },
-  { key: 'rejected', label: 'Rejected' },
+  { key: 'rejected', label: 'Failed' },
 ]
 
 const REFUND_STATUS_OPTIONS = [
@@ -56,10 +56,12 @@ const LAWYER_FEE_STATUS_OPTIONS = [
 ]
 
 const PARTNER_STATUS_OPTIONS = [
-  { value: 'To Pay', label: 'To Pay' },
-  { value: 'Completed', label: 'Completed' },
-  { value: 'Hold', label: 'Hold' },
-  { value: 'Rejected', label: 'Rejected' },
+  { value: 'Eligible', label: 'Eligible' },
+  { value: 'Requested', label: 'Requested' },
+  { value: 'Auto-Processed', label: 'Auto-Processed' },
+  { value: 'Processing', label: 'Processing' },
+  { value: 'Processed', label: 'Processed' },
+  { value: 'Failed', label: 'Failed' },
 ]
 
 function isRefundInStage(refund: Refund, stage: string): boolean {
@@ -79,10 +81,10 @@ function isLawyerFeeInStage(fee: LawyerFee, stage: string): boolean {
 }
 
 function isPartnerPayoutInStage(payout: PartnerPayout, stage: string): boolean {
-  if (stage === 'to_pay') return payout.status === 'To Pay'
-  if (stage === 'completed') return payout.status === 'Completed'
-  if (stage === 'hold') return payout.status === 'Hold'
-  if (stage === 'rejected') return payout.status === 'Rejected'
+  if (stage === 'to_pay') return payout.status === 'Eligible' || payout.status === 'Requested'
+  if (stage === 'completed') return payout.status === 'Processed'
+  if (stage === 'hold') return payout.status === 'Processing'
+  if (stage === 'rejected') return payout.status === 'Failed'
   return true
 }
 
@@ -195,10 +197,10 @@ export function PaymentsDashboard({
 
   // Partner payout stage counts
   const partnerStageCounts = useMemo(() => ({
-    to_pay: partnerPayouts.filter((p) => p.status === 'To Pay').length,
-    completed: partnerPayouts.filter((p) => p.status === 'Completed').length,
-    hold: partnerPayouts.filter((p) => p.status === 'Hold').length,
-    rejected: partnerPayouts.filter((p) => p.status === 'Rejected').length,
+    to_pay: partnerPayouts.filter((p) => p.status === 'Eligible' || p.status === 'Requested').length,
+    completed: partnerPayouts.filter((p) => p.status === 'Processed').length,
+    hold: partnerPayouts.filter((p) => p.status === 'Processing').length,
+    rejected: partnerPayouts.filter((p) => p.status === 'Failed').length,
   }), [partnerPayouts])
 
   // Filtered leads
@@ -615,6 +617,7 @@ export function PaymentsDashboard({
           onSearchChange={setSearchQuery}
           onExport={currentExport}
           statusOptions={currentStatusOptions}
+          {...(sidebarView === 'partners' ? { fromDateLabel: 'Requested Date', toDateLabel: 'Paid Date' } : {})}
         />
 
         {/* Table */}
@@ -825,13 +828,13 @@ export function PaymentsDashboard({
                     Total Earnings
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Payout Amount
+                    Monthly Payout
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Status
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Due Date
+                    Requested Date
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Paid Date
@@ -952,9 +955,19 @@ export function PaymentsDashboard({
       {sidebarView === 'partners' && selectedPartnerKeys.size > 0 && (
         <RefundBulkActionsBar
           selectedCount={selectedPartnerKeys.size}
-          actionLabel="Mark as Paid"
           onClearSelection={() => setSelectedPartnerKeys(new Set())}
-          onMarkComplete={() => onBulkMarkPartnerPayoutsPaid?.(selectedPartnerArray)}
+          moveOptions={[
+            { value: 'completed', label: 'Completed' },
+            { value: 'hold', label: 'Hold' },
+            { value: 'rejected', label: 'Failed' },
+          ]}
+          onMove={(target) => {
+            console.log(`Move ${selectedPartnerArray.length} payouts to ${target}`)
+            setSelectedPartnerKeys(new Set())
+          }}
+          onAddNote={(note) => {
+            console.log(`Add note for ${selectedPartnerArray.length} payouts:`, note)
+          }}
         />
       )}
 

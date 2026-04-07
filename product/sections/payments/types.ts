@@ -62,7 +62,7 @@ export interface PartnerPayout {
   subscriberCount: number
   totalEarnings: number
   payoutAmount: number
-  status: 'To Pay' | 'Completed' | 'Hold' | 'Rejected'
+  status: 'Eligible' | 'Requested' | 'Auto-Processed' | 'Processing' | 'Processed' | 'Failed'
   dueDate: string
   paidDate: string | null
 }

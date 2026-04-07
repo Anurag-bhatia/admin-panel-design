@@ -485,6 +485,29 @@ export function PartnerDetail({
                   </div>
                 )}
               </div>
+
+              {/* Profile Verification Card */}
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">Profile Verification</p>
+                {(() => {
+                  const completion = partner.profileCompletion ?? 0
+                  const isVerified = completion === 100
+                  return (
+                    <div className="flex flex-col gap-3">
+                      <div className={`inline-flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium ${isVerified ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'}`}>
+                        <span>{isVerified ? 'Verified profile' : 'Unverified profile'}</span>
+                        <span className="font-bold ml-6">{completion}%</span>
+                      </div>
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5">
+                        <div
+                          className={`h-1.5 rounded-full transition-all ${isVerified ? 'bg-green-500' : completion >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                          style={{ width: `${completion}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
             </div>
           </div>
         )}

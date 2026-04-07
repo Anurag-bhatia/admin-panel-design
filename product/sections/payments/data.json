@@ -464,7 +464,7 @@
       "subscriberCount": 3,
       "totalEarnings": 45000,
       "payoutAmount": 5000,
-      "status": "To Pay",
+      "status": "Eligible",
       "dueDate": "2026-03-15",
       "paidDate": null
     },
@@ -475,7 +475,7 @@
       "subscriberCount": 2,
       "totalEarnings": 32500,
       "payoutAmount": 7500,
-      "status": "To Pay",
+      "status": "Requested",
       "dueDate": "2026-03-20",
       "paidDate": null
     },
@@ -486,7 +486,7 @@
       "subscriberCount": 1,
       "totalEarnings": 12000,
       "payoutAmount": 2000,
-      "status": "To Pay",
+      "status": "Auto-Processed",
       "dueDate": "2026-03-25",
       "paidDate": null
     },
@@ -497,7 +497,7 @@
       "subscriberCount": 2,
       "totalEarnings": 8500,
       "payoutAmount": 8500,
-      "status": "To Pay",
+      "status": "Processing",
       "dueDate": "2026-03-10",
       "paidDate": null
     },
@@ -508,7 +508,7 @@
       "subscriberCount": 3,
       "totalEarnings": 38000,
       "payoutAmount": 8000,
-      "status": "To Pay",
+      "status": "Eligible",
       "dueDate": "2026-03-18",
       "paidDate": null
     },
@@ -519,7 +519,7 @@
       "subscriberCount": 1,
       "totalEarnings": 6000,
       "payoutAmount": 6000,
-      "status": "To Pay",
+      "status": "Failed",
       "dueDate": "2026-03-22",
       "paidDate": null
     },
@@ -530,7 +530,7 @@
       "subscriberCount": 2,
       "totalEarnings": 28500,
       "payoutAmount": 8500,
-      "status": "To Pay",
+      "status": "Requested",
       "dueDate": "2026-03-12",
       "paidDate": null
     },
@@ -541,7 +541,7 @@
       "subscriberCount": 3,
       "totalEarnings": 45000,
       "payoutAmount": 20000,
-      "status": "Completed",
+      "status": "Processed",
       "dueDate": "2026-01-15",
       "paidDate": "2026-01-15"
     },
@@ -552,7 +552,7 @@
       "subscriberCount": 2,
       "totalEarnings": 32500,
       "payoutAmount": 25000,
-      "status": "Completed",
+      "status": "Processed",
       "dueDate": "2026-02-10",
       "paidDate": "2026-02-10"
     },
@@ -563,7 +563,7 @@
       "subscriberCount": 3,
       "totalEarnings": 38000,
       "payoutAmount": 30000,
-      "status": "Completed",
+      "status": "Processed",
       "dueDate": "2026-02-10",
       "paidDate": "2026-02-10"
     },
@@ -574,7 +574,7 @@
       "subscriberCount": 1,
       "totalEarnings": 5000,
       "payoutAmount": 5000,
-      "status": "Completed",
+      "status": "Processed",
       "dueDate": "2023-12-15",
       "paidDate": "2023-12-15"
     }

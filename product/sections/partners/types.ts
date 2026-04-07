@@ -146,6 +146,7 @@ export interface Partner {
   activationActivity?: 'assigned' | 'trained'
   mobilisationActivity?: 'posterCreated' | 'welcomeLetterCreated' | 'keychainCreated' | 'dispatch' | 'delivered'
   assignedTo?: string
+  profileCompletion?: number
   utmSource?: string
   dateOnboarded: string
   linkedSubscribers: LinkedSubscriber[]
