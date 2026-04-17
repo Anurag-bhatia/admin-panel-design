@@ -1754,20 +1754,22 @@ export function PartnerDetail({
                     className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="">Select Stage</option>
+                    <option value="registration">Registration</option>
                     <option value="verification">Verification</option>
                     <option value="activation">Activation</option>
+                    <option value="mobilisation">Mobilisation</option>
                   </select>
                 </div>
 
                 {/* Activity */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                    Activity <span className="text-red-500">*</span>
+                    Activity {(followUpForm.activityType === 'verification' || followUpForm.activityType === 'activation') && <span className="text-red-500">*</span>}
                   </label>
                   <select
                     value={followUpForm.subActivityType}
                     onChange={(e) => setFollowUpForm({ ...followUpForm, subActivityType: e.target.value })}
-                    disabled={!followUpForm.activityType}
+                    disabled={!followUpForm.activityType || followUpForm.activityType === 'registration' || followUpForm.activityType === 'mobilisation'}
                     className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Activity</option>
@@ -1812,13 +1814,14 @@ export function PartnerDetail({
                 </button>
                 <button
                   onClick={() => {
-                    if (followUpForm.activityType && followUpForm.subActivityType && followUpForm.notes) {
+                    const needsActivity = followUpForm.activityType === 'verification' || followUpForm.activityType === 'activation'
+                    if (followUpForm.activityType && followUpForm.notes && (!needsActivity || followUpForm.subActivityType)) {
                       onAddFollowUp?.(partner.id, followUpForm)
                       setShowAddFollowUp(false)
                       setFollowUpForm({ activityType: '', subActivityType: '', notes: '' })
                     }
                   }}
-                  disabled={!followUpForm.activityType || !followUpForm.notes}
+                  disabled={!followUpForm.activityType || !followUpForm.notes || ((followUpForm.activityType === 'verification' || followUpForm.activityType === 'activation') && !followUpForm.subActivityType)}
                   className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg transition-colors"
                 >
                   Add Follow Up
