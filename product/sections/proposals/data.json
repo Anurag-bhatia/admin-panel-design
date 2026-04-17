@@ -1,0 +1,941 @@
+{
+  "_meta": {
+    "models": {
+      "proposals": "A customer service request for challan resolution, DL verification, or RC verification. Each proposal moves through a lifecycle from inbox to review, quoting, and finally conversion to an incident or rejection.",
+      "proposalItems": "The individual items within a proposal — specific challans, driving licences, or registration certificates that need processing.",
+      "activities": "Audit trail entries that record every status change, assignment, quote action, and note on a proposal.",
+      "comments": "Messages in the shared notes thread between the customer and the admin team. Both sides see the same thread.",
+      "teamMembers": "Internal LOTS team staff who can be assigned to review and manage proposals."
+    },
+    "relationships": [
+      "Each Proposal belongs to a Customer (tracked via the customer object on the proposal)",
+      "Each Proposal may be assigned to a TeamMember",
+      "Each Proposal contains one or more ProposalItems (the specific challans, DLs, or RCs)",
+      "Each Proposal has many Activities (the audit timeline)",
+      "Each Proposal has many Comments (the shared chat thread)",
+      "A converted Proposal links to an Incident via linkedIncidentId"
+    ]
+  },
+  "teamMembers": [
+    { "id": "tm-001", "name": "Amit Verma", "role": "Senior Operations Manager" },
+    { "id": "tm-002", "name": "Priya Sharma", "role": "Compliance Specialist" },
+    { "id": "tm-003", "name": "Vikram Singh", "role": "Challan Resolution Lead" },
+    { "id": "tm-004", "name": "Neha Gupta", "role": "DL & RC Processing" },
+    { "id": "tm-005", "name": "Rahul Tiwari", "role": "Operations Executive" }
+  ],
+  "proposals": [
+    {
+      "id": "prp-001",
+      "displayId": "REQ-1001",
+      "type": "Challan",
+      "description": "Bulk challan resolution for 12 pending challans across Lucknow fleet",
+      "quantity": 12,
+      "amount": 240000,
+      "status": "sent",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-11T08:15:00Z",
+      "updatedAt": "2026-04-11T08:15:00Z",
+      "customer": {
+        "id": "cust-001",
+        "name": "Rajesh Kumar",
+        "company": "Kumar Transport Pvt Ltd",
+        "phone": "+91 98765 43210",
+        "email": "rajesh@kumartransport.in"
+      },
+      "assignedTo": null
+    },
+    {
+      "id": "prp-002",
+      "displayId": "REQ-1002",
+      "type": "DL",
+      "description": "DL verification for 5 newly onboarded drivers — UP and MP RTOs",
+      "quantity": 5,
+      "amount": 7500,
+      "status": "sent",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-11T09:30:00Z",
+      "updatedAt": "2026-04-11T09:30:00Z",
+      "customer": {
+        "id": "cust-001",
+        "name": "Rajesh Kumar",
+        "company": "Kumar Transport Pvt Ltd",
+        "phone": "+91 98765 43210",
+        "email": "rajesh@kumartransport.in"
+      },
+      "assignedTo": null
+    },
+    {
+      "id": "prp-003",
+      "displayId": "REQ-1003",
+      "type": "RC",
+      "description": "RC verification for 8 trucks transferred from Jaipur depot",
+      "quantity": 8,
+      "amount": 12000,
+      "status": "sent",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-11T11:00:00Z",
+      "updatedAt": "2026-04-11T11:00:00Z",
+      "customer": {
+        "id": "cust-001",
+        "name": "Rajesh Kumar",
+        "company": "Kumar Transport Pvt Ltd",
+        "phone": "+91 98765 43210",
+        "email": "rajesh@kumartransport.in"
+      },
+      "assignedTo": null
+    },
+    {
+      "id": "prp-004",
+      "displayId": "REQ-1004",
+      "type": "Challan",
+      "description": "Overloading challans for 3 vehicles on NH48 Pune stretch",
+      "quantity": 3,
+      "amount": 60000,
+      "status": "sent",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-11T14:20:00Z",
+      "updatedAt": "2026-04-11T14:20:00Z",
+      "customer": {
+        "id": "cust-001",
+        "name": "Rajesh Kumar",
+        "company": "Kumar Transport Pvt Ltd",
+        "phone": "+91 98765 43210",
+        "email": "rajesh@kumartransport.in"
+      },
+      "assignedTo": null
+    },
+    {
+      "id": "prp-012",
+      "displayId": "REQ-1012",
+      "type": "RC",
+      "description": "RC fitness renewal for 6 heavy trucks due in April",
+      "quantity": 6,
+      "amount": 9000,
+      "status": "sent",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-12T07:45:00Z",
+      "updatedAt": "2026-04-12T07:45:00Z",
+      "customer": {
+        "id": "cust-002",
+        "name": "Suresh Patel",
+        "company": "Patel Logistics",
+        "phone": "+91 87654 32109",
+        "email": "suresh@patellogistics.com"
+      },
+      "assignedTo": null
+    },
+    {
+      "id": "prp-013",
+      "displayId": "REQ-1013",
+      "type": "DL",
+      "description": "Badge renewal for 4 commercial drivers — HGMV endorsement",
+      "quantity": 4,
+      "amount": 6000,
+      "status": "sent",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-12T10:00:00Z",
+      "updatedAt": "2026-04-12T10:00:00Z",
+      "customer": {
+        "id": "cust-003",
+        "name": "Anita Deshmukh",
+        "company": "Deshmukh Freight Services",
+        "phone": "+91 76543 21098",
+        "email": "anita@deshmukhfreight.in"
+      },
+      "assignedTo": null
+    },
+    {
+      "id": "prp-014",
+      "displayId": "REQ-1014",
+      "type": "Challan",
+      "description": "Signal violation challans — Mumbai-Pune corridor bulk dispute",
+      "quantity": 9,
+      "amount": 135000,
+      "status": "sent",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-12T13:30:00Z",
+      "updatedAt": "2026-04-12T13:30:00Z",
+      "customer": {
+        "id": "cust-002",
+        "name": "Suresh Patel",
+        "company": "Patel Logistics",
+        "phone": "+91 87654 32109",
+        "email": "suresh@patellogistics.com"
+      },
+      "assignedTo": null
+    },
+    {
+      "id": "prp-015",
+      "displayId": "REQ-1015",
+      "type": "RC",
+      "description": "Address update on RC for 2 vehicles relocated Nagpur → Hyderabad",
+      "quantity": 2,
+      "amount": 3000,
+      "status": "sent",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-12T16:10:00Z",
+      "updatedAt": "2026-04-12T16:10:00Z",
+      "customer": {
+        "id": "cust-003",
+        "name": "Anita Deshmukh",
+        "company": "Deshmukh Freight Services",
+        "phone": "+91 76543 21098",
+        "email": "anita@deshmukhfreight.in"
+      },
+      "assignedTo": null
+    },
+    {
+      "id": "prp-023",
+      "displayId": "REQ-1023",
+      "type": "Challan",
+      "description": "6 highway challans from NH44 — documents submitted",
+      "quantity": 6,
+      "amount": 90000,
+      "status": "under_review",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-08T09:00:00Z",
+      "updatedAt": "2026-04-10T11:30:00Z",
+      "customer": {
+        "id": "cust-001",
+        "name": "Rajesh Kumar",
+        "company": "Kumar Transport Pvt Ltd",
+        "phone": "+91 98765 43210",
+        "email": "rajesh@kumartransport.in"
+      },
+      "assignedTo": { "id": "tm-003", "name": "Vikram Singh" }
+    },
+    {
+      "id": "prp-024",
+      "displayId": "REQ-1024",
+      "type": "DL",
+      "description": "DL endorsement upgrade — documents under verification",
+      "quantity": 3,
+      "amount": 4500,
+      "status": "under_review",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-09T07:20:00Z",
+      "updatedAt": "2026-04-10T14:00:00Z",
+      "customer": {
+        "id": "cust-002",
+        "name": "Suresh Patel",
+        "company": "Patel Logistics",
+        "phone": "+91 87654 32109",
+        "email": "suresh@patellogistics.com"
+      },
+      "assignedTo": { "id": "tm-004", "name": "Neha Gupta" }
+    },
+    {
+      "id": "prp-025",
+      "displayId": "REQ-1025",
+      "type": "RC",
+      "description": "Fitness certificate renewal — inspections scheduled",
+      "quantity": 5,
+      "amount": 7500,
+      "status": "under_review",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-09T11:45:00Z",
+      "updatedAt": "2026-04-11T09:15:00Z",
+      "customer": {
+        "id": "cust-003",
+        "name": "Anita Deshmukh",
+        "company": "Deshmukh Freight Services",
+        "phone": "+91 76543 21098",
+        "email": "anita@deshmukhfreight.in"
+      },
+      "assignedTo": { "id": "tm-004", "name": "Neha Gupta" }
+    },
+    {
+      "id": "prp-026",
+      "displayId": "REQ-1026",
+      "type": "Challan",
+      "description": "Court challan batch — 4 vehicles in Lok Adalat pending",
+      "quantity": 4,
+      "amount": 64000,
+      "status": "under_review",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-07T15:30:00Z",
+      "updatedAt": "2026-04-10T16:45:00Z",
+      "customer": {
+        "id": "cust-004",
+        "name": "Mohammed Irfan",
+        "company": "Irfan & Sons Transport",
+        "phone": "+91 99887 76655",
+        "email": "irfan@irfantransport.co.in"
+      },
+      "assignedTo": { "id": "tm-001", "name": "Amit Verma" }
+    },
+    {
+      "id": "prp-009",
+      "displayId": "REQ-1009",
+      "type": "Challan",
+      "description": "Lok Adalat batch processing via Delhi RTO",
+      "quantity": 5,
+      "amount": 95000,
+      "status": "received",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-03T08:00:00Z",
+      "updatedAt": "2026-04-08T10:30:00Z",
+      "customer": {
+        "id": "cust-001",
+        "name": "Rajesh Kumar",
+        "company": "Kumar Transport Pvt Ltd",
+        "phone": "+91 98765 43210",
+        "email": "rajesh@kumartransport.in"
+      },
+      "assignedTo": { "id": "tm-001", "name": "Amit Verma" }
+    },
+    {
+      "id": "prp-010",
+      "displayId": "REQ-1010",
+      "type": "RC",
+      "description": "RC transfer documentation for 4 vehicles from Jaipur",
+      "quantity": 4,
+      "amount": 18000,
+      "status": "received",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-04T10:15:00Z",
+      "updatedAt": "2026-04-09T09:00:00Z",
+      "customer": {
+        "id": "cust-002",
+        "name": "Suresh Patel",
+        "company": "Patel Logistics",
+        "phone": "+91 87654 32109",
+        "email": "suresh@patellogistics.com"
+      },
+      "assignedTo": { "id": "tm-004", "name": "Neha Gupta" }
+    },
+    {
+      "id": "prp-011",
+      "displayId": "REQ-1011",
+      "type": "DL",
+      "description": "DL renewal for 3 drivers — licenses expiring April",
+      "quantity": 3,
+      "amount": 4500,
+      "status": "received",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-05T06:45:00Z",
+      "updatedAt": "2026-04-09T14:20:00Z",
+      "customer": {
+        "id": "cust-003",
+        "name": "Anita Deshmukh",
+        "company": "Deshmukh Freight Services",
+        "phone": "+91 76543 21098",
+        "email": "anita@deshmukhfreight.in"
+      },
+      "assignedTo": { "id": "tm-002", "name": "Priya Sharma" }
+    },
+    {
+      "id": "prp-016",
+      "displayId": "REQ-1016",
+      "type": "Challan",
+      "description": "Lok Adalat batch — 8 pending challans Bengaluru RTO",
+      "quantity": 8,
+      "amount": 112000,
+      "status": "received",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-02T12:00:00Z",
+      "updatedAt": "2026-04-07T11:00:00Z",
+      "customer": {
+        "id": "cust-004",
+        "name": "Mohammed Irfan",
+        "company": "Irfan & Sons Transport",
+        "phone": "+91 99887 76655",
+        "email": "irfan@irfantransport.co.in"
+      },
+      "assignedTo": { "id": "tm-003", "name": "Vikram Singh" }
+    },
+    {
+      "id": "prp-017",
+      "displayId": "REQ-1017",
+      "type": "RC",
+      "description": "Hypothecation removal for 5 vehicles with cleared loans",
+      "quantity": 5,
+      "amount": 7500,
+      "status": "received",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-04T15:30:00Z",
+      "updatedAt": "2026-04-08T16:00:00Z",
+      "customer": {
+        "id": "cust-005",
+        "name": "Deepak Chaudhary",
+        "company": "Chaudhary Fleet Solutions",
+        "phone": "+91 88776 65544",
+        "email": "deepak@chaudharyfleet.com"
+      },
+      "assignedTo": { "id": "tm-004", "name": "Neha Gupta" }
+    },
+    {
+      "id": "prp-018",
+      "displayId": "REQ-1018",
+      "type": "DL",
+      "description": "PSV badge renewal for 7 bus drivers",
+      "quantity": 7,
+      "amount": 10500,
+      "status": "received",
+      "serviceStatus": null,
+      "linkedIncidentId": null,
+      "rejectionReason": null,
+      "createdAt": "2026-04-05T09:00:00Z",
+      "updatedAt": "2026-04-09T10:45:00Z",
+      "customer": {
+        "id": "cust-005",
+        "name": "Deepak Chaudhary",
+        "company": "Chaudhary Fleet Solutions",
+        "phone": "+91 88776 65544",
+        "email": "deepak@chaudharyfleet.com"
+      },
+      "assignedTo": { "id": "tm-002", "name": "Priya Sharma" }
+    },
+    {
+      "id": "prp-005",
+      "displayId": "REQ-1005",
+      "type": "Challan",
+      "description": "Lok Adalat resolution for 7 pending highway challans — Jaipur court",
+      "quantity": 7,
+      "amount": 175000,
+      "status": "converted",
+      "serviceStatus": "in_progress",
+      "linkedIncidentId": "IRN-11106557",
+      "rejectionReason": null,
+      "createdAt": "2026-03-20T08:00:00Z",
+      "updatedAt": "2026-04-05T14:30:00Z",
+      "customer": {
+        "id": "cust-001",
+        "name": "Rajesh Kumar",
+        "company": "Kumar Transport Pvt Ltd",
+        "phone": "+91 98765 43210",
+        "email": "rajesh@kumartransport.in"
+      },
+      "assignedTo": { "id": "tm-001", "name": "Amit Verma" }
+    },
+    {
+      "id": "prp-006",
+      "displayId": "REQ-1006",
+      "type": "DL",
+      "description": "DL renewal for 2 senior drivers — licences expired March",
+      "quantity": 2,
+      "amount": 3000,
+      "status": "converted",
+      "serviceStatus": "completed",
+      "linkedIncidentId": "IRN-11106590",
+      "rejectionReason": null,
+      "createdAt": "2026-03-15T10:00:00Z",
+      "updatedAt": "2026-04-01T16:00:00Z",
+      "customer": {
+        "id": "cust-002",
+        "name": "Suresh Patel",
+        "company": "Patel Logistics",
+        "phone": "+91 87654 32109",
+        "email": "suresh@patellogistics.com"
+      },
+      "assignedTo": { "id": "tm-002", "name": "Priya Sharma" }
+    },
+    {
+      "id": "prp-019",
+      "displayId": "REQ-1019",
+      "type": "DL",
+      "description": "International driving permit processing for 6 drivers — Gulf deployment",
+      "quantity": 6,
+      "amount": 9000,
+      "status": "converted",
+      "serviceStatus": "completed",
+      "linkedIncidentId": "IRN-11106612",
+      "rejectionReason": null,
+      "createdAt": "2026-03-10T07:30:00Z",
+      "updatedAt": "2026-03-28T12:00:00Z",
+      "customer": {
+        "id": "cust-004",
+        "name": "Mohammed Irfan",
+        "company": "Irfan & Sons Transport",
+        "phone": "+91 99887 76655",
+        "email": "irfan@irfantransport.co.in"
+      },
+      "assignedTo": { "id": "tm-004", "name": "Neha Gupta" }
+    },
+    {
+      "id": "prp-020",
+      "displayId": "REQ-1020",
+      "type": "RC",
+      "description": "NOC and RC transfer for 10 vehicles acquired from auction",
+      "quantity": 10,
+      "amount": 25000,
+      "status": "converted",
+      "serviceStatus": "pending",
+      "linkedIncidentId": "IRN-11106634",
+      "rejectionReason": null,
+      "createdAt": "2026-03-25T11:00:00Z",
+      "updatedAt": "2026-04-08T09:30:00Z",
+      "customer": {
+        "id": "cust-005",
+        "name": "Deepak Chaudhary",
+        "company": "Chaudhary Fleet Solutions",
+        "phone": "+91 88776 65544",
+        "email": "deepak@chaudharyfleet.com"
+      },
+      "assignedTo": { "id": "tm-003", "name": "Vikram Singh" }
+    },
+    {
+      "id": "prp-007",
+      "displayId": "REQ-1007",
+      "type": "RC",
+      "description": "Vehicle registration correction — owner updated at RTO directly",
+      "quantity": 1,
+      "amount": 1500,
+      "status": "rejected",
+      "serviceStatus": "not_applicable",
+      "linkedIncidentId": null,
+      "rejectionReason": "Customer request",
+      "createdAt": "2026-04-01T13:00:00Z",
+      "updatedAt": "2026-04-03T10:00:00Z",
+      "customer": {
+        "id": "cust-003",
+        "name": "Anita Deshmukh",
+        "company": "Deshmukh Freight Services",
+        "phone": "+91 76543 21098",
+        "email": "anita@deshmukhfreight.in"
+      },
+      "assignedTo": null
+    },
+    {
+      "id": "prp-008",
+      "displayId": "REQ-1008",
+      "type": "Challan",
+      "description": "CCTV evidence confirms violations across 15 vehicles — dispute not viable after review of footage from multiple toll plazas and intersections along NH48 corridor between Mumbai and Pune",
+      "quantity": 15,
+      "amount": 300000,
+      "status": "rejected",
+      "serviceStatus": "not_applicable",
+      "linkedIncidentId": null,
+      "rejectionReason": "Service not available for this case",
+      "createdAt": "2026-03-28T09:00:00Z",
+      "updatedAt": "2026-04-02T15:30:00Z",
+      "customer": {
+        "id": "cust-001",
+        "name": "Rajesh Kumar",
+        "company": "Kumar Transport Pvt Ltd",
+        "phone": "+91 98765 43210",
+        "email": "rajesh@kumartransport.in"
+      },
+      "assignedTo": { "id": "tm-002", "name": "Priya Sharma" }
+    }
+  ],
+  "proposalItems": {
+    "prp-001": [
+      { "id": "item-001", "challanId": "CH-LKO-44821", "vehicleNumber": "UP32 AB 1234", "amount": 20000, "status": "pending" },
+      { "id": "item-002", "challanId": "CH-LKO-44822", "vehicleNumber": "UP32 CD 5678", "amount": 20000, "status": "pending" },
+      { "id": "item-003", "challanId": "CH-LKO-44823", "vehicleNumber": "UP32 EF 9012", "amount": 20000, "status": "pending" },
+      { "id": "item-004", "challanId": "CH-LKO-44824", "vehicleNumber": "UP32 GH 3456", "amount": 20000, "status": "pending" },
+      { "id": "item-005", "challanId": "CH-LKO-44825", "vehicleNumber": "UP32 IJ 7890", "amount": 20000, "status": "pending" },
+      { "id": "item-006", "challanId": "CH-LKO-44826", "vehicleNumber": "UP32 KL 2345", "amount": 20000, "status": "pending" },
+      { "id": "item-007", "challanId": "CH-LKO-44827", "vehicleNumber": "UP32 MN 6789", "amount": 20000, "status": "pending" },
+      { "id": "item-008", "challanId": "CH-LKO-44828", "vehicleNumber": "UP32 OP 1122", "amount": 20000, "status": "pending" },
+      { "id": "item-009", "challanId": "CH-LKO-44829", "vehicleNumber": "UP32 QR 3344", "amount": 20000, "status": "pending" },
+      { "id": "item-010", "challanId": "CH-LKO-44830", "vehicleNumber": "UP32 ST 5566", "amount": 20000, "status": "pending" },
+      { "id": "item-011", "challanId": "CH-LKO-44831", "vehicleNumber": "UP32 UV 7788", "amount": 20000, "status": "pending" },
+      { "id": "item-012", "challanId": "CH-LKO-44832", "vehicleNumber": "UP32 WX 9900", "amount": 20000, "status": "pending" }
+    ],
+    "prp-002": [
+      { "id": "item-013", "licenceNumber": "UP3220260001234", "driverName": "Ramesh Yadav", "status": "pending" },
+      { "id": "item-014", "licenceNumber": "MP0920260005678", "driverName": "Sunil Tiwari", "status": "pending" },
+      { "id": "item-015", "licenceNumber": "UP3220260009012", "driverName": "Mohan Lal", "status": "pending" },
+      { "id": "item-016", "licenceNumber": "MP0920260003456", "driverName": "Vijay Kumar", "status": "pending" },
+      { "id": "item-017", "licenceNumber": "UP3220260007890", "driverName": "Arjun Singh", "status": "pending" }
+    ],
+    "prp-003": [
+      { "id": "item-018", "rcNumber": "RJ14 TC 1234", "vehicleNumber": "UP32 AA 1001", "status": "pending" },
+      { "id": "item-019", "rcNumber": "RJ14 TC 1235", "vehicleNumber": "UP32 AA 1002", "status": "pending" },
+      { "id": "item-020", "rcNumber": "RJ14 TC 1236", "vehicleNumber": "UP32 AA 1003", "status": "pending" },
+      { "id": "item-021", "rcNumber": "RJ14 TC 1237", "vehicleNumber": "UP32 AA 1004", "status": "pending" },
+      { "id": "item-022", "rcNumber": "RJ14 TC 1238", "vehicleNumber": "UP32 AA 1005", "status": "pending" },
+      { "id": "item-023", "rcNumber": "RJ14 TC 1239", "vehicleNumber": "UP32 AA 1006", "status": "pending" },
+      { "id": "item-024", "rcNumber": "RJ14 TC 1240", "vehicleNumber": "UP32 AA 1007", "status": "pending" },
+      { "id": "item-025", "rcNumber": "RJ14 TC 1241", "vehicleNumber": "UP32 AA 1008", "status": "pending" }
+    ],
+    "prp-005": [
+      { "id": "item-026", "challanId": "CH-JPR-55101", "vehicleNumber": "RJ14 GB 4401", "amount": 25000, "status": "in_progress" },
+      { "id": "item-027", "challanId": "CH-JPR-55102", "vehicleNumber": "RJ14 GB 4402", "amount": 25000, "status": "in_progress" },
+      { "id": "item-028", "challanId": "CH-JPR-55103", "vehicleNumber": "RJ14 GB 4403", "amount": 25000, "status": "completed" },
+      { "id": "item-029", "challanId": "CH-JPR-55104", "vehicleNumber": "RJ14 GB 4404", "amount": 25000, "status": "completed" },
+      { "id": "item-030", "challanId": "CH-JPR-55105", "vehicleNumber": "RJ14 GB 4405", "amount": 25000, "status": "completed" },
+      { "id": "item-031", "challanId": "CH-JPR-55106", "vehicleNumber": "RJ14 GB 4406", "amount": 25000, "status": "completed" },
+      { "id": "item-032", "challanId": "CH-JPR-55107", "vehicleNumber": "RJ14 GB 4407", "amount": 25000, "status": "completed" }
+    ],
+    "prp-006": [
+      { "id": "item-033", "licenceNumber": "GJ0120260004455", "driverName": "Bharat Patel", "status": "completed" },
+      { "id": "item-034", "licenceNumber": "GJ0120260006677", "driverName": "Kamlesh Shah", "status": "completed" }
+    ]
+  },
+  "activities": [
+    {
+      "id": "act-001",
+      "proposalId": "prp-005",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal received from customer",
+      "timestamp": "2026-03-20T08:00:00Z"
+    },
+    {
+      "id": "act-002",
+      "proposalId": "prp-005",
+      "actionType": "statusChange",
+      "performedBy": "Amit Verma",
+      "notes": "Picked up for review",
+      "timestamp": "2026-03-20T09:15:00Z"
+    },
+    {
+      "id": "act-003",
+      "proposalId": "prp-005",
+      "actionType": "statusChange",
+      "performedBy": "Amit Verma",
+      "notes": "Quote sent — ₹1,75,000 for 7 challans via Lok Adalat route",
+      "timestamp": "2026-03-22T11:00:00Z"
+    },
+    {
+      "id": "act-004",
+      "proposalId": "prp-005",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Customer accepted the quote",
+      "timestamp": "2026-03-23T14:30:00Z"
+    },
+    {
+      "id": "act-005",
+      "proposalId": "prp-005",
+      "actionType": "statusChange",
+      "performedBy": "Amit Verma",
+      "notes": "Converted to incident IRN-11106557. Service status set to pending.",
+      "timestamp": "2026-03-23T15:00:00Z"
+    },
+    {
+      "id": "act-006",
+      "proposalId": "prp-005",
+      "actionType": "statusChange",
+      "performedBy": "Amit Verma",
+      "notes": "Service status updated to in_progress. Lok Adalat hearing scheduled 5 Apr.",
+      "timestamp": "2026-04-01T10:00:00Z"
+    },
+    {
+      "id": "act-007",
+      "proposalId": "prp-005",
+      "actionType": "note",
+      "performedBy": "Amit Verma",
+      "notes": "5 of 7 challans resolved at Lok Adalat. Remaining 2 adjourned to next sitting on 20 Apr.",
+      "timestamp": "2026-04-05T14:30:00Z"
+    },
+    {
+      "id": "act-008",
+      "proposalId": "prp-008",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal received from customer",
+      "timestamp": "2026-03-28T09:00:00Z"
+    },
+    {
+      "id": "act-009",
+      "proposalId": "prp-008",
+      "actionType": "statusChange",
+      "performedBy": "Priya Sharma",
+      "notes": "Picked up for review",
+      "timestamp": "2026-03-28T10:30:00Z"
+    },
+    {
+      "id": "act-010",
+      "proposalId": "prp-008",
+      "actionType": "note",
+      "performedBy": "Priya Sharma",
+      "notes": "Reviewed CCTV footage from 3 toll plazas. Violations clearly documented. Dispute not viable.",
+      "timestamp": "2026-03-30T16:00:00Z"
+    },
+    {
+      "id": "act-011",
+      "proposalId": "prp-008",
+      "actionType": "statusChange",
+      "performedBy": "Priya Sharma",
+      "notes": "Rejected — Service not available for this case. CCTV evidence confirms violations.",
+      "timestamp": "2026-04-02T15:30:00Z"
+    },
+    {
+      "id": "act-012",
+      "proposalId": "prp-023",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal received from customer",
+      "timestamp": "2026-04-08T09:00:00Z"
+    },
+    {
+      "id": "act-013",
+      "proposalId": "prp-023",
+      "actionType": "statusChange",
+      "performedBy": "Vikram Singh",
+      "notes": "Picked up for review. Documents look complete, verifying challan details with RTO.",
+      "timestamp": "2026-04-10T11:30:00Z"
+    },
+    {
+      "id": "act-014",
+      "proposalId": "prp-009",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal received from customer",
+      "timestamp": "2026-04-03T08:00:00Z"
+    },
+    {
+      "id": "act-015",
+      "proposalId": "prp-009",
+      "actionType": "statusChange",
+      "performedBy": "Amit Verma",
+      "notes": "Picked up for review",
+      "timestamp": "2026-04-03T09:00:00Z"
+    },
+    {
+      "id": "act-016",
+      "proposalId": "prp-009",
+      "actionType": "statusChange",
+      "performedBy": "Amit Verma",
+      "notes": "Quote sent — ₹95,000 for 5 challans via Delhi Lok Adalat",
+      "timestamp": "2026-04-08T10:30:00Z"
+    },
+    {
+      "id": "act-017",
+      "proposalId": "prp-001",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal received from customer",
+      "timestamp": "2026-04-11T08:15:00Z"
+    },
+    {
+      "id": "act-018",
+      "proposalId": "prp-006",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal received from customer",
+      "timestamp": "2026-03-15T10:00:00Z"
+    },
+    {
+      "id": "act-019",
+      "proposalId": "prp-006",
+      "actionType": "statusChange",
+      "performedBy": "Priya Sharma",
+      "notes": "Picked up for review",
+      "timestamp": "2026-03-15T11:30:00Z"
+    },
+    {
+      "id": "act-020",
+      "proposalId": "prp-006",
+      "actionType": "statusChange",
+      "performedBy": "Priya Sharma",
+      "notes": "Quote sent — ₹3,000 for 2 DL renewals",
+      "timestamp": "2026-03-17T09:00:00Z"
+    },
+    {
+      "id": "act-021",
+      "proposalId": "prp-006",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Customer accepted the quote",
+      "timestamp": "2026-03-18T08:00:00Z"
+    },
+    {
+      "id": "act-022",
+      "proposalId": "prp-006",
+      "actionType": "statusChange",
+      "performedBy": "Priya Sharma",
+      "notes": "Converted to incident IRN-11106590. Service status set to pending.",
+      "timestamp": "2026-03-18T09:00:00Z"
+    },
+    {
+      "id": "act-023",
+      "proposalId": "prp-006",
+      "actionType": "statusChange",
+      "performedBy": "Priya Sharma",
+      "notes": "Service status updated to in_progress. Applications submitted to Parivahan portal.",
+      "timestamp": "2026-03-20T10:00:00Z"
+    },
+    {
+      "id": "act-024",
+      "proposalId": "prp-006",
+      "actionType": "statusChange",
+      "performedBy": "Priya Sharma",
+      "notes": "Service completed. Both DLs renewed successfully. Smart cards dispatched.",
+      "timestamp": "2026-04-01T16:00:00Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "cmt-001",
+      "entityType": "proposal",
+      "entityId": "prp-001",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "Please prioritise the 4 court challans in this batch — hearing dates are approaching.",
+      "createdAt": "2026-04-11T08:20:00Z"
+    },
+    {
+      "id": "cmt-002",
+      "entityType": "proposal",
+      "entityId": "prp-001",
+      "authorType": "team",
+      "authorName": "Amit Verma",
+      "message": "Noted. Court challans flagged as priority. We'll process those first.",
+      "createdAt": "2026-04-11T09:45:00Z"
+    },
+    {
+      "id": "cmt-003",
+      "entityType": "proposal",
+      "entityId": "prp-002",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "Two of the drivers are currently on long-haul routes — will that delay the verification?",
+      "createdAt": "2026-04-11T09:35:00Z"
+    },
+    {
+      "id": "cmt-004",
+      "entityType": "proposal",
+      "entityId": "prp-002",
+      "authorType": "team",
+      "authorName": "Priya Sharma",
+      "message": "No delay expected. DL verification is done digitally through the Parivahan portal. Physical presence is not needed.",
+      "createdAt": "2026-04-11T10:15:00Z"
+    },
+    {
+      "id": "cmt-005",
+      "entityType": "proposal",
+      "entityId": "prp-005",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "Thanks for the quick turnaround on this. When can we expect the Lok Adalat results?",
+      "createdAt": "2026-04-04T11:00:00Z"
+    },
+    {
+      "id": "cmt-006",
+      "entityType": "proposal",
+      "entityId": "prp-005",
+      "authorType": "team",
+      "authorName": "Amit Verma",
+      "message": "Hearing was successful for 5 of 7 challans. Remaining 2 adjourned to next sitting. Full update in the incident timeline.",
+      "createdAt": "2026-04-05T15:00:00Z"
+    },
+    {
+      "id": "cmt-007",
+      "entityType": "proposal",
+      "entityId": "prp-008",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "Can we at least get the penalty amount reduced? ₹3,00,000 is a significant hit.",
+      "createdAt": "2026-04-03T08:00:00Z"
+    },
+    {
+      "id": "cmt-008",
+      "entityType": "proposal",
+      "entityId": "prp-008",
+      "authorType": "team",
+      "authorName": "Priya Sharma",
+      "message": "Unfortunately the CCTV evidence is clear. We recommend paying promptly to avoid the late penalty surcharge which adds 25% after 60 days.",
+      "createdAt": "2026-04-03T10:30:00Z"
+    },
+    {
+      "id": "cmt-009",
+      "entityType": "proposal",
+      "entityId": "prp-009",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "The quote looks reasonable. Let me check with our accounts team and get back to you by Friday.",
+      "createdAt": "2026-04-08T14:00:00Z"
+    },
+    {
+      "id": "cmt-010",
+      "entityType": "proposal",
+      "entityId": "prp-009",
+      "authorType": "team",
+      "authorName": "Amit Verma",
+      "message": "Sure, take your time. The Lok Adalat hearing window is open until end of April so we have buffer.",
+      "createdAt": "2026-04-08T14:30:00Z"
+    },
+    {
+      "id": "cmt-011",
+      "entityType": "proposal",
+      "entityId": "prp-016",
+      "authorType": "user",
+      "authorName": "Mohammed Irfan",
+      "message": "Can you confirm the breakdown? ₹1,12,000 for 8 challans seems high compared to our last batch.",
+      "createdAt": "2026-04-07T14:00:00Z"
+    },
+    {
+      "id": "cmt-012",
+      "entityType": "proposal",
+      "entityId": "prp-016",
+      "authorType": "team",
+      "authorName": "Vikram Singh",
+      "message": "The higher rate is because 3 of these are court challans requiring physical appearance at Bengaluru RTO. I've attached the breakdown in the quote details.",
+      "createdAt": "2026-04-07T15:45:00Z"
+    },
+    {
+      "id": "cmt-013",
+      "entityType": "proposal",
+      "entityId": "prp-023",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "All documents uploaded in the portal. Let me know if anything else is needed.",
+      "createdAt": "2026-04-08T09:10:00Z"
+    },
+    {
+      "id": "cmt-014",
+      "entityType": "proposal",
+      "entityId": "prp-020",
+      "authorType": "user",
+      "authorName": "Deepak Chaudhary",
+      "message": "These are auction vehicles so some paperwork may be incomplete. Happy to provide any additional docs you need.",
+      "createdAt": "2026-03-25T12:00:00Z"
+    },
+    {
+      "id": "cmt-015",
+      "entityType": "proposal",
+      "entityId": "prp-020",
+      "authorType": "team",
+      "authorName": "Vikram Singh",
+      "message": "Thanks Deepak. We'll need the auction sale certificate and Form 35 for each vehicle. I'll send you the checklist.",
+      "createdAt": "2026-03-25T14:30:00Z"
+    }
+  ],
+  "dashboardStats": {
+    "newRequests": 8,
+    "inReview": 4,
+    "awaitingResponse": 6,
+    "activeWork": 2,
+    "completedThisMonth": 2,
+    "totalValue": 212000
+  }
+}
