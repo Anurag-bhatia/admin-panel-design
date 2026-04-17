@@ -1386,10 +1386,10 @@ export function PartnerDetail({
                 )}
                 {(() => {
                   const activity =
-                    partner.stage === 'activation' && partner.activationActivity
-                      ? { assigned: 'Assigned', trained: 'Trained' }[partner.activationActivity]
-                      : partner.stage === 'mobilisation' && partner.mobilisationActivity
-                      ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
+                    partner.stage === 'verification' && partner.verificationActivity
+                      ? { emailVerification: 'Email Verification', profileVerification: 'Profile Verification' }[partner.verificationActivity]
+                      : partner.stage === 'activation' && partner.activationActivity
+                      ? { qrActivated: 'QR Activated', qrUnlocked: 'QR Unlocked', kitSend: 'Kit Send' }[partner.activationActivity]
                       : null
                   return activity ? (
                     <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400">
@@ -1577,16 +1577,20 @@ export function PartnerDetail({
                 key: 'verification',
                 label: 'Verification',
                 icon: <UserCheck className="w-4 h-4" />,
-                activities: [],
-                currentActivity: undefined,
+                activities: [
+                  { key: 'emailVerification', label: 'Email Verification' },
+                  { key: 'profileVerification', label: 'Profile Verification' },
+                ],
+                currentActivity: partner.verificationActivity,
               },
               {
                 key: 'activation',
                 label: 'Activation',
                 icon: <RefreshCw className="w-4 h-4" />,
                 activities: [
-                  { key: 'assigned', label: 'Assigned' },
-                  { key: 'trained', label: 'Trained' },
+                  { key: 'qrActivated', label: 'QR Activated' },
+                  { key: 'qrUnlocked', label: 'QR Unlocked' },
+                  { key: 'kitSend', label: 'Kit Send' },
                 ],
                 currentActivity: partner.activationActivity,
               },
@@ -1594,14 +1598,8 @@ export function PartnerDetail({
                 key: 'mobilisation',
                 label: 'Mobilisation',
                 icon: <Truck className="w-4 h-4" />,
-                activities: [
-                  { key: 'posterCreated', label: 'Poster Created' },
-                  { key: 'welcomeLetterCreated', label: 'Welcome Letter' },
-                  { key: 'keychainCreated', label: 'Keychain Created' },
-                  { key: 'dispatch', label: 'Dispatch' },
-                  { key: 'delivered', label: 'Delivered' },
-                ],
-                currentActivity: partner.mobilisationActivity,
+                activities: [],
+                currentActivity: undefined,
               },
             ]
             const stageOrder = ['registration', 'verification', 'activation', 'mobilisation']
@@ -1756,10 +1754,8 @@ export function PartnerDetail({
                     className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="">Select Stage</option>
-                    <option value="registration">Registration</option>
                     <option value="verification">Verification</option>
                     <option value="activation">Activation</option>
-                    <option value="mobilisation">Mobilisation</option>
                   </select>
                 </div>
 
@@ -1775,19 +1771,17 @@ export function PartnerDetail({
                     className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Activity</option>
-                    {followUpForm.activityType === 'activation' && (
+                    {followUpForm.activityType === 'verification' && (
                       <>
-                        <option value="assigned">Assigned</option>
-                        <option value="trained">Trained</option>
+                        <option value="emailVerification">Email Verification</option>
+                        <option value="profileVerification">Profile Verification</option>
                       </>
                     )}
-                    {followUpForm.activityType === 'mobilisation' && (
+                    {followUpForm.activityType === 'activation' && (
                       <>
-                        <option value="posterCreated">Poster Created</option>
-                        <option value="welcomeLetterCreated">Welcome Letter</option>
-                        <option value="keychainCreated">Keychain Created</option>
-                        <option value="dispatch">Dispatch</option>
-                        <option value="delivered">Delivered</option>
+                        <option value="qrActivated">QR Activated</option>
+                        <option value="qrUnlocked">QR Unlocked</option>
+                        <option value="kitSend">Kit Send</option>
                       </>
                     )}
                   </select>

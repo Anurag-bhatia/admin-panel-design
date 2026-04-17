@@ -52,8 +52,8 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
   const getActivationMetrics = () => {
     const activationPartners = challanPayPartners.filter(p => p.stage === 'activation')
     return {
-      qrActivated: activationPartners.filter(p => p.activationActivity === 'assigned').length,
-      qrUnlocked: activationPartners.filter(p => p.activationActivity === 'trained').length,
+      qrActivated: activationPartners.filter(p => p.activationActivity === 'qrActivated').length,
+      qrUnlocked: activationPartners.filter(p => p.activationActivity === 'qrUnlocked').length,
       kitSend: activationPartners.filter(p => (p as any).kitSent).length,
     }
   }

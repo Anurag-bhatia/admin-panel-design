@@ -142,8 +142,8 @@ export interface Partner {
   linkedVehicles: Vehicle[]
   status: 'active' | 'inactive'
   stage?: 'registration' | 'verification' | 'activation' | 'mobilisation'
-  activationActivity?: 'assigned' | 'trained'
-  mobilisationActivity?: 'posterCreated' | 'welcomeLetterCreated' | 'keychainCreated' | 'dispatch' | 'delivered'
+  verificationActivity?: 'emailVerification' | 'profileVerification'
+  activationActivity?: 'qrActivated' | 'qrUnlocked' | 'kitSend'
   assignedTo?: string
   profileCompletion?: number
   utmSource?: string

@@ -43,7 +43,7 @@
       "bankName": "HDFC Bank",
       "partnerType": "challanPay",
       "stage": "activation",
-      "activationActivity": "trained",
+      "activationActivity": "qrUnlocked",
       "assignedTo": "Arun Kumar",
       "profileCompletion": 30,
       "utmSource": "Google Ads",
@@ -520,7 +520,6 @@
       "bankName": "ICICI Bank",
       "partnerType": "challanPay",
       "stage": "mobilisation",
-      "activationActivity": "trained",
       "assignedTo": "Neha Patel",
       "profileCompletion": 75,
       "utmSource": "Referral",
@@ -821,7 +820,6 @@
           "details": "Partner status set to active"
         }
       ],
-      "mobilisationActivity": "dispatch"
     },
     {
       "id": "partner-003",
@@ -1291,7 +1289,7 @@
       "bankName": "Yes Bank",
       "partnerType": "challanPay",
       "stage": "activation",
-      "activationActivity": "assigned",
+      "activationActivity": "qrActivated",
       "assignedTo": "Rajesh Verma",
       "profileCompletion": 100,
       "utmSource": "Google Ads",
@@ -1700,7 +1698,6 @@
       "bankName": "SBI",
       "partnerType": "challanPay",
       "stage": "mobilisation",
-      "activationActivity": "trained",
       "assignedTo": "Kavita Sharma",
       "profileCompletion": 60,
       "utmSource": "Referral",
@@ -1923,7 +1920,6 @@
           "details": "GST certificate uploaded"
         }
       ],
-      "mobilisationActivity": "welcomeLetterCreated"
     }
   ]
 }

@@ -517,10 +517,10 @@ export function PartnerList({
                     onClick={() => onView?.(partner.id)}
                   >
                     <p className="text-sm text-slate-900 dark:text-white">
-                      {partner.stage === 'activation' && partner.activationActivity
-                        ? { assigned: 'Assigned', trained: 'Trained' }[partner.activationActivity]
-                        : partner.stage === 'mobilisation' && partner.mobilisationActivity
-                        ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
+                      {partner.stage === 'verification' && partner.verificationActivity
+                        ? { emailVerification: 'Email Verification', profileVerification: 'Profile Verification' }[partner.verificationActivity]
+                        : partner.stage === 'activation' && partner.activationActivity
+                        ? { qrActivated: 'QR Activated', qrUnlocked: 'QR Unlocked', kitSend: 'Kit Send' }[partner.activationActivity]
                         : '—'}
                     </p>
                   </td>
@@ -642,10 +642,10 @@ export function PartnerList({
                   )}
                   {isChallanPay && (
                     <div className="text-slate-600 dark:text-slate-400">
-                      {partner.stage === 'activation' && partner.activationActivity
-                        ? { assigned: 'Assigned', trained: 'Trained' }[partner.activationActivity]
-                        : partner.stage === 'mobilisation' && partner.mobilisationActivity
-                        ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
+                      {partner.stage === 'verification' && partner.verificationActivity
+                        ? { emailVerification: 'Email Verification', profileVerification: 'Profile Verification' }[partner.verificationActivity]
+                        : partner.stage === 'activation' && partner.activationActivity
+                        ? { qrActivated: 'QR Activated', qrUnlocked: 'QR Unlocked', kitSend: 'Kit Send' }[partner.activationActivity]
                         : '—'}
                     </div>
                   )}
