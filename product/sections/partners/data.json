@@ -47,6 +47,17 @@
       "assignedTo": "Arun Kumar",
       "profileCompletion": 30,
       "utmSource": "Google Ads",
+      "yearsInOperation": "8",
+      "dailyVehicleFootfall": "120",
+      "hasDedicatedCounter": "yes",
+      "dealsWithVehicleDocuments": "yes",
+      "preferredLanguage": "english",
+      "bestTimeForCall": "morning",
+      "expectedMonthlyIncome": "50000",
+      "customersAskedAboutChallans": "yes",
+      "biggestCustomerPainPoint": "Time-consuming court visits",
+      "awarenessOfChallanPay": "yes",
+      "questionsOrComments": "",
       "outlets": 4,
       "linkedOutlets": [
         {
@@ -282,7 +293,7 @@
       "followUps": [
         {
           "id": "fu-001",
-          "activityType": "onboarding",
+          "activityType": "registration",
           "subActivityType": "call",
           "notes": "Completed partner onboarding for Gurugram region. Documents verified and account activated.",
           "createdAt": "2026-03-10T10:30:00Z",
@@ -481,8 +492,7 @@
           "timestamp": "2023-05-20T09:15:00Z",
           "details": "GST certificate uploaded"
         }
-      ],
-      "onboardingActivity": "profileVerification"
+      ]
     },
     {
       "id": "partner-002",
@@ -514,6 +524,17 @@
       "assignedTo": "Neha Patel",
       "profileCompletion": 75,
       "utmSource": "Referral",
+      "yearsInOperation": "12",
+      "dailyVehicleFootfall": "85",
+      "hasDedicatedCounter": "yes",
+      "dealsWithVehicleDocuments": "no",
+      "preferredLanguage": "hindi",
+      "bestTimeForCall": "afternoon",
+      "expectedMonthlyIncome": "35000",
+      "customersAskedAboutChallans": "yes",
+      "biggestCustomerPainPoint": "High challan penalty amounts",
+      "awarenessOfChallanPay": "no",
+      "questionsOrComments": "",
       "outlets": 2,
       "linkedOutlets": [
         {
@@ -663,7 +684,7 @@
       "followUps": [
         {
           "id": "fu-006",
-          "activityType": "onboarding",
+          "activityType": "registration",
           "subActivityType": "email",
           "notes": "Onboarding process initiated for Mumbai partner. KYC documents collected and verified.",
           "createdAt": "2026-03-08T11:30:00Z",
@@ -800,7 +821,6 @@
           "details": "Partner status set to active"
         }
       ],
-      "onboardingActivity": "profileVerification",
       "mobilisationActivity": "dispatch"
     },
     {
@@ -1032,11 +1052,21 @@
       "bankAccountNumber": "3333444455556666",
       "bankName": "HDFC Bank",
       "partnerType": "challanPay",
-      "stage": "onboarding",
-      "onboardingActivity": "registration",
+      "stage": "registration",
       "assignedTo": null,
       "profileCompletion": 50,
       "utmSource": "Facebook",
+      "yearsInOperation": "3",
+      "dailyVehicleFootfall": "40",
+      "hasDedicatedCounter": "no",
+      "dealsWithVehicleDocuments": "yes",
+      "preferredLanguage": "hindi",
+      "bestTimeForCall": "evening",
+      "expectedMonthlyIncome": "20000",
+      "customersAskedAboutChallans": "no",
+      "biggestCustomerPainPoint": "Lack of awareness about challans",
+      "awarenessOfChallanPay": "no",
+      "questionsOrComments": "Interested in learning more about the commission structure",
       "outlets": 1,
       "linkedOutlets": [
         {
@@ -1136,7 +1166,7 @@
       "followUps": [
         {
           "id": "fu-009",
-          "activityType": "onboarding",
+          "activityType": "registration",
           "subActivityType": "meeting",
           "notes": "Onboarding kickoff for Gurugram partner. Discussed setup requirements and timelines.",
           "createdAt": "2026-03-02T15:00:00Z",
@@ -1265,6 +1295,17 @@
       "assignedTo": "Rajesh Verma",
       "profileCompletion": 100,
       "utmSource": "Google Ads",
+      "yearsInOperation": "15",
+      "dailyVehicleFootfall": "200",
+      "hasDedicatedCounter": "yes",
+      "dealsWithVehicleDocuments": "yes",
+      "preferredLanguage": "english",
+      "bestTimeForCall": "morning",
+      "expectedMonthlyIncome": "75000",
+      "customersAskedAboutChallans": "yes",
+      "biggestCustomerPainPoint": "No digital payment options",
+      "awarenessOfChallanPay": "yes",
+      "questionsOrComments": "",
       "outlets": 6,
       "registeredVisitorsCount": 485,
       "registeredVisitors": [
@@ -1537,8 +1578,7 @@
           "timestamp": "2023-10-05T12:45:00Z",
           "details": "Hyderabad Movers linked to partner"
         }
-      ],
-      "onboardingActivity": "profileVerification"
+      ]
     },
     {
       "id": "partner-007",
@@ -1664,6 +1704,17 @@
       "assignedTo": "Kavita Sharma",
       "profileCompletion": 60,
       "utmSource": "Referral",
+      "yearsInOperation": "6",
+      "dailyVehicleFootfall": "95",
+      "hasDedicatedCounter": "yes",
+      "dealsWithVehicleDocuments": "no",
+      "preferredLanguage": "hindi",
+      "bestTimeForCall": "afternoon",
+      "expectedMonthlyIncome": "30000",
+      "customersAskedAboutChallans": "yes",
+      "biggestCustomerPainPoint": "Difficulty tracking multiple vehicles",
+      "awarenessOfChallanPay": "no",
+      "questionsOrComments": "",
       "outlets": 3,
       "registeredVisitorsCount": 156,
       "registeredVisitors": [
@@ -1872,7 +1923,6 @@
           "details": "GST certificate uploaded"
         }
       ],
-      "onboardingActivity": "profileVerification",
       "mobilisationActivity": "welcomeLetterCreated"
     }
   ]

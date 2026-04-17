@@ -34,9 +34,9 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
   const filteredPartners = partners.filter(p => p.partnerType === activePartnerType)
 
   // Stage counts for ChallanPay summary cards
-  const stageOnboarding = challanPayPartners.filter(p => p.stage === 'onboarding').length
+  const stageRegistration = challanPayPartners.filter(p => p.stage === 'registration').length
+  const stageVerification = challanPayPartners.filter(p => p.stage === 'verification').length
   const stageActivation = challanPayPartners.filter(p => p.stage === 'activation').length
-  const stageTraining = challanPayPartners.filter(p => p.stage === 'training').length
   const stageMobilisation = challanPayPartners.filter(p => p.stage === 'mobilisation').length
 
   // Sub-card metrics for the expanded stage
@@ -47,16 +47,6 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
       inactive: stagePartners.filter(p => p.status === 'inactive').length,
       assigned: stagePartners.filter(p => p.assignedTo).length,
       unassigned: stagePartners.filter(p => !p.assignedTo).length,
-    }
-  }
-
-  // Onboarding activity counts
-  const getOnboardingActivityMetrics = () => {
-    const onboardingPartners = challanPayPartners.filter(p => p.stage === 'onboarding')
-    return {
-      registration: onboardingPartners.filter(p => p.onboardingActivity === 'registration').length,
-      qrCreation: onboardingPartners.filter(p => p.onboardingActivity === 'qrCreation').length,
-      profileVerification: onboardingPartners.filter(p => p.onboardingActivity === 'profileVerification').length,
     }
   }
 
@@ -88,7 +78,17 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
         />
 
         {/* Edit Partner Modal */}
-        {editingPartner && (
+        {editingPartner && editingPartner.partnerType === 'challanPay' && (
+          <AddPartnerChallanPay
+            partner={editingPartner}
+            onSubmit={(data) => {
+              console.log('Update ChallanPay partner:', editingPartnerId, data)
+              setEditingPartnerId(null)
+            }}
+            onCancel={() => setEditingPartnerId(null)}
+          />
+        )}
+        {editingPartner && editingPartner.partnerType === 'lots247' && (
           <EditPartner
             partner={editingPartner}
             onSubmit={(partnerData) => {
@@ -153,10 +153,11 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
         {/* Summary Cards — ChallanPay only */}
         {activePartnerType === 'challanPay' && (
           <div className="mt-6">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {([
                 { key: 'total', label: 'Total RoadSmart Partners', value: challanPayCount, accent: 'cyan' },
-                { key: 'onboarding', label: 'Onboarding', value: stageOnboarding, accent: 'amber' },
+                { key: 'registration', label: 'Registration', value: stageRegistration, accent: 'amber' },
+                { key: 'verification', label: 'Verification', value: stageVerification, accent: 'violet' },
                 { key: 'activation', label: 'Activation', value: stageActivation, accent: 'blue' },
                 { key: 'mobilisation', label: 'Mobilisation', value: stageMobilisation, accent: 'emerald' },
               ] as const).map((card) => {
@@ -212,17 +213,15 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
             </div>
 
             {/* Expanded Sub-Cards with popover notch */}
-            {expandedStage && expandedStage !== 'total' && (() => {
+            {expandedStage && (() => {
               const stageLabel = expandedStage.charAt(0).toUpperCase() + expandedStage.slice(1)
-              const stageKeys = ['total', 'onboarding', 'activation', 'mobilisation'] as const
+              const stageKeys = ['total', 'registration', 'verification', 'activation', 'mobilisation'] as const
               const idx = stageKeys.indexOf(expandedStage as any)
-              const notchLeft = ((idx + 0.5) / 4) * 100
+              const notchLeft = ((idx + 0.5) / 5) * 100
 
-              const isOnboarding = expandedStage === 'onboarding'
               const isMobilisation = expandedStage === 'mobilisation'
-              const activityMetrics = isOnboarding ? getOnboardingActivityMetrics() : null
               const mobilisationMetrics = isMobilisation ? getMobilisationActivityMetrics() : null
-              const metrics = (!isOnboarding && !isMobilisation) ? getStageSubMetrics(expandedStage) : null
+              const metrics = !isMobilisation ? getStageSubMetrics(expandedStage) : null
 
               return (
                 <div className="relative mt-4">
@@ -268,24 +267,6 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                       {expandedStage === 'activation' ? 'Training Activity' : `${stageLabel} Activity`}
                     </p>
 
-                    {isOnboarding && activityMetrics && (
-                      <div className="grid grid-cols-3 gap-2.5">
-                        {([
-                          { label: 'Registration', value: activityMetrics.registration, dot: 'bg-amber-500' },
-                          { label: 'QR Creation', value: activityMetrics.qrCreation, dot: 'bg-blue-500' },
-                          { label: 'Profile Verification Approval', value: activityMetrics.profileVerification, dot: 'bg-emerald-500' },
-                        ]).map((sub) => (
-                          <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span className={`w-2 h-2 rounded-full ${sub.dot}`} />
-                              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sub.label}</span>
-                            </div>
-                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{sub.value}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
                     {isMobilisation && mobilisationMetrics && (
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                         {([
@@ -306,7 +287,7 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                       </div>
                     )}
 
-                    {!isOnboarding && !isMobilisation && metrics && (
+                    {!isMobilisation && metrics && (
                       <div className="grid grid-cols-2 gap-2.5">
                         {([
                           { label: 'QR Printed', value: metrics.assigned, dot: 'bg-blue-500' },

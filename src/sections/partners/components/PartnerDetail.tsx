@@ -248,59 +248,103 @@ export function PartnerDetail({
               {isChallanPay ? (
                 /* ===== ChallanPay Profile ===== */
                 <div className="space-y-8">
+                  {/* Business Details */}
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Basic Information</h2>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Business Details</h2>
                     <div className="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg">
-                      <div className="flex items-center justify-between px-4 py-4">
-                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Primary Contact</span>
-                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.mobile}</span>
-                      </div>
-                      <div className="flex items-center justify-between px-4 py-4">
-                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Business/Individual Name</span>
-                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.companyName || `${partner.firstName} ${partner.lastName}`}</span>
-                      </div>
                       <div className="flex items-center justify-between px-4 py-4">
                         <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Business Type</span>
                         <span className="text-sm text-slate-900 dark:text-slate-50">{partner.subscriberTypesAllowed?.[0] || 'Not specified'}</span>
                       </div>
                       <div className="flex items-center justify-between px-4 py-4">
-                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">State</span>
-                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.state}</span>
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Years in Operation</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{(partner as any).yearsInOperation || '—'}</span>
                       </div>
                       <div className="flex items-center justify-between px-4 py-4">
-                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Pincode</span>
-                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.pinCode}</span>
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Outlet / Shop Address</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50 text-right max-w-[60%]">{partner.address || '—'}</span>
                       </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Area / Locality / Pincode</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.city}, {partner.state} — {partner.pinCode}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Daily Vehicle Footfall</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{(partner as any).dailyVehicleFootfall || '—'}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Dedicated Counter / Display Space</span>
+                        <span className={`text-sm font-medium ${(partner as any).hasDedicatedCounter === 'yes' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                          {(partner as any).hasDedicatedCounter === 'yes' ? 'Yes' : (partner as any).hasDedicatedCounter === 'no' ? 'No' : '—'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Deals with Vehicle Documents</span>
+                        <span className={`text-sm font-medium ${(partner as any).dealsWithVehicleDocuments === 'yes' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                          {(partner as any).dealsWithVehicleDocuments === 'yes' ? 'Yes' : (partner as any).dealsWithVehicleDocuments === 'no' ? 'No' : '—'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact & Identity */}
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Contact & Identity</h2>
+                    <div className="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg">
                       <div className="flex items-center justify-between px-4 py-4">
                         <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Email</span>
                         <span className="text-sm text-slate-900 dark:text-slate-50">{partner.email}</span>
                       </div>
                       <div className="flex items-center justify-between px-4 py-4">
-                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Onboarded Date</span>
-                        <span className="text-sm text-slate-900 dark:text-slate-50">{formatDate(partner.dateOnboarded)}</span>
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Owner Name</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.firstName} {partner.lastName}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Primary Contact</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.mobile}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Alternate Contact</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{partner.phone || '—'}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Preferred Language</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50 capitalize">{(partner as any).preferredLanguage || '—'}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Best Time for Call</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50 capitalize">{(partner as any).bestTimeForCall || '—'}</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Permissions */}
+                  {/* Qualification Signals */}
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Permissions</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Permissions</p>
-                        <div className="flex flex-wrap gap-2">
-                          {partner.productsAllowed.map((p) => (
-                            <span key={p} className="inline-flex px-2.5 py-1 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 rounded text-xs font-medium">{p}</span>
-                          ))}
-                        </div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Qualification Signals</h2>
+                    <div className="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg">
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Expected Monthly Income</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50">{(partner as any).expectedMonthlyIncome ? `₹${Number((partner as any).expectedMonthlyIncome).toLocaleString('en-IN')}` : '—'}</span>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Dashboard Permissions</p>
-                        <div className="flex flex-wrap gap-2">
-                          {partner.subscriberTypesAllowed.map((t) => (
-                            <span key={t} className="inline-flex px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-xs font-medium">{t}</span>
-                          ))}
-                        </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Customers Asked About Challans</span>
+                        <span className={`text-sm font-medium ${(partner as any).customersAskedAboutChallans === 'yes' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                          {(partner as any).customersAskedAboutChallans === 'yes' ? 'Yes' : (partner as any).customersAskedAboutChallans === 'no' ? 'No' : '—'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Biggest Pain Point</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50 text-right max-w-[60%]">{(partner as any).biggestCustomerPainPoint || '—'}</span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Awareness of ChallanPay</span>
+                        <span className={`text-sm font-medium ${(partner as any).awarenessOfChallanPay === 'yes' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                          {(partner as any).awarenessOfChallanPay === 'yes' ? 'Yes' : (partner as any).awarenessOfChallanPay === 'no' ? 'No' : '—'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-4">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Questions / Comments</span>
+                        <span className="text-sm text-slate-900 dark:text-slate-50 text-right max-w-[60%]">{(partner as any).questionsOrComments || '—'}</span>
                       </div>
                     </div>
                   </div>
@@ -1333,18 +1377,16 @@ export function PartnerDetail({
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Partner Summary</h2>
                 {partner.stage && (
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium capitalize ${
-                    partner.stage === 'onboarding' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                    partner.stage === 'registration' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                    partner.stage === 'verification' ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400' :
                     partner.stage === 'activation' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                    partner.stage === 'training' ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400' :
                     partner.stage === 'mobilisation' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
                     'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
                   }`}>{partner.stage}</span>
                 )}
                 {(() => {
                   const activity =
-                    partner.stage === 'onboarding' && partner.onboardingActivity
-                      ? { registration: 'Registration', qrCreation: 'QR Creation', profileVerification: 'Profile Verification' }[partner.onboardingActivity]
-                      : partner.stage === 'activation' && partner.activationActivity
+                    partner.stage === 'activation' && partner.activationActivity
                       ? { assigned: 'Assigned', trained: 'Trained' }[partner.activationActivity]
                       : partner.stage === 'mobilisation' && partner.mobilisationActivity
                       ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
@@ -1525,15 +1567,18 @@ export function PartnerDetail({
           {activeTab === 'followUps' && (() => {
             const stages = [
               {
-                key: 'onboarding',
-                label: 'Onboarding',
+                key: 'registration',
+                label: 'Registration',
                 icon: <UserCheck className="w-4 h-4" />,
-                activities: [
-                  { key: 'registration', label: 'Registration' },
-                  { key: 'qrCreation', label: 'QR Creation' },
-                  { key: 'profileVerification', label: 'Profile Verification' },
-                ],
-                currentActivity: partner.onboardingActivity,
+                activities: [],
+                currentActivity: undefined,
+              },
+              {
+                key: 'verification',
+                label: 'Verification',
+                icon: <UserCheck className="w-4 h-4" />,
+                activities: [],
+                currentActivity: undefined,
               },
               {
                 key: 'activation',
@@ -1559,7 +1604,7 @@ export function PartnerDetail({
                 currentActivity: partner.mobilisationActivity,
               },
             ]
-            const stageOrder = ['onboarding', 'activation', 'mobilisation']
+            const stageOrder = ['registration', 'verification', 'activation', 'mobilisation']
             const currentStageIdx = partner.stage ? stageOrder.indexOf(partner.stage) : -1
             const followUps = partner.followUps || []
 
@@ -1711,7 +1756,8 @@ export function PartnerDetail({
                     className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="">Select Stage</option>
-                    <option value="onboarding">Onboarding</option>
+                    <option value="registration">Registration</option>
+                    <option value="verification">Verification</option>
                     <option value="activation">Activation</option>
                     <option value="mobilisation">Mobilisation</option>
                   </select>
@@ -1729,13 +1775,6 @@ export function PartnerDetail({
                     className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Activity</option>
-                    {followUpForm.activityType === 'onboarding' && (
-                      <>
-                        <option value="registration">Registration</option>
-                        <option value="qrCreation">QR Creation</option>
-                        <option value="profileVerification">Profile Verification</option>
-                      </>
-                    )}
                     {followUpForm.activityType === 'activation' && (
                       <>
                         <option value="assigned">Assigned</option>

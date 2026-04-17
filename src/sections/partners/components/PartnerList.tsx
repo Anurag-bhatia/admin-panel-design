@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MoreVertical, Search, Filter, ChevronLeft, ChevronRight, X, UserPlus, ArrowUpDown } from 'lucide-react'
+import { MoreVertical, Search, Filter, ChevronLeft, ChevronRight, X, UserPlus, ArrowUpDown, QrCode, Link, Eye } from 'lucide-react'
 import type { PartnerListProps } from '@/../product/sections/partners/types'
 
 interface ExtendedPartnerListProps extends PartnerListProps {
@@ -137,34 +137,26 @@ export function PartnerList({
           ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
           : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
       }`}>
-        <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${isActive ? 'bg-cyan-500' : 'bg-slate-400'}`} />
         {isActive ? 'Active' : 'Inactive'}
       </div>
     )
   }
 
-  const StageBadge = ({ stage }: { stage: 'onboarding' | 'activation' | 'training' | 'mobilisation' }) => {
+  const StageBadge = ({ stage }: { stage: 'registration' | 'verification' | 'activation' | 'mobilisation' }) => {
     const styles = {
-      onboarding: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+      registration: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+      verification: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300',
       activation: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
-      training: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300',
       mobilisation: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
     }
-    const dots = {
-      onboarding: 'bg-amber-500',
-      activation: 'bg-blue-500',
-      training: 'bg-violet-500',
-      mobilisation: 'bg-emerald-500',
-    }
     const labels = {
-      onboarding: 'Onboarding',
+      registration: 'Registration',
+      verification: 'Verification',
       activation: 'Activation',
-      training: 'Training',
       mobilisation: 'Mobilisation',
     }
     return (
       <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${styles[stage]}`}>
-        <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${dots[stage]}`} />
         {labels[stage]}
       </div>
     )
@@ -299,9 +291,9 @@ export function PartnerList({
                   {isChallanPay ? (
                     <>
                       <option value="">All Stages</option>
-                      <option value="onboarding">Onboarding</option>
+                      <option value="registration">Registration</option>
+                      <option value="verification">Verification</option>
                       <option value="activation">Activation</option>
-                      <option value="training">Training</option>
                       <option value="mobilisation">Mobilisation</option>
                     </>
                   ) : (
@@ -420,6 +412,8 @@ export function PartnerList({
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Partner ID</th>
               {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Assigned To</th>}
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">{isChallanPay ? 'Stage' : 'Status'}</th>
+              {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status</th>}
+              {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Profile Verification</th>}
               {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Activity</th>}
               {isChallanPay && <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">Registered Visitors</th>}
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">{isChallanPay ? 'Customers' : 'Subscribers'}</th>
@@ -494,10 +488,36 @@ export function PartnerList({
                     className="px-6 py-4 whitespace-nowrap cursor-pointer"
                     onClick={() => onView?.(partner.id)}
                   >
+                    <StatusBadge status={partner.status} />
+                  </td>
+                )}
+                {isChallanPay && (
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onView?.(partner.id)}
+                  >
+                    {(() => {
+                      const completion = partner.profileCompletion ?? 0
+                      const isVerified = completion >= 100
+                      return (
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                          isVerified
+                            ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'
+                        }`}>
+                          {isVerified ? 'Verified' : `Unverified ${completion}%`}
+                        </span>
+                      )
+                    })()}
+                  </td>
+                )}
+                {isChallanPay && (
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onView?.(partner.id)}
+                  >
                     <p className="text-sm text-slate-900 dark:text-white">
-                      {partner.stage === 'onboarding' && partner.onboardingActivity
-                        ? { registration: 'Registration', qrCreation: 'QR Creation', profileVerification: 'Profile Verification' }[partner.onboardingActivity]
-                        : partner.stage === 'activation' && partner.activationActivity
+                      {partner.stage === 'activation' && partner.activationActivity
                         ? { assigned: 'Assigned', trained: 'Trained' }[partner.activationActivity]
                         : partner.stage === 'mobilisation' && partner.mobilisationActivity
                         ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]
@@ -547,6 +567,24 @@ export function PartnerList({
                             className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
                           >
                             View/Edit Details
+                          </button>
+                          <button
+                            onClick={() => {
+                              setOpenActionMenu(null)
+                            }}
+                            className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                          >
+                            <QrCode className="w-4 h-4" />
+                            View QR
+                          </button>
+                          <button
+                            onClick={() => {
+                              setOpenActionMenu(null)
+                            }}
+                            className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                          >
+                            <Link className="w-4 h-4" />
+                            Copy QR Link
                           </button>
                           <button
                             onClick={() => {
@@ -604,9 +642,7 @@ export function PartnerList({
                   )}
                   {isChallanPay && (
                     <div className="text-slate-600 dark:text-slate-400">
-                      {partner.stage === 'onboarding' && partner.onboardingActivity
-                        ? { registration: 'Registration', qrCreation: 'QR Creation', profileVerification: 'Profile Verification' }[partner.onboardingActivity]
-                        : partner.stage === 'activation' && partner.activationActivity
+                      {partner.stage === 'activation' && partner.activationActivity
                         ? { assigned: 'Assigned', trained: 'Trained' }[partner.activationActivity]
                         : partner.stage === 'mobilisation' && partner.mobilisationActivity
                         ? { posterCreated: 'Poster Created', welcomeLetterCreated: 'Welcome Letter', keychainCreated: 'Keychain Created', dispatch: 'Dispatch', delivered: 'Delivered' }[partner.mobilisationActivity]

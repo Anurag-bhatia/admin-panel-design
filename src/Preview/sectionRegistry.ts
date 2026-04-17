@@ -14,6 +14,7 @@ import {
   Settings,
   FileText,
   CheckCircle2,
+  FileInput,
 } from 'lucide-react'
 
 // Lazy-loaded section preview components
@@ -58,6 +59,9 @@ const CMSDashboardPreview = React.lazy(() =>
 )
 const SettledChallansPreview = React.lazy(() =>
   import('../sections/settled-challans/SettledChallansPreview')
+)
+const ProposalListPreview = React.lazy(() =>
+  import('../sections/proposals/ProposalListPreview')
 )
 
 // Section metadata mapping
@@ -132,6 +136,11 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     description: 'Read-only table view for browsing all settled challans with search, filters, and export.',
     icon: CheckCircle2,
   },
+  proposals: {
+    label: 'Proposals',
+    description: 'Admin-side proposal management for receiving, reviewing, quoting, and converting customer service requests into incidents.',
+    icon: FileInput,
+  },
 }
 
 // Component mapping for implemented sections
@@ -150,6 +159,7 @@ export const SECTION_COMPONENTS: Record<string, React.ComponentType<any> | null>
   setup: SetupDashboard,
   cms: CMSDashboardPreview,
   'settled-challans': SettledChallansPreview,
+  proposals: ProposalListPreview,
 }
 
 // Ordered list of section IDs for consistent navigation
@@ -168,6 +178,7 @@ export const SECTION_IDS = [
   'setup',
   'cms',
   'settled-challans',
+  'proposals',
 ] as const
 
 // Sections hidden from sidebar navigation (kept in registry for data access)
