@@ -1,8 +1,14 @@
-import { jsx as _jsx } from "react/jsx-runtime";
+import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
+import { useState } from 'react';
 import data from '@/../product/sections/partners/data.json';
+import subscriberData from '@/../product/sections/subscribers/data.json';
 import { PartnerDetail } from './components/PartnerDetail';
+import { AddSubscriberModal } from '../subscribers/components/AddSubscriberModal';
 export default function PartnerDetailPreview() {
-    // Use the first partner as the preview
     const partner = data.partners[0];
-    return (_jsx(PartnerDetail, { partner: partner, onBack: () => console.log('Go back to partner list'), onEditPartner: (id) => console.log('Edit partner:', id), onViewIncidents: (subscriberId) => console.log('View incidents for subscriber:', subscriberId), onUploadDocument: (id, file) => console.log('Upload document for partner:', id, file), onDeleteDocument: (id, documentId) => console.log('Delete document:', documentId) }));
+    const [showAddSubscriberModal, setShowAddSubscriberModal] = useState(false);
+    return (_jsxs(_Fragment, { children: [_jsx(PartnerDetail, { partner: partner, onBack: () => console.log('Go back to partner list'), onEditPartner: (id) => console.log('Edit partner:', id), onViewIncidents: (subscriberId) => console.log('View incidents for subscriber:', subscriberId), onUploadDocument: (id, file) => console.log('Upload document for partner:', id, file), onDeleteDocument: (id, documentId) => console.log('Delete document:', documentId), onAddSubscriber: () => setShowAddSubscriberModal(true), onBulkImportSubscribers: () => console.log('Bulk import subscribers'), onAddFollowUp: (partnerId, followUp) => console.log('Add follow-up for partner:', partnerId, followUp) }), showAddSubscriberModal && (_jsx(AddSubscriberModal, { users: subscriberData.users, partners: subscriberData.partners, subscriberSources: subscriberData.subscriberSources, subscriberTypes: subscriberData.subscriberTypes, subscriberSubTypes: subscriberData.subscriberSubTypes, onSubmit: (data) => {
+                    console.log('Add subscriber from partner:', partner.id, data);
+                    setShowAddSubscriberModal(false);
+                }, onClose: () => setShowAddSubscriberModal(false) }))] }));
 }

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { ArrowLeft, Edit, Shield, User, Lock, Activity, FileText, Upload, Download, Eye, X } from 'lucide-react'
+import { ArrowLeft, Edit, Shield, User, Lock, Activity, FileText, Upload, Download, Eye, X, UserX } from 'lucide-react'
 import type { Employee, EmployeeDocument } from '@/../product/sections/team/types'
 
 type TabType = 'details' | 'documents' | 'permissions'
@@ -10,6 +10,7 @@ interface EmployeeDetailViewProps {
   onBack?: () => void
   onEdit?: () => void
   onManagePermissions?: () => void
+  onDeactivate?: () => void
 }
 
 export function EmployeeDetailView({
@@ -18,6 +19,7 @@ export function EmployeeDetailView({
   onBack,
   onEdit,
   onManagePermissions,
+  onDeactivate,
 }: EmployeeDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
   const [showUploadModal, setShowUploadModal] = useState(false)

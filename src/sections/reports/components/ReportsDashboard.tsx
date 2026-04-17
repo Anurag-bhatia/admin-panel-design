@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ExecutiveDashboard } from './ExecutiveDashboard'
 import { ChallanPayReportsTab } from './ChallanPayReportsTab'
-import type { ReportsDashboardProps, ReportFilters } from '@/../product/sections/reports/types'
+import type { ReportsDashboardProps, ReportFilters, ReportsTab } from '@/../product/sections/reports/types'
 
 export function ReportsDashboard({
   executiveSummary,
@@ -37,10 +37,10 @@ export function ReportsDashboard({
     { id: 'challanpay-reports', label: 'ChallanPay Reports' },
   ]
 
-  const [selectedTab, setSelectedTab] = useState(activeTab)
+  const [selectedTab, setSelectedTab] = useState<ReportsTab>(activeTab)
 
   const handleTabClick = (tabId: string) => {
-    setSelectedTab(tabId)
+    setSelectedTab(tabId as ReportsTab)
     onTabChange?.(tabId)
   }
 

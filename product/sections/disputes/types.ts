@@ -10,7 +10,7 @@ export type DisputePriority = 'low' | 'medium' | 'high' | 'critical'
 
 export type DisputeRaisedBy = 'customer' | 'subscriber' | 'internal'
 
-export type LinkedEntityType = 'incident' | 'subscriber' | 'customer' | 'payment'
+export type LinkedEntityType = 'incident' | 'subscriber' | 'customer' | 'payment' | 'vehicle' | 'other'
 
 export interface LinkedEntity {
   type: LinkedEntityType

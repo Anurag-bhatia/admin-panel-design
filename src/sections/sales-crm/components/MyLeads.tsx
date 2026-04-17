@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Calendar, Clock, ChevronDown, MoreVertical, Eye, Phone, MapPin, Truck, Building2 } from 'lucide-react'
 import type { MyLeadsProps, Lead } from '@/../product/sections/sales-crm/my-leads-types'
+import type { Lead as LeadBase, TimelineActivity as TimelineActivityBase, User as UserBase } from '@/../product/sections/sales-crm/types'
 import { LeadDetailView } from './LeadDetailView'
 import { EditLeadModal } from './EditLeadModal'
 import { AddFollowUpModal } from './AddFollowUpModal'
@@ -133,10 +134,10 @@ export function MyLeads({
     return (
       <>
         <LeadDetailView
-          lead={selectedLead}
-          timelineActivities={timelineActivities}
+          lead={selectedLead as unknown as LeadBase}
+          timelineActivities={timelineActivities as unknown as TimelineActivityBase[]}
           documents={[]} // Documents not available in My Leads data
-          users={users}
+          users={users as unknown as UserBase[]}
           onClose={() => setSelectedLeadId(null)}
           onEdit={() => setEditLeadId(selectedLead.id)}
           onChangeStatus={(leadId, status) => console.log('Change status:', { leadId, status })}
@@ -147,7 +148,7 @@ export function MyLeads({
         {/* Modals for detail view */}
         {editLead && (
           <EditLeadModal
-            lead={editLead}
+            lead={editLead as unknown as LeadBase}
             leadSources={leadSources}
             serviceTypes={serviceTypes}
             serviceSubTypes={serviceSubTypes}

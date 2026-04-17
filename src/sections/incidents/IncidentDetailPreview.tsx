@@ -23,7 +23,7 @@ export default function IncidentDetailPreview() {
     (l: any) => l.id === incident.assignedLawyerId
   ) as Lawyer | null
 
-  const followUps = (data.followUps as FollowUp[]).filter(
+  const followUps = (data.followUps as unknown as FollowUp[]).filter(
     (f: FollowUp) => f.incidentId === incident.id
   )
   const timelineActivities = (data.timelineActivities as TimelineActivity[]).filter(

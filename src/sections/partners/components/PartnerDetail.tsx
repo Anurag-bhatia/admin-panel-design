@@ -1824,7 +1824,7 @@ export function PartnerDetail({
                       setFollowUpForm({ activityType: '', subActivityType: '', notes: '' })
                     }
                   }}
-                  disabled={!followUpForm.activityType || !followUpForm.notes || !followUpForm.outcome}
+                  disabled={!followUpForm.activityType || !followUpForm.notes}
                   className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg transition-colors"
                 >
                   Add Follow Up

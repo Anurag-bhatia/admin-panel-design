@@ -159,7 +159,11 @@ export function AddSubscriberModal({
 
   const handleSubmit = () => {
     if (validateStep(currentStep)) {
-      onSubmit(formData)
+      onSubmit({
+        ...formData,
+        lotsFor: formData.serviceType || '',
+        numberOfTrucks: formData.numberOfVehicles || 0,
+      } as any)
     }
   }
 

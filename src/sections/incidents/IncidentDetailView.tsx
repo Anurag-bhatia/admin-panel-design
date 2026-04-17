@@ -69,12 +69,8 @@ export function IncidentDetailView({
   const [showExpenseModal, setShowExpenseModal] = useState(false)
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
 
-  const handleAddFollowUp = (followUp: {
-    notes: string
-    outcome: string
-    nextFollowUpDate: string | null
-  }) => {
-    onAddFollowUp?.(incident.id, followUp)
+  const handleAddFollowUp = (followUp: Record<string, any>) => {
+    onAddFollowUp?.(incident.id, followUp as any)
   }
 
   const handleUploadDocument = (file: File, type: any) => {

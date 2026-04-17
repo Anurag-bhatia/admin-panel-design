@@ -1,13 +1,14 @@
 import data from '@/../product/sections/sales-crm/my-leads-data.json'
+import type { Lead, TodaysPriority } from '@/../product/sections/sales-crm/my-leads-types'
 import { MyLeads } from './components/MyLeads'
 
 export default function MyLeadsPreview() {
   return (
     <MyLeads
       currentUser={data.currentUser}
-      leads={data.leads}
+      leads={data.leads as unknown as Lead[]}
       todaysMeetings={data.todaysMeetings}
-      todaysPriorities={data.todaysPriorities}
+      todaysPriorities={data.todaysPriorities as unknown as TodaysPriority[]}
       timelineActivities={data.timelineActivities}
       users={data.users}
       leadSources={data.leadSources}

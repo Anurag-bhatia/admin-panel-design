@@ -54,7 +54,7 @@ export default function IncidentListPreview() {
   const assignedLawyer = selectedIncident?.assignedLawyerId
     ? data.lawyers.find(l => l.id === selectedIncident.assignedLawyerId) as Lawyer | null
     : null
-  const followUps = (data.followUps as FollowUp[]).filter(f => f.incidentId === selectedIncidentId)
+  const followUps = (data.followUps as unknown as FollowUp[]).filter(f => f.incidentId === selectedIncidentId)
   const timelineActivities = (data.timelineActivities as TimelineActivity[]).filter(t => t.incidentId === selectedIncidentId)
   const documents = (data.documents as Document[]).filter(d => d.incidentId === selectedIncidentId)
 

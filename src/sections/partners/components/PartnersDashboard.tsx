@@ -39,26 +39,22 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
   const stageActivation = challanPayPartners.filter(p => p.stage === 'activation').length
   const stageMobilisation = challanPayPartners.filter(p => p.stage === 'mobilisation').length
 
-  // Sub-card metrics for the expanded stage
-  const getStageSubMetrics = (stageName: string) => {
-    const stagePartners = challanPayPartners.filter(p => p.stage === stageName)
+  // Verification sub-metrics
+  const getVerificationMetrics = () => {
+    const verificationPartners = challanPayPartners.filter(p => p.stage === 'verification')
     return {
-      active: stagePartners.filter(p => p.status === 'active').length,
-      inactive: stagePartners.filter(p => p.status === 'inactive').length,
-      assigned: stagePartners.filter(p => p.assignedTo).length,
-      unassigned: stagePartners.filter(p => !p.assignedTo).length,
+      emailVerified: verificationPartners.filter(p => (p as any).emailVerified).length,
+      profileVerified: verificationPartners.filter(p => p.profileCompletion != null && p.profileCompletion >= 100).length,
     }
   }
 
-  // Mobilisation activity counts
-  const getMobilisationActivityMetrics = () => {
-    const mobilisationPartners = challanPayPartners.filter(p => p.stage === 'mobilisation')
+  // Activation sub-metrics
+  const getActivationMetrics = () => {
+    const activationPartners = challanPayPartners.filter(p => p.stage === 'activation')
     return {
-      posterCreated: mobilisationPartners.filter(p => p.mobilisationActivity === 'posterCreated').length,
-      welcomeLetterCreated: mobilisationPartners.filter(p => p.mobilisationActivity === 'welcomeLetterCreated').length,
-      keychainCreated: mobilisationPartners.filter(p => p.mobilisationActivity === 'keychainCreated').length,
-      dispatch: mobilisationPartners.filter(p => p.mobilisationActivity === 'dispatch').length,
-      delivered: mobilisationPartners.filter(p => p.mobilisationActivity === 'delivered').length,
+      qrActivated: activationPartners.filter(p => p.activationActivity === 'assigned').length,
+      qrUnlocked: activationPartners.filter(p => p.activationActivity === 'trained').length,
+      kitSend: activationPartners.filter(p => (p as any).kitSent).length,
     }
   }
 
@@ -191,7 +187,7 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                         <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">{card.label}</p>
                         <p className="text-3xl font-bold text-slate-900 dark:text-white">{card.value}</p>
                       </div>
-                      {card.key !== 'total' && (
+                      {(card.key === 'verification' || card.key === 'activation') && (
                         <button
                           onClick={() => setExpandedStage(isExpanded ? null : card.key)}
                           className={`mt-0.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
@@ -213,21 +209,19 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
             </div>
 
             {/* Expanded Sub-Cards with popover notch */}
-            {expandedStage && (() => {
-              const stageLabel = expandedStage.charAt(0).toUpperCase() + expandedStage.slice(1)
+            {expandedStage && (expandedStage === 'verification' || expandedStage === 'activation') && (() => {
               const stageKeys = ['total', 'registration', 'verification', 'activation', 'mobilisation'] as const
               const idx = stageKeys.indexOf(expandedStage as any)
               const notchLeft = ((idx + 0.5) / 5) * 100
 
-              const isMobilisation = expandedStage === 'mobilisation'
-              const mobilisationMetrics = isMobilisation ? getMobilisationActivityMetrics() : null
-              const metrics = !isMobilisation ? getStageSubMetrics(expandedStage) : null
+              const isVerification = expandedStage === 'verification'
+              const verificationMetrics = isVerification ? getVerificationMetrics() : null
+              const activationMetrics = !isVerification ? getActivationMetrics() : null
 
               return (
                 <div className="relative mt-4">
                   {/* Notch / caret pointing up */}
                   <div className="absolute -top-2 z-10" style={{ left: `${notchLeft}%`, transform: 'translateX(-50%)' }}>
-                    {/* Border triangle */}
                     <div
                       className="w-0 h-0 absolute -top-px"
                       style={{
@@ -236,7 +230,6 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                         borderBottom: '10px solid var(--notch-border, #e2e8f0)',
                       }}
                     />
-                    {/* Fill triangle */}
                     <div
                       className="w-0 h-0 relative"
                       style={{
@@ -264,17 +257,14 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                     }}
                   >
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
-                      {expandedStage === 'activation' ? 'Training Activity' : `${stageLabel} Activity`}
+                      {isVerification ? 'Verification Status' : 'Activation Status'}
                     </p>
 
-                    {isMobilisation && mobilisationMetrics && (
-                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                    {isVerification && verificationMetrics && (
+                      <div className="grid grid-cols-2 gap-2.5">
                         {([
-                          { label: 'Poster Created', value: mobilisationMetrics.posterCreated, dot: 'bg-violet-500' },
-                          { label: 'Welcome Letter', value: mobilisationMetrics.welcomeLetterCreated, dot: 'bg-cyan-500' },
-                          { label: 'Keychain Created', value: mobilisationMetrics.keychainCreated, dot: 'bg-amber-500' },
-                          { label: 'Dispatch', value: mobilisationMetrics.dispatch, dot: 'bg-blue-500' },
-                          { label: 'Delivered', value: mobilisationMetrics.delivered, dot: 'bg-emerald-500' },
+                          { label: 'Email Verified', value: verificationMetrics.emailVerified, dot: 'bg-violet-500' },
+                          { label: 'Profile Verified', value: verificationMetrics.profileVerified, dot: 'bg-emerald-500' },
                         ]).map((sub) => (
                           <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-1.5 mb-1">
@@ -287,11 +277,12 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                       </div>
                     )}
 
-                    {!isMobilisation && metrics && (
-                      <div className="grid grid-cols-2 gap-2.5">
+                    {!isVerification && activationMetrics && (
+                      <div className="grid grid-cols-3 gap-2.5">
                         {([
-                          { label: 'QR Printed', value: metrics.assigned, dot: 'bg-blue-500' },
-                          { label: 'Training', value: metrics.active, dot: 'bg-emerald-500' },
+                          { label: 'QR Activated', value: activationMetrics.qrActivated, dot: 'bg-blue-500' },
+                          { label: 'QR Unlocked', value: activationMetrics.qrUnlocked, dot: 'bg-cyan-500' },
+                          { label: 'Kit Send', value: activationMetrics.kitSend, dot: 'bg-emerald-500' },
                         ]).map((sub) => (
                           <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-1.5 mb-1">
