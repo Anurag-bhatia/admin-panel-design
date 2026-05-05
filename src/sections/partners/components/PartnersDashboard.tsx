@@ -24,24 +24,28 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
   const [showAddSubscriberModal, setShowAddSubscriberModal] = useState(false)
   const [bulkAssignPartnerIds, setBulkAssignPartnerIds] = useState<string[] | null>(null)
   const [expandedStage, setExpandedStage] = useState<string | null>(null)
+  const [activeTeam, setActiveTeam] = useState<'all' | 'marketing' | 'sales'>('all')
 
   const selectedPartner = selectedPartnerId ? partners.find(p => p.id === selectedPartnerId) : null
   const editingPartner = editingPartnerId ? partners.find(p => p.id === editingPartnerId) : null
 
   const challanPayPartners = partners.filter(p => p.partnerType === 'challanPay')
-  const challanPayCount = challanPayPartners.length
+  const teamFilteredPartners = activeTeam === 'all'
+    ? challanPayPartners
+    : challanPayPartners.filter(p => p.team === activeTeam)
+  const challanPayCount = teamFilteredPartners.length
   const lots247Count = partners.filter(p => p.partnerType === 'lots247').length
   const filteredPartners = partners.filter(p => p.partnerType === activePartnerType)
 
-  // Stage counts for ChallanPay summary cards
-  const stageRegistration = challanPayPartners.filter(p => p.stage === 'registration').length
-  const stageVerification = challanPayPartners.filter(p => p.stage === 'verification').length
-  const stageActivation = challanPayPartners.filter(p => p.stage === 'activation').length
-  const stageMobilisation = challanPayPartners.filter(p => p.stage === 'mobilisation').length
+  // Stage counts for ChallanPay summary cards (team-filtered)
+  const stageRegistration = teamFilteredPartners.filter(p => p.stage === 'registration').length
+  const stageVerification = teamFilteredPartners.filter(p => p.stage === 'verification').length
+  const stageActivation = teamFilteredPartners.filter(p => p.stage === 'activation').length
+  const stageMobilisation = teamFilteredPartners.filter(p => p.stage === 'mobilisation').length
 
   // Verification sub-metrics
   const getVerificationMetrics = () => {
-    const verificationPartners = challanPayPartners.filter(p => p.stage === 'verification')
+    const verificationPartners = teamFilteredPartners.filter(p => p.stage === 'verification')
     return {
       emailVerified: verificationPartners.filter(p => (p as any).emailVerified).length,
       profileVerified: verificationPartners.filter(p => p.profileCompletion != null && p.profileCompletion >= 100).length,
@@ -50,7 +54,7 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
 
   // Activation sub-metrics
   const getActivationMetrics = () => {
-    const activationPartners = challanPayPartners.filter(p => p.stage === 'activation')
+    const activationPartners = teamFilteredPartners.filter(p => p.stage === 'activation')
     return {
       qrActivated: activationPartners.filter(p => p.activationActivity === 'qrActivated').length,
       qrUnlocked: activationPartners.filter(p => p.activationActivity === 'qrUnlocked').length,
@@ -149,6 +153,27 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
         {/* Summary Cards — ChallanPay only */}
         {activePartnerType === 'challanPay' && (
           <div className="mt-6">
+            {/* Team Filter */}
+            <div className="flex items-center gap-2 mb-4">
+              {([
+                { key: 'all' as const, label: 'All Teams' },
+                { key: 'marketing' as const, label: 'Marketing' },
+                { key: 'sales' as const, label: 'Sales' },
+              ]).map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTeam(tab.key)}
+                  className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    activeTeam === tab.key
+                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {([
                 { key: 'total', label: 'Total RoadSmart Partners', value: challanPayCount, accent: 'cyan' },

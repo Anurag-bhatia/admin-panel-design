@@ -144,6 +144,7 @@ export interface Partner {
   stage?: 'registration' | 'verification' | 'activation' | 'mobilisation'
   verificationActivity?: 'emailVerification' | 'profileVerification'
   activationActivity?: 'qrActivated' | 'qrUnlocked' | 'kitSend'
+  team?: 'marketing' | 'sales'
   assignedTo?: string
   profileCompletion?: number
   utmSource?: string
