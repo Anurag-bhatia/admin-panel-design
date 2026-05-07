@@ -4,7 +4,7 @@ These test-writing instructions are **framework-agnostic**. Adapt them to your t
 
 ## Overview
 
-Test subscriber lifecycle management including list view, CRUD operations, bulk upload, and the 7-tab detail page (Details, Challans, Incidents, Documents, Subscription, Wallet, Team).
+The Subscribers module manages B2B client accounts with a list view, add/bulk upload, and a 7-tab detail page.
 
 ---
 
@@ -14,68 +14,91 @@ Test subscriber lifecycle management including list view, CRUD operations, bulk 
 
 **Steps:**
 1. User clicks "Add Subscriber"
-2. Fills Source, Type, Company Name, Contact Person, Phone, Email, State, City, Owner
-3. Submits
+2. User fills: Source, Type, Company, Name, Email, Phone, GST, State, City
+3. User clicks "Save"
 
 **Expected Results:**
-- [ ] Subscriber appears in list with Active status (green pill)
-- [ ] Subs-ID auto-generated
-- [ ] Success notification shown
+- [ ] Subscriber appears in list with Subs-ID
+- [ ] Status shows "Active"
+- [ ] Modal/form closes
 
-**Failure Path:** Required fields missing shows validation errors
+### Flow 2: Bulk Upload
 
-### Flow 2: View Detail Page with 7 Tabs
+**Steps:**
+1. User clicks "Bulk Upload Subscriber"
+2. User downloads template
+3. User uploads filled file
+4. System validates
+
+**Expected Results:**
+- [ ] Template download works
+- [ ] Validation errors displayed clearly
+- [ ] Valid subscribers imported
+
+### Flow 3: View Subscriber Detail
 
 **Steps:**
 1. User clicks subscriber row
-2. Full-screen detail opens
-3. User navigates all 7 tabs
+2. Full-screen detail page opens
 
 **Expected Results:**
-- [ ] Header shows subscriber name, ID, status badge, "Edit Details" button
-- [ ] Details tab: company info, contact, address
-- [ ] Challans tab: linked challans with status
-- [ ] Incidents tab: linked incidents
-- [ ] Documents tab: uploaded files
-- [ ] Subscription tab: plan details, billing
-- [ ] Wallet tab: payments, credits, invoices
-- [ ] Team tab: assigned team members
+- [ ] Header shows subscriber name, ID, status badge
+- [ ] 7 tabs visible: Details, Challans, Incidents, Documents, Subscription, Wallet, Team
+- [ ] Back button returns to list
+- [ ] Edit Details button visible
 
-### Flow 3: Bulk Upload
+### Flow 4: Navigate Detail Tabs
 
 **Steps:**
-1. Click "Bulk Upload Subscriber"
-2. Download template, fill, upload
+1. User clicks each tab in detail view
 
 **Expected Results:**
-- [ ] Template downloads
-- [ ] Subscribers created from file
-- [ ] Validation errors per row shown
+- [ ] Details tab: Company info, contact details, address, metadata
+- [ ] Challans tab: Traffic challans linked to subscriber
+- [ ] Incidents tab: Linked incidents with status
+- [ ] Documents tab: Upload and manage documents
+- [ ] Subscription tab: Plan details, billing period, status
+- [ ] Wallet tab: Payments, credits, invoices, transactions
+- [ ] Team tab: Assigned team members
+
+### Flow 5: Edit Subscriber
+
+**Steps:**
+1. User clicks "Edit Details" or Actions > Edit
+2. User modifies fields
+3. User saves
+
+**Expected Results:**
+- [ ] Fields become editable
+- [ ] Changes saved and reflected
+- [ ] Change logged in audit trail
 
 ---
 
 ## Empty State Tests
 
-- [ ] No subscribers: "No subscribers yet" with add CTA
-- [ ] No challans for subscriber: empty Challans tab
-- [ ] No documents: empty Documents tab with upload prompt
-- [ ] Empty wallet: "No transactions yet"
+### No Subscribers
+
+**Expected Results:**
+- [ ] Empty state message shown
+- [ ] "Add Subscriber" button accessible
+
+### Subscriber with No Challans
+
+**Expected Results:**
+- [ ] Challans tab shows "No challans yet"
+- [ ] Other tabs not affected
+
+### Subscriber with No Documents
+
+**Expected Results:**
+- [ ] Documents tab shows empty state with upload prompt
 
 ---
 
-## Sample Test Data
+## Edge Cases
 
-```typescript
-const mockSubscriber = {
-  id: "SUB-001",
-  source: "Sales",
-  companyName: "Fleet Corp",
-  contactPerson: "Amit Singh",
-  phone: "+91-9876543210",
-  email: "amit@fleetcorp.com",
-  status: "active",
-  owner: "Sales Team",
-  subscription: { plan: "Enterprise", status: "active" },
-  vehicleCount: 45,
-};
-```
+- [ ] Search works by name, company, Subs-ID, and GST
+- [ ] Status filter (Active/Inactive) works
+- [ ] Pagination works in subscriber list
+- [ ] Long company names truncated properly

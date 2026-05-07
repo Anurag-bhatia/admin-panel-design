@@ -14,6 +14,8 @@ interface PaymentsTableHeaderProps {
   onFilter?: (filters: PaymentFilters) => void
   onExport?: () => void
   statusOptions: { value: string; label: string }[]
+  fromDateLabel?: string
+  toDateLabel?: string
 }
 
 export function PaymentsTableHeader({
@@ -23,6 +25,8 @@ export function PaymentsTableHeader({
   onFilter,
   onExport,
   statusOptions,
+  fromDateLabel = 'From Date',
+  toDateLabel = 'To Date',
 }: PaymentsTableHeaderProps) {
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState<PaymentFilters>({})
@@ -115,7 +119,7 @@ export function PaymentsTableHeader({
             {/* Date From */}
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                From Date
+                {fromDateLabel}
               </label>
               <input
                 type="date"
@@ -128,7 +132,7 @@ export function PaymentsTableHeader({
             {/* Date To */}
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                To Date
+                {toDateLabel}
               </label>
               <input
                 type="date"

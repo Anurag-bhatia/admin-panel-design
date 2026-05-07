@@ -6,20 +6,21 @@ A B2B operations platform that manages the complete lifecycle of traffic challan
 
 ## Planned Sections
 
-1. **Incidents** — Queue-driven ticket management for challan and case resolution with 45-day TAT enforcement, structured workflows, and complete audit trails
-2. **Sales CRM** — Lead capture, qualification, and pipeline management replacing fragmented Excel-based tracking
-3. **Subscribers** — Active B2B client account management from onboarding through service delivery
-4. **Customers** — Centralized D2C registered visitor management with vehicle, incident, and financial tracking
-5. **Lawyers** — External legal professional network management with multi-step onboarding, credentialing, and lifecycle management
-6. **Partners** — External business introducer management for subscriber onboarding with commission tracking
-7. **Payments** — Unified workspace for refund processing, lawyer fee management, and partner payouts
-8. **Disputes** — Governance and escalation engine for conflicts, refund disagreements, and contested outcomes
-9. **Support** — Centralized intake and triage system for inbound messages, routing to Leads, Disputes, or Partnerships
-10. **Reports** — Real-time analytics and reporting dashboards across all business domains
-11. **Team** — Employee and team administration with permissions and access control
-12. **Setup** — Centralized configuration hub for system-wide categories, statuses, and configurable values
-13. **CMS** — Content management for blogs, events, and news articles
-14. **Settled Challans** — Dedicated read-only archive for browsing settled challans
+1. **Incidents** — Core workflow for challan intake, screening, assignment, resolution tracking, and SLA enforcement with automated lawyer coordination
+2. **Sales CRM** — Lead capture, qualification, and conversion tracking for prospective B2B clients with separate views for all leads and assigned leads
+3. **Subscribers** — Active client account management and relationship tracking for B2B fleet operators and companies
+4. **Customers** — Customer profile management and service delivery tracking for individual end-users and fleet operators
+5. **Lawyers** — Legal professional network management with performance tracking and commission calculation
+6. **Partners** — Partner relationship management for data sources, referral partners, and service delivery partners
+7. **Payments** — Commission and refund payment processing with automated calculations and financial tracking
+8. **Disputes** — Customer dispute resolution workflow for handling challenges regarding charges, refunds, or service outcomes
+9. **Support** — Support ticket management system for handling subscriber inquiries and issues
+10. **Reports** — Comprehensive reporting dashboards and analytics across all business metrics and operations
+11. **Team** — User and team administration for managing internal operations staff and permissions
+12. **Setup** — Centralized configuration hub for managing system-wide categories, data points, statuses, and configurable values used across all modules
+13. **CMS** — Content management system for creating, editing, and publishing blogs, events, and news articles
+14. **Settled Challans** — Read-only view for browsing all settled challans with search, filtering, and export
+15. **Proposals** — Proposal management for receiving, reviewing, quoting, and converting customer service requests into incidents
 
 ## Data Model
 
@@ -28,41 +29,49 @@ A B2B operations platform that manages the complete lifecycle of traffic challan
 **Key Relationships:**
 - Lead converts to Subscriber
 - Subscriber has many Incidents, Disputes, Support Tickets, Refunds
-- Incident has many Assignments (tracking reassignments)
-- Incident may have one Commission or one Refund
+- Incident has many Assignments (for tracking reassignments and resolution attempts)
+- Incident may have one Commission (when successfully resolved)
+- Incident may have one Refund (when resolution fails)
 - Assignment connects Incident and Lawyer
 - Lawyer has many Assignments and Commissions
+- Commission belongs to Lawyer and Incident
+- Refund belongs to Subscriber and Incident
+- Dispute belongs to Subscriber
+- Support Ticket belongs to Subscriber
 - Payment can be for Commission or Refund
-- Audit Log tracks changes to any entity
+- Audit Log tracks changes to any entity in the system
 
 ## Design System
 
 **Colors:**
 - Primary: `cyan` — Buttons, links, active states, key accents
-- Secondary: `zinc` — Secondary UI elements, borders, sidebar
-- Neutral: `slate` — Backgrounds, text, surfaces
+- Secondary: `zinc` — Tags, highlights, secondary elements
+- Neutral: `slate` — Backgrounds, text, borders
 
 **Typography:**
-- Not defined — Use system defaults or your preference
+- Heading: Geist
+- Body: Geist
+- Mono: Geist Mono
 
 ## Implementation Sequence
 
 Build this product in milestones:
 
-1. **Foundation** — Set up design tokens, data model types, routing, and application shell
-2. **Incidents** — Queue-driven challan/case management
-3. **Sales CRM** — Lead pipeline management
-4. **Subscribers** — B2B client accounts
-5. **Customers** — D2C visitor management
-6. **Lawyers** — Legal network management
-7. **Partners** — Business introducer management
-8. **Payments** — Financial processing
-9. **Disputes** — Conflict resolution
-10. **Support** — Message intake and triage
-11. **Reports** — Analytics dashboards
-12. **Team** — Employee administration
-13. **Setup** — System configuration
-14. **CMS** — Content management
-15. **Settled Challans** — Challan archive
+1. **Foundation** — Set up design tokens, data model types, routing structure, and application shell
+2. **Incidents** — Queue-driven challan workflow with screening, assignment, and SLA enforcement
+3. **Sales CRM** — Lead pipeline with lifecycle stages, follow-ups, and conversions
+4. **Subscribers** — Client account management with subscription tracking
+5. **Customers** — D2C visitor profile management and service tracking
+6. **Lawyers** — Legal network onboarding, credentialing, and performance tracking
+7. **Partners** — Business introducer management with subscriber linking
+8. **Payments** — Refund processing, lawyer fees, and partner payouts
+9. **Disputes** — Escalation engine with SLA-driven resolution workflow
+10. **Support** — Inbound message triage and routing gateway
+11. **Reports** — Executive dashboards and domain-specific analytics
+12. **Team** — Employee and team administration with permissions
+13. **Setup** — System-wide configuration and audit logging
+14. **CMS** — Blog, events, and news content management
+15. **Settled Challans** — Read-only settled challan browsing and export
+16. **Proposals** — Service request intake, quoting, and incident conversion
 
 Each milestone has a dedicated instruction document in `product-plan/instructions/`.

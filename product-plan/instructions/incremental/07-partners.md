@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist
+- **DO** implement empty states when no records exist (first-time users, after deletions)
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,21 +34,18 @@
 
 ## Goal
 
-Implement the Partners module — the system for managing external business introducers who onboard subscribers on the platform.
+Implement the Partners section — business introducer management for external organizations that onboard subscribers.
 
 ## Overview
 
-Partners can create and view subscribers linked to them, access high-level metrics about their business, and view read-only incidents related to their subscribers. All financial tracking, payouts, and system-wide access controls are managed centrally.
+The Partner module manages external business introducers who onboard subscribers on the platform. Partners can create and view subscribers linked to them, access metrics, and view read-only incidents.
 
 **Key Functionality:**
-- Partner list table (Name, Partner ID, Contact, Company, Subscriber count, Status)
-- 4-step onboarding stepper: Personal Info → Company Details → Service Scope → Permissions & Bank Account
+- View partner list with search, filters, and status toggle
+- 4-step partner onboarding (Personal → Company → Service Scope → Permissions & Bank)
 - Partner detail page with tabs: Profile, Subscribers, Financial, Documents, Activity
-- Toggle partner status (active/inactive)
-- View linked subscribers and their incidents (read-only)
-- System-calculated earnings and payout history
-- Document management (GST, PAN, Business License)
-- Search by name, filter by status
+- Manage partner status (active/inactive)
+- View linked subscribers and incidents (read-only)
 
 ## Recommended Approach: Test-Driven Development
 
@@ -58,57 +55,56 @@ See `product-plan/sections/partners/tests.md` for detailed test-writing instruct
 
 ### Components
 
-- `PartnerList` — Main list view
-- `PartnerDetail` — Detail page with tabs
-- `AddPartner` — 4-step onboarding stepper
-- `AddPartnerChallanPay` — ChallanPay partner variant
-- `EditPartner` — Partner editing form
-- `PartnersDashboard` — Dashboard with metrics
-- `PartnersListHeader` — Search, filters, Add Partner button
+Copy from `product-plan/sections/partners/components/`:
 
-### Empty States
+- `PartnersDashboard` — Main dashboard
+- `PartnerList` — Partner table
+- `PartnersListHeader` — Header with search and actions
+- `AddPartner` — 4-step onboarding form
+- `AddPartnerChallanPay` — ChallanPay specific partner form
+- `EditPartner` — Edit partner details
+- `PartnerDetail` — Full detail page
 
-- **No partners yet:** CTA to add first partner
-- **No subscribers:** Empty Subscribers tab
-- **No payouts:** Empty Financial tab
-- **No documents:** Empty Documents tab
+### Callbacks
 
-## Files to Reference
-
-- `product-plan/sections/partners/README.md` — Feature overview
-- `product-plan/sections/partners/tests.md` — Test-writing instructions
-- `product-plan/sections/partners/components/` — React components
-- `product-plan/sections/partners/types.ts` — TypeScript interfaces
-- `product-plan/sections/partners/sample-data.json` — Test data
+- `onAddPartner` — Open onboarding form
+- `onViewDetail` — Open detail page
+- `onEditPartner` — Update partner info
+- `onToggleStatus` — Activate/deactivate
 
 ## Expected User Flows
 
-### Flow 1: Onboard New Partner
+### Flow 1: Onboard Partner
 1. User clicks "Add Partner"
-2. 4-step stepper opens: Personal → Company → Service Scope → Permissions & Bank
-3. User completes each step
-4. **Outcome:** Partner created, appears in list as active
+2. User fills 4-step form: Personal → Company → Service Scope → Permissions & Bank
+3. User clicks "Submit"
+4. **Outcome:** Partner appears in active list
 
-### Flow 2: View Partner Detail
+### Flow 2: View Partner Details
 1. User clicks a partner row
-2. Detail page opens with tabs (Profile, Subscribers, Financial, Documents, Activity)
-3. User views linked subscribers, earnings, documents
-4. **Outcome:** Complete partner information accessible
+2. User sees detail page with Profile, Subscribers, Financial, Documents, Activity tabs
+3. **Outcome:** Complete partner information visible
 
-### Flow 3: Toggle Partner Status
-1. User clicks toggle/action to deactivate a partner
-2. Confirmation appears
-3. **Outcome:** Partner deactivated, cannot onboard new subscribers, historical data preserved
+### Flow 3: Deactivate Partner
+1. User clicks "Deactivate" on partner detail
+2. User confirms
+3. **Outcome:** Partner marked inactive, can no longer onboard subscribers
+
+## Files to Reference
+
+- `product-plan/sections/partners/README.md`
+- `product-plan/sections/partners/tests.md`
+- `product-plan/sections/partners/components/`
+- `product-plan/sections/partners/types.ts`
+- `product-plan/sections/partners/sample-data.json`
 
 ## Done When
 
-- [ ] Tests written and passing
-- [ ] Partner list with search and status filter
-- [ ] 4-step onboarding works
-- [ ] Detail page with all tabs
-- [ ] Status toggle works (active/inactive)
-- [ ] Linked subscribers display with incident links
-- [ ] Financial summary and payout history display
-- [ ] Document uploads work
+- [ ] Tests written for key user flows
+- [ ] All tests pass
+- [ ] Partner list with search and filters works
+- [ ] 4-step onboarding completes
+- [ ] Detail page renders all tabs
+- [ ] Status toggle works
 - [ ] Empty states display properly
 - [ ] Responsive on mobile

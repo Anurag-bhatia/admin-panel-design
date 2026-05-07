@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist
+- **DO** implement empty states when no records exist (first-time users, after deletions)
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,23 +34,21 @@
 
 ## Goal
 
-Implement the Sales CRM — the central system for capturing, organizing, tracking, and converting all potential business opportunities through a structured pipeline.
+Implement the Sales CRM section — lead capture, qualification, and conversion tracking for prospective B2B clients.
 
 ## Overview
 
-The Leads module replaces fragmented Excel-based lead tracking with a structured, real-time pipeline management system. Every lead is uniquely identifiable, actionable, and traceable across its entire lifecycle from initial capture through to conversion or loss.
+The Leads module replaces fragmented Excel-based lead tracking with a structured pipeline management system. Every lead is uniquely identifiable, actionable, and traceable across its lifecycle.
 
 **Key Functionality:**
-- Tab-based pipeline view (All Leads, New, Assigned, Follow-up, Quotations, Projected, Ready to Invoice, Sales, Lost) with real-time counts
-- Add single lead via structured form modal
-- Bulk upload leads via Excel with template download and validation
-- Search and filter leads by source, owner, service type, location
-- Bulk update leads (change status or owner for selected leads)
-- Lead detail view with activity timeline, assignments, and documents
-- Assign/reassign leads to users
-- Follow-up tracking with activity type, notes, next date, outcome
-- My Leads personal view for assigned leads
-- Document upload and management
+- Tab-based pipeline view (All Leads, New, Assigned, Follow-up, Quotations, Projected, Ready to Invoice, Sales, Lost)
+- Add single leads and bulk upload via Excel
+- Search and filter across multiple dimensions
+- Lead detail view with activity timeline and documents
+- Assign/reassign leads to team members
+- Add follow-up activities with scheduling
+- Bulk update status or owner
+- Dashboard summary cards with key metrics
 
 ## Recommended Approach: Test-Driven Development
 
@@ -60,73 +58,71 @@ See `product-plan/sections/sales-crm/tests.md` for detailed test-writing instruc
 
 ### Components
 
-- `LeadsDashboard` — Main dashboard with summary cards and pipeline
-- `LeadsTable` — Data table with stage tabs
-- `LeadsListHeader` — Search bar, filters, Add Lead, Bulk Upload buttons
-- `AddLeadModal` — Lead creation form (Source, Type, Company, Contact, Location)
-- `EditLeadModal` — Lead editing form
-- `BulkUploadModal` — Excel upload with template download
-- `BulkMoveLead` — Bulk status/owner change modal
-- `BulkActionsBar` — Appears on selection
-- `LeadDetailView` — Full detail with timeline, documents, assignments
-- `AssignLeadModal` — Lead assignment to user
-- `AddFollowUpModal` — Follow-up activity logging
+Copy from `product-plan/sections/sales-crm/components/`:
+
+- `LeadsDashboard` — Main dashboard with summary cards and table
+- `LeadsTable` — Lead list table
+- `LeadsListHeader` — Header with search, filters, actions
+- `AddLeadModal` — Single lead creation form
+- `BulkUploadModal` — Excel upload for bulk leads
+- `EditLeadModal` — Edit lead form
+- `AssignLeadModal` — Lead assignment
+- `LeadDetailView` — Full lead detail page
+- `AddFollowUpModal` — Follow-up activity recording
+- `BulkActionsBar` — Bulk operations bar
+- `BulkMoveLead` — Bulk status change
+- `MyLeads` — Personal assigned leads view
 - `UploadDocumentModal` — Document attachment
-- `MyLeads` — Personal leads view
 
-### Empty States
+### Callbacks
 
-- **No leads yet:** Helpful CTA to create first lead
-- **No leads in stage:** Empty tab with guidance
-- **No follow-ups:** Empty timeline in detail view
-- **No documents:** Empty documents section
-
-## Files to Reference
-
-- `product-plan/sections/sales-crm/README.md` — Feature overview
-- `product-plan/sections/sales-crm/tests.md` — Test-writing instructions
-- `product-plan/sections/sales-crm/components/` — React components
-- `product-plan/sections/sales-crm/types.ts` — TypeScript interfaces
-- `product-plan/sections/sales-crm/sample-data.json` — Test data
+- `onAddLead` — Create new lead
+- `onBulkUpload` — Excel bulk import
+- `onEditLead` — Update lead details
+- `onAssignLead` — Assign/reassign
+- `onAddFollowUp` — Record follow-up
+- `onChangeStatus` — Update lifecycle stage
+- `onBulkUpdate` — Bulk operations
+- `onViewDetail` — Open detail view
+- `onExport` — Export data
 
 ## Expected User Flows
 
 ### Flow 1: Add New Lead
-1. User clicks "Add Lead" button
-2. Modal opens with form (Source, Type, Sub Type, Company, Contact Person, Phone, Email, State, City)
-3. User fills required fields and submits
-4. **Outcome:** Lead appears in "New" tab, success message shown
+1. User clicks "Add Lead"
+2. User fills in source, company, contact details, service requirements
+3. User clicks "Save"
+4. **Outcome:** Lead appears in "New" tab
 
-### Flow 2: Bulk Upload Leads
-1. User clicks "Bulk Upload Leads"
-2. Modal opens with template download and file upload
-3. User downloads template, fills it, uploads Excel file
-4. **Outcome:** Leads created from file, validation errors shown if any
+### Flow 2: Qualify and Assign
+1. User views lead in pipeline
+2. User clicks "Assign" from actions menu
+3. User selects team member
+4. **Outcome:** Lead moves to "Assigned" tab, assignment logged
 
-### Flow 3: View and Follow Up on Lead
-1. User clicks a lead row to open detail view
-2. User views timeline, assignments, documents
-3. User clicks "Add Follow-Up" and records activity (type, notes, next date, outcome)
-4. **Outcome:** Follow-up saved, visible in timeline, next follow-up date tracked
+### Flow 3: Follow Up
+1. User opens lead detail view
+2. User clicks "Add Follow Up"
+3. User records activity type, notes, next follow-up date
+4. **Outcome:** Follow-up logged in activity timeline
 
-### Flow 4: Bulk Update Leads
-1. User selects multiple leads via checkboxes
-2. Bulk actions bar appears with "Bulk Update" button
-3. User clicks Bulk Update, chooses Status or Owner change, selects new value
-4. **Outcome:** All selected leads updated, confirmation shown
+## Files to Reference
+
+- `product-plan/sections/sales-crm/README.md`
+- `product-plan/sections/sales-crm/tests.md`
+- `product-plan/sections/sales-crm/components/`
+- `product-plan/sections/sales-crm/types.ts`
+- `product-plan/sections/sales-crm/sample-data.json`
 
 ## Done When
 
 - [ ] Tests written for key user flows
 - [ ] All tests pass
-- [ ] Pipeline tabs display with correct counts
-- [ ] Add Lead creates lead in correct stage
-- [ ] Bulk upload works with validation
-- [ ] Lead detail view shows full information and timeline
-- [ ] Follow-ups can be added and tracked
-- [ ] Bulk update works for status and owner
-- [ ] My Leads shows only assigned leads
-- [ ] Search and filters work
-- [ ] Export works
+- [ ] Pipeline tabs show correct counts
+- [ ] Single and bulk lead creation works
+- [ ] Lead assignment and reassignment works
+- [ ] Follow-up activities can be recorded
+- [ ] Lead detail view shows all information
+- [ ] Bulk update operations work
 - [ ] Empty states display properly
 - [ ] Responsive on mobile

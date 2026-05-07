@@ -1,7 +1,7 @@
 # Milestone 15: Settled Challans
 
 > **Provide alongside:** `product-overview.md`
-> **Prerequisites:** Milestone 1 (Foundation), Milestone 2 (Incidents) recommended
+> **Prerequisites:** Milestone 1 (Foundation) complete
 
 ---
 
@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist
+- **DO** implement empty states when no records exist (first-time users, after deletions)
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,18 +34,18 @@
 
 ## Goal
 
-Implement the Settled Challans module — a dedicated read-only table view for browsing all settled challans.
+Implement the Settled Challans section — a read-only table for browsing resolved challans.
 
 ## Overview
 
-A simple archive view providing search, filtering, and export capabilities for quick lookup and reporting on resolved challans. This is a read-only module — no creation, editing, or detail views.
+A dedicated read-only table view for browsing all settled challans. Provides search, filtering, and export capabilities for quick lookup and reporting.
 
 **Key Functionality:**
-- Paginated table: Vehicle No, Subscriber, Challan No, Offence Name
-- Full-text search across all fields
-- Filters: date range, subscriber, state, amount
+- Paginated table of settled challans
+- Search across records (vehicle no, challan no, subscriber)
+- Filter by date range, subscriber, state, amount
 - Export filtered data as CSV/Excel
-- Read-only — no row click, no detail view, no editing
+- Read-only — no row click or detail view
 
 ## Recommended Approach: Test-Driven Development
 
@@ -55,51 +55,37 @@ See `product-plan/sections/settled-challans/tests.md` for detailed test-writing 
 
 ### Components
 
-- `SettledChallansDashboard` — Main table view with search, filters, export, pagination
+Copy from `product-plan/sections/settled-challans/components/`:
 
-### Data Layer
+- `SettledChallansDashboard` — Main table view
 
-Query settled challans from the incidents/challans that have reached "Settled" status. This is a read-only view over existing data.
+### Expected User Flows
 
-### Empty States
+### Flow 1: Browse Settled Challans
+1. User navigates to Settled Challans
+2. User sees paginated table with Vehicle No, Subscriber, Challan No, Offence Name
+3. User searches by vehicle number
+4. **Outcome:** Filtered results displayed
 
-- **No settled challans:** "No settled challans yet"
-- **No search results:** "No challans match your search"
-- **No filter results:** "No challans match the selected filters"
+### Flow 2: Export Data
+1. User applies filters (date range, state)
+2. User clicks "Export"
+3. **Outcome:** Filtered data downloaded as CSV
 
 ## Files to Reference
 
-- `product-plan/sections/settled-challans/README.md` — Feature overview
-- `product-plan/sections/settled-challans/tests.md` — Test-writing instructions
-- `product-plan/sections/settled-challans/components/` — React components
-- `product-plan/sections/settled-challans/types.ts` — TypeScript interfaces
-- `product-plan/sections/settled-challans/sample-data.json` — Test data
-
-## Expected User Flows
-
-### Flow 1: Search Settled Challans
-1. User enters search term (vehicle number, challan number, subscriber name)
-2. Table filters in real-time
-3. **Outcome:** Only matching records displayed
-
-### Flow 2: Filter by Criteria
-1. User applies date range, subscriber, state, and/or amount filters
-2. Table updates to show only matching records
-3. **Outcome:** Filtered view of settled challans
-
-### Flow 3: Export Data
-1. User applies desired filters
-2. Clicks Export button
-3. **Outcome:** CSV/Excel file downloads with filtered data
+- `product-plan/sections/settled-challans/components/`
+- `product-plan/sections/settled-challans/types.ts`
+- `product-plan/sections/settled-challans/sample-data.json`
+- `product-plan/sections/settled-challans/tests.md`
 
 ## Done When
 
-- [ ] Tests written and passing
-- [ ] Table displays settled challans with pagination
-- [ ] Search works across all fields
-- [ ] Date range filter works
-- [ ] Subscriber, state, amount filters work
-- [ ] Export downloads filtered data
-- [ ] Table is read-only (no row click actions)
-- [ ] Empty states display properly
+- [ ] Tests written for key user flows
+- [ ] All tests pass
+- [ ] Table renders with pagination
+- [ ] Search works across records
+- [ ] All filters work
+- [ ] Export works
+- [ ] Empty state shows when no records
 - [ ] Responsive on mobile

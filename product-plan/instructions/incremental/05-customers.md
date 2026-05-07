@@ -1,4 +1,4 @@
-# Milestone 5: Customers (Registered Visitors)
+# Milestone 5: Customers
 
 > **Provide alongside:** `product-overview.md`
 > **Prerequisites:** Milestone 1 (Foundation) complete
@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist
+- **DO** implement empty states when no records exist (first-time users, after deletions)
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,23 +34,19 @@
 
 ## Goal
 
-Implement the Customers module — the centralized system for managing all D2C registered visitors who use the platform independently.
+Implement the Customers section — D2C visitor profile management and service delivery tracking.
 
 ## Overview
 
-The Registered Visitors module provides operations, support, and finance teams with a unified view of each visitor, their vehicles, incidents, challans, and payment history. It acts as the single source of truth for all retail visitor interactions.
+The Customers module manages all direct-to-consumer visitors who use the platform independently. It provides operations, support, and finance teams with a unified view of each visitor, their vehicles, incidents, challans, and payment history.
 
 **Key Functionality:**
-- Visitor list table (Name, ID, Mobile, Vehicle Details)
-- Add new visitor via form modal
-- Bulk upload visitors via CSV/Excel
-- Full detail page with 5 tabs: Details, Incidents, Challans, Vehicles, Financials
-- Edit visitor profile
-- Track visitor incidents with quick status updates
-- Review challan history across vehicles
-- View read-only consolidated financials
-- Activity log of all changes
-- Bulk operations (export, status updates)
+- Browse and search D2C visitors
+- Add new visitors individually or via bulk upload
+- Full visitor detail page with tabs: Details, Incidents, Challans, Vehicles, Financials
+- Edit visitor profiles
+- Create incidents from visitor detail page
+- View activity log
 
 ## Recommended Approach: Test-Driven Development
 
@@ -60,57 +56,57 @@ See `product-plan/sections/customers/tests.md` for detailed test-writing instruc
 
 ### Components
 
-- `CustomerList` — Main list view
-- `CustomerListHeader` — Search, filters, Add/Bulk Upload buttons
-- `CustomerTable` — Data table
-- `CustomerRow` — Table row with visitor data
-- `BulkUploadCustomers` — CSV/Excel upload modal
-- `CustomerDetailView` — Full detail page with 5 tabs
+Copy from `product-plan/sections/customers/components/`:
 
-### Empty States
+- `CustomerList` — Main customer list
+- `CustomerTable` — Customer data table
+- `CustomerRow` — Individual customer row
+- `CustomerListHeader` — Header with search and actions
+- `CustomerDetailView` — Full detail page
+- `BulkUploadCustomers` — Bulk import
 
-- **No visitors yet:** CTA to add first visitor
-- **No incidents:** Empty Incidents tab
-- **No challans:** Empty Challans tab
-- **No vehicles:** Empty Vehicles tab
-- **No financials:** Empty Financials tab
+### Callbacks
 
-## Files to Reference
-
-- `product-plan/sections/customers/README.md` — Feature overview
-- `product-plan/sections/customers/tests.md` — Test-writing instructions
-- `product-plan/sections/customers/components/` — React components
-- `product-plan/sections/customers/types.ts` — TypeScript interfaces
-- `product-plan/sections/customers/sample-data.json` — Test data
+- `onAddCustomer` — Create visitor
+- `onBulkUpload` — Excel bulk import
+- `onViewDetail` — Open detail page
+- `onEditCustomer` — Update visitor info
+- `onCreateIncident` — Create incident from detail page
 
 ## Expected User Flows
 
-### Flow 1: Add New Visitor
-1. User clicks "Add New Visitor"
-2. Modal opens with form fields (name, mobile, email, etc.)
-3. User fills in details and submits
-4. **Outcome:** Visitor appears in list
+### Flow 1: Browse Visitors
+1. User navigates to Customers section
+2. User sees table of all visitors
+3. User searches by name, mobile, or visitor ID
+4. **Outcome:** Filtered results displayed
 
-### Flow 2: View Visitor Detail
+### Flow 2: View Visitor Details
 1. User clicks a visitor row
-2. Detail page opens with 5 tabs
-3. User navigates tabs to view incidents, challans, vehicles, financials
-4. **Outcome:** Complete visitor information accessible
+2. User sees detail page with tabs
+3. User navigates between Details, Incidents, Challans, Vehicles, Financials
+4. **Outcome:** Complete visitor information visible
 
-### Flow 3: Bulk Upload
-1. User clicks "Bulk Upload Visitors"
-2. Uploads CSV/Excel file
-3. System validates and creates records
-4. **Outcome:** Multiple visitors created with validation feedback
+### Flow 3: Create Incident
+1. User opens visitor detail page
+2. User clicks "Create Incident"
+3. User fills in incident details
+4. **Outcome:** Incident created and linked to visitor
+
+## Files to Reference
+
+- `product-plan/sections/customers/README.md`
+- `product-plan/sections/customers/tests.md`
+- `product-plan/sections/customers/components/`
+- `product-plan/sections/customers/types.ts`
+- `product-plan/sections/customers/sample-data.json`
 
 ## Done When
 
-- [ ] Tests written and passing
-- [ ] Visitor list displays with search
-- [ ] Add visitor works
-- [ ] Bulk upload works with validation
-- [ ] Detail page renders with all 5 tabs
-- [ ] Incidents tab shows visitor's incidents
-- [ ] Financials tab shows read-only financial data
+- [ ] Tests written for key user flows
+- [ ] All tests pass
+- [ ] Customer list with search works
+- [ ] Add customer (single and bulk) works
+- [ ] Detail page renders all tabs
 - [ ] Empty states display properly
 - [ ] Responsive on mobile

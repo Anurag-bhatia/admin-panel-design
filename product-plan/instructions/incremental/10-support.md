@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist
+- **DO** implement empty states when no records exist (first-time users, after deletions)
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,20 +34,18 @@
 
 ## Goal
 
-Implement the Support module — the centralized intake and triage system for all inbound messages from public touchpoints.
+Implement the Support section — inbound message triage from public touchpoints.
 
 ## Overview
 
-The Support module captures, reviews, and routes every message into the appropriate internal workflow (Leads, Disputes, or Partnerships). It does not resolve issues — it acts as a structured gateway that converts raw customer communication into actionable system records.
+The Support module is a centralized intake and triage system for all inbound messages. It captures, reviews, and routes every message into the appropriate workflow (Leads, Disputes, or Partnerships). This module does not resolve issues — it acts as a gateway that converts raw communication into actionable records.
 
 **Key Functionality:**
-- Table of unconverted submissions (Subject, Source, Type, Actions)
+- View unconverted submissions in a table
 - Filter by Source and Type
-- Sort by Type or Source
-- Click row to view full details in read-only modal
-- Convert via Actions: Convert to Lead, Convert to Dispute, Convert to Partnership
-- Converted entries auto-hidden from main view
-- All conversions logged in audit trail
+- View full submission details in read-only modal
+- Convert submissions to Lead, Dispute, or Partnership
+- Converted entries automatically hidden from main view
 
 ## Recommended Approach: Test-Driven Development
 
@@ -57,52 +55,40 @@ See `product-plan/sections/support/tests.md` for detailed test-writing instructi
 
 ### Components
 
-- `SupportDashboard` — Main table view with filters
-- `SubmissionDetailsModal` — Read-only detail popup
+Copy from `product-plan/sections/support/components/`:
 
-### Empty States
+- `SupportDashboard` — Main support table view
+- `SubmissionDetailsModal` — Read-only submission detail modal
 
-- **No submissions:** "No support submissions yet"
-- **All converted:** "All submissions have been processed"
-- **No results for filter:** "No submissions match your filters"
+### Expected User Flows
+
+### Flow 1: Triage Submission
+1. User views table of unconverted submissions
+2. User clicks a row to view full details in modal
+3. User closes modal and uses Actions dropdown
+4. User clicks "Convert to Lead"
+5. **Outcome:** Lead created, submission hidden from view
+
+### Flow 2: Filter Submissions
+1. User applies Source filter (landing page, campaign form, etc.)
+2. User applies Type filter (query, complaint, etc.)
+3. **Outcome:** Table shows filtered results
 
 ## Files to Reference
 
-- `product-plan/sections/support/README.md` — Feature overview
-- `product-plan/sections/support/tests.md` — Test-writing instructions
-- `product-plan/sections/support/components/` — React components
-- `product-plan/sections/support/types.ts` — TypeScript interfaces
-- `product-plan/sections/support/sample-data.json` — Test data
-
-## Expected User Flows
-
-### Flow 1: Review Submission
-1. User sees table of unconverted submissions
-2. Clicks a row (outside Actions dropdown)
-3. Read-only modal shows full Subject, Message, submission time, source
-4. **Outcome:** User understands the submission context
-
-### Flow 2: Convert to Lead
-1. User clicks Actions dropdown on a submission row
-2. Selects "Convert to Lead"
-3. System creates a lead prefilled with contact details and source
-4. **Outcome:** Lead created, submission hidden from main view, conversion logged
-
-### Flow 3: Convert to Dispute
-1. User clicks Actions → "Convert to Dispute"
-2. System creates dispute linked to the support message
-3. **Outcome:** Dispute created, submission hidden, conversion logged
+- `product-plan/sections/support/components/`
+- `product-plan/sections/support/types.ts`
+- `product-plan/sections/support/sample-data.json`
+- `product-plan/sections/support/tests.md`
 
 ## Done When
 
-- [ ] Tests written and passing
-- [ ] Table displays unconverted submissions
-- [ ] Filters work (Source, Type)
-- [ ] Detail modal opens on row click (read-only, no action buttons)
-- [ ] Convert to Lead creates lead with prefilled data
-- [ ] Convert to Dispute creates linked dispute
-- [ ] Convert to Partnership creates partner entry
-- [ ] Converted entries hidden from view
-- [ ] Audit trail records all conversions
+- [ ] Tests written for key user flows
+- [ ] All tests pass
+- [ ] Submission table displays correctly
+- [ ] Filters work for Source and Type
+- [ ] Detail modal shows full submission
+- [ ] All three conversion paths work
+- [ ] Converted entries hidden automatically
 - [ ] Empty states display properly
 - [ ] Responsive on mobile

@@ -4,61 +4,66 @@
 
 The Admin Panel shell provides a sidebar navigation layout optimized for operations management. The sidebar displays all major sections with clear visual hierarchy, while the content area provides maximum space for data tables, forms, and dashboards.
 
+## Components
+
+### AppShell
+Main layout wrapper that provides the sidebar + content area structure.
+
+**Props:**
+| Prop | Type | Description |
+|------|------|-------------|
+| `children` | `ReactNode` | Main content to render |
+| `navigationItems` | `NavigationItem[]` | Sidebar navigation items |
+| `user` | `User` | Current user info |
+| `breadcrumbs` | `Breadcrumb[]` | Breadcrumb trail |
+| `onNavigate` | `(href: string) => void` | Navigation callback |
+| `onLogout` | `() => void` | Logout callback |
+
+### MainNav
+Sidebar navigation with collapsible sections and active state highlighting.
+
+**Props:**
+| Prop | Type | Description |
+|------|------|-------------|
+| `items` | `NavigationItem[]` | Navigation items |
+| `onNavigate` | `(href: string) => void` | Click callback |
+| `isCollapsed` | `boolean` | Collapsed state |
+| `darkMode` | `boolean` | Dark sidebar theme |
+
+### UserMenu
+User avatar with dropdown menu for account actions.
+
+**Props:**
+| Prop | Type | Description |
+|------|------|-------------|
+| `user` | `User` | User info (name, email, avatar) |
+| `onLogout` | `() => void` | Logout callback |
+
 ## Layout Pattern
 
-- **Desktop:** Dark sidebar (#212121) on the left, collapsed by default (64px), expands on hover (240px). Content area fills remaining space with header bar containing user menu.
-- **Mobile:** Bottom tab navigation showing 5 primary sections. Hamburger menu opens full sidebar overlay.
+- **Desktop:** Sidebar (240px, collapsible to 64px) on left, content fills remaining space
+- **Tablet:** Sidebar visible but slightly narrower
+- **Mobile:** Bottom tab navigation bar with top 5 sections
 
 ## Navigation Structure
 
-| Nav Item | Route | Sub-items |
-|----------|-------|-----------|
-| Incidents | /incidents | — |
-| Sales CRM | /sales-crm | All Leads, My Leads |
-| Subscribers | /subscribers | — |
-| Customers | /customers | — |
-| Lawyers | /lawyers | — |
-| Partners | /partners | — |
-| Payments | /payments | — |
-| Disputes | /disputes | — |
-| Support | /support | — |
-| Reports | /reports | — |
-| Team | /team | — |
-
-## Components Provided
-
-### `AppShell`
-Root layout wrapper. Renders sidebar, header, content area, and mobile bottom nav.
-
-**Props:**
-- `children` — Page content
-- `navigationItems` — Array of nav items with label, href, icon, isActive, children
-- `user` — Current user (name, email, avatarUrl, designation)
-- `breadcrumbs` — Breadcrumb path (currently disabled)
-- `onNavigate` — Called when user clicks a nav item
-- `onLogout` — Called when user clicks logout
-
-### `MainNav`
-Sidebar navigation with collapsible sub-items.
-
-**Props:**
-- `items` — Navigation items array
-- `onNavigate` — Navigation callback
-- `isCollapsed` — Whether sidebar is collapsed
-- `darkMode` — Use dark color scheme
-
-### `UserMenu`
-User avatar with dropdown containing logout.
-
-**Props:**
-- `user` — User object (name, email, avatarUrl, designation)
-- `onLogout` — Logout callback
+Wire up navigation items for these sections:
+1. Incidents
+2. Sales CRM (sub-items: All Leads, My Leads)
+3. Subscribers
+4. Customers
+5. Lawyers
+6. Partners
+7. Payments
+8. Disputes
+9. Support
+10. Reports
+11. Team
 
 ## Design Notes
 
-- Active nav items use `bg-cyan-600 text-white`
-- Collapsed sidebar shows icons only with hover tooltips
-- Sub-navigation items (e.g., Sales CRM children) auto-expand when a child is active
-- Smooth 300ms transition when hovering to expand sidebar
-- Logo shows "L" when collapsed, full logo image when expanded
-- Mobile bottom nav shows first 5 items from navigation
+- Sidebar background: `#212121` with zinc-800 borders
+- Active items: `cyan-600` background, white text
+- Collapsed state shows single letter "L" logo, expanded shows full logo
+- Hover-to-expand behavior on desktop
+- Icons from `lucide-react`

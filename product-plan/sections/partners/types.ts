@@ -77,7 +77,7 @@ export interface RegisteredVisitorDetail {
 
 export interface PartnerFollowUp {
   id: string
-  activityType: 'onboarding' | 'activation' | 'training' | 'mobilisation'
+  activityType: 'registration' | 'verification' | 'activation' | 'mobilisation'
   subActivityType: 'call' | 'meeting' | 'email' | 'visit' | 'whatsapp'
   notes: string
   createdAt: string
@@ -141,11 +141,11 @@ export interface Partner {
   vehicles?: number
   linkedVehicles: Vehicle[]
   status: 'active' | 'inactive'
-  stage?: 'onboarding' | 'activation' | 'mobilisation'
-  onboardingActivity?: 'registration' | 'qrCreation' | 'profileVerification'
-  activationActivity?: 'assigned' | 'trained'
-  mobilisationActivity?: 'posterCreated' | 'welcomeLetterCreated' | 'keychainCreated' | 'dispatch' | 'delivered'
+  stage?: 'registration' | 'verification' | 'activation' | 'mobilisation'
+  verificationActivity?: 'emailVerification' | 'profileVerification'
+  activationActivity?: 'qrActivated' | 'qrUnlocked' | 'kitSend'
   assignedTo?: string
+  profileCompletion?: number
   utmSource?: string
   dateOnboarded: string
   linkedSubscribers: LinkedSubscriber[]

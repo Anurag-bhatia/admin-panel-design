@@ -33,6 +33,7 @@ export interface Subscriber {
   subType: string
   lotsFor: string
   numberOfTrucks: number
+  serviceType?: string
   phoneNumber: string
   country: string
   state: string

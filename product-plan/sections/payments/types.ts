@@ -62,7 +62,7 @@ export interface PartnerPayout {
   subscriberCount: number
   totalEarnings: number
   payoutAmount: number
-  status: 'To Pay' | 'Completed' | 'Hold' | 'Rejected'
+  status: 'Eligible' | 'Requested' | 'Auto-Processed' | 'Processing' | 'Processed' | 'Failed'
   dueDate: string
   paidDate: string | null
 }
@@ -77,11 +77,11 @@ export interface PaymentsProps {
   /** List of lawyer fee records */
   lawyerFees: LawyerFee[]
   /** List of leads for the Leads sub-section */
-  leads?: import('../types').Lead[]
+  leads?: import('@/../product/sections/sales-crm/types').Lead[]
   /** Available users for lead assignment */
-  users?: import('../types').User[]
+  users?: import('@/../product/sections/sales-crm/types').User[]
   /** List of lawyers for profile navigation from Lawyer Payments */
-  lawyers?: import('../types').Lawyer[]
+  lawyers?: import('@/../product/sections/lawyers/types').Lawyer[]
   /** Called when user approves a refund */
   onApproveRefund?: (id: string) => void
   /** Called when user processes a refund */
@@ -107,7 +107,7 @@ export interface PaymentsProps {
   /** List of partner payout records */
   partnerPayouts?: PartnerPayout[]
   /** List of full partner objects for detail navigation from ChallanPay Partners */
-  partners?: import('../types').Partner[]
+  partners?: import('@/../product/sections/partners/types').Partner[]
   /** Called when user bulk marks selected partner payouts as paid */
   onBulkMarkPartnerPayoutsPaid?: (keys: string[]) => void
   /** Called when user clicks a partner payout row to navigate to partner profile */

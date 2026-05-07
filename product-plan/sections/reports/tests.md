@@ -4,7 +4,7 @@ These test-writing instructions are **framework-agnostic**. Adapt them to your t
 
 ## Overview
 
-Test the analytics module including executive dashboard, 9 report tabs, filter bar, metric drill-down, chart rendering, export, and role-based visibility.
+The Reports module provides dashboards and analytics with an Executive Dashboard, category tabs, persistent filters, and drill-down capabilities.
 
 ---
 
@@ -13,63 +13,88 @@ Test the analytics module including executive dashboard, 9 report tabs, filter b
 ### Flow 1: View Executive Dashboard
 
 **Steps:**
-1. Navigate to Reports
+1. User navigates to Reports
+2. Executive Dashboard loads
 
 **Expected Results:**
-- [ ] Executive Dashboard shows summary cards
-- [ ] Cards display metrics across all domains
-- [ ] Trend indicators visible (up/down arrows)
+- [ ] High-level summary cards display across all domains
+- [ ] Cards show large numbers with labels
+- [ ] Trend indicators visible (up/down arrows, percentage changes)
 
-### Flow 2: Drill Down into Metric
-
-**Steps:**
-1. Click a metric card (e.g., "Total Incidents")
-2. Detailed view expands
-
-**Expected Results:**
-- [ ] Detailed data table or chart appears
-- [ ] Data corresponds to the metric clicked
-
-### Flow 3: Filter and Export
+### Flow 2: Navigate Report Tabs
 
 **Steps:**
-1. Select date range
-2. Apply state filter
-3. Click Export
-
-**Expected Results:**
-- [ ] All metrics update with filtered data
-- [ ] Export downloads filtered report (CSV/PDF)
-
-### Flow 4: Tab Navigation
-
-**Steps:**
-1. Click through tabs: Incidents, Leads, Subscribers, Lawyers, Partners, Payments, Disputes, Support, Team
+1. User clicks "Incidents" tab
+2. User clicks "Leads" tab
+3. User clicks other tabs
 
 **Expected Results:**
 - [ ] Each tab shows domain-specific metrics
-- [ ] Filters persist across tabs
+- [ ] Charts and tables appropriate to domain
+- [ ] Tab visually highlighted when active
+
+### Flow 3: Apply Filters
+
+**Steps:**
+1. User selects date range
+2. User selects state from dropdown
+3. User selects service type
+
+**Expected Results:**
+- [ ] Metrics update based on filters
+- [ ] Filters persist across tab switches
+- [ ] Clear filters option available
+
+### Flow 4: Drill Down
+
+**Steps:**
+1. User clicks a metric card
+2. Detailed data appears
+
+**Expected Results:**
+- [ ] Filtered data table shown below or in modal
+- [ ] Data matches the metric that was clicked
+- [ ] Can navigate back to summary
+
+### Flow 5: Export Report
+
+**Steps:**
+1. User applies filters
+2. User clicks "Export" button
+3. User selects format (PDF or CSV)
+
+**Expected Results:**
+- [ ] Export includes current tab data with applied filters
+- [ ] File downloads correctly
+- [ ] Per-metric export also available
+
+### Flow 6: Role-Based Visibility
+
+**Setup:** Users with different roles
+
+**Expected Results:**
+- [ ] Only authorized tabs visible per role
+- [ ] Unauthorized tabs hidden entirely
+- [ ] Data scoped to user's permissions
 
 ---
 
 ## Empty State Tests
 
-- [ ] No data for period: "No data available for the selected date range"
-- [ ] Empty report tab: helpful message per category
-- [ ] No drill-down results: "No detailed records found"
+### No Data for Tab
+- [ ] Tab shows empty state with helpful message
+- [ ] Metric cards show zero values
+
+### No Data for Filtered Period
+- [ ] Charts and tables show empty state
+- [ ] "No data for selected period" message
 
 ---
 
-## Sample Test Data
+## Edge Cases
 
-```typescript
-const mockExecutiveSummary = {
-  totalIncidents: 1234,
-  totalLeads: 567,
-  totalSubscribers: 89,
-  totalLawyers: 45,
-  totalPartners: 23,
-  conversionRate: 0.34,
-  revenueThisMonth: 1500000,
-};
-```
+- [ ] Dashboard handles missing data gracefully
+- [ ] Charts render with small and large datasets
+- [ ] Mobile responsive (stacked cards, horizontal scrolling tables)
+- [ ] Dark mode support across all visualizations
+- [ ] Multiple visualization types render correctly (bar, line, pie charts)

@@ -1,0 +1,20 @@
+{
+  "note": "Sample data for each section is available in the individual section directories.",
+  "sections": {
+    "incidents": "sections/incidents/sample-data.json",
+    "sales-crm": "sections/sales-crm/sample-data.json",
+    "subscribers": "sections/subscribers/sample-data.json",
+    "customers": "sections/customers/sample-data.json",
+    "lawyers": "sections/lawyers/sample-data.json",
+    "partners": "sections/partners/sample-data.json",
+    "payments": "sections/payments/sample-data.json",
+    "disputes": "sections/disputes/sample-data.json",
+    "support": "sections/support/sample-data.json",
+    "reports": "sections/reports/sample-data.json",
+    "team": "sections/team/sample-data.json",
+    "setup": "sections/setup/sample-data.json",
+    "cms": "sections/cms/sample-data.json",
+    "settled-challans": "sections/settled-challans/sample-data.json",
+    "proposals": "sections/proposals/sample-data.json"
+  }
+}

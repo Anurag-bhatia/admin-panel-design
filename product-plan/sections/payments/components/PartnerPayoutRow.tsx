@@ -11,20 +11,28 @@ interface PartnerPayoutRowProps {
 }
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  'To Pay': {
-    label: 'To Pay',
+  Eligible: {
+    label: 'Eligible',
+    className: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
+  },
+  Requested: {
+    label: 'Requested',
     className: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
   },
-  Completed: {
-    label: 'Completed',
+  'Auto-Processed': {
+    label: 'Auto-Processed',
+    className: 'bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400',
+  },
+  Processing: {
+    label: 'Processing',
+    className: 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400',
+  },
+  Processed: {
+    label: 'Processed',
     className: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400',
   },
-  Hold: {
-    label: 'Hold',
-    className: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
-  },
-  Rejected: {
-    label: 'Rejected',
+  Failed: {
+    label: 'Failed',
     className: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
   },
 }
@@ -156,8 +164,9 @@ export function PartnerPayoutRow({
                 onClick={() => setShowMenu(false)}
               />
               <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
-                {payout.status !== 'Completed' ? (
+                {['Completed', 'Hold', 'Failed'].map((action) => (
                   <button
+                    key={action}
                     onClick={() => {
                       onMarkComplete?.()
                       setShowMenu(false)
@@ -165,13 +174,9 @@ export function PartnerPayoutRow({
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                   >
                     <CheckCircle className="h-4 w-4" />
-                    Mark as Paid
+                    {action}
                   </button>
-                ) : (
-                  <div className="px-3 py-2 text-sm text-slate-400 dark:text-slate-500">
-                    No actions available
-                  </div>
-                )}
+                ))}
               </div>
             </>
           )}

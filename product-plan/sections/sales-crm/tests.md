@@ -4,116 +4,143 @@ These test-writing instructions are **framework-agnostic**. Adapt them to your t
 
 ## Overview
 
-Test the lead pipeline management including stage navigation, lead CRUD, bulk operations, detail view with timeline, follow-up tracking, and My Leads view.
+The Sales CRM manages a tab-based lead pipeline with single/bulk lead creation, assignment, follow-up tracking, and detail views.
 
 ---
 
 ## User Flow Tests
 
-### Flow 1: Add New Lead
+### Flow 1: Add Single Lead
 
-**Success Path**
+**Scenario:** User creates a new lead
 
 **Steps:**
-1. User clicks "Add Lead" button
+1. User clicks "Add Lead"
 2. Modal opens with form
-3. User fills Source, Type, Company Name, Contact Person, Phone, Email, State, City
-4. User submits
+3. User fills: Source, Type, Company, Contact Person, Phone, Email, State, City
+4. User clicks "Save"
 
 **Expected Results:**
+- [ ] Modal closes
 - [ ] Lead appears in "New" tab
-- [ ] Tab count increments
-- [ ] Success notification shown
+- [ ] Lead has system-generated Lead ID
+- [ ] "All Leads" count increases
 
-**Failure Path: Validation**
-- [ ] Phone number format validated
-- [ ] Required fields (Source, Type, Phone) show error messages
-- [ ] Form data preserved on error
+#### Failure Path: Missing Required Fields
+
+**Steps:**
+1. User leaves Phone Number empty
+2. User clicks "Save"
+
+**Expected Results:**
+- [ ] Validation error on Phone Number field
+- [ ] Form not submitted
 
 ### Flow 2: Bulk Upload Leads
 
+**Scenario:** User uploads leads via Excel
+
 **Steps:**
 1. User clicks "Bulk Upload Leads"
-2. Downloads template via "Download Template" link
-3. Uploads filled Excel file
+2. User downloads template
+3. User uploads filled Excel file
+4. System validates and imports
 
 **Expected Results:**
-- [ ] Template downloads successfully
-- [ ] Upload shows progress
-- [ ] Created leads appear in list
-- [ ] Validation errors shown per row if any
+- [ ] Template download works
+- [ ] Upload accepts Excel/CSV
+- [ ] Validation errors shown clearly
+- [ ] Successfully imported leads appear in list
 
-### Flow 3: View Lead Detail and Add Follow-Up
+### Flow 3: Pipeline Tab Navigation
+
+**Steps:**
+1. User clicks through tabs: All, New, Assigned, Follow-up, etc.
+
+**Expected Results:**
+- [ ] Each tab shows correct count
+- [ ] Table updates to show leads in that stage
+- [ ] Active tab visually highlighted
+
+### Flow 4: Assign Lead
+
+**Steps:**
+1. User clicks "Assign" from Actions menu on a lead
+2. User selects team member from modal
+3. User confirms
+
+**Expected Results:**
+- [ ] Assignment modal shows available users
+- [ ] Lead moves to "Assigned" tab
+- [ ] Assigned Owner column updated
+- [ ] Assignment logged in lead timeline
+
+### Flow 5: Add Follow-Up
+
+**Steps:**
+1. User opens lead detail view
+2. User clicks "Add Follow Up"
+3. User fills activity type, notes, next date, outcome
+4. User saves
+
+**Expected Results:**
+- [ ] Follow-up recorded in activity timeline
+- [ ] Next follow-up date visible
+- [ ] Lead can move to "Follow-up" tab
+
+### Flow 6: Bulk Update
+
+**Steps:**
+1. User selects multiple leads via checkboxes
+2. User clicks "Bulk Update"
+3. User toggles between Status and Owner update
+4. User selects new value and confirms
+
+**Expected Results:**
+- [ ] Bulk update modal opens
+- [ ] Toggle between Status and Owner works
+- [ ] All selected leads updated
+- [ ] Changes reflected in table
+
+### Flow 7: View Lead Detail
 
 **Steps:**
 1. User clicks a lead row
-2. Detail view opens with timeline
-3. User clicks "Add Follow-Up"
-4. Fills activity type, notes, next follow-up date, outcome
-5. Submits
+2. Detail view opens
 
 **Expected Results:**
-- [ ] Detail shows lead info, timeline, documents
-- [ ] Follow-up appears in timeline
-- [ ] Next follow-up date tracked
-
-### Flow 4: Bulk Update
-
-**Steps:**
-1. User selects multiple leads
-2. Clicks "Bulk Update"
-3. Chooses Status change, selects new status
-4. Confirms
-
-**Expected Results:**
-- [ ] All selected leads move to new status
-- [ ] Tab counts update
-- [ ] Confirmation shown
+- [ ] Complete lead profile displayed
+- [ ] Activity timeline shows all events
+- [ ] Edit mode accessible
+- [ ] Documents section visible
 
 ---
 
 ## Empty State Tests
 
 ### No Leads
-- [ ] Shows "No leads yet" with CTA to add lead
-- [ ] "Add Lead" button functional
 
-### No Leads in Stage
-- [ ] Empty tab shows helpful message
-- [ ] Other tabs still show counts
+**Setup:** No leads in system
 
-### No Follow-Ups
-- [ ] Timeline shows "No activity yet"
+**Expected Results:**
+- [ ] Empty state shown in table area
+- [ ] "Add Lead" button accessible
+- [ ] Dashboard cards show zero counts
+
+### No Follow-Ups on Lead
+
+**Setup:** Lead has no follow-up activities
+
+**Expected Results:**
+- [ ] Activity timeline shows no entries
+- [ ] "Add Follow Up" button visible
 
 ---
 
 ## Edge Cases
 
-- [ ] Lead with very long company name truncates
-- [ ] Duplicate phone number handling
-- [ ] Switching between All Leads and My Leads preserves filters
-- [ ] Tab counts update in real-time after operations
-
----
-
-## Sample Test Data
-
-```typescript
-const mockLead = {
-  id: "LD-001",
-  source: "Website",
-  type: "B2B",
-  subType: "Fleet",
-  companyName: "Transport Solutions Ltd",
-  contactPerson: "Rajesh Kumar",
-  phone: "+91-9876543210",
-  email: "rajesh@transport.com",
-  status: "new",
-  owner: "John Doe",
-  state: "Delhi",
-  city: "New Delhi",
-  createdAt: "2025-12-01T10:00:00Z",
-};
-
-const mockEmptyList = [];
-```
+- [ ] Dashboard summary cards show correct aggregated metrics
+- [ ] My Leads view shows only current user's assigned leads
+- [ ] Search works across name, company, and Lead ID
+- [ ] Filters persist across tab navigation
+- [ ] Export includes applied filters

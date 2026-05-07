@@ -356,6 +356,8 @@ export interface FilterOptions {
 // Component Props
 // =============================================================================
 
+export type ReportsTab = 'overview' | 'challanpay-reports' | 'incidents' | 'leads' | 'subscribers' | 'lawyers' | 'partners' | 'payments' | 'disputes' | 'support' | 'team'
+
 export interface ReportsDashboardProps {
   /** Executive summary metrics across all domains */
   executiveSummary: ExecutiveSummary
@@ -380,7 +382,7 @@ export interface ReportsDashboardProps {
   /** Available filter options */
   filterOptions: FilterOptions
   /** Currently active tab */
-  activeTab?: 'overview' | 'incidents' | 'leads' | 'subscribers' | 'lawyers' | 'partners' | 'payments' | 'disputes' | 'support' | 'team'
+  activeTab?: ReportsTab
   /** Called when user switches tabs */
   onTabChange?: (tab: string) => void
   /** Called when user applies filters */

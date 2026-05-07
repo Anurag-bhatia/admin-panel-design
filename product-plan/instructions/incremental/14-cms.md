@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist
+- **DO** implement empty states when no records exist (first-time users, after deletions)
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,20 +34,18 @@
 
 ## Goal
 
-Implement the CMS module — content management for creating, editing, and publishing blogs, events, and news articles.
+Implement the CMS section — blog and events/news content management.
 
 ## Overview
 
-The CMS provides a simple content management interface for maintaining customer-facing content across blogs and events/news sections.
+Content management system for creating, editing, and publishing blogs, events, and news articles surfaced across customer-facing channels.
 
 **Key Functionality:**
-- Two tabs: Blog and Events & News
-- Blog list table (SR No, Name, Category, Author, Read Mins, Featured, Icon, Alt Text)
-- Events & News table (SR No, Name, Category, Author, Read Mins, Icon, Status, Actions)
-- Add blog with rich text editor
-- Add event/news article
-- Toggle enable/disable for events/news
-- Edit and delete entries
+- Blog management with table list, add/edit forms
+- Events & News management with enable/disable toggle
+- Rich text editor for content creation
+- Image upload for blog/event icons
+- Category and author assignment
 
 ## Recommended Approach: Test-Driven Development
 
@@ -57,53 +55,45 @@ See `product-plan/sections/cms/tests.md` for detailed test-writing instructions.
 
 ### Components
 
-- `CMSDashboard` — Main tabbed view
-- `BlogList` — Blog table
-- `EventNewsList` — Events & News table
-- `AddBlogPage` — Blog creation page with rich text editor
-- `AddEventNewsPage` — Event/News creation page
-- `RichTextEditor` — Content editor component
+Copy from `product-plan/sections/cms/components/`:
 
-### Empty States
+- `CMSDashboard` — Main CMS view with tabs
+- `BlogList` — Blog posts table
+- `AddBlogModal` / `AddBlogPage` — Blog creation form
+- `EventNewsList` — Events & news table
+- `AddEventNewsModal` / `AddEventNewsPage` — Event/news creation form
+- `RichTextEditor` — Content editor
 
-- **No blog posts:** "No blog posts yet. Click '+ Add Blog' to create one."
-- **No events/news:** "No events or news yet. Click '+ Add Event and News' to create one."
+### Expected User Flows
+
+### Flow 1: Add Blog Post
+1. User clicks "+ Add Blog"
+2. User fills in title, category, author, content
+3. User uploads icon image
+4. User clicks "Save"
+5. **Outcome:** Blog appears in list
+
+### Flow 2: Manage Events & News
+1. User clicks "Events & News" tab
+2. User sees table with enable/disable toggle
+3. User toggles an entry to disabled
+4. **Outcome:** Entry status changes, reflected in table
 
 ## Files to Reference
 
-- `product-plan/sections/cms/README.md` — Feature overview
-- `product-plan/sections/cms/tests.md` — Test-writing instructions
-- `product-plan/sections/cms/components/` — React components
-- `product-plan/sections/cms/types.ts` — TypeScript interfaces
-- `product-plan/sections/cms/sample-data.json` — Test data
-
-## Expected User Flows
-
-### Flow 1: Create Blog Post
-1. User clicks "+ Add Blog"
-2. Form opens with fields: Title, Category, Author, Read Mins, Featured toggle, Icon upload, Alt Text, Content (rich text)
-3. User fills in details and submits
-4. **Outcome:** Blog post appears in Blog tab list
-
-### Flow 2: Create Event/News
-1. User switches to "Events & News" tab
-2. Clicks "+ Add Event and News"
-3. Fills form with title, category, author, content
-4. **Outcome:** Entry appears in list as Enabled by default
-
-### Flow 3: Toggle Event Status
-1. User clicks enable/disable toggle on an event row
-2. **Outcome:** Event status changes immediately
+- `product-plan/sections/cms/components/`
+- `product-plan/sections/cms/types.ts`
+- `product-plan/sections/cms/sample-data.json`
+- `product-plan/sections/cms/tests.md`
 
 ## Done When
 
-- [ ] Tests written and passing
-- [ ] Blog tab shows blog list
-- [ ] Add blog works with rich text editor
-- [ ] Events & News tab shows entries
-- [ ] Add event/news works
-- [ ] Toggle enable/disable works
-- [ ] Edit and delete work
+- [ ] Tests written for key user flows
+- [ ] All tests pass
+- [ ] Blog list renders correctly
+- [ ] Blog creation with rich text works
+- [ ] Events & News tab works
+- [ ] Enable/disable toggle works
 - [ ] Image upload works
 - [ ] Empty states display properly
 - [ ] Responsive on mobile

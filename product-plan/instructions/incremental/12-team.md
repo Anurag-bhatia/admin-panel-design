@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist
+- **DO** implement empty states when no records exist (first-time users, after deletions)
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,21 +34,19 @@
 
 ## Goal
 
-Implement the Team module — the organizational backbone for managing employees, teams, permissions, and access control.
+Implement the Team section — employee and team administration with permissions management.
 
 ## Overview
 
-The Team section provides administrators with a structured interface for defining who is part of the system, how they're organized, and what they can access, eliminating manual people management.
+The Team section manages employees, teams, permissions, and access control. It provides a structured interface for defining who is part of the system, how they're organized, and what they can access.
 
 **Key Functionality:**
-- Two-tab layout: Employees and Teams
-- Employee table (profile photo, name, department, designation, reporting manager, status)
-- 3-step onboarding wizard: Profile Info → Create Credentials → Permissions
-- Full-screen employee detail page with 2 tabs: Details, Permissions
-- Permission management: module-level and flow-level switches
-- Edit profile, deactivate/reactivate employees
-- Teams table (name, department, lead, member count, status)
-- Create/edit teams
+- Employee list with active count
+- 3-step employee onboarding wizard (Profile → Credentials → Permissions)
+- Full employee detail page with Details and Permissions tabs
+- Permissions management with module and flow toggles
+- Teams management with creation, editing, and status control
+- Deactivate/reactivate employees and teams
 
 ## Recommended Approach: Test-Driven Development
 
@@ -58,63 +56,58 @@ See `product-plan/sections/team/tests.md` for detailed test-writing instructions
 
 ### Components
 
-- `TeamManagement` — Main view with Employees/Teams tabs
-- `EmployeeTable` — Employee data table
-- `TeamsTable` — Teams data table
-- `EmployeeOnboardingWizard` — 3-step creation wizard
-- `EditEmployeeModal` — Edit employee profile
-- `PermissionsPage` — Module/flow permission toggles
-- `CreateTeamModal` — New team form
-- `EditTeamModal` — Edit team form
-- `DeactivateConfirmDialog` — Deactivation confirmation
+Copy from `product-plan/sections/team/components/`:
+
+- `TeamManagement` — Main team management view
+- `EmployeeTable` — Employee list table
+- `EmployeeOnboardingWizard` — 3-step onboarding
+- `EmployeeDetailView` — Full employee detail page
+- `EditEmployeeModal` — Edit employee form
+- `PermissionsPage` — Permissions management
+- `TeamsTable` — Teams list
 - `TeamDetailView` — Team detail page
-- `EmployeeDetailView` — Employee detail with Details + Permissions tabs
+- `CreateTeamModal` — Create new team
+- `EditTeamModal` — Edit team
+- `DeactivateConfirmDialog` — Deactivation confirmation
 
-### Empty States
+### Expected User Flows
 
-- **No employees yet:** CTA to add first employee
-- **No teams yet:** CTA to create first team
-- **No team members:** Empty team detail
-
-## Files to Reference
-
-- `product-plan/sections/team/README.md` — Feature overview
-- `product-plan/sections/team/tests.md` — Test-writing instructions
-- `product-plan/sections/team/components/` — React components
-- `product-plan/sections/team/types.ts` — TypeScript interfaces
-- `product-plan/sections/team/sample-data.json` — Test data
-
-## Expected User Flows
-
-### Flow 1: Add New Employee
+### Flow 1: Onboard Employee
 1. User clicks "Add Employee"
-2. 3-step wizard: Step 1 (Profile Info: photo, name, email, department, designation, reporting managers) → Step 2 (Credentials: email, password) → Step 3 (Permissions: module/flow toggles)
-3. **Outcome:** Employee created, appears in list, credentials ready for login
+2. User fills Profile Information (name, department, designation, etc.)
+3. User creates login credentials
+4. User configures module/flow permissions
+5. **Outcome:** Employee appears in active list
 
 ### Flow 2: Manage Permissions
-1. User clicks an employee row → Detail page opens
-2. User navigates to Permissions tab
-3. Toggles module switches (enabling/disabling access)
-4. Toggling a module off greys out its flows
-5. Clicks "Save"
-6. **Outcome:** Permissions updated, change logged in audit trail
+1. User opens employee detail page
+2. User clicks "Permissions" tab
+3. User toggles module and flow access switches
+4. User clicks "Save"
+5. **Outcome:** Permissions updated, logged in audit trail
 
 ### Flow 3: Create Team
 1. User switches to Teams tab
-2. Clicks "Create Team"
-3. Fills in name, department, team lead, active members
-4. **Outcome:** Team created, appears in teams list
+2. User clicks "Create Team"
+3. User fills team name, department, lead, members
+4. **Outcome:** Team appears in teams list
+
+## Files to Reference
+
+- `product-plan/sections/team/components/`
+- `product-plan/sections/team/types.ts`
+- `product-plan/sections/team/sample-data.json`
+- `product-plan/sections/team/tests.md`
 
 ## Done When
 
-- [ ] Tests written and passing
-- [ ] Employees tab shows employee table with status badges
-- [ ] 3-step onboarding wizard works with validation
-- [ ] Employee detail page with Details and Permissions tabs
-- [ ] Permission toggles work (module disabling greys out flows)
-- [ ] Edit profile works
+- [ ] Tests written for key user flows
+- [ ] All tests pass
+- [ ] Employee list displays with active count
+- [ ] 3-step onboarding wizard works
+- [ ] Employee detail page renders both tabs
+- [ ] Permissions management with toggles works
+- [ ] Teams CRUD operations work
 - [ ] Deactivate/reactivate works
-- [ ] Teams tab shows teams table
-- [ ] Create/edit team works
 - [ ] Empty states display properly
 - [ ] Responsive on mobile

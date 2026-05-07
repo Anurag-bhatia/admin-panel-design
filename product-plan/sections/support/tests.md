@@ -4,75 +4,101 @@ These test-writing instructions are **framework-agnostic**. Adapt them to your t
 
 ## Overview
 
-Test the support intake and triage system including submission list, filtering, read-only detail modal, and conversion actions to Lead/Dispute/Partnership.
+The Support module is a triage gateway for inbound messages, converting them to Leads, Disputes, or Partnerships.
 
 ---
 
 ## User Flow Tests
 
-### Flow 1: Review Submission
+### Flow 1: View Submissions
 
 **Steps:**
-1. Click a submission row (outside Actions dropdown)
+1. User navigates to Support
+2. Table displays unconverted submissions
+
+**Expected Results:**
+- [ ] Columns: Subject, Source, Type, Actions
+- [ ] Only unconverted entries shown
+- [ ] Table displays real data from submissions
+
+### Flow 2: View Submission Details
+
+**Steps:**
+1. User clicks a submission row (outside Actions dropdown)
 2. Read-only modal opens
 
 **Expected Results:**
-- [ ] Modal shows full Subject, Message, submission time, source
-- [ ] Modal has no action buttons (read-only)
-- [ ] Modal closes on dismiss
+- [ ] Modal shows: full Subject, complete Message, submission time, source
+- [ ] No action buttons in modal
+- [ ] Modal closes on click outside or close button
 
-### Flow 2: Convert to Lead
+### Flow 3: Convert to Lead
 
 **Steps:**
-1. Click Actions dropdown on a row
-2. Select "Convert to Lead"
+1. User clicks Actions dropdown on a row
+2. User clicks "Convert to Lead"
 
 **Expected Results:**
-- [ ] Lead created with prefilled contact details and source
-- [ ] Submission hidden from main view
+- [ ] Lead created with prefilled data (subject, message, contact, source)
+- [ ] Original submission hidden from main view
 - [ ] Conversion logged in audit trail
 
-### Flow 3: Convert to Dispute
+### Flow 4: Convert to Dispute
 
 **Steps:**
-1. Actions → "Convert to Dispute"
+1. User clicks "Convert to Dispute" from Actions
 
 **Expected Results:**
-- [ ] Dispute created linked to support message
+- [ ] Dispute/incident record created
+- [ ] Support message linked as originating context
 - [ ] Submission hidden from view
 
-### Flow 4: Filter Submissions
+### Flow 5: Convert to Partnership
 
 **Steps:**
-1. Apply Source filter
-2. Apply Type filter
+1. User clicks "Convert to Partnership" from Actions
 
 **Expected Results:**
-- [ ] Table shows only matching submissions
-- [ ] Counts update
+- [ ] Partner onboarding entry created
+- [ ] Submission hidden from view
+
+### Flow 6: Filter Submissions
+
+**Steps:**
+1. User applies Source filter
+2. User applies Type filter
+
+**Expected Results:**
+- [ ] Table filters by selected Source
+- [ ] Table filters by selected Type
+- [ ] Filters can be combined
+
+### Flow 7: Sort Submissions
+
+**Steps:**
+1. User sorts by Type
+2. User sorts by Source
+
+**Expected Results:**
+- [ ] Table reorders correctly
 
 ---
 
 ## Empty State Tests
 
-- [ ] No submissions: "No support submissions yet"
-- [ ] All converted: "All submissions have been processed"
-- [ ] No filter results: "No submissions match your filters"
+### No Unconverted Submissions
+- [ ] Empty state message shown
+- [ ] Helpful text indicating all submissions have been triaged
+
+### All Submissions Converted
+- [ ] Main view empty
+- [ ] No "Add" button (submissions come from external sources)
 
 ---
 
-## Sample Test Data
+## Edge Cases
 
-```typescript
-const mockSubmission = {
-  id: "SUP-001",
-  subject: "Issue with challan payment",
-  message: "I paid for my challan but it still shows pending...",
-  source: "Landing Page",
-  type: "complaint",
-  contactEmail: "user@example.com",
-  contactPhone: "+91-9876543210",
-  createdAt: "2025-12-01T10:00:00Z",
-  isConverted: false,
-};
-```
+- [ ] No archive or delete actions available
+- [ ] Every submission must go through one of three conversions
+- [ ] Permission-controlled access (ops leads, support staff, admins only)
+- [ ] Converted entries can't be re-converted

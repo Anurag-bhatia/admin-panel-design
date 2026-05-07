@@ -4,73 +4,92 @@ These test-writing instructions are **framework-agnostic**. Adapt them to your t
 
 ## Overview
 
-Test partner management including list, 4-step onboarding, detail page with 5 tabs, status toggle, and linked subscriber/incident views.
+The Partners module manages external business introducers with 4-step onboarding, status management, and detail views with 5 tabs.
 
 ---
 
 ## User Flow Tests
 
-### Flow 1: Onboard New Partner (4-Step Stepper)
+### Flow 1: View Partner List
 
 **Steps:**
-1. Click "Add Partner"
-2. Step 1: Personal (first name, last name, email, mobile, password)
-3. Step 2: Company (company name, email, phone, address)
-4. Step 3: Service Scope (products/services, subscriber types)
+1. User navigates to Partners section
+
+**Expected Results:**
+- [ ] Table shows: Name, Partner ID, Contact, Company, Subscriber Count, Status, Actions
+- [ ] Search by partner name works
+- [ ] Filter by status (active/inactive) works
+- [ ] Sort by column headers works
+
+### Flow 2: Add Partner (4-Step Onboarding)
+
+**Steps:**
+1. User clicks "Add Partner"
+2. Step 1: Personal identity (first name, last name, email, mobile, password)
+3. Step 2: Company details (company name, email, phone, address)
+4. Step 3: Service scope (products/services, subscriber types)
 5. Step 4: Permissions & Bank (bank details, system permissions)
-6. Submit
 
 **Expected Results:**
-- [ ] Stepper shows progress
-- [ ] Partner appears in list as active
-- [ ] Success notification shown
+- [ ] Stepper shows current step
+- [ ] Navigation between steps works
+- [ ] Required fields validated per step
+- [ ] On submit, partner appears in list as active
 
-### Flow 2: View Partner Detail
+### Flow 3: View Partner Details
 
 **Steps:**
-1. Click partner row
-2. Navigate 5 tabs
+1. User clicks partner row
+2. Detail page opens
 
 **Expected Results:**
-- [ ] Profile tab: personal and company info
-- [ ] Subscribers tab: linked subscribers table
-- [ ] Financial tab: earnings, payout history
-- [ ] Documents tab: GST, PAN, etc.
-- [ ] Activity tab: chronological log
+- [ ] Header: Partner name, ID, status, action buttons
+- [ ] 5 tabs: Profile, Subscribers, Financial, Documents, Activity
+- [ ] Profile: Personal and company info
+- [ ] Subscribers: Linked subscribers with name, mobile, company, status, incidents link
+- [ ] Financial: Summary cards (total earnings, paid, pending) + payout table
+- [ ] Documents: Document cards with upload status
+- [ ] Activity: Chronological activity log
 
-### Flow 3: Toggle Status
+### Flow 4: Toggle Partner Status
 
 **Steps:**
-1. Click deactivate on active partner
-2. Confirm
+1. User clicks "Deactivate" on active partner
+2. User confirms
 
 **Expected Results:**
-- [ ] Status changes to inactive
+- [ ] Partner marked inactive
 - [ ] Cannot onboard new subscribers
 - [ ] Historical data preserved
+- [ ] Reactivation available
+
+### Flow 5: View Partner Incidents
+
+**Steps:**
+1. User opens partner detail
+2. User clicks incident link on subscriber row
+
+**Expected Results:**
+- [ ] Read-only view of subscriber's incidents
+- [ ] No edit actions available
 
 ---
 
 ## Empty State Tests
 
-- [ ] No partners: "No partners yet" with add CTA
-- [ ] No subscribers for partner: empty Subscribers tab
-- [ ] No payouts: empty Financial tab
-- [ ] No documents: empty Documents tab
+### No Partners
+- [ ] Empty state with "Add Partner" CTA
+
+### Partner with No Subscribers
+- [ ] Subscribers tab shows empty state
+
+### Partner with No Documents
+- [ ] Documents tab shows upload prompts for each document type
 
 ---
 
-## Sample Test Data
+## Edge Cases
 
-```typescript
-const mockPartner = {
-  id: "PTR-001",
-  firstName: "Vikram",
-  lastName: "Patel",
-  email: "vikram@partner.com",
-  mobile: "+91-9876543210",
-  companyName: "Partner Solutions",
-  status: "active",
-  subscriberCount: 12,
-};
-```
+- [ ] Financial data is system-generated (no manual overrides)
+- [ ] All activity logged with timestamp and user
+- [ ] Deactivated partners still visible in list (distinguished visually)

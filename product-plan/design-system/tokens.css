@@ -1,7 +1,7 @@
 /* Design Tokens for Admin Panel */
 
 :root {
-  /* Primary — Cyan (actions, active states, links) */
+  /* Primary: Cyan */
   --color-primary-50: #ecfeff;
   --color-primary-100: #cffafe;
   --color-primary-200: #a5f3fc;
@@ -14,7 +14,7 @@
   --color-primary-900: #164e63;
   --color-primary-950: #083344;
 
-  /* Secondary — Zinc (secondary elements, borders, sidebar) */
+  /* Secondary: Zinc */
   --color-secondary-50: #fafafa;
   --color-secondary-100: #f4f4f5;
   --color-secondary-200: #e4e4e7;
@@ -27,7 +27,7 @@
   --color-secondary-900: #18181b;
   --color-secondary-950: #09090b;
 
-  /* Neutral — Slate (backgrounds, text, surfaces) */
+  /* Neutral: Slate */
   --color-neutral-50: #f8fafc;
   --color-neutral-100: #f1f5f9;
   --color-neutral-200: #e2e8f0;
@@ -40,8 +40,8 @@
   --color-neutral-900: #0f172a;
   --color-neutral-950: #020617;
 
-  /* Typography — Not defined, use system defaults or your preference */
-  --font-heading: system-ui, -apple-system, sans-serif;
-  --font-body: system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  /* Typography */
+  --font-heading: 'Geist', system-ui, -apple-system, sans-serif;
+  --font-body: 'Geist', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', monospace;
 }

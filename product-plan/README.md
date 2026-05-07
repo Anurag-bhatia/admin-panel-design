@@ -1,23 +1,23 @@
 # Admin Panel — Design Handoff
 
-This folder contains everything needed to implement Admin Panel — a B2B operations platform that manages the complete lifecycle of traffic challan resolution services for fleet operators and corporate clients.
+This folder contains everything needed to implement Admin Panel.
 
 ## What's Included
 
 **Ready-to-Use Prompts:**
-- `prompts/one-shot-prompt.md` — Prompt for full implementation
-- `prompts/section-prompt.md` — Prompt template for section-by-section
+- `prompts/one-shot-prompt.md` — Prompt template for full implementation
+- `prompts/section-prompt.md` — Prompt template for section-by-section implementation
 
 **Instructions:**
-- `product-overview.md` — Product summary (always provide with instructions)
-- `instructions/one-shot-instructions.md` — All milestones combined
-- `instructions/incremental/` — 15 milestone instructions (foundation + 14 sections)
+- `product-overview.md` — Product summary (provide with every implementation)
+- `instructions/one-shot-instructions.md` — All milestones combined for full implementation
+- `instructions/incremental/` — 16 milestone instructions (foundation, then 15 sections)
 
 **Design Assets:**
-- `design-system/` — Colors, fonts, tokens
-- `data-model/` — Entity types and relationships
+- `design-system/` — Colors, fonts, design tokens
+- `data-model/` — Core entities and TypeScript types
 - `shell/` — Application shell components
-- `sections/` — 14 section component packages with test instructions
+- `sections/` — 15 section component packages with test instructions
 
 ## How to Use This
 
@@ -45,26 +45,6 @@ Build the entire app in one session:
 5. Answer the agent's clarifying questions
 6. Let the agent plan and implement everything
 
-## Implementation Order
-
-| Milestone | Section | Description |
-|-----------|---------|-------------|
-| 01 | Foundation | Design tokens, data model, routing, application shell |
-| 02 | Incidents | Challan and case queue management |
-| 03 | Sales CRM | Lead capture and pipeline management |
-| 04 | Subscribers | Active client account management |
-| 05 | Customers | D2C registered visitor management |
-| 06 | Lawyers | Legal professional network management |
-| 07 | Partners | Partner relationship management |
-| 08 | Payments | Commission and refund processing |
-| 09 | Disputes | Customer dispute resolution |
-| 10 | Support | Support ticket intake and triage |
-| 11 | Reports | Analytics and reporting dashboards |
-| 12 | Team | Employee and team administration |
-| 13 | Setup | System configuration management |
-| 14 | CMS | Content management (blogs, events) |
-| 15 | Settled Challans | Settled challan archive |
-
 ## Test-Driven Development
 
 Each section includes a `tests.md` file with test-writing instructions. For best results:
@@ -76,13 +56,33 @@ Each section includes a `tests.md` file with test-writing instructions. For best
 
 The test instructions are **framework-agnostic** — they describe WHAT to test, not HOW. Adapt to your testing setup (Jest, Vitest, Playwright, Cypress, RSpec, Minitest, PHPUnit, etc.).
 
+## Sections
+
+| # | Section | ID | Description |
+|---|---------|-----|-------------|
+| 1 | Incidents | `incidents` | Challan workflow with queue management |
+| 2 | Sales CRM | `sales-crm` | Lead pipeline and conversion tracking |
+| 3 | Subscribers | `subscribers` | Client account management |
+| 4 | Customers | `customers` | D2C visitor profile management |
+| 5 | Lawyers | `lawyers` | Legal network management |
+| 6 | Partners | `partners` | Business introducer management |
+| 7 | Payments | `payments` | Refunds, fees, and payouts |
+| 8 | Disputes | `disputes` | Escalation and resolution workflow |
+| 9 | Support | `support` | Inbound message triage |
+| 10 | Reports | `reports` | Dashboards and analytics |
+| 11 | Team | `team` | Employee and team administration |
+| 12 | Setup | `setup` | System configuration hub |
+| 13 | CMS | `cms` | Blog and events management |
+| 14 | Settled Challans | `settled-challans` | Settled challan browser |
+| 15 | Proposals | `proposals` | Service request management |
+
 ## Tips
 
 - **Use the pre-written prompts** — They include important clarifying questions about auth and data modeling.
-- **Add your own notes** — Customize prompts with project-specific context when needed.
-- **Build on your designs** — Use completed sections as the starting point for future feature development.
-- **Review thoroughly** — Check plans and implementations carefully to catch details and inconsistencies.
-- **Fill in the gaps** — Backend business logic may need manual additions. Incremental implementation helps you identify these along the way.
+- **Always provide product-overview.md** — Include it with every implementation session for context.
+- **Build incrementally** — Each section is self-contained and testable independently.
+- **Review thoroughly** — Check plans and implementations carefully to catch details.
+- **Fill in the gaps** — Backend business logic may need manual additions.
 
 ---
 

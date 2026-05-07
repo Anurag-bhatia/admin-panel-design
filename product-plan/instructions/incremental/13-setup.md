@@ -1,4 +1,4 @@
-# Milestone 13: Setup (Admin Control)
+# Milestone 13: Setup
 
 > **Provide alongside:** `product-overview.md`
 > **Prerequisites:** Milestone 1 (Foundation) complete
@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist
+- **DO** implement empty states when no records exist (first-time users, after deletions)
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,23 +34,20 @@
 
 ## Goal
 
-Implement the Setup module — the centralized configuration hub for managing system-wide categories, data points, statuses, and configurable values.
+Implement the Setup section — centralized system configuration hub.
 
 ## Overview
 
-All selectable values and operational metadata used across Incidents, Leads, Subscribers, Lawyers, Payments, Disputes, and Reports are managed here instead of being hardcoded, ensuring the platform remains flexible and adaptable.
+The Setup module is the centralized configuration hub for managing system-wide categories, data points, statuses, and configurable values used across all modules. All selectable values and operational metadata are managed here.
 
 **Key Functionality:**
 - Tabbed dashboard: Categories, Data Points, Statuses, Sources, Service Types, Geographic Values, Audit Log
-- Add entries via slide-over panel from the right
-- Edit entries (pre-filled slide-over)
-- Activate/deactivate entries
-- Drag-to-reorder rows for display priority
+- Slide-over panel for add/edit forms
+- Status toggle (active/inactive) with badges
+- Drag-to-reorder rows
 - Per-section audit history
-- Global audit log with filters (user, area, date range)
-- Protected core values (can't edit/deactivate)
-- Hierarchical category support
-- Admin-only access
+- Global audit log with filters
+- Protected core values (locked, cannot be edited)
 
 ## Recommended Approach: Test-Driven Development
 
@@ -60,61 +57,57 @@ See `product-plan/sections/setup/tests.md` for detailed test-writing instruction
 
 ### Components
 
-- `SetupDashboard` — Main tabbed view
+Copy from `product-plan/sections/setup/components/`:
+
+- `SetupDashboard` — Main setup view
 - `SetupSidebar` — Navigation sidebar
-- `SlideOverPanel` — Right-side panel for add/edit forms
-- `ServicesTable` — Services configuration table
-- `PriceCategoriesTable` — Price categories table
-- `DepartmentsTable` — Departments table
-- `DesignationsTable` — Designations table
-- `MastersTable` — Master values table
-- `GeographicTable` — Geographic values table
+- `SlideOverPanel` — Right slide-over form
+- `MastersTable` — Generic config table
+- `DepartmentsTable` — Departments configuration
+- `DesignationsTable` — Designations configuration
+- `GeographicTable` — Geographic values
+- `PriceCategoriesTable` — Price categories
+- `ServicesTable` — Service types
 - `AuditLogTable` — Global audit log
 
-### Empty States
+### Expected User Flows
 
-- **No entries for tab:** "No entries yet. Click Add to create one."
-- **No audit log entries:** "No changes recorded yet"
-- **No search results:** "No entries match your search"
+### Flow 1: Add Configuration Entry
+1. User selects "Categories" tab
+2. User clicks "Add" button
+3. Slide-over panel opens from right
+4. User fills name, description, module, status
+5. User clicks "Save"
+6. **Outcome:** Entry appears in table
+
+### Flow 2: Edit and Deactivate Entry
+1. User clicks a row in config table
+2. Slide-over opens pre-filled with entry data
+3. User toggles status to inactive
+4. User clicks "Save"
+5. **Outcome:** Entry marked inactive, hidden from future selections
+
+### Flow 3: View Audit Log
+1. User clicks "Audit Log" tab
+2. User filters by area, user, date range
+3. **Outcome:** Filtered timeline of configuration changes
 
 ## Files to Reference
 
-- `product-plan/sections/setup/README.md` — Feature overview
-- `product-plan/sections/setup/tests.md` — Test-writing instructions
-- `product-plan/sections/setup/components/` — React components
-- `product-plan/sections/setup/types.ts` — TypeScript interfaces
-- `product-plan/sections/setup/sample-data.json` — Test data
-
-## Expected User Flows
-
-### Flow 1: Add Configuration Entry
-1. User selects a tab (e.g., Categories)
-2. Clicks "Add" button
-3. Slide-over panel opens from right with form
-4. User fills name, description, module, status
-5. **Outcome:** Entry appears in table
-
-### Flow 2: Edit Entry
-1. User clicks a row in the table
-2. Slide-over opens pre-filled with existing data
-3. User modifies fields and saves
-4. **Outcome:** Entry updated, change logged in audit
-
-### Flow 3: Reorder Entries
-1. User drags a row to a new position
-2. **Outcome:** Display order changes, reflected in dropdowns across platform
+- `product-plan/sections/setup/components/`
+- `product-plan/sections/setup/types.ts`
+- `product-plan/sections/setup/sample-data.json`
+- `product-plan/sections/setup/tests.md`
 
 ## Done When
 
-- [ ] Tests written and passing
-- [ ] All 7 tabs render with correct data
-- [ ] Add entry via slide-over works
-- [ ] Edit entry with pre-filled data works
-- [ ] Activate/deactivate toggle works
+- [ ] Tests written for key user flows
+- [ ] All tests pass
+- [ ] All 7 config tabs render correctly
+- [ ] Slide-over add/edit forms work
+- [ ] Status toggle works
 - [ ] Drag-to-reorder works
-- [ ] Per-section audit history visible
-- [ ] Global audit log with filters
-- [ ] Protected values can't be edited/deactivated (locked with tooltip)
-- [ ] Admin-only access enforced
+- [ ] Audit log with filters works
+- [ ] Protected values are locked
 - [ ] Empty states display properly
 - [ ] Responsive on mobile

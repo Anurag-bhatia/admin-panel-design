@@ -1,7 +1,7 @@
 # Milestone 9: Disputes
 
 > **Provide alongside:** `product-overview.md`
-> **Prerequisites:** Milestone 1 (Foundation), Milestone 2 (Incidents) recommended
+> **Prerequisites:** Milestone 1 (Foundation) complete
 
 ---
 
@@ -26,7 +26,7 @@
 - **DO** wire up the callback props to your routing and API calls
 - **DO** replace sample data with real data from your backend
 - **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist
+- **DO** implement empty states when no records exist (first-time users, after deletions)
 - **DO** use test-driven development — write tests first using `tests.md` instructions
 - The components are props-based and ready to integrate — focus on the backend and data layer
 
@@ -34,20 +34,20 @@
 
 ## Goal
 
-Implement the Disputes module — the governance and escalation engine for handling conflicts, objections, refund disagreements, and contested outcomes.
+Implement the Disputes section — customer dispute resolution workflow for escalation and governance.
 
 ## Overview
 
-Unlike incidents (which are operational execution), disputes are review-driven challenges to outcomes or decisions, handled with higher scrutiny, documented reasoning, and configurable SLA enforcement. Every dispute must link to an entity (Incident, Subscriber, Customer, or Payment).
+The Disputes module is a governance and escalation engine for handling conflicts, objections, refund disagreements, and contested outcomes. Unlike incidents (operational execution), disputes are review-driven challenges handled with higher scrutiny and configurable SLA enforcement.
 
 **Key Functionality:**
-- Collapsible sidebar: All Disputes / My Disputes
-- Stage tabs: Open, Under Review, Escalated, Resolved, Rejected with counts
-- Create disputes (must link to entity) from Support, Incidents, Financials, or manually
-- Bulk operations: Assign Reviewer, Change Priority (NO bulk resolution or refund approvals)
-- Detail view: two-column with SLA sidebar + 5 tabs (Summary, Linked Incident, Investigation, Evidence, Activity)
-- SLA enforcement (7-15 days configurable, escalation on breach)
-- Every action logged with mandatory audit trail
+- Stage-based dispute tracking (Open, Under Review, Escalated, Resolved, Rejected)
+- Collapsible sidebar: All Disputes, My Disputes
+- Create disputes linked to incidents, subscribers, or payments
+- Assign reviewers and escalate disputes
+- Full detail view with Summary, Linked Incident, Investigation, Evidence, Activity tabs
+- Bulk operations (assign reviewer, change priority)
+- Configurable SLA enforcement (7-15 days)
 
 ## Recommended Approach: Test-Driven Development
 
@@ -57,71 +57,57 @@ See `product-plan/sections/disputes/tests.md` for detailed test-writing instruct
 
 ### Components
 
-- `DisputeList` — Main list view
-- `DisputesSidebar` — All Disputes / My Disputes
-- `StageTabs` — Stage tab navigation with counts
-- `DisputesTableHeader` — Search, filters, export
-- `DisputeRow` — Table row
-- `DisputeBulkActionsBar` — Assign Reviewer, Change Priority
-- `Pagination` — Page navigation
+Copy from `product-plan/sections/disputes/components/`:
+
+- `DisputeList` — Main dispute list
+- `DisputeRow` — Individual dispute row
+- `DisputesTableHeader` — Header with search and filters
+- `DisputesSidebar` — Collapsible sidebar
+- `StageTabs` — Stage tabs with counts
+- `DisputeBulkActionsBar` — Bulk operations
 - `DisputeDetailView` — Full detail page
-- `SummaryTab` — Dispute reason, description, evidence
-- `LinkedIncidentTab` — Read-only incident snapshot
-- `InvestigationTab` — Internal review notes
-- `EvidenceTab` — Document uploads
-- `DisputeActivityTab` — Action history
-- `BulkUpdateModal` — Bulk operations
-- `CreateDisputeModal` — New dispute form
+- `CreateDisputeModal` — Dispute creation form
 - `AssignReviewerModal` — Reviewer assignment
+- `BulkUpdateModal` — Bulk operations
+- `ImportDisputesModal` — Import disputes
+- `SummaryTab`, `LinkedIncidentTab`, `InvestigationTab`, `EvidenceTab`, `DisputeActivityTab` — Detail tabs
+- `Pagination` — Table pagination
 
-### Empty States
+### Expected User Flows
 
-- **No disputes yet:** Helpful message
-- **No evidence:** Empty Evidence tab
-- **No investigation notes:** Empty Investigation tab
-- **No linked incident:** When dispute links to non-incident entity
+### Flow 1: Create Dispute
+1. User clicks "Create Dispute"
+2. User links to incident/subscriber/payment
+3. User fills in dispute type, reason, priority
+4. **Outcome:** Dispute appears in "Open" tab
+
+### Flow 2: Review and Resolve
+1. User assigns reviewer to dispute
+2. Reviewer investigates and adds notes
+3. Reviewer approves refund or rejects dispute
+4. **Outcome:** Dispute moves to "Resolved" or "Rejected"
+
+### Flow 3: Escalate
+1. User opens dispute nearing SLA deadline
+2. User clicks "Escalate"
+3. **Outcome:** Dispute moves to "Escalated" tab with increased priority
 
 ## Files to Reference
 
-- `product-plan/sections/disputes/README.md` — Feature overview
-- `product-plan/sections/disputes/tests.md` — Test-writing instructions
-- `product-plan/sections/disputes/components/` — React components
-- `product-plan/sections/disputes/types.ts` — TypeScript interfaces
-- `product-plan/sections/disputes/sample-data.json` — Test data
-
-## Expected User Flows
-
-### Flow 1: Create Dispute
-1. User clicks "Create Dispute" (or from linked module)
-2. Form requires linking to an entity (Incident ID, Subscriber, Payment)
-3. User fills dispute type, reason, description, priority
-4. **Outcome:** Dispute created in "Open" stage
-
-### Flow 2: Review and Resolve Dispute
-1. Reviewer opens dispute detail from their queue
-2. Reviews Summary tab, checks Linked Incident, reads Evidence
-3. Adds investigation notes with reasoning
-4. Clicks "Resolve" or "Reject" with mandatory notes
-5. **Outcome:** Dispute moves to Resolved/Rejected, actions logged
-
-### Flow 3: Escalate Dispute
-1. Reviewer identifies dispute needs higher authority
-2. Clicks "Escalate" action
-3. Confirms escalation with notes
-4. **Outcome:** Dispute moves to "Escalated" stage, SLA adjusts
+- `product-plan/sections/disputes/components/`
+- `product-plan/sections/disputes/types.ts`
+- `product-plan/sections/disputes/sample-data.json`
+- `product-plan/sections/disputes/tests.md`
 
 ## Done When
 
-- [ ] Tests written and passing
-- [ ] Sidebar navigation (All/My Disputes) works
-- [ ] Stage tabs with correct counts
-- [ ] Create dispute requires linked entity
-- [ ] Bulk assign reviewer and change priority work
-- [ ] Detail view with all 5 tabs
-- [ ] SLA countdown displays (overdue in red)
-- [ ] Investigation notes can be added
-- [ ] Evidence documents can be uploaded
-- [ ] Resolve/Reject/Escalate actions work
-- [ ] Audit trail records all actions
+- [ ] Tests written for key user flows
+- [ ] All tests pass
+- [ ] Stage tabs show correct counts
+- [ ] Dispute creation with linking works
+- [ ] Reviewer assignment works
+- [ ] Escalation workflow works
+- [ ] Detail view shows all tabs
+- [ ] SLA indicators display correctly
 - [ ] Empty states display properly
 - [ ] Responsive on mobile

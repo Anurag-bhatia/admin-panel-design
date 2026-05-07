@@ -8,8 +8,8 @@ import { EditPartner } from './EditPartner'
 import { PartnersListHeader } from './PartnersListHeader'
 import { AssignAgentModal } from '../../incidents/components/AssignAgentModal'
 import { AddSubscriberModal } from '../../subscribers/components/AddSubscriberModal'
-import subscriberData from '../../subscribers/sample-data.json'
-import incidentData from '../../incidents/sample-data.json'
+import subscriberData from '../sample-data.json'
+import incidentData from '../sample-data.json'
 
 interface PartnersDashboardProps {
   partners: Partner[]
@@ -34,41 +34,27 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
   const filteredPartners = partners.filter(p => p.partnerType === activePartnerType)
 
   // Stage counts for ChallanPay summary cards
-  const stageOnboarding = challanPayPartners.filter(p => p.stage === 'onboarding').length
+  const stageRegistration = challanPayPartners.filter(p => p.stage === 'registration').length
+  const stageVerification = challanPayPartners.filter(p => p.stage === 'verification').length
   const stageActivation = challanPayPartners.filter(p => p.stage === 'activation').length
-  const stageTraining = challanPayPartners.filter(p => p.stage === 'training').length
   const stageMobilisation = challanPayPartners.filter(p => p.stage === 'mobilisation').length
 
-  // Sub-card metrics for the expanded stage
-  const getStageSubMetrics = (stageName: string) => {
-    const stagePartners = challanPayPartners.filter(p => p.stage === stageName)
+  // Verification sub-metrics
+  const getVerificationMetrics = () => {
+    const verificationPartners = challanPayPartners.filter(p => p.stage === 'verification')
     return {
-      active: stagePartners.filter(p => p.status === 'active').length,
-      inactive: stagePartners.filter(p => p.status === 'inactive').length,
-      assigned: stagePartners.filter(p => p.assignedTo).length,
-      unassigned: stagePartners.filter(p => !p.assignedTo).length,
+      emailVerified: verificationPartners.filter(p => (p as any).emailVerified).length,
+      profileVerified: verificationPartners.filter(p => p.profileCompletion != null && p.profileCompletion >= 100).length,
     }
   }
 
-  // Onboarding activity counts
-  const getOnboardingActivityMetrics = () => {
-    const onboardingPartners = challanPayPartners.filter(p => p.stage === 'onboarding')
+  // Activation sub-metrics
+  const getActivationMetrics = () => {
+    const activationPartners = challanPayPartners.filter(p => p.stage === 'activation')
     return {
-      registration: onboardingPartners.filter(p => p.onboardingActivity === 'registration').length,
-      qrCreation: onboardingPartners.filter(p => p.onboardingActivity === 'qrCreation').length,
-      profileVerification: onboardingPartners.filter(p => p.onboardingActivity === 'profileVerification').length,
-    }
-  }
-
-  // Mobilisation activity counts
-  const getMobilisationActivityMetrics = () => {
-    const mobilisationPartners = challanPayPartners.filter(p => p.stage === 'mobilisation')
-    return {
-      posterCreated: mobilisationPartners.filter(p => p.mobilisationActivity === 'posterCreated').length,
-      welcomeLetterCreated: mobilisationPartners.filter(p => p.mobilisationActivity === 'welcomeLetterCreated').length,
-      keychainCreated: mobilisationPartners.filter(p => p.mobilisationActivity === 'keychainCreated').length,
-      dispatch: mobilisationPartners.filter(p => p.mobilisationActivity === 'dispatch').length,
-      delivered: mobilisationPartners.filter(p => p.mobilisationActivity === 'delivered').length,
+      qrActivated: activationPartners.filter(p => p.activationActivity === 'qrActivated').length,
+      qrUnlocked: activationPartners.filter(p => p.activationActivity === 'qrUnlocked').length,
+      kitSend: activationPartners.filter(p => (p as any).kitSent).length,
     }
   }
 
@@ -88,7 +74,17 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
         />
 
         {/* Edit Partner Modal */}
-        {editingPartner && (
+        {editingPartner && editingPartner.partnerType === 'challanPay' && (
+          <AddPartnerChallanPay
+            partner={editingPartner}
+            onSubmit={(data) => {
+              console.log('Update ChallanPay partner:', editingPartnerId, data)
+              setEditingPartnerId(null)
+            }}
+            onCancel={() => setEditingPartnerId(null)}
+          />
+        )}
+        {editingPartner && editingPartner.partnerType === 'lots247' && (
           <EditPartner
             partner={editingPartner}
             onSubmit={(partnerData) => {
@@ -153,10 +149,11 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
         {/* Summary Cards — ChallanPay only */}
         {activePartnerType === 'challanPay' && (
           <div className="mt-6">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {([
                 { key: 'total', label: 'Total RoadSmart Partners', value: challanPayCount, accent: 'cyan' },
-                { key: 'onboarding', label: 'Onboarding', value: stageOnboarding, accent: 'amber' },
+                { key: 'registration', label: 'Registration', value: stageRegistration, accent: 'amber' },
+                { key: 'verification', label: 'Verification', value: stageVerification, accent: 'violet' },
                 { key: 'activation', label: 'Activation', value: stageActivation, accent: 'blue' },
                 { key: 'mobilisation', label: 'Mobilisation', value: stageMobilisation, accent: 'emerald' },
               ] as const).map((card) => {
@@ -190,7 +187,7 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                         <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">{card.label}</p>
                         <p className="text-3xl font-bold text-slate-900 dark:text-white">{card.value}</p>
                       </div>
-                      {card.key !== 'total' && (
+                      {(card.key === 'verification' || card.key === 'activation') && (
                         <button
                           onClick={() => setExpandedStage(isExpanded ? null : card.key)}
                           className={`mt-0.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
@@ -212,23 +209,19 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
             </div>
 
             {/* Expanded Sub-Cards with popover notch */}
-            {expandedStage && expandedStage !== 'total' && (() => {
-              const stageLabel = expandedStage.charAt(0).toUpperCase() + expandedStage.slice(1)
-              const stageKeys = ['total', 'onboarding', 'activation', 'mobilisation'] as const
+            {expandedStage && (expandedStage === 'verification' || expandedStage === 'activation') && (() => {
+              const stageKeys = ['total', 'registration', 'verification', 'activation', 'mobilisation'] as const
               const idx = stageKeys.indexOf(expandedStage as any)
-              const notchLeft = ((idx + 0.5) / 4) * 100
+              const notchLeft = ((idx + 0.5) / 5) * 100
 
-              const isOnboarding = expandedStage === 'onboarding'
-              const isMobilisation = expandedStage === 'mobilisation'
-              const activityMetrics = isOnboarding ? getOnboardingActivityMetrics() : null
-              const mobilisationMetrics = isMobilisation ? getMobilisationActivityMetrics() : null
-              const metrics = (!isOnboarding && !isMobilisation) ? getStageSubMetrics(expandedStage) : null
+              const isVerification = expandedStage === 'verification'
+              const verificationMetrics = isVerification ? getVerificationMetrics() : null
+              const activationMetrics = !isVerification ? getActivationMetrics() : null
 
               return (
                 <div className="relative mt-4">
                   {/* Notch / caret pointing up */}
                   <div className="absolute -top-2 z-10" style={{ left: `${notchLeft}%`, transform: 'translateX(-50%)' }}>
-                    {/* Border triangle */}
                     <div
                       className="w-0 h-0 absolute -top-px"
                       style={{
@@ -237,7 +230,6 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                         borderBottom: '10px solid var(--notch-border, #e2e8f0)',
                       }}
                     />
-                    {/* Fill triangle */}
                     <div
                       className="w-0 h-0 relative"
                       style={{
@@ -265,52 +257,32 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                     }}
                   >
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
-                      {expandedStage === 'activation' ? 'Training Activity' : `${stageLabel} Activity`}
+                      {isVerification ? 'Verification Status' : 'Activation Status'}
                     </p>
 
-                    {isOnboarding && activityMetrics && (
-                      <div className="grid grid-cols-3 gap-2.5">
-                        {([
-                          { label: 'Registration', value: activityMetrics.registration, dot: 'bg-amber-500' },
-                          { label: 'QR Creation', value: activityMetrics.qrCreation, dot: 'bg-blue-500' },
-                          { label: 'Profile Verification Approval', value: activityMetrics.profileVerification, dot: 'bg-emerald-500' },
-                        ]).map((sub) => (
-                          <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span className={`w-2 h-2 rounded-full ${sub.dot}`} />
-                              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sub.label}</span>
-                            </div>
-                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{sub.value}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {isMobilisation && mobilisationMetrics && (
-                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                        {([
-                          { label: 'Poster Created', value: mobilisationMetrics.posterCreated, dot: 'bg-violet-500' },
-                          { label: 'Welcome Letter', value: mobilisationMetrics.welcomeLetterCreated, dot: 'bg-cyan-500' },
-                          { label: 'Keychain Created', value: mobilisationMetrics.keychainCreated, dot: 'bg-amber-500' },
-                          { label: 'Dispatch', value: mobilisationMetrics.dispatch, dot: 'bg-blue-500' },
-                          { label: 'Delivered', value: mobilisationMetrics.delivered, dot: 'bg-emerald-500' },
-                        ]).map((sub) => (
-                          <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span className={`w-2 h-2 rounded-full ${sub.dot}`} />
-                              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sub.label}</span>
-                            </div>
-                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{sub.value}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {!isOnboarding && !isMobilisation && metrics && (
+                    {isVerification && verificationMetrics && (
                       <div className="grid grid-cols-2 gap-2.5">
                         {([
-                          { label: 'QR Printed', value: metrics.assigned, dot: 'bg-blue-500' },
-                          { label: 'Training', value: metrics.active, dot: 'bg-emerald-500' },
+                          { label: 'Email Verified', value: verificationMetrics.emailVerified, dot: 'bg-violet-500' },
+                          { label: 'Profile Verified', value: verificationMetrics.profileVerified, dot: 'bg-emerald-500' },
+                        ]).map((sub) => (
+                          <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className={`w-2 h-2 rounded-full ${sub.dot}`} />
+                              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sub.label}</span>
+                            </div>
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{sub.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {!isVerification && activationMetrics && (
+                      <div className="grid grid-cols-3 gap-2.5">
+                        {([
+                          { label: 'QR Activated', value: activationMetrics.qrActivated, dot: 'bg-blue-500' },
+                          { label: 'QR Unlocked', value: activationMetrics.qrUnlocked, dot: 'bg-cyan-500' },
+                          { label: 'Kit Send', value: activationMetrics.kitSend, dot: 'bg-emerald-500' },
                         ]).map((sub) => (
                           <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-1.5 mb-1">

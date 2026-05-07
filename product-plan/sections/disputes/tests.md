@@ -4,7 +4,7 @@ These test-writing instructions are **framework-agnostic**. Adapt them to your t
 
 ## Overview
 
-Test the dispute governance engine including sidebar navigation, stage management, dispute creation (must link entity), bulk operations, detail view with 5 tabs, and SLA enforcement.
+The Disputes module handles escalation and governance with stage-based progression, reviewer assignment, and configurable SLA enforcement.
 
 ---
 
@@ -13,78 +13,109 @@ Test the dispute governance engine including sidebar navigation, stage managemen
 ### Flow 1: Create Dispute
 
 **Steps:**
-1. Click "Create Dispute"
-2. Select linked entity type (Incident/Subscriber/Payment)
-3. Enter entity ID
-4. Fill dispute type, reason, description, priority
-5. Submit
+1. User clicks "Create Dispute"
+2. User links to an incident, subscriber, or payment
+3. User fills: dispute type, reason, description, priority
+4. User clicks "Create"
 
 **Expected Results:**
-- [ ] Dispute created in "Open" stage
-- [ ] Stage count increments
-- [ ] Linked entity reference saved
+- [ ] Dispute appears in "Open" tab
+- [ ] Dispute ID generated (DSP-xxxxx format)
+- [ ] Linked entity info displayed
+- [ ] Modal closes
 
-**Failure Path: No Linked Entity**
-- [ ] Form requires linked entity — cannot create standalone dispute
-- [ ] Error shown: "A linked entity is required"
+#### Failure Path: No Linked Entity
 
-### Flow 2: Review and Resolve
+**Expected Results:**
+- [ ] Validation error — dispute must link to existing entity
+- [ ] Form not submitted
+
+### Flow 2: Navigate Stage Tabs
 
 **Steps:**
-1. Open dispute detail
-2. Review Summary, Linked Incident, Evidence tabs
-3. Add investigation notes
-4. Click "Resolve" with mandatory notes
+1. User clicks through tabs: Open, Under Review, Escalated, Resolved, Rejected
 
 **Expected Results:**
-- [ ] Dispute moves to "Resolved" stage
-- [ ] Resolution notes saved
-- [ ] Action logged in Activity tab
+- [ ] Each tab shows dispute count
+- [ ] Table content updates per stage
+- [ ] Correct columns displayed
 
-### Flow 3: Escalate
+### Flow 3: Assign Reviewer
 
 **Steps:**
-1. Open dispute detail
-2. Click "Escalate"
-3. Add escalation notes
+1. User selects dispute(s)
+2. User clicks "Assign Reviewer"
+3. User selects reviewer from modal
+4. User confirms
 
 **Expected Results:**
-- [ ] Dispute moves to "Escalated" stage
-- [ ] SLA adjusts
+- [ ] Reviewer assigned
+- [ ] Assignment logged in activity trail
+- [ ] Dispute can move to "Under Review"
 
-### Flow 4: Bulk Assign Reviewer
+### Flow 4: Escalate Dispute
 
 **Steps:**
-1. Select multiple disputes
-2. Click "Assign Reviewer"
-3. Select reviewer, confirm
+1. User opens dispute detail
+2. User clicks "Escalate"
 
 **Expected Results:**
-- [ ] All selected disputes assigned
-- [ ] No bulk resolve/reject option available (sensitive)
+- [ ] Dispute moves to "Escalated" tab
+- [ ] Priority may increase
+- [ ] Escalation logged in activity
+
+### Flow 5: Resolve Dispute
+
+**Steps:**
+1. Reviewer opens dispute in "Under Review"
+2. Reviewer adds investigation notes
+3. Reviewer clicks "Approve Refund" or "Reject Dispute"
+
+**Expected Results:**
+- [ ] Dispute moves to "Resolved" or "Rejected"
+- [ ] Resolution reasoning logged
+- [ ] Mandatory audit trail entry
+
+### Flow 6: View Dispute Detail
+
+**Steps:**
+1. User clicks dispute row
+2. Detail page opens
+
+**Expected Results:**
+- [ ] Header: Dispute ID, action buttons
+- [ ] Left sidebar: SLA deadline, linked entity info, assigned reviewer
+- [ ] 5 tabs: Summary, Linked Incident, Investigation, Evidence, Activity
+- [ ] SLA indicator visible (red if overdue)
+
+### Flow 7: Bulk Operations
+
+**Steps:**
+1. User selects multiple disputes
+2. User clicks "Assign Reviewer" or "Change Priority"
+
+**Expected Results:**
+- [ ] Bulk actions bar shows selected count
+- [ ] Only Assign Reviewer and Change Priority available (no bulk resolution)
+- [ ] All selected disputes updated
 
 ---
 
 ## Empty State Tests
 
-- [ ] No disputes: helpful message
-- [ ] No evidence: empty Evidence tab with upload CTA
-- [ ] No investigation notes: empty Investigation tab
+### No Disputes
+- [ ] Empty state message shown
+- [ ] "Create Dispute" button accessible
+
+### No Evidence on Dispute
+- [ ] Evidence tab shows upload prompt
 
 ---
 
-## Sample Test Data
+## Edge Cases
 
-```typescript
-const mockDispute = {
-  id: "DSP-12345",
-  linkedEntity: { type: "incident", id: "IRN-67890" },
-  type: "refund",
-  raisedBy: "customer",
-  priority: "high",
-  status: "open",
-  assignedTo: null,
-  createdAt: "2025-12-01T10:00:00Z",
-  slaDeadline: "2025-12-15T10:00:00Z",
-};
-```
+- [ ] SLA indicator shows correctly (7-15 day range)
+- [ ] Overdue disputes highlighted in red
+- [ ] Sidebar toggle between All/My Disputes works
+- [ ] Cannot create standalone dispute (must link to entity)
+- [ ] Only authorized roles can approve refunds/reject

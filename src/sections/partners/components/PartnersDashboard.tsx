@@ -62,6 +62,24 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
     }
   }
 
+  // Mobilisation sub-metrics
+  const getMobilisationMetrics = () => {
+    const mobilisationPartners = teamFilteredPartners.filter(p => p.stage === 'mobilisation')
+    const totalAmount = mobilisationPartners.reduce((sum, p) => sum + (p.earnings ?? 0), 0)
+    const totalEarning = mobilisationPartners.reduce((sum, p) => sum + (p.totalCommission ?? 0) + (p.totalRspBenefit ?? 0), 0)
+    const totalConvertedUsers = mobilisationPartners.reduce((sum, p) => sum + (p.linkedSubscribers?.length ?? 0), 0)
+    return { totalAmount, totalEarning, totalConvertedUsers }
+  }
+
+  const formatCurrency = (n: number) =>
+    n >= 10000000
+      ? `₹${(n / 10000000).toFixed(1)}Cr`
+      : n >= 100000
+      ? `₹${(n / 100000).toFixed(1)}L`
+      : n >= 1000
+      ? `₹${(n / 1000).toFixed(1)}k`
+      : `₹${n}`
+
   // If a partner is selected, show detail view
   if (selectedPartner) {
     return (
@@ -212,7 +230,7 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                         <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">{card.label}</p>
                         <p className="text-3xl font-bold text-slate-900 dark:text-white">{card.value}</p>
                       </div>
-                      {(card.key === 'verification' || card.key === 'activation') && (
+                      {(card.key === 'verification' || card.key === 'activation' || card.key === 'mobilisation') && (
                         <button
                           onClick={() => setExpandedStage(isExpanded ? null : card.key)}
                           className={`mt-0.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
@@ -234,14 +252,21 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
             </div>
 
             {/* Expanded Sub-Cards with popover notch */}
-            {expandedStage && (expandedStage === 'verification' || expandedStage === 'activation') && (() => {
+            {expandedStage && (expandedStage === 'verification' || expandedStage === 'activation' || expandedStage === 'mobilisation') && (() => {
               const stageKeys = ['total', 'registration', 'verification', 'activation', 'mobilisation'] as const
               const idx = stageKeys.indexOf(expandedStage as any)
               const notchLeft = ((idx + 0.5) / 5) * 100
 
-              const isVerification = expandedStage === 'verification'
-              const verificationMetrics = isVerification ? getVerificationMetrics() : null
-              const activationMetrics = !isVerification ? getActivationMetrics() : null
+              const verificationMetrics = expandedStage === 'verification' ? getVerificationMetrics() : null
+              const activationMetrics = expandedStage === 'activation' ? getActivationMetrics() : null
+              const mobilisationMetrics = expandedStage === 'mobilisation' ? getMobilisationMetrics() : null
+
+              const headerLabel =
+                expandedStage === 'verification'
+                  ? 'Verification Status'
+                  : expandedStage === 'activation'
+                  ? 'Activation Status'
+                  : 'Mobilisation Performance'
 
               return (
                 <div className="relative mt-4">
@@ -282,10 +307,10 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                     }}
                   >
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
-                      {isVerification ? 'Verification Status' : 'Activation Status'}
+                      {headerLabel}
                     </p>
 
-                    {isVerification && verificationMetrics && (
+                    {verificationMetrics && (
                       <div className="grid grid-cols-2 gap-2.5">
                         {([
                           { label: 'Email Verified', value: verificationMetrics.emailVerified, dot: 'bg-violet-500' },
@@ -302,12 +327,30 @@ export function PartnersDashboard({ partners, onViewIncidents }: PartnersDashboa
                       </div>
                     )}
 
-                    {!isVerification && activationMetrics && (
+                    {activationMetrics && (
                       <div className="grid grid-cols-3 gap-2.5">
                         {([
                           { label: 'QR Activated', value: activationMetrics.qrActivated, dot: 'bg-blue-500' },
                           { label: 'QR Unlocked', value: activationMetrics.qrUnlocked, dot: 'bg-cyan-500' },
                           { label: 'Kit Send', value: activationMetrics.kitSend, dot: 'bg-emerald-500' },
+                        ]).map((sub) => (
+                          <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className={`w-2 h-2 rounded-full ${sub.dot}`} />
+                              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sub.label}</span>
+                            </div>
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{sub.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {mobilisationMetrics && (
+                      <div className="grid grid-cols-3 gap-2.5">
+                        {([
+                          { label: 'Total Amount', value: formatCurrency(mobilisationMetrics.totalAmount), dot: 'bg-emerald-500' },
+                          { label: 'Total Earning', value: formatCurrency(mobilisationMetrics.totalEarning), dot: 'bg-amber-500' },
+                          { label: 'Total Converted Users', value: mobilisationMetrics.totalConvertedUsers, dot: 'bg-blue-500' },
                         ]).map((sub) => (
                           <div key={sub.label} className="bg-white dark:bg-slate-900 rounded-lg px-3.5 py-3 border border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-1.5 mb-1">

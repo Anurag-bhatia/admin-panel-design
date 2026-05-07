@@ -88,7 +88,7 @@ export function PaymentsSidebar({
                 : 'text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
           >
-            ChallanPay Partners
+            RSP Earnings
           </button>
         </div>
       </div>
