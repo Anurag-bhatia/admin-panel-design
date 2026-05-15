@@ -36,6 +36,8 @@ export function PartnerDetail({
   const [followUpPage, setFollowUpPage] = useState(1)
   const [showAddFollowUp, setShowAddFollowUp] = useState(false)
   const [followUpForm, setFollowUpForm] = useState({ activityType: '', subActivityType: '', notes: '' })
+  const [incidentsModuleActive, setIncidentsModuleActive] = useState(true)
+  const [pendingPermissionChange, setPendingPermissionChange] = useState<null | { module: 'incidents'; nextValue: boolean }>(null)
   const vehiclesPerPage = 5
   const filteredVehicles = (partner.linkedVehicles || []).filter((v) => {
     const matchesSearch = vehicleSearch === '' ||
@@ -551,6 +553,79 @@ export function PartnerDetail({
                     </div>
                   )
                 })()}
+              </div>
+
+              {/* Permissions Card */}
+              {isChallanPay && (
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Permissions</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-50">Incidents module</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        {incidentsModuleActive ? 'Active' : 'Inactive'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={incidentsModuleActive}
+                      onClick={() => setPendingPermissionChange({ module: 'incidents', nextValue: !incidentsModuleActive })}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${
+                        incidentsModuleActive ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-700'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
+                          incidentsModuleActive ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Permission Change Confirmation Modal */}
+        {pendingPermissionChange && (
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+            onClick={() => setPendingPermissionChange(null)}
+          >
+            <div
+              className="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="px-6 py-5">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-2">
+                  Are you sure?
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  This will set the Incidents module to{' '}
+                  <span className="font-medium text-slate-900 dark:text-slate-50">
+                    {pendingPermissionChange.nextValue ? 'Active' : 'Inactive'}
+                  </span>{' '}
+                  for this partner.
+                </p>
+              </div>
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+                <button
+                  onClick={() => setPendingPermissionChange(null)}
+                  className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors"
+                >
+                  No
+                </button>
+                <button
+                  onClick={() => {
+                    setIncidentsModuleActive(pendingPermissionChange.nextValue)
+                    setPendingPermissionChange(null)
+                  }}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Yes
+                </button>
               </div>
             </div>
           </div>
