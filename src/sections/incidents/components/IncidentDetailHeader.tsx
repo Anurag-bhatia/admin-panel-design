@@ -144,6 +144,12 @@ export function IncidentDetailHeader({
           <h1 className="text-xl font-semibold text-slate-900 dark:text-white font-mono">
             {incident.incidentId}
           </h1>
+
+          {incident.isExpress && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+              Express
+            </span>
+          )}
         </div>
 
         {/* Quick Actions */}

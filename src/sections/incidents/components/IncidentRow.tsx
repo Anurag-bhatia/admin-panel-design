@@ -54,6 +54,17 @@ const TYPE_LABELS: Record<string, string> = {
   onCall: 'On Call',
 }
 
+const SLA_DAYS_NORMAL = 42
+const SLA_DAYS_EXPRESS = 10
+
+function computeDaysLeft(createdAt: string, isExpress: boolean): number {
+  const sla = isExpress ? SLA_DAYS_EXPRESS : SLA_DAYS_NORMAL
+  const created = new Date(createdAt).getTime()
+  const deadline = created + sla * 24 * 60 * 60 * 1000
+  const diffMs = deadline - Date.now()
+  return Math.ceil(diffMs / (24 * 60 * 60 * 1000))
+}
+
 const CHALLAN_TYPE_LABELS: Record<string, string> = {
   court: 'Court',
   online: 'Online',
@@ -196,12 +207,38 @@ export function IncidentRow({
       {/* Incident ID */}
       <td className="px-4 py-3">
         <div>
-          <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">
-            {incident.incidentId}
-          </span>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {incident.source}
-          </p>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">
+              {incident.incidentId}
+            </span>
+            {incident.isExpress && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                Express
+              </span>
+            )}
+          </div>
+          {(() => {
+            const daysLeft = computeDaysLeft(incident.createdAt, !!incident.isExpress)
+            if (daysLeft <= 0) {
+              return (
+                <p className="text-xs font-medium text-red-600 dark:text-red-400">
+                  Overdue by {Math.abs(daysLeft)} {Math.abs(daysLeft) === 1 ? 'day' : 'days'}
+                </p>
+              )
+            }
+            const isCritical = daysLeft <= 5
+            return (
+              <p
+                className={`text-xs ${
+                  isCritical
+                    ? 'text-amber-600 dark:text-amber-400 font-medium'
+                    : 'text-slate-500 dark:text-slate-400'
+                }`}
+              >
+                {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
+              </p>
+            )
+          })()}
         </div>
       </td>
 
@@ -222,20 +259,6 @@ export function IncidentRow({
         <span className="font-mono text-sm text-slate-700 dark:text-slate-300">
           {incident.vehicle}
         </span>
-      </td>
-
-      {/* Offence */}
-      <td className="px-4 py-3 max-w-[180px]">
-        {incident.offence ? (
-          <span
-            className="block text-sm text-slate-700 dark:text-slate-300 truncate"
-            title={incident.offence}
-          >
-            {incident.offence}
-          </span>
-        ) : (
-          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-        )}
       </td>
 
       {/* Type */}

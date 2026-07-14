@@ -101,6 +101,7 @@ export interface Incident {
   offence: string | null
   amount: number
   resolutionNotes?: string
+  isExpress?: boolean
 }
 
 export interface FollowUp {
