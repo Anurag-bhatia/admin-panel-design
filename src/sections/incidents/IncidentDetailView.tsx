@@ -5,7 +5,19 @@ import { NotesTab, type Note } from './components/NotesTab'
 import { DetailsTab } from './components/DetailsTab'
 import { CallSummaryTab } from './components/CallSummaryTab'
 import { AddExpenseModal } from './components/AddExpenseModal'
+import {
+  MoveQueueDetailsModal,
+  type MoveQueueDetailsPayload,
+  type MoveQueueStage,
+} from './components/MoveQueueDetailsModal'
 import type { IncidentDetailProps } from '@/../product/sections/incidents/types'
+
+const STAGES_REQUIRING_DETAILS: MoveQueueStage[] = [
+  'refundRequested',
+  'refundCompleted',
+  'notSettled',
+  'settled',
+]
 
 type TabType = 'activity' | 'notes' | 'details' | 'callSummary'
 
@@ -68,6 +80,7 @@ export function IncidentDetailView({
   const [notes, setNotes] = useState<Note[]>(SAMPLE_NOTES)
   const [showExpenseModal, setShowExpenseModal] = useState(false)
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
+  const [pendingMoveStage, setPendingMoveStage] = useState<MoveQueueStage | null>(null)
 
   const handleAddFollowUp = (followUp: Record<string, any>) => {
     onAddFollowUp?.(incident.id, followUp as any)
@@ -86,7 +99,18 @@ export function IncidentDetailView({
   }
 
   const handleMoveQueue = (queue: any) => {
+    if (STAGES_REQUIRING_DETAILS.includes(queue as MoveQueueStage)) {
+      setPendingMoveStage(queue as MoveQueueStage)
+      return
+    }
     onMoveQueue?.(incident.id, queue)
+  }
+
+  const handleMoveQueueWithDetails = (payload: MoveQueueDetailsPayload) => {
+    if (!pendingMoveStage) return
+    console.log('Move queue details:', pendingMoveStage, payload)
+    onMoveQueue?.(incident.id, pendingMoveStage as any)
+    setPendingMoveStage(null)
   }
 
   const handleValidate = () => {
@@ -210,7 +234,8 @@ export function IncidentDetailView({
                       { key: 'settled', label: 'Settled' },
                       { key: 'notSettled', label: 'Not Settled' },
                       { key: 'hold', label: 'Hold' },
-                      { key: 'refund', label: 'Refund' },
+                      { key: 'refundRequested', label: 'Refund Requested' },
+                      { key: 'refundCompleted', label: 'Refund Completed' },
                     ]
                       .filter((q) => q.key !== incident.queue)
                       .map((queue) => (
@@ -476,6 +501,16 @@ export function IncidentDetailView({
             setShowExpenseModal(false)
           }}
           onCancel={() => setShowExpenseModal(false)}
+        />
+      )}
+
+      {/* Move Queue Details Modal */}
+      {pendingMoveStage && (
+        <MoveQueueDetailsModal
+          incidentId={incident.incidentId}
+          stage={pendingMoveStage}
+          onSubmit={handleMoveQueueWithDetails}
+          onCancel={() => setPendingMoveStage(null)}
         />
       )}
     </div>
