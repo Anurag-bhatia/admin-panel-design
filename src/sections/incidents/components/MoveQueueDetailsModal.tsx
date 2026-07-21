@@ -6,10 +6,14 @@ export type MoveQueueStage =
   | 'refundCompleted'
   | 'notSettled'
   | 'settled'
+  | 'hold'
+  | 'lawyerAssigned'
 
 export interface MoveQueueDetailsPayload {
   reason?: string
   notes?: string
+  title?: string
+  subtitle?: string
   caseTentativeAmount?: number
   caseActualAmount?: number
   caseProfessionalFees?: number
@@ -29,6 +33,8 @@ const STAGE_META: Record<MoveQueueStage, { title: string; submitLabel: string }>
   refundCompleted: { title: 'Move to Refund Completed', submitLabel: 'Confirm Move' },
   notSettled: { title: 'Move to Not Settled', submitLabel: 'Confirm Move' },
   settled: { title: 'Move to Settled', submitLabel: 'Confirm Move' },
+  hold: { title: 'Move to Hold', submitLabel: 'Move to Hold' },
+  lawyerAssigned: { title: 'Move to Lawyer Assigned', submitLabel: 'Move to Lawyer Assigned' },
 }
 
 export function MoveQueueDetailsModal({
@@ -39,6 +45,8 @@ export function MoveQueueDetailsModal({
 }: MoveQueueDetailsModalProps) {
   const [reason, setReason] = useState('')
   const [notes, setNotes] = useState('')
+  const [title, setTitle] = useState('')
+  const [subtitle, setSubtitle] = useState('')
   const [caseTentativeAmount, setCaseTentativeAmount] = useState('')
   const [caseActualAmount, setCaseActualAmount] = useState('')
   const [caseProfessionalFees, setCaseProfessionalFees] = useState('')
@@ -51,6 +59,8 @@ export function MoveQueueDetailsModal({
     if (stage === 'refundRequested') return !reason.trim() || !notes.trim()
     if (stage === 'refundCompleted') return !notes.trim()
     if (stage === 'notSettled') return !reason.trim()
+    if (stage === 'hold') return !reason.trim()
+    if (stage === 'lawyerAssigned') return !title.trim() || !subtitle.trim()
     if (stage === 'settled') {
       return (
         !caseTentativeAmount ||
@@ -72,6 +82,10 @@ export function MoveQueueDetailsModal({
       onSubmit({ notes: notes.trim() })
     } else if (stage === 'notSettled') {
       onSubmit({ reason: reason.trim() })
+    } else if (stage === 'hold') {
+      onSubmit({ reason: reason.trim() })
+    } else if (stage === 'lawyerAssigned') {
+      onSubmit({ title: title.trim(), subtitle: subtitle.trim() })
     } else if (stage === 'settled') {
       onSubmit({
         caseTentativeAmount: parseFloat(caseTentativeAmount) || 0,
@@ -169,6 +183,53 @@ export function MoveQueueDetailsModal({
                 required
               />
             </div>
+          )}
+
+          {stage === 'hold' && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Reason for Hold <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Explain why this is being placed on hold"
+                rows={4}
+                className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white resize-y"
+                required
+              />
+            </div>
+          )}
+
+          {stage === 'lawyerAssigned' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter a title"
+                  className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Subtitle <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={subtitle}
+                  onChange={(e) => setSubtitle(e.target.value)}
+                  placeholder="Enter a subtitle"
+                  className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+                  required
+                />
+              </div>
+            </>
           )}
 
           {stage === 'settled' && (

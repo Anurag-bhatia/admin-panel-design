@@ -5,6 +5,7 @@ import { NotesTab, type Note } from './components/NotesTab'
 import { DetailsTab } from './components/DetailsTab'
 import { CallSummaryTab } from './components/CallSummaryTab'
 import { AddExpenseModal } from './components/AddExpenseModal'
+import { AssignAgentModal } from './components/AssignAgentModal'
 import {
   MoveQueueDetailsModal,
   type MoveQueueDetailsPayload,
@@ -17,6 +18,8 @@ const STAGES_REQUIRING_DETAILS: MoveQueueStage[] = [
   'refundCompleted',
   'notSettled',
   'settled',
+  'hold',
+  'lawyerAssigned',
 ]
 
 type TabType = 'activity' | 'notes' | 'details' | 'callSummary'
@@ -81,6 +84,7 @@ export function IncidentDetailView({
   const [showExpenseModal, setShowExpenseModal] = useState(false)
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
   const [pendingMoveStage, setPendingMoveStage] = useState<MoveQueueStage | null>(null)
+  const [showAssignAgentForMove, setShowAssignAgentForMove] = useState(false)
 
   const handleAddFollowUp = (followUp: Record<string, any>) => {
     onAddFollowUp?.(incident.id, followUp as any)
@@ -99,6 +103,10 @@ export function IncidentDetailView({
   }
 
   const handleMoveQueue = (queue: any) => {
+    if (queue === 'agentAssigned') {
+      setShowAssignAgentForMove(true)
+      return
+    }
     if (STAGES_REQUIRING_DETAILS.includes(queue as MoveQueueStage)) {
       setPendingMoveStage(queue as MoveQueueStage)
       return
@@ -511,6 +519,22 @@ export function IncidentDetailView({
           stage={pendingMoveStage}
           onSubmit={handleMoveQueueWithDetails}
           onCancel={() => setPendingMoveStage(null)}
+        />
+      )}
+
+      {/* Assign Agent Modal (from Move Ticket) */}
+      {showAssignAgentForMove && (
+        <AssignAgentModal
+          selectedCount={1}
+          users={users}
+          currentAgentId={assignedAgent?.id}
+          entityLabel={isCases ? 'case' : 'challan'}
+          onAssign={(agentId) => {
+            onAssignAgent?.(incident.id, agentId)
+            onMoveQueue?.(incident.id, 'agentAssigned' as any)
+            setShowAssignAgentForMove(false)
+          }}
+          onClose={() => setShowAssignAgentForMove(false)}
         />
       )}
     </div>
