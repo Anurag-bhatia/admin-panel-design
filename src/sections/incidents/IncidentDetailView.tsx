@@ -117,6 +117,9 @@ export function IncidentDetailView({
   const handleMoveQueueWithDetails = (payload: MoveQueueDetailsPayload) => {
     if (!pendingMoveStage) return
     console.log('Move queue details:', pendingMoveStage, payload)
+    if (pendingMoveStage === 'lawyerAssigned' && payload.lawyerId) {
+      onAssignLawyer?.(incident.id, payload.lawyerId)
+    }
     onMoveQueue?.(incident.id, pendingMoveStage as any)
     setPendingMoveStage(null)
   }
@@ -517,6 +520,7 @@ export function IncidentDetailView({
         <MoveQueueDetailsModal
           incidentId={incident.incidentId}
           stage={pendingMoveStage}
+          lawyers={lawyers}
           onSubmit={handleMoveQueueWithDetails}
           onCancel={() => setPendingMoveStage(null)}
         />
