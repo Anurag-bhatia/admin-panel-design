@@ -10,17 +10,12 @@ interface QueueTabsProps {
 
 const QUEUE_CONFIG: { key: IncidentQueue; label: string; caseLabel?: string; color: string }[] = [
   { key: 'newIncidents', label: 'New Incidents', caseLabel: 'New Cases', color: 'cyan' },
-  { key: 'screening', label: 'Screening', color: 'amber' },
-  { key: 'agentAssigned', label: 'Agent Assigned', color: 'orange' },
-  { key: 'lawyerAssigned', label: 'Lawyer Assigned', color: 'blue' },
+  { key: 'inProgress', label: 'In Progress', color: 'amber' },
   { key: 'settled', label: 'Settled', color: 'emerald' },
   { key: 'notSettled', label: 'Not Settled', color: 'red' },
   { key: 'hold', label: 'Hold', color: 'slate' },
   { key: 'refund', label: 'Refund', color: 'purple' },
 ]
-
-// Cases don't have screening or agentAssigned queues
-const CASE_HIDDEN_QUEUES: IncidentQueue[] = ['screening', 'agentAssigned']
 
 export function QueueTabs({
   activeQueue,
@@ -31,15 +26,10 @@ export function QueueTabs({
 }: QueueTabsProps) {
   const isCases = workType === 'cases'
 
-  // Filter queues based on view and workType
   let displayedQueues = QUEUE_CONFIG
 
-  if (isCases) {
-    displayedQueues = displayedQueues.filter((q) => !CASE_HIDDEN_QUEUES.includes(q.key))
-  }
-
   if (view === 'my') {
-    displayedQueues = displayedQueues.filter((q) => q.key !== 'newIncidents' && q.key !== 'screening')
+    displayedQueues = displayedQueues.filter((q) => q.key !== 'newIncidents')
   }
 
   return (
@@ -49,11 +39,10 @@ export function QueueTabs({
           const isActive = activeQueue === queue.key
           const count = queueCounts[queue.key]
 
-          // Determine label
           let label = queue.label
           if (isCases && queue.caseLabel) {
             label = queue.caseLabel
-          } else if (queue.key === 'agentAssigned' && view === 'my') {
+          } else if (queue.key === 'inProgress' && view === 'my') {
             label = 'Assigned to me'
           }
 

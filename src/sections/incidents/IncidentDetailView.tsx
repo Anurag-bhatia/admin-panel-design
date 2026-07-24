@@ -1,11 +1,10 @@
-import { useState } from 'react'
-import { ArrowLeft, Clock, UserPlus, Scale, CheckCircle, Search, IndianRupee, ArrowRightLeft, ChevronDown } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { ArrowLeft, Clock, UserPlus, Scale, Search, IndianRupee, ArrowRightLeft, ChevronDown } from 'lucide-react'
 import { ActivityTab } from './components/ActivityTab'
 import { NotesTab, type Note } from './components/NotesTab'
 import { DetailsTab } from './components/DetailsTab'
 import { CallSummaryTab } from './components/CallSummaryTab'
 import { AddExpenseModal } from './components/AddExpenseModal'
-import { AssignAgentModal } from './components/AssignAgentModal'
 import {
   MoveQueueDetailsModal,
   type MoveQueueDetailsPayload,
@@ -19,10 +18,9 @@ const STAGES_REQUIRING_DETAILS: MoveQueueStage[] = [
   'notSettled',
   'settled',
   'hold',
-  'lawyerAssigned',
 ]
 
-type TabType = 'activity' | 'notes' | 'details' | 'callSummary'
+type TabType = 'screeningDetails' | 'activity' | 'notes' | 'details' | 'callSummary'
 
 const CASE_CATEGORY_LABELS: Record<string, string> = {
   iaStart: 'IA Start',
@@ -64,8 +62,6 @@ export function IncidentDetailView({
   followUps,
   timelineActivities,
   documents,
-  users,
-  lawyers,
   onBack,
   onAddFollowUp,
   onUploadDocument,
@@ -74,7 +70,6 @@ export function IncidentDetailView({
   onAssignAgent,
   onAssignLawyer,
   onMoveQueue,
-  onValidate,
   onScreen,
   onUpdate,
 }: IncidentDetailProps) {
@@ -84,7 +79,15 @@ export function IncidentDetailView({
   const [showExpenseModal, setShowExpenseModal] = useState(false)
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
   const [pendingMoveStage, setPendingMoveStage] = useState<MoveQueueStage | null>(null)
-  const [showAssignAgentForMove, setShowAssignAgentForMove] = useState(false)
+  const screeningRuns = useMemo(
+    () => (isCases ? [] : buildScreeningRuns(incident, subscriber)),
+    [incident, subscriber, isCases],
+  )
+  const [activeScreeningId, setActiveScreeningId] = useState<string | null>(
+    screeningRuns[0]?.id ?? null,
+  )
+  const activeScreeningRun =
+    screeningRuns.find((run) => run.id === activeScreeningId) ?? screeningRuns[0] ?? null
 
   const handleAddFollowUp = (followUp: Record<string, any>) => {
     onAddFollowUp?.(incident.id, followUp as any)
@@ -103,10 +106,6 @@ export function IncidentDetailView({
   }
 
   const handleMoveQueue = (queue: any) => {
-    if (queue === 'agentAssigned') {
-      setShowAssignAgentForMove(true)
-      return
-    }
     if (STAGES_REQUIRING_DETAILS.includes(queue as MoveQueueStage)) {
       setPendingMoveStage(queue as MoveQueueStage)
       return
@@ -117,15 +116,8 @@ export function IncidentDetailView({
   const handleMoveQueueWithDetails = (payload: MoveQueueDetailsPayload) => {
     if (!pendingMoveStage) return
     console.log('Move queue details:', pendingMoveStage, payload)
-    if (pendingMoveStage === 'lawyerAssigned' && payload.lawyerId) {
-      onAssignLawyer?.(incident.id, payload.lawyerId)
-    }
     onMoveQueue?.(incident.id, pendingMoveStage as any)
     setPendingMoveStage(null)
-  }
-
-  const handleValidate = () => {
-    onValidate?.(incident.id)
   }
 
   const handleScreen = () => {
@@ -201,22 +193,13 @@ export function IncidentDetailView({
               Add Expense
             </button>
             {!isCases && (
-              <>
-                <button
-                  onClick={handleValidate}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  Validate
-                </button>
-                <button
-                  onClick={handleScreen}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                >
-                  <Search className="h-4 w-4" />
-                  Screen
-                </button>
-              </>
+              <button
+                onClick={handleScreen}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <Search className="h-4 w-4" />
+                Screen
+              </button>
             )}
 
             {/* Move Ticket Dropdown */}
@@ -239,9 +222,7 @@ export function IncidentDetailView({
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
                     {[
                       { key: 'newIncidents', label: 'New Incidents' },
-                      { key: 'screening', label: 'Screening' },
-                      { key: 'agentAssigned', label: 'Agent Assigned' },
-                      { key: 'lawyerAssigned', label: 'Lawyer Assigned' },
+                      { key: 'inProgress', label: 'In Progress' },
                       { key: 'settled', label: 'Settled' },
                       { key: 'notSettled', label: 'Not Settled' },
                       { key: 'hold', label: 'Hold' },
@@ -423,6 +404,18 @@ export function IncidentDetailView({
               {/* Main Tabs Header */}
               <div className="border-b border-slate-200 dark:border-slate-700">
                 <div className="flex">
+                  {!isCases && (
+                    <button
+                      onClick={() => setActiveTab('screeningDetails')}
+                      className={`px-6 py-4 text-sm font-medium transition-colors border-b-2 ${
+                        activeTab === 'screeningDetails'
+                          ? 'border-cyan-600 text-cyan-600 dark:border-cyan-400 dark:text-cyan-400'
+                          : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Screening Details
+                    </button>
+                  )}
                   <button
                     onClick={() => setActiveTab('activity')}
                     className={`px-6 py-4 text-sm font-medium transition-colors border-b-2 ${
@@ -468,6 +461,94 @@ export function IncidentDetailView({
 
               {/* Tab Content */}
               <div className="min-h-[400px]">
+                {activeTab === 'screeningDetails' && !isCases && (
+                  <div className="p-5 space-y-4">
+                    {screeningRuns.length > 0 && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {screeningRuns.map((run) => {
+                          const isActive = run.id === (activeScreeningRun?.id ?? null)
+                          return (
+                            <button
+                              key={run.id}
+                              type="button"
+                              onClick={() => setActiveScreeningId(run.id)}
+                              className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                                isActive
+                                  ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
+                                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                              }`}
+                            >
+                              <span className="font-medium">{run.dateLabel}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                    {activeScreeningRun && (
+                      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                              {activeScreeningRun.dateLabel}
+                            </span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                              · {activeScreeningRun.timeLabel}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="p-6">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-5">
+                            <Detail label="Violater" value={activeScreeningRun.violaterName} />
+                            <Detail
+                              label="Challan Number"
+                              value={<span className="font-mono">{activeScreeningRun.challanNumber}</span>}
+                            />
+                            <Detail label="State" value={activeScreeningRun.state} />
+                            <Detail label="Date" value={activeScreeningRun.dateLabel} />
+                            <Detail label="Offence" value={activeScreeningRun.offence} />
+                            <Detail label="Place" value={activeScreeningRun.place} />
+                            <Detail label="RTO" value={activeScreeningRun.rto} />
+                            <Detail
+                              label="Amount"
+                              value={`₹${activeScreeningRun.amount.toLocaleString('en-IN')}`}
+                            />
+                            <Detail
+                              label="Virtual Status"
+                              value={
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                  {activeScreeningRun.virtualStatus}
+                                </span>
+                              }
+                            />
+                            <Detail
+                              label="Virtual Amount"
+                              value={`₹${activeScreeningRun.virtualAmount.toLocaleString('en-IN')}`}
+                            />
+                            <Detail
+                              label="Status"
+                              value={
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${activeScreeningRun.statusClass}`}>
+                                  {activeScreeningRun.status}
+                                </span>
+                              }
+                            />
+                            <Detail
+                              label="Physical Court"
+                              value={
+                                <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                                  {activeScreeningRun.court}
+                                </span>
+                              }
+                            />
+                            <Detail label="Vehicle Impound" value={activeScreeningRun.vehicleImpound} />
+                            <Detail label="Document Impound" value={activeScreeningRun.docImpound} />
+                            <Detail label="Disposed" value={activeScreeningRun.disposed} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {activeTab === 'activity' && (
                   <ActivityTab
                     followUps={followUps}
@@ -520,27 +601,118 @@ export function IncidentDetailView({
         <MoveQueueDetailsModal
           incidentId={incident.incidentId}
           stage={pendingMoveStage}
-          lawyers={lawyers}
           onSubmit={handleMoveQueueWithDetails}
           onCancel={() => setPendingMoveStage(null)}
         />
       )}
 
-      {/* Assign Agent Modal (from Move Ticket) */}
-      {showAssignAgentForMove && (
-        <AssignAgentModal
-          selectedCount={1}
-          users={users}
-          currentAgentId={assignedAgent?.id}
-          entityLabel={isCases ? 'case' : 'challan'}
-          onAssign={(agentId) => {
-            onAssignAgent?.(incident.id, agentId)
-            onMoveQueue?.(incident.id, 'agentAssigned' as any)
-            setShowAssignAgentForMove(false)
-          }}
-          onClose={() => setShowAssignAgentForMove(false)}
-        />
-      )}
     </div>
   )
+}
+
+function Detail({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+        {label}
+      </p>
+      <div className="mt-1 text-sm font-medium text-slate-900 dark:text-white">{value}</div>
+    </div>
+  )
+}
+
+interface ScreeningRun {
+  id: string
+  number: number
+  dateLabel: string
+  timeLabel: string
+  violaterName: string
+  challanNumber: string
+  state: string
+  offence: string
+  place: string
+  rto: string
+  amount: number
+  virtualStatus: string
+  virtualAmount: number
+  status: string
+  statusClass: string
+  court: string
+  vehicleImpound: string
+  docImpound: string
+  disposed: string
+}
+
+function buildScreeningRuns(
+  incident: {
+    challanNumber: string
+    state: string
+    offence: string | null
+    amount: number
+    createdAt: string
+  },
+  subscriber: { contactPerson: string },
+): ScreeningRun[] {
+  const base = {
+    violaterName: subscriber.contactPerson,
+    challanNumber: incident.challanNumber,
+    state: incident.state,
+    offence: incident.offence || 'Over Speeding',
+    place: `NH-8, ${incident.state}`,
+    rto: `${incident.state} RTO`,
+    amount: incident.amount,
+    virtualAmount: incident.amount,
+  }
+  const createdMs = new Date(incident.createdAt).getTime()
+  const day = 24 * 60 * 60 * 1000
+  const runsMeta = [
+    {
+      offsetDays: 14,
+      virtualStatus: '04',
+      status: 'Court Pending',
+      statusClass:
+        'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
+      court: 'Hearing Awaited',
+      vehicleImpound: 'No',
+      docImpound: 'None',
+      disposed: 'No',
+    },
+    {
+      offsetDays: 7,
+      virtualStatus: '03',
+      status: 'In Progress',
+      statusClass:
+        'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+      court: 'Notice Issued',
+      vehicleImpound: 'No',
+      docImpound: 'None',
+      disposed: 'No',
+    },
+    {
+      offsetDays: 0,
+      virtualStatus: '02',
+      status: 'Pending',
+      statusClass:
+        'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
+      court: 'Not Listed',
+      vehicleImpound: 'No',
+      docImpound: 'None',
+      disposed: 'No',
+    },
+  ]
+
+  return runsMeta.map((meta, idx) => {
+    const runDate = new Date(createdMs + meta.offsetDays * day)
+    return {
+      id: `screening-${idx}`,
+      number: runsMeta.length - idx,
+      dateLabel: runDate.toLocaleDateString('en-IN', { dateStyle: 'medium' }),
+      timeLabel: runDate.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      ...base,
+      ...meta,
+    }
+  })
 }

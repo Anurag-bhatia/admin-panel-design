@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
   MoreHorizontal,
-  CheckCircle2,
   Search,
   UserPlus,
   Scale,
@@ -38,7 +37,6 @@ interface IncidentRowProps {
   workType?: 'cases' | 'challans'
   onSelect: (selected: boolean) => void
   onView?: () => void
-  onValidate?: () => void
   onScreen?: () => void
   onAssignAgent?: (agentId: string) => void
   onAssignLawyer?: (lawyerId: string) => void
@@ -86,14 +84,38 @@ const CASE_CATEGORY_LABELS: Record<string, string> = {
 
 const QUEUE_OPTIONS: { key: IncidentQueue; label: string }[] = [
   { key: 'newIncidents', label: 'New Incidents' },
-  { key: 'screening', label: 'Screening' },
-  { key: 'agentAssigned', label: 'Agent Assigned' },
-  { key: 'lawyerAssigned', label: 'Lawyer Assigned' },
+  { key: 'inProgress', label: 'In Progress' },
   { key: 'settled', label: 'Settled' },
   { key: 'notSettled', label: 'Not Settled' },
   { key: 'hold', label: 'Hold' },
   { key: 'refund', label: 'Refund' },
 ]
+
+const STEP_META: Record<
+  NonNullable<Incident['step']>,
+  { label: string; className: string }
+> = {
+  screening: {
+    label: 'Screening',
+    className:
+      'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+  },
+  agentAssigned: {
+    label: 'Agent Assigned',
+    className:
+      'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+  },
+  lawyerAssigned: {
+    label: 'Lawyer Assigned',
+    className:
+      'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+  },
+  validated: {
+    label: 'Validated',
+    className:
+      'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+  },
+}
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
@@ -120,7 +142,6 @@ export function IncidentRow({
   workType = 'challans',
   onSelect,
   onView,
-  onValidate,
   onScreen,
   onAssignAgent,
   onAssignLawyer,
@@ -207,34 +228,25 @@ export function IncidentRow({
       {/* Incident ID */}
       <td className="px-4 py-3">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">
-              {incident.incidentId}
+          {incident.isExpress && (
+            <span className="inline-flex items-center px-1 py-px rounded text-[9px] font-semibold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 mb-1">
+              Express
             </span>
-            {incident.isExpress && (
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                Express
-              </span>
-            )}
-          </div>
+          )}
+          <span className="block font-mono text-sm font-medium text-slate-900 dark:text-white">
+            {incident.incidentId}
+          </span>
           {(() => {
             const daysLeft = computeDaysLeft(incident.createdAt, !!incident.isExpress)
             if (daysLeft <= 0) {
               return (
-                <p className="text-xs font-medium text-red-600 dark:text-red-400">
+                <p className="text-xs font-medium text-cyan-600 dark:text-cyan-400">
                   Overdue by {Math.abs(daysLeft)} {Math.abs(daysLeft) === 1 ? 'day' : 'days'}
                 </p>
               )
             }
-            const isCritical = daysLeft <= 5
             return (
-              <p
-                className={`text-xs ${
-                  isCritical
-                    ? 'text-amber-600 dark:text-amber-400 font-medium'
-                    : 'text-slate-500 dark:text-slate-400'
-                }`}
-              >
+              <p className="text-xs text-cyan-600 dark:text-cyan-400">
                 {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
               </p>
             )
@@ -242,7 +254,7 @@ export function IncidentRow({
         </div>
       </td>
 
-      {/* Subscriber */}
+      {/* Subscriber & Vehicle */}
       <td className="px-4 py-3">
         <div>
           <p className="text-sm font-medium text-slate-900 dark:text-white">
@@ -251,103 +263,80 @@ export function IncidentRow({
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {incident.subscriberId}
           </p>
+          <p className="mt-1 font-mono text-xs text-slate-700 dark:text-slate-300">
+            {incident.vehicle}
+          </p>
         </div>
       </td>
 
-      {/* Vehicle */}
+      {/* Type (Type + Challan/Case Type badges) */}
       <td className="px-4 py-3">
-        <span className="font-mono text-sm text-slate-700 dark:text-slate-300">
-          {incident.vehicle}
-        </span>
-      </td>
-
-      {/* Type */}
-      <td className="px-4 py-3">
-        {isCases ? (
+        <div className="flex flex-wrap items-center gap-1">
           <span
-            className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-              incident.type === 'onSpot'
-                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-                : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-            }`}
-          >
-            {TYPE_LABELS[incident.type]}
-          </span>
-        ) : (
-          <span
-            className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-              incident.type === 'contest'
+            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+              isCases
+                ? incident.type === 'onSpot'
+                  ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
+                  : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                : incident.type === 'contest'
                 ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
                 : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
             }`}
           >
             {TYPE_LABELS[incident.type]}
           </span>
-        )}
-      </td>
-
-      {/* Challan Type / Case Type */}
-      <td className="px-4 py-3">
-        {isCases ? (
-          incident.caseCategory ? (
-            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400">
-              {CASE_CATEGORY_LABELS[incident.caseCategory] || incident.caseCategory}
-            </span>
-          ) : (
-            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-          )
-        ) : (
-          incident.challanType === 'court' || incident.challanType === 'online' ? (
-            <span
-              className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                incident.challanType === 'court'
-                  ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400'
-                  : 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
-              }`}
-            >
-              {CHALLAN_TYPE_LABELS[incident.challanType]}
-            </span>
-          ) : (
-            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-          )
-        )}
-      </td>
-
-      {/* Created */}
-      <td className="px-4 py-3">
-        <div>
-          <p className="text-sm text-slate-700 dark:text-slate-300">
-            {formatDate(incident.createdAt)}
-          </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {formatTime(incident.createdAt)}
-          </p>
+          {isCases
+            ? incident.caseCategory && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400">
+                  {CASE_CATEGORY_LABELS[incident.caseCategory] || incident.caseCategory}
+                </span>
+              )
+            : (incident.challanType === 'court' || incident.challanType === 'online') && (
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                    incident.challanType === 'court'
+                      ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400'
+                      : 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
+                  }`}
+                >
+                  {CHALLAN_TYPE_LABELS[incident.challanType]}
+                </span>
+              )}
         </div>
       </td>
 
       {/* Last Updated */}
       <td className="px-4 py-3">
-        <div>
-          <p className="text-sm text-slate-700 dark:text-slate-300">
-            {formatDate(incident.lastUpdatedAt)}
-          </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {formatTime(incident.lastUpdatedAt)}
-          </p>
-        </div>
+        <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
+          {formatDate(incident.lastUpdatedAt)}
+        </p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          {formatTime(incident.lastUpdatedAt)}
+        </p>
+      </td>
+
+      {/* Step */}
+      <td className="px-4 py-3">
+        {incident.step ? (
+          <span
+            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STEP_META[incident.step].className}`}
+          >
+            {STEP_META[incident.step].label}
+          </span>
+        ) : (
+          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+        )}
       </td>
 
       {/* Assigned Agent - hidden for cases */}
       {!isCases && (
         <td className="px-4 py-3">
-          {incident.queue === 'newIncidents' || incident.queue === 'screening' ? (
-            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-          ) : assignedAgent ? (
-            <div className="flex items-center gap-2">
-              <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300">
+          {assignedAgent ? (
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300 flex-shrink-0">
                 {assignedAgent.name.charAt(0)}
               </div>
-              <span className="text-sm text-slate-700 dark:text-slate-300">
+              <span className="text-sm text-slate-700 dark:text-slate-300 truncate">
                 {assignedAgent.name.split(' ')[0]}
               </span>
             </div>
@@ -360,7 +349,7 @@ export function IncidentRow({
       {/* Assigned Lawyer */}
       <td className="px-4 py-3">
         {assignedLawyer ? (
-          <span className="text-sm text-slate-700 dark:text-slate-300 truncate max-w-[120px]">
+          <span className="text-sm text-slate-700 dark:text-slate-300 truncate block">
             {assignedLawyer.name.replace('Adv. ', '')}
           </span>
         ) : (
@@ -403,26 +392,9 @@ export function IncidentRow({
                   </button>
                 ) : (
                   <>
-                    {/* Validate & Screen - hidden for cases */}
+                    {/* Screen - hidden for cases */}
                     {!isCases && (
                       <>
-                        <button
-                          onClick={() => {
-                            if (incident.queue === 'newIncidents') {
-                              onValidate?.()
-                              setShowMenu(false)
-                            }
-                          }}
-                          disabled={incident.queue !== 'newIncidents'}
-                          className={`w-full flex items-center gap-2 px-3 py-2 text-sm ${
-                            incident.queue !== 'newIncidents'
-                              ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-                          }`}
-                        >
-                          <CheckCircle2 className="h-4 w-4" />
-                          Validate
-                        </button>
                         <button
                           onClick={() => {
                             if (incident.queue === 'newIncidents') {
@@ -540,7 +512,7 @@ export function IncidentRow({
                       </button>
                       {showQueueDropdown && (isCases || incident.queue !== 'newIncidents') && (
                         <div className="absolute left-full top-0 ml-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1">
-                          {QUEUE_OPTIONS.filter((q) => q.key !== incident.queue && (!isCases || (q.key !== 'screening' && q.key !== 'agentAssigned'))).map(
+                          {QUEUE_OPTIONS.filter((q) => q.key !== incident.queue).map(
                             (queue) => (
                               <button
                                 key={queue.key}

@@ -8,7 +8,6 @@ import { AssignAgentModal } from './components/AssignAgentModal'
 import { AssignLawyerModal } from './components/AssignLawyerModal'
 import { MoveQueueModal } from './components/MoveQueueModal'
 import { BulkUpdateModal } from './components/BulkUpdateModal'
-import { ValidateResultsView } from './components/ValidateResultsView'
 import { ScreenResultsView } from './components/ScreenResultsView'
 import type {
   Incident,
@@ -22,11 +21,10 @@ import type {
   FollowUp,
   TimelineActivity,
   Document,
-  ValidationResult,
   ScreeningResult,
 } from '@/../product/sections/incidents/types'
 
-type ViewMode = 'list' | 'detail' | 'validateResults' | 'screenResults'
+type ViewMode = 'list' | 'detail' | 'screenResults'
 
 type ModalType = 'addChallan' | 'addCase' | 'assignAgent' | 'assignLawyer' | 'moveQueue' | 'bulkUpdate' | null
 
@@ -40,7 +38,6 @@ export default function IncidentListPreview() {
   const [selectedIncidentIds, setSelectedIncidentIds] = useState<string[]>([])
 
   // Results state (for demo)
-  const [validationResults, setValidationResults] = useState<ValidationResult[]>([])
   const [screeningResults, setScreeningResults] = useState<ScreeningResult[]>([])
 
   // Get incident details for detail view
@@ -77,17 +74,19 @@ export default function IncidentListPreview() {
     setActiveModal('addCase')
   }
 
-  const handleValidate = (incidentIds: string[]) => {
-    setSelectedIncidentIds(incidentIds)
-    // Use sample screening results from data.json for validation display
-    setScreeningResults(data.screeningResults as ScreeningResult[])
-    setViewMode('validateResults')
-  }
-
   const handleScreen = (incidentIds: string[]) => {
     setSelectedIncidentIds(incidentIds)
-    // Use sample screening results from data.json
-    setScreeningResults(data.screeningResults as ScreeningResult[])
+    const selectedChallanNumbers = new Set(
+      (data.incidents as Incident[])
+        .filter((i) => incidentIds.includes(i.id))
+        .map((i) => i.challanNumber),
+    )
+    const allResults = data.screeningResults as ScreeningResult[]
+    const scoped = allResults.filter((r) => selectedChallanNumbers.has(r.challanNumber))
+    // Fall back to sampling by count when sample data doesn't cover the picked challan numbers
+    const scopedResults =
+      scoped.length > 0 ? scoped : allResults.slice(0, incidentIds.length)
+    setScreeningResults(scopedResults)
     setViewMode('screenResults')
   }
 
@@ -129,20 +128,6 @@ export default function IncidentListPreview() {
       setSelectedIncidentIds(incidentIds)
       setActiveModal('bulkUpdate')
     }
-  }
-
-  // Render validation results view
-  if (viewMode === 'validateResults') {
-    return (
-      <ValidateResultsView
-        results={screeningResults}
-        onClose={handleBack}
-        onConfirm={(selectedChallans) => {
-          console.log('Confirming validation for challans:', selectedChallans)
-          handleBack()
-        }}
-      />
-    )
   }
 
   // Render screening results view
@@ -190,7 +175,6 @@ export default function IncidentListPreview() {
         onMoveQueue={(incidentId, queue) => {
           console.log('Move incident:', incidentId, 'to queue:', queue)
         }}
-        onValidate={(incidentId) => handleValidate([incidentId])}
         onScreen={(incidentId) => handleScreen([incidentId])}
         onUpdate={(incidentId, updates) => {
           console.log('Update incident:', incidentId, updates)
@@ -215,7 +199,6 @@ export default function IncidentListPreview() {
           onViewIncident={handleViewIncident}
           onAddChallan={handleAddChallan}
           onAddCase={handleAddCase}
-          onValidate={handleValidate}
           onScreen={handleScreen}
           onAssignAgent={(ids, agentId) => handleAssignAgent(ids, agentId)}
           onAssignLawyer={(ids, lawyerId) => handleAssignLawyer(ids, lawyerId)}

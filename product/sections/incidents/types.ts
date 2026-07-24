@@ -4,13 +4,13 @@
 
 export type IncidentQueue =
   | 'newIncidents'
-  | 'screening'
-  | 'agentAssigned'
-  | 'lawyerAssigned'
+  | 'inProgress'
   | 'settled'
   | 'notSettled'
   | 'hold'
   | 'refund'
+
+export type IncidentStep = 'screening' | 'agentAssigned' | 'lawyerAssigned' | 'validated'
 
 export type IncidentStatus =
   | 'pending_screening'
@@ -30,8 +30,6 @@ export type ChallanType = 'court' | 'online'
 export type CaseCategory = 'iaStart' | 'wills24' | 'legalNotice' | 'others' | 'litigation' | 'laas' | 'accident' | 'liveChallan' | 'oldChallan' | 'ndps' | 'employmentLabour'
 
 export type IncidentSource = 'API' | 'Manual' | 'Bulk Upload' | 'Partner'
-
-export type ValidationStatus = 'exists' | 'disposed' | 'not_found'
 
 export type DocumentType = 'challan' | 'vehicle_document' | 'court_document' | 'receipt' | 'other'
 
@@ -91,6 +89,7 @@ export interface Incident {
   caseCategory?: CaseCategory
   status: IncidentStatus
   queue: IncidentQueue
+  step?: IncidentStep
   createdAt: string
   lastUpdatedAt: string
   tatDeadline: string
@@ -136,12 +135,6 @@ export interface Document {
   uploadedByName: string
 }
 
-export interface ValidationResult {
-  challanNumber: string
-  status: ValidationStatus
-  message: string
-}
-
 export interface ScreeningResult {
   violaterName: string
   challanNumber: string
@@ -162,9 +155,7 @@ export interface ScreeningResult {
 
 export interface QueueCounts {
   newIncidents: number
-  screening: number
-  agentAssigned: number
-  lawyerAssigned: number
+  inProgress: number
   settled: number
   notSettled: number
   hold: number
@@ -207,8 +198,6 @@ export interface IncidentListProps {
   onViewIncident?: (incidentId: string) => void
   /** Called when user wants to add a new challan */
   onAddChallan?: () => void
-  /** Called when user triggers bulk validate */
-  onValidate?: (incidentIds: string[]) => void
   /** Called when user triggers bulk screen */
   onScreen?: (incidentIds: string[]) => void
   /** Called when user assigns agent to incidents */
@@ -231,6 +220,7 @@ export interface IncidentFilters {
   type?: IncidentType
   challanType?: ChallanType
   status?: IncidentStatus
+  step?: IncidentStep
   assignedAgentId?: string
   assignedLawyerId?: string
   dateFrom?: string
@@ -274,21 +264,10 @@ export interface IncidentDetailProps {
   onAssignLawyer?: (incidentId: string, lawyerId: string) => void
   /** Called when user moves to a different queue */
   onMoveQueue?: (incidentId: string, targetQueue: IncidentQueue) => void
-  /** Called when user validates this incident */
-  onValidate?: (incidentId: string) => void
   /** Called when user screens this incident */
   onScreen?: (incidentId: string) => void
   /** Called when user updates incident details */
   onUpdate?: (incidentId: string, updates: Partial<Incident>) => void
-}
-
-export interface ValidationResultsProps {
-  /** Results from the validation operation */
-  results: ValidationResult[]
-  /** Called when user closes the results view */
-  onClose?: () => void
-  /** Called when user wants to take action on specific challans */
-  onActionOnChallan?: (challanNumber: string, action: 'proceed' | 'remove') => void
 }
 
 export interface ScreeningResultsProps {

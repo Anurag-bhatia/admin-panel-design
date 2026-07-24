@@ -2,7 +2,6 @@ import {
   ArrowLeft,
   Clock,
   AlertTriangle,
-  CheckCircle,
   UserPlus,
   Scale,
   ArrowRight,
@@ -23,7 +22,6 @@ interface IncidentDetailHeaderProps {
   assignedAgent: User | null
   assignedLawyer: Lawyer | null
   onBack?: () => void
-  onValidate?: () => void
   onScreen?: () => void
   onAssignAgent?: (agentId: string) => void
   onAssignLawyer?: (lawyerId: string) => void
@@ -115,7 +113,6 @@ export function IncidentDetailHeader({
   assignedAgent,
   assignedLawyer,
   onBack,
-  onValidate,
   onScreen,
   onAssignAgent,
   onAssignLawyer,
@@ -154,13 +151,6 @@ export function IncidentDetailHeader({
 
         {/* Quick Actions */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={onValidate}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-          >
-            <CheckCircle className="h-4 w-4" />
-            Validate
-          </button>
           <button
             onClick={onScreen}
             className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"

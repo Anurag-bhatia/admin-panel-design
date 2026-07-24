@@ -28,7 +28,6 @@ export interface IncidentListProps {
   onViewIncident?: (incidentId: string) => void
   onAddChallan?: () => void
   onAddCase?: () => void
-  onValidate?: (incidentIds: string[]) => void
   onScreen?: (incidentIds: string[]) => void
   onAssignAgent?: (incidentIds: string[], agentId?: string) => void
   onAssignLawyer?: (incidentIds: string[], lawyerId?: string) => void
@@ -53,7 +52,6 @@ export function IncidentList({
   onViewIncident,
   onAddChallan,
   onAddCase,
-  onValidate,
   onScreen,
   onAssignAgent,
   onAssignLawyer,
@@ -157,9 +155,7 @@ export function IncidentList({
       : incidents.filter((inc) => inc.workType === workTypeValue && inc.assignedAgentId === currentUserId)
     return {
       newIncidents: myIncidents.filter((inc) => inc.queue === 'newIncidents').length,
-      screening: myIncidents.filter((inc) => inc.queue === 'screening').length,
-      agentAssigned: myIncidents.filter((inc) => inc.queue === 'agentAssigned').length,
-      lawyerAssigned: myIncidents.filter((inc) => inc.queue === 'lawyerAssigned').length,
+      inProgress: myIncidents.filter((inc) => inc.queue === 'inProgress').length,
       settled: myIncidents.filter((inc) => inc.queue === 'settled').length,
       notSettled: myIncidents.filter((inc) => inc.queue === 'notSettled').length,
       hold: myIncidents.filter((inc) => inc.queue === 'hold').length,
@@ -175,9 +171,8 @@ export function IncidentList({
         workType={workType}
         onViewChange={(view) => {
           setSidebarView(view)
-          // If switching to "My Incidents" and currently on newIncidents or screening, switch to appropriate queue
-          if (view === 'my' && (activeQueue === 'newIncidents' || activeQueue === 'screening')) {
-            setActiveQueue(workType === 'cases' ? 'lawyerAssigned' : 'agentAssigned')
+          if (view === 'my' && activeQueue === 'newIncidents') {
+            setActiveQueue('inProgress')
           }
         }}
         onWorkTypeChange={(type) => {
@@ -219,7 +214,18 @@ export function IncidentList({
 
         {/* Table */}
         <div className="flex-1 overflow-auto bg-white dark:bg-slate-900">
-          <table className="w-full">
+          <table className="w-full table-fixed">
+            <colgroup>
+              <col className="w-12" />
+              <col className="w-40" />
+              <col className="w-64" />
+              <col className="w-32" />
+              <col className="w-32" />
+              <col className="w-36" />
+              {!isCases && <col className="w-40" />}
+              <col className="w-40" />
+              <col className="w-12" />
+            </colgroup>
             <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
               <tr>
                 <th className="px-4 py-3 text-left">
@@ -237,22 +243,16 @@ export function IncidentList({
                   {isCases ? 'Case ID' : 'Incident ID'}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Subscriber
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Vehicle
+                  Subscriber / Vehicle
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Type
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {isCases ? 'Case Type' : 'Challan'}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Created
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Updated
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Steps
                 </th>
                 {!isCases && (
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -271,7 +271,7 @@ export function IncidentList({
               {displayedIncidents.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={isCases ? 10 : 11}
+                    colSpan={isCases ? 8 : 9}
                     className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
@@ -310,7 +310,6 @@ export function IncidentList({
                     workType={workType}
                     onSelect={(checked) => handleSelectOne(incident.id, checked)}
                     onView={() => onViewIncident?.(incident.id)}
-                    onValidate={() => onValidate?.([incident.id])}
                     onScreen={() => onScreen?.([incident.id])}
                     onAssignAgent={(agentId) =>
                       onAssignAgent?.([incident.id], agentId)
@@ -338,7 +337,6 @@ export function IncidentList({
           activeQueue={activeQueue}
           workType={workType}
           onClearSelection={() => setSelectedIds(new Set())}
-          onValidate={() => onValidate?.(selectedArray)}
           onScreen={() => onScreen?.(selectedArray)}
           onAssignAgent={() => onAssignAgent?.(selectedArray)}
           onAssignLawyer={() => onAssignLawyer?.(selectedArray)}

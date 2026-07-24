@@ -40,3 +40,6 @@ Centralized configuration hub for managing system-wide categories, data points, 
 
 ### 13. CMS
 Content management system for creating, editing, and publishing static pages, FAQs, blog posts, and other informational content surfaced across customer-facing channels.
+
+### 14. Rewards Configuration
+State-level configuration of Operations Cost %, Margin %, and Lawyered CV/NCV margins that determine the maximum reward passed to ChallanPay users. Email-allow-listed access for Ops Head, Product Head, CEO, and CTO, with versioned change history.

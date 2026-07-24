@@ -1,6 +1,5 @@
-import { useRef, useState } from 'react'
-import { Search, X } from 'lucide-react'
-import type { Lawyer } from '@/../product/sections/incidents/types'
+import { useState } from 'react'
+import { X } from 'lucide-react'
 
 export type MoveQueueStage =
   | 'refundRequested'
@@ -8,14 +7,10 @@ export type MoveQueueStage =
   | 'notSettled'
   | 'settled'
   | 'hold'
-  | 'lawyerAssigned'
 
 export interface MoveQueueDetailsPayload {
   reason?: string
   notes?: string
-  title?: string
-  subtitle?: string
-  lawyerId?: string
   caseTentativeAmount?: number
   caseActualAmount?: number
   caseProfessionalFees?: number
@@ -26,7 +21,6 @@ export interface MoveQueueDetailsPayload {
 interface MoveQueueDetailsModalProps {
   incidentId: string
   stage: MoveQueueStage
-  lawyers?: Lawyer[]
   onSubmit: (payload: MoveQueueDetailsPayload) => void
   onCancel: () => void
 }
@@ -37,24 +31,16 @@ const STAGE_META: Record<MoveQueueStage, { title: string; submitLabel: string }>
   notSettled: { title: 'Move to Not Settled', submitLabel: 'Confirm Move' },
   settled: { title: 'Move to Settled', submitLabel: 'Confirm Move' },
   hold: { title: 'Move to Hold', submitLabel: 'Move to Hold' },
-  lawyerAssigned: { title: 'Move to Lawyer Assigned', submitLabel: 'Move to Lawyer Assigned' },
 }
 
 export function MoveQueueDetailsModal({
   incidentId,
   stage,
-  lawyers = [],
   onSubmit,
   onCancel,
 }: MoveQueueDetailsModalProps) {
   const [reason, setReason] = useState('')
   const [notes, setNotes] = useState('')
-  const [title, setTitle] = useState('')
-  const [subtitle, setSubtitle] = useState('')
-  const [selectedLawyerId, setSelectedLawyerId] = useState<string | null>(null)
-  const [lawyerSearch, setLawyerSearch] = useState('')
-  const [showLawyerDropdown, setShowLawyerDropdown] = useState(false)
-  const lawyerInputRef = useRef<HTMLInputElement>(null)
   const [caseTentativeAmount, setCaseTentativeAmount] = useState('')
   const [caseActualAmount, setCaseActualAmount] = useState('')
   const [caseProfessionalFees, setCaseProfessionalFees] = useState('')
@@ -63,24 +49,11 @@ export function MoveQueueDetailsModal({
 
   const meta = STAGE_META[stage]
 
-  const filteredLawyers = lawyers.filter(
-    (lawyer) =>
-      lawyer.name.toLowerCase().includes(lawyerSearch.toLowerCase()) ||
-      lawyer.email.toLowerCase().includes(lawyerSearch.toLowerCase()) ||
-      lawyer.state.toLowerCase().includes(lawyerSearch.toLowerCase()) ||
-      lawyer.phone.includes(lawyerSearch)
-  )
-
-  const selectedLawyer = selectedLawyerId
-    ? lawyers.find((l) => l.id === selectedLawyerId)
-    : null
-
   const isDisabled = (() => {
     if (stage === 'refundRequested') return !reason.trim() || !notes.trim()
     if (stage === 'refundCompleted') return !notes.trim()
     if (stage === 'notSettled') return !reason.trim()
     if (stage === 'hold') return !reason.trim()
-    if (stage === 'lawyerAssigned') return !title.trim() || !subtitle.trim() || !selectedLawyerId
     if (stage === 'settled') {
       return (
         !caseTentativeAmount ||
@@ -104,12 +77,6 @@ export function MoveQueueDetailsModal({
       onSubmit({ reason: reason.trim() })
     } else if (stage === 'hold') {
       onSubmit({ reason: reason.trim() })
-    } else if (stage === 'lawyerAssigned') {
-      onSubmit({
-        title: title.trim(),
-        subtitle: subtitle.trim(),
-        lawyerId: selectedLawyerId || undefined,
-      })
     } else if (stage === 'settled') {
       onSubmit({
         caseTentativeAmount: parseFloat(caseTentativeAmount) || 0,
@@ -223,124 +190,6 @@ export function MoveQueueDetailsModal({
                 required
               />
             </div>
-          )}
-
-          {stage === 'lawyerAssigned' && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Lawyer <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <input
-                    ref={lawyerInputRef}
-                    type="text"
-                    value={lawyerSearch}
-                    onChange={(e) => {
-                      setLawyerSearch(e.target.value)
-                      setShowLawyerDropdown(true)
-                    }}
-                    onFocus={() => {
-                      if (lawyerSearch.trim()) setShowLawyerDropdown(true)
-                    }}
-                    placeholder="Search by name, state, email, or phone..."
-                    className="w-full pl-10 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                  />
-
-                  {showLawyerDropdown && lawyerSearch.trim() && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-10"
-                        onClick={() => setShowLawyerDropdown(false)}
-                      />
-                      <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-48 overflow-y-auto z-20">
-                        {filteredLawyers.length === 0 ? (
-                          <div className="px-3 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
-                            No lawyers found
-                          </div>
-                        ) : (
-                          filteredLawyers.map((lawyer) => (
-                            <button
-                              key={lawyer.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedLawyerId(lawyer.id)
-                                setLawyerSearch('')
-                                setShowLawyerDropdown(false)
-                              }}
-                              className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                            >
-                              <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center flex-shrink-0 text-xs font-medium text-slate-600 dark:text-slate-300">
-                                {lawyer.name.charAt(0)}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                                  {lawyer.name}
-                                </div>
-                                <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                                  {lawyer.state} · {lawyer.email}
-                                </div>
-                              </div>
-                            </button>
-                          ))
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {selectedLawyer && (
-                  <div className="mt-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-lg">
-                      <div className="w-5 h-5 rounded-full bg-cyan-600 text-white flex items-center justify-center text-[10px] font-medium">
-                        {selectedLawyer.name.charAt(0)}
-                      </div>
-                      <span className="text-sm font-medium text-cyan-900 dark:text-cyan-300">
-                        {selectedLawyer.name}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedLawyerId(null)
-                          lawyerInputRef.current?.focus()
-                        }}
-                        className="p-0.5 hover:bg-cyan-100 dark:hover:bg-cyan-900/40 rounded transition-colors"
-                      >
-                        <X className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter a title"
-                  className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Subtitle <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={subtitle}
-                  onChange={(e) => setSubtitle(e.target.value)}
-                  placeholder="Enter a subtitle"
-                  className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                  required
-                />
-              </div>
-            </>
           )}
 
           {stage === 'settled' && (

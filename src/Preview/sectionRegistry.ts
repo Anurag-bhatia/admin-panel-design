@@ -15,6 +15,7 @@ import {
   FileText,
   CheckCircle2,
   FileInput,
+  Gift,
 } from 'lucide-react'
 
 // Lazy-loaded section preview components
@@ -62,6 +63,9 @@ const SettledChallansPreview = React.lazy(() =>
 )
 const ProposalListPreview = React.lazy(() =>
   import('../sections/proposals/ProposalListPreview')
+)
+const RewardsConfigPreview = React.lazy(() =>
+  import('../sections/rewards-config/RewardsConfigPreview')
 )
 
 // Section metadata mapping
@@ -141,6 +145,11 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     description: 'Admin-side proposal management for receiving, reviewing, quoting, and converting customer service requests into incidents.',
     icon: FileInput,
   },
+  'rewards-config': {
+    label: 'Rewards Config',
+    description: 'State-level reward configuration for Operations Cost, Margin, and Lawyered CV/NCV margins. Email-allow-listed access with versioned change history.',
+    icon: Gift,
+  },
 }
 
 // Component mapping for implemented sections
@@ -160,6 +169,7 @@ export const SECTION_COMPONENTS: Record<string, React.ComponentType<any> | null>
   cms: CMSDashboardPreview,
   'settled-challans': SettledChallansPreview,
   proposals: ProposalListPreview,
+  'rewards-config': RewardsConfigPreview,
 }
 
 // Ordered list of section IDs for consistent navigation
@@ -179,6 +189,7 @@ export const SECTION_IDS = [
   'cms',
   'settled-challans',
   'proposals',
+  'rewards-config',
 ] as const
 
 // Sections hidden from sidebar navigation (kept in registry for data access)

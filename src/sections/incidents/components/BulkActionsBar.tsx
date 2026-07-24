@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import {
   X,
-  CheckCircle2,
   Search,
   UserPlus,
   Scale,
@@ -18,7 +17,6 @@ interface BulkActionsBarProps {
   activeQueue: IncidentQueue
   workType?: 'cases' | 'challans'
   onClearSelection: () => void
-  onValidate?: () => void
   onScreen?: () => void
   onAssignAgent?: () => void
   onAssignLawyer?: () => void
@@ -29,9 +27,7 @@ interface BulkActionsBarProps {
 
 const QUEUE_OPTIONS: { key: IncidentQueue; label: string }[] = [
   { key: 'newIncidents', label: 'New Incidents' },
-  { key: 'screening', label: 'Screening' },
-  { key: 'agentAssigned', label: 'Agent Assigned' },
-  { key: 'lawyerAssigned', label: 'Lawyer Assigned' },
+  { key: 'inProgress', label: 'In Progress' },
   { key: 'settled', label: 'Settled' },
   { key: 'notSettled', label: 'Not Settled' },
   { key: 'hold', label: 'Hold' },
@@ -43,7 +39,6 @@ export function BulkActionsBar({
   activeQueue,
   workType = 'challans',
   onClearSelection,
-  onValidate,
   onScreen,
   onAssignAgent,
   onAssignLawyer,
@@ -140,43 +135,24 @@ export function BulkActionsBar({
               </button>
             ) : (
               <>
-                {/* Validate & Screen - hidden for cases */}
+                {/* Screen - hidden for cases */}
                 {!isCases && (
-                  <>
-                    <button
-                      onClick={() => {
-                        if (activeQueue === 'screening') {
-                          onValidate?.()
-                        }
-                      }}
-                      disabled={activeQueue !== 'screening'}
-                      className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                        activeQueue !== 'screening'
-                          ? 'text-slate-500 cursor-not-allowed'
-                          : 'text-white hover:bg-slate-700'
-                      }`}
-                    >
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>Validate</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        if (activeQueue === 'newIncidents') {
-                          onScreen?.()
-                        }
-                      }}
-                      disabled={activeQueue !== 'newIncidents'}
-                      className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                        activeQueue !== 'newIncidents'
-                          ? 'text-slate-500 cursor-not-allowed'
-                          : 'text-white hover:bg-slate-700'
-                      }`}
-                    >
-                      <Search className="h-4 w-4" />
-                      <span>Screen</span>
-                    </button>
-                  </>
+                  <button
+                    onClick={() => {
+                      if (activeQueue === 'newIncidents') {
+                        onScreen?.()
+                      }
+                    }}
+                    disabled={activeQueue !== 'newIncidents'}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                      activeQueue !== 'newIncidents'
+                        ? 'text-slate-500 cursor-not-allowed'
+                        : 'text-white hover:bg-slate-700'
+                    }`}
+                  >
+                    <Search className="h-4 w-4" />
+                    <span>Screen</span>
+                  </button>
                 )}
 
                 {/* Divider */}
@@ -197,7 +173,7 @@ export function BulkActionsBar({
                         ? 'text-slate-500 cursor-not-allowed'
                         : 'text-white hover:bg-slate-700'
                     }`}
-                    title={isNewIncidents ? 'Available after screening' : undefined}
+                    title={isNewIncidents ? 'Available once moved to In Progress' : undefined}
                   >
                     <UserPlus className="h-4 w-4" />
                     <span>Assign Agent</span>
@@ -218,7 +194,7 @@ export function BulkActionsBar({
                       ? 'text-slate-500 cursor-not-allowed'
                       : 'text-white hover:bg-slate-700'
                   }`}
-                  title={!isCases && isNewIncidents ? 'Available after screening' : undefined}
+                  title={!isCases && isNewIncidents ? 'Available once moved to In Progress' : undefined}
                 >
                   <Scale className="h-4 w-4" />
                   <span>Assign Lawyer</span>
@@ -238,7 +214,7 @@ export function BulkActionsBar({
                         ? 'text-slate-500 cursor-not-allowed'
                         : 'text-white hover:bg-slate-700'
                     }`}
-                    title={!isCases && isNewIncidents ? 'Available after screening' : undefined}
+                    title={!isCases && isNewIncidents ? 'Available once moved to In Progress' : undefined}
                   >
                     <ArrowRight className="h-4 w-4" />
                     <span>Move Queue</span>
@@ -251,7 +227,7 @@ export function BulkActionsBar({
                         onClick={() => setShowQueueDropdown(false)}
                       />
                       <div className="absolute bottom-full left-0 mb-2 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1">
-                        {QUEUE_OPTIONS.filter((q) => !isCases || (q.key !== 'screening' && q.key !== 'agentAssigned')).map((queue) => (
+                        {QUEUE_OPTIONS.map((queue) => (
                           <button
                             key={queue.key}
                             onClick={() => handleMoveToQueue(queue.key)}

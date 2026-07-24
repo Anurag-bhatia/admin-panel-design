@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { X, CheckCircle, XCircle, MapPin, Filter, ChevronDown, Search } from 'lucide-react'
+import { X, CheckCircle, XCircle, Filter, ChevronDown, Search } from 'lucide-react'
 import type { ScreeningResultsProps, ScreeningResult } from '@/../product/sections/incidents/types'
 
 function formatCurrency(amount: number): string {
@@ -33,6 +33,7 @@ export function ScreenResultsView({ results, onClose, onConfirm }: ScreeningResu
   )
   const [showFilters, setShowFilters] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeDate, setActiveDate] = useState<string>('all')
   const [filters, setFilters] = useState<Filters>({
     state: '',
     virtualStatus: '',
@@ -48,9 +49,18 @@ export function ScreenResultsView({ results, onClose, onConfirm }: ScreeningResu
     documentImpounds: [...new Set(results.map(r => r.documentImpound))],
   }), [results])
 
+  // Get unique screening dates, sorted newest-first
+  const dateTabs = useMemo(() => {
+    const unique = [...new Set(results.map((r) => r.challanDate))]
+    unique.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+    return unique.map((d) => ({ value: d, label: formatDate(d) }))
+  }, [results])
+
   // Apply search and filters
   const filteredResults = useMemo(() => {
     return results.filter(result => {
+      // Apply date tab
+      if (activeDate !== 'all' && result.challanDate !== activeDate) return false
       // Apply search query
       if (searchQuery) {
         const query = searchQuery.toLowerCase()
@@ -73,7 +83,7 @@ export function ScreenResultsView({ results, onClose, onConfirm }: ScreeningResu
       if (filters.vehicleImpound === 'no' && result.vehicleImpound) return false
       return true
     })
-  }, [results, filters, searchQuery])
+  }, [results, filters, searchQuery, activeDate])
 
   const disposedCount = results.filter((r) => r.disposed).length
   const pendingCount = results.filter((r) => !r.disposed).length
@@ -126,10 +136,6 @@ export function ScreenResultsView({ results, onClose, onConfirm }: ScreeningResu
               <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
                 Screening Results
               </h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                {results.length} {results.length === 1 ? 'challan' : 'challans'} screened •{' '}
-                {selectedChallans.length} selected
-              </p>
             </div>
           </div>
         </div>
@@ -137,57 +143,45 @@ export function ScreenResultsView({ results, onClose, onConfirm }: ScreeningResu
 
       {/* Summary Cards */}
       <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                  {results.length}
-                </p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Total Screened
-                </p>
-              </div>
-            </div>
+        {/* Screening date tabs */}
+        {dateTabs.length > 0 && (
+          <div className="mb-4 flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setActiveDate('all')}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                activeDate === 'all'
+                  ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
+                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+            >
+              <span className="font-medium">All</span>
+            </button>
+            {dateTabs.map((tab) => {
+              const isActive = tab.value === activeDate
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => setActiveDate(tab.value)}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                    isActive
+                      ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
+                      : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <span className="font-medium">{tab.label}</span>
+                </button>
+              )
+            })}
           </div>
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
-                <XCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                  {disposedCount}
-                </p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Already Disposed</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                  {pendingCount}
-                </p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Pending to Dispose</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Search and Filters */}
         <div className="mb-4">
           <div className="flex items-center gap-3">
             {/* Search Input */}
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
@@ -320,7 +314,10 @@ export function ScreenResultsView({ results, onClose, onConfirm }: ScreeningResu
                     />
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                    Violater Name
+                    #
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    Violater
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     Challan No.
@@ -367,7 +364,7 @@ export function ScreenResultsView({ results, onClose, onConfirm }: ScreeningResu
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                {filteredResults.map((result) => {
+                {filteredResults.map((result, idx) => {
                   const isSelected = selectedChallans.includes(result.challanNumber)
 
                   return (
@@ -388,6 +385,11 @@ export function ScreenResultsView({ results, onClose, onConfirm }: ScreeningResu
                         />
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
+                        <span className="text-sm tabular-nums text-slate-500 dark:text-slate-400">
+                          {idx + 1}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className="text-sm font-medium text-slate-900 dark:text-white">
                           {result.violaterName}
                         </span>
@@ -398,12 +400,9 @@ export function ScreenResultsView({ results, onClose, onConfirm }: ScreeningResu
                         </span>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3 text-slate-400" />
-                          <span className="text-sm text-slate-600 dark:text-slate-400">
-                            {result.state}
-                          </span>
-                        </div>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {result.state}
+                        </span>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         <span className="text-sm text-slate-600 dark:text-slate-400">

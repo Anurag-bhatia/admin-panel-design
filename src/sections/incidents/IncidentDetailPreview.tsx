@@ -62,7 +62,6 @@ export default function IncidentDetailPreview() {
       onMoveQueue={(incidentId, queue) =>
         console.log('Move incident to queue:', incidentId, queue)
       }
-      onValidate={(incidentId) => console.log('Validate incident:', incidentId)}
       onScreen={(incidentId) => console.log('Screen incident:', incidentId)}
       onUpdate={(incidentId, updates) =>
         console.log('Update incident:', incidentId, updates)

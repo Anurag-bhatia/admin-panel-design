@@ -17,6 +17,7 @@ import type {
   IncidentFilters,
   IncidentType,
   ChallanType,
+  IncidentStep,
 } from '@/../product/sections/incidents/types'
 
 const INDIAN_STATES = [
@@ -330,6 +331,26 @@ export function IncidentsTableHeader({
                     {state}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            {/* Step Filter */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                Step
+              </label>
+              <select
+                value={filters.step || ''}
+                onChange={(e) =>
+                  handleFilterChange('step', e.target.value as IncidentStep)
+                }
+                className="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white min-w-[160px]"
+              >
+                <option value="">All Steps</option>
+                {!isCases && <option value="screening">Screening</option>}
+                {!isCases && <option value="agentAssigned">Agent Assigned</option>}
+                <option value="lawyerAssigned">Lawyer Assigned</option>
+                {!isCases && <option value="validated">Validated</option>}
               </select>
             </div>
 

@@ -13,17 +13,12 @@ const QUEUE_OPTIONS: { value: IncidentQueue; label: string; description: string 
   {
     value: 'newIncidents',
     label: 'New Incidents',
-    description: 'Newly created challans awaiting screening',
+    description: 'Newly created challans awaiting action',
   },
   {
-    value: 'screening',
-    label: 'Screening',
-    description: 'Challans being screened for validity and details',
-  },
-  {
-    value: 'lawyerAssigned',
-    label: 'Lawyer Assigned',
-    description: 'Challans assigned to lawyers for resolution',
+    value: 'inProgress',
+    label: 'In Progress',
+    description: 'Challans currently being worked on',
   },
   {
     value: 'settled',
@@ -34,6 +29,11 @@ const QUEUE_OPTIONS: { value: IncidentQueue; label: string; description: string 
     value: 'notSettled',
     label: 'Not Settled',
     description: 'Challans that could not be resolved',
+  },
+  {
+    value: 'hold',
+    label: 'Hold',
+    description: 'Challans temporarily paused',
   },
   {
     value: 'refund',
