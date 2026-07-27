@@ -102,20 +102,18 @@ export function RewardsConfigTable({
                   <Th align="right">Ops %</Th>
                   <Th align="right">Margin %</Th>
                   <Th align="right" variant="cv">CV %</Th>
-                  <Th align="right" variant="ncv">NCV %</Th>
                   <Th align="right" variant="cv" computed>
                     <span className="block leading-tight">Max CV</span>
                     <span className="block leading-tight">Reward %</span>
                   </Th>
+                  <Th align="right" variant="ncv">NCV %</Th>
                   <Th align="right" variant="ncv" computed>
                     <span className="block leading-tight">Max NCV</span>
                     <span className="block leading-tight">Reward %</span>
                   </Th>
-                  <Th>Status</Th>
                   <Th>Last Updated By</Th>
-                  <Th align="right" className="pr-5">
-                    Actions
-                  </Th>
+                  <Th>Status</Th>
+                  <Th className="pr-5">Actions</Th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -249,12 +247,9 @@ function Row({
       <NumCell value={config.operationsCostPct} />
       <NumCell value={config.marginPct} muted />
       <NumCell value={config.lawyeredCvPct} variant="cv" />
-      <NumCell value={config.lawyeredNcvPct} variant="ncv" />
       <NumCell value={maxCv} variant="cv" computed />
+      <NumCell value={config.lawyeredNcvPct} variant="ncv" />
       <NumCell value={maxNcv} variant="ncv" computed />
-      <td className="py-3 px-3">
-        <StatusBadge status={config.status} />
-      </td>
       <td className="py-3 px-3">
         <div className="flex flex-col leading-tight">
           <span className="text-[13px] text-slate-800 dark:text-slate-200 font-medium">
@@ -265,8 +260,11 @@ function Row({
           </span>
         </div>
       </td>
-      <td className="py-3 pr-5 pl-3">
-        <div className="flex items-center justify-end gap-1">
+      <td className="py-3 px-3 w-px whitespace-nowrap">
+        <StatusBadge status={config.status} />
+      </td>
+      <td className="py-3 pr-5 pl-3 w-px whitespace-nowrap">
+        <div className="flex items-center gap-1">
           <ActionButton
             icon={<Pencil className="w-3.5 h-3.5" />}
             label="Edit"
