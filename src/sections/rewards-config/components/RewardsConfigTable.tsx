@@ -101,13 +101,13 @@ export function RewardsConfigTable({
                   <Th>Region</Th>
                   <Th align="right">Ops %</Th>
                   <Th align="right">Margin %</Th>
-                  <Th align="right">CV %</Th>
-                  <Th align="right">NCV %</Th>
-                  <Th align="right" computed>
+                  <Th align="right" variant="cv">CV %</Th>
+                  <Th align="right" variant="ncv">NCV %</Th>
+                  <Th align="right" variant="cv" computed>
                     <span className="block leading-tight">Max CV</span>
                     <span className="block leading-tight">Reward %</span>
                   </Th>
-                  <Th align="right" computed>
+                  <Th align="right" variant="ncv" computed>
                     <span className="block leading-tight">Max NCV</span>
                     <span className="block leading-tight">Reward %</span>
                   </Th>
@@ -188,21 +188,27 @@ function Th({
   align,
   className,
   computed,
+  variant,
 }: {
   children: React.ReactNode
   align?: 'right'
   className?: string
   computed?: boolean
+  variant?: 'cv' | 'ncv'
 }) {
+  const colorClass =
+    variant === 'cv'
+      ? 'text-cyan-700 dark:text-cyan-400'
+      : variant === 'ncv'
+        ? 'text-violet-700 dark:text-violet-400'
+        : computed
+          ? 'text-cyan-700 dark:text-cyan-400'
+          : 'text-slate-500 dark:text-slate-400'
   return (
     <th
       className={`py-3 px-3 text-[10px] font-semibold uppercase tracking-wider ${
         align === 'right' ? 'text-right' : 'text-left'
-      } ${
-        computed
-          ? 'text-cyan-700 dark:text-cyan-400'
-          : 'text-slate-500 dark:text-slate-400'
-      } ${className ?? ''}`}
+      } ${colorClass} ${className ?? ''}`}
     >
       {children}
     </th>
@@ -242,10 +248,10 @@ function Row({
       </td>
       <NumCell value={config.operationsCostPct} />
       <NumCell value={config.marginPct} muted />
-      <NumCell value={config.lawyeredCvPct} />
-      <NumCell value={config.lawyeredNcvPct} />
-      <NumCell value={maxCv} computed />
-      <NumCell value={maxNcv} computed />
+      <NumCell value={config.lawyeredCvPct} variant="cv" />
+      <NumCell value={config.lawyeredNcvPct} variant="ncv" />
+      <NumCell value={maxCv} variant="cv" computed />
+      <NumCell value={maxNcv} variant="ncv" computed />
       <td className="py-3 px-3">
         <StatusBadge status={config.status} />
       </td>
@@ -282,21 +288,41 @@ function NumCell({
   value,
   computed,
   muted,
+  variant,
 }: {
   value: number
   computed?: boolean
   muted?: boolean
+  variant?: 'cv' | 'ncv'
 }) {
+  const cvComputed =
+    'bg-cyan-50 text-cyan-800 dark:bg-cyan-900/25 dark:text-cyan-300'
+  const ncvComputed =
+    'bg-violet-50 text-violet-800 dark:bg-violet-900/25 dark:text-violet-300'
+  const cvPlain =
+    'bg-cyan-50/60 text-cyan-800 dark:bg-cyan-900/15 dark:text-cyan-300'
+  const ncvPlain =
+    'bg-violet-50/60 text-violet-800 dark:bg-violet-900/15 dark:text-violet-300'
+
+  const colorClass =
+    variant === 'cv'
+      ? computed
+        ? cvComputed
+        : cvPlain
+      : variant === 'ncv'
+        ? computed
+          ? ncvComputed
+          : ncvPlain
+        : computed
+          ? cvComputed
+          : muted
+            ? 'text-slate-500 dark:text-slate-400'
+            : 'text-slate-800 dark:text-slate-200'
+
   return (
     <td className="py-3 px-3 text-right">
       <span
-        className={`inline-block px-2 py-0.5 rounded tabular-nums text-[13px] font-medium ${
-          computed
-            ? 'bg-cyan-50 text-cyan-800 dark:bg-cyan-900/25 dark:text-cyan-300'
-            : muted
-              ? 'text-slate-500 dark:text-slate-400'
-              : 'text-slate-800 dark:text-slate-200'
-        }`}
+        className={`inline-block px-2 py-0.5 rounded tabular-nums text-[13px] font-medium ${colorClass}`}
       >
         {value}%
       </span>
