@@ -334,10 +334,10 @@ export function IncidentsTableHeader({
               </select>
             </div>
 
-            {/* Step Filter */}
+            {/* Status Filter */}
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Step
+                Status
               </label>
               <select
                 value={filters.step || ''}
@@ -346,7 +346,7 @@ export function IncidentsTableHeader({
                 }
                 className="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white min-w-[160px]"
               >
-                <option value="">All Steps</option>
+                <option value="">All Status</option>
                 {!isCases && <option value="screening">Screening</option>}
                 {!isCases && <option value="agentAssigned">Agent Assigned</option>}
                 <option value="lawyerAssigned">Lawyer Assigned</option>

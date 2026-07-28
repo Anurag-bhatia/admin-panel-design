@@ -252,7 +252,7 @@ export function IncidentList({
                   Updated
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Steps
+                  Status
                 </th>
                 {!isCases && (
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">

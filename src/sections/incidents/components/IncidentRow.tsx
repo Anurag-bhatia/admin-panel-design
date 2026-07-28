@@ -315,17 +315,33 @@ export function IncidentRow({
         </p>
       </td>
 
-      {/* Step */}
+      {/* Status */}
       <td className="px-4 py-3">
-        {incident.step ? (
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STEP_META[incident.step].className}`}
-          >
-            {STEP_META[incident.step].label}
-          </span>
-        ) : (
-          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-        )}
+        {(() => {
+          const statuses =
+            incident.statuses && incident.statuses.length > 0
+              ? incident.statuses
+              : incident.step
+                ? [incident.step]
+                : []
+          if (statuses.length === 0) {
+            return (
+              <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+            )
+          }
+          return (
+            <div className="flex flex-wrap items-center gap-1">
+              {statuses.map((s) => (
+                <span
+                  key={s}
+                  className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STEP_META[s].className}`}
+                >
+                  {STEP_META[s].label}
+                </span>
+              ))}
+            </div>
+          )
+        })()}
       </td>
 
       {/* Assigned Agent - hidden for cases */}

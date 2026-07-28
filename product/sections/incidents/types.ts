@@ -90,6 +90,7 @@ export interface Incident {
   status: IncidentStatus
   queue: IncidentQueue
   step?: IncidentStep
+  statuses?: IncidentStep[]
   createdAt: string
   lastUpdatedAt: string
   tatDeadline: string

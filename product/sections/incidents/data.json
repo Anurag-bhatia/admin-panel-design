@@ -262,7 +262,8 @@
       "offence": null,
       "amount": 1000,
       "workType": "challan",
-      "step": "screening"
+      "step": "screening",
+      "statuses": ["screening", "agentAssigned"]
     },
     {
       "id": "inc-005",
@@ -309,7 +310,8 @@
       "offence": "Over Speeding",
       "amount": 2000,
       "workType": "challan",
-      "step": "screening"
+      "step": "screening",
+      "statuses": ["screening", "agentAssigned", "lawyerAssigned"]
     },
     {
       "id": "inc-007",
