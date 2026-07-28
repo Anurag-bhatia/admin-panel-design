@@ -318,6 +318,11 @@ export function IncidentRow({
       {/* Status */}
       <td className="px-4 py-3">
         {(() => {
+          if (incident.queue === 'newIncidents') {
+            return (
+              <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+            )
+          }
           const statuses =
             incident.statuses && incident.statuses.length > 0
               ? incident.statuses
