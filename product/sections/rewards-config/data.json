@@ -44,6 +44,7 @@
   "configs": [
     {
       "id": "cfg_mh",
+      "product": "challanPay",
       "state": "Maharashtra",
       "region": "All Regions",
       "operationsCostPct": 30,
@@ -61,6 +62,7 @@
     },
     {
       "id": "cfg_ka",
+      "product": "challanPay",
       "state": "Karnataka",
       "region": "All Regions",
       "operationsCostPct": 25,
@@ -78,6 +80,7 @@
     },
     {
       "id": "cfg_tn",
+      "product": "lots247",
       "state": "Tamil Nadu",
       "region": "All Regions",
       "operationsCostPct": 40,
@@ -95,6 +98,7 @@
     },
     {
       "id": "cfg_up",
+      "product": "challanPay",
       "state": "Uttar Pradesh",
       "region": "All Regions",
       "operationsCostPct": 35,
@@ -112,6 +116,7 @@
     },
     {
       "id": "cfg_dl",
+      "product": "lots247",
       "state": "Delhi",
       "region": "All Regions",
       "operationsCostPct": 28,
@@ -129,6 +134,7 @@
     },
     {
       "id": "cfg_gj",
+      "product": "challanPay",
       "state": "Gujarat",
       "region": "All Regions",
       "operationsCostPct": 32,
@@ -146,6 +152,7 @@
     },
     {
       "id": "cfg_wb",
+      "product": "lots247",
       "state": "West Bengal",
       "region": "All Regions",
       "operationsCostPct": 38,

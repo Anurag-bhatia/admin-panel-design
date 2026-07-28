@@ -1,10 +1,15 @@
+import { useState } from 'react'
 import { X, ShieldQuestion } from 'lucide-react'
-import type { ConfigDraft } from '@/../product/sections/rewards-config/types'
+import type {
+  ConfigDraft,
+  ConfigStatus,
+} from '@/../product/sections/rewards-config/types'
+import { StatusToggle } from './StatusToggle'
 
 interface ConfirmationModalProps {
   mode: 'add' | 'edit'
   draft: ConfigDraft
-  onConfirm: () => void
+  onConfirm: (status: ConfigStatus) => void
   onCancel: () => void
 }
 
@@ -14,6 +19,7 @@ export function ConfirmationModal({
   onConfirm,
   onCancel,
 }: ConfirmationModalProps) {
+  const [status, setStatus] = useState<ConfigStatus>(draft.status)
   const marginPct =
     draft.operationsCostPct !== null ? 100 - draft.operationsCostPct : null
   const maxCv =
@@ -86,6 +92,14 @@ export function ConfirmationModal({
           />
         </div>
 
+        {/* Status (outside the summary card) */}
+        <div className="mx-6 mb-5 flex items-center justify-between">
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+            Configuration Status
+          </span>
+          <StatusToggle value={status} onChange={setStatus} />
+        </div>
+
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 px-6 pb-5">
           <button
@@ -97,7 +111,7 @@ export function ConfirmationModal({
           </button>
           <button
             type="button"
-            onClick={onConfirm}
+            onClick={() => onConfirm(status)}
             className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm"
           >
             {mode === 'add' ? 'Yes, Add Configuration' : 'Yes, Update Configuration'}

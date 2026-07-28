@@ -6,6 +6,8 @@ export type ConfigStatus = 'active' | 'inactive'
 
 export type ApprovalStatus = 'approved' | 'pending'
 
+export type Product = 'challanPay' | 'lots247'
+
 export type AllowlistRole = 'Ops Head' | 'Product Head' | 'CEO' | 'CTO'
 
 export type Region = 'All Regions'
@@ -18,6 +20,7 @@ export type ChangeLogAction = 'created' | 'updated'
 
 export interface RewardsConfig {
   id: string
+  product: Product
   state: string
   region: Region
   operationsCostPct: number
@@ -58,6 +61,7 @@ export interface AllowlistedUser {
 // =============================================================================
 
 export interface ConfigDraft {
+  product?: Product
   state: string | null
   region: Region
   operationsCostPct: number | null

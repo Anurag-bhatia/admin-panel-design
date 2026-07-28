@@ -2,11 +2,16 @@ import { useMemo, useState } from 'react'
 import { AlertCircle, ChevronDown, Lock } from 'lucide-react'
 import type {
   ConfigDraft,
+  Product,
   RewardsConfig,
   ValidationErrors,
 } from '@/../product/sections/rewards-config/types'
+
+const PLATFORM_OPTIONS: { value: Product; label: string }[] = [
+  { value: 'challanPay', label: 'ChallanPay' },
+  { value: 'lots247', label: 'LOTS247' },
+]
 import { InfoTooltip } from './InfoTooltip'
-import { StatusToggle } from './StatusToggle'
 import { MaxRewardPreview } from './MaxRewardPreview'
 
 interface ConfigurationFormProps {
@@ -14,6 +19,7 @@ interface ConfigurationFormProps {
   states: string[]
   existingStates: string[]
   initialConfig?: RewardsConfig
+  defaultProduct?: Product
   onCancel: () => void
   onSubmit: (draft: ConfigDraft) => void
 }
@@ -61,12 +67,14 @@ export function ConfigurationForm({
   states,
   existingStates,
   initialConfig,
+  defaultProduct,
   onCancel,
   onSubmit,
 }: ConfigurationFormProps) {
   const [draft, setDraft] = useState<ConfigDraft>(() =>
     initialConfig
       ? {
+          product: initialConfig.product,
           state: initialConfig.state,
           region: initialConfig.region,
           operationsCostPct: initialConfig.operationsCostPct,
@@ -75,6 +83,7 @@ export function ConfigurationForm({
           status: initialConfig.status,
         }
       : {
+          product: defaultProduct ?? 'challanPay',
           state: null,
           region: 'All Regions',
           operationsCostPct: null,
@@ -85,6 +94,9 @@ export function ConfigurationForm({
   )
   const [errors, setErrors] = useState<ValidationErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const [rewardTierMode, setRewardTierMode] = useState<'flat' | 'range'>('flat')
+  const [rangeLowPct, setRangeLowPct] = useState<number | null>(20)
+  const [rangeHighPct, setRangeHighPct] = useState<number | null>(30)
 
   const marginPct = useMemo(() => {
     if (draft.operationsCostPct === null || Number.isNaN(draft.operationsCostPct))
@@ -123,27 +135,30 @@ export function ConfigurationForm({
   return (
     <div className="max-w-5xl mx-auto">
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-        {/* Header */}
-        <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                {mode === 'add'
-                  ? 'Add Reward Configuration'
-                  : `Update Configuration — ${initialConfig?.state}`}
-              </h2>
-            </div>
-          </div>
-        </div>
-
         {/* Body */}
         <div className="px-8 py-8 space-y-10">
           {/* Scope Section */}
           <SectionGroup
             eyebrow="1 · Scope"
-            title="State & Region"
+            title="Platform and State"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Field label="Platform" required>
+                <Select
+                  value={draft.product ?? 'challanPay'}
+                  placeholder="Select a platform…"
+                  onChange={(v) =>
+                    setDraft({ ...draft, product: v as Product })
+                  }
+                  options={PLATFORM_OPTIONS.map((p) => ({
+                    value: p.value,
+                    label: p.label,
+                  }))}
+                />
+              </Field>
+
+              <div className="hidden md:block" />
+
               <Field
                 label="Select State"
                 required
@@ -270,15 +285,41 @@ export function ConfigurationForm({
             </div>
           </SectionGroup>
 
-          {/* Status */}
-          <SectionGroup
-            eyebrow="4 · Status"
-            title="Configuration Status"
-          >
-            <StatusToggle
-              value={draft.status}
-              onChange={(next) => setDraft({ ...draft, status: next })}
-            />
+          {/* Reward Tier */}
+          <SectionGroup eyebrow="4 · Reward Tier" title="Reward Tier">
+            <div className="space-y-4">
+              <div className="flex items-center gap-6">
+                <RadioOption
+                  name="rewardTier"
+                  value="flat"
+                  label="Flat Reward"
+                  checked={rewardTierMode === 'flat'}
+                  onChange={() => setRewardTierMode('flat')}
+                />
+                <RadioOption
+                  name="rewardTier"
+                  value="range"
+                  label="Range"
+                  checked={rewardTierMode === 'range'}
+                  onChange={() => setRewardTierMode('range')}
+                />
+              </div>
+
+              {rewardTierMode === 'range' && (
+                <div className="space-y-3 pt-1">
+                  <RangeRow
+                    label="2000 – 5000"
+                    value={rangeLowPct}
+                    onChange={setRangeLowPct}
+                  />
+                  <RangeRow
+                    label="5000 and more"
+                    value={rangeHighPct}
+                    onChange={setRangeHighPct}
+                  />
+                </div>
+              )}
+            </div>
           </SectionGroup>
 
           {/* Preview */}
@@ -470,6 +511,57 @@ function PercentInput({
       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
         %
       </span>
+    </div>
+  )
+}
+
+function RadioOption({
+  name,
+  value,
+  label,
+  checked,
+  onChange,
+}: {
+  name: string
+  value: string
+  label: string
+  checked: boolean
+  onChange: () => void
+}) {
+  return (
+    <label className="inline-flex items-center gap-3 cursor-pointer select-none">
+      <input
+        type="radio"
+        name={name}
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        className="w-6 h-6 accent-cyan-600"
+      />
+      <span className="text-base font-medium text-slate-800 dark:text-slate-200">
+        {label}
+      </span>
+    </label>
+  )
+}
+
+function RangeRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: number | null
+  onChange: (v: number | null) => void
+}) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+      <div className="flex items-center h-11 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+        <span className="text-sm font-medium text-slate-700 dark:text-slate-200 tabular-nums">
+          {label}
+        </span>
+      </div>
+      <PercentInput value={value} placeholder="e.g., 50" onChange={onChange} />
     </div>
   )
 }
