@@ -253,7 +253,12 @@ export function IncidentList({
                   Updated
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Status
+                  {activeQueue === 'settled' || activeQueue === 'notSettled'
+                    ? 'Total Amount'
+                    : activeQueue === 'refundRequested' ||
+                        activeQueue === 'refundCompleted'
+                      ? 'Refunded Amount'
+                      : 'Status'}
                 </th>
                 {!isCases && (
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">

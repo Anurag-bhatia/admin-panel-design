@@ -27,10 +27,10 @@ export function CustomerTable({
           Mobile Number
         </div>
         <div className="flex-1 text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider hidden xl:block">
-          Pending Challans
+          Paid Challans
         </div>
         <div className="flex-1 text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider hidden xl:block">
-          Pending Amount
+          Paid Amount
         </div>
       </div>
 

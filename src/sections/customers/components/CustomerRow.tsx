@@ -1,4 +1,4 @@
-import { Car, AlertCircle } from 'lucide-react'
+import { Car, CheckCircle2 } from 'lucide-react'
 import type { Customer } from '@/../product/sections/customers/types'
 
 interface CustomerRowProps {
@@ -7,9 +7,9 @@ interface CustomerRowProps {
 }
 
 export function CustomerRow({ customer, onClick }: CustomerRowProps) {
-  // Mock data for pending challans - in real app, this would come from the customer object
-  const pendingChallans = customer.totalIncidents || 0
-  const pendingChallanAmount = (customer.totalIncidents || 0) * 1500 // Mock calculation
+  // Mock data for paid challans - in real app, this would come from the customer object
+  const paidChallans = customer.totalIncidents || 0
+  const paidChallanAmount = (customer.totalIncidents || 0) * 1500 // Mock calculation
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -47,23 +47,23 @@ export function CustomerRow({ customer, onClick }: CustomerRowProps) {
         <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{customer.mobile}</p>
       </div>
 
-      {/* Pending Challans */}
+      {/* Paid Challans */}
       <div className="flex-1 hidden xl:flex items-center gap-2">
-        {pendingChallans > 0 ? (
+        {paidChallans > 0 ? (
           <>
-            <AlertCircle className="w-4 h-4 text-amber-500" />
-            <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">{pendingChallans}</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{paidChallans}</span>
           </>
         ) : (
           <span className="text-sm text-slate-400 dark:text-slate-500">0</span>
         )}
       </div>
 
-      {/* Pending Challan Amount */}
+      {/* Paid Challan Amount */}
       <div className="flex-1 hidden xl:block">
-        {pendingChallanAmount > 0 ? (
-          <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
-            {formatCurrency(pendingChallanAmount)}
+        {paidChallanAmount > 0 ? (
+          <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+            {formatCurrency(paidChallanAmount)}
           </span>
         ) : (
           <span className="text-sm text-slate-400 dark:text-slate-500">₹0</span>

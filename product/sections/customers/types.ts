@@ -7,6 +7,7 @@ export interface FinancialSummary {
   pendingPayments: number
   paidAmount: number
   refundsIssued: number
+  pledgeReward?: number
 }
 
 export interface Customer {

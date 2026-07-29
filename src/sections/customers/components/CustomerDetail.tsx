@@ -170,7 +170,7 @@ export function CustomerDetail({
 
               <div className="mb-8">
                 <SectionHeader>Financial Summary</SectionHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-6">
                   <InfoField
                     label="Total Spend"
                     value={formatCurrency(customer.financialSummary.totalSpend)}
@@ -186,6 +186,10 @@ export function CustomerDetail({
                   <InfoField
                     label="Refunded"
                     value={formatCurrency(customer.financialSummary.refundsIssued)}
+                  />
+                  <InfoField
+                    label="Pledge Reward"
+                    value={formatCurrency(customer.financialSummary.pledgeReward ?? 0)}
                   />
                 </div>
               </div>
