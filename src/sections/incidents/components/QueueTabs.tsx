@@ -14,7 +14,8 @@ const QUEUE_CONFIG: { key: IncidentQueue; label: string; caseLabel?: string; col
   { key: 'settled', label: 'Settled', color: 'emerald' },
   { key: 'notSettled', label: 'Not Settled', color: 'red' },
   { key: 'hold', label: 'Hold', color: 'slate' },
-  { key: 'refund', label: 'Refund', color: 'purple' },
+  { key: 'refundRequested', label: 'Refund Requested', color: 'purple' },
+  { key: 'refundCompleted', label: 'Refund Completed', color: 'emerald' },
 ]
 
 export function QueueTabs({

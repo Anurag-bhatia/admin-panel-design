@@ -7,7 +7,8 @@ import { CustomerTable } from './CustomerTable'
 export function CustomerList({
   customers,
   onSearch,
-}: Omit<CustomerListProps, 'onViewCustomer'>) {
+  onViewCustomer,
+}: CustomerListProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState({
@@ -141,16 +142,17 @@ export function CustomerList({
             )}
           </div>
 
-          {/* Visitor Table */}
+          {/* Customer Table */}
           <CustomerTable
             customers={filteredCustomers}
+            onViewCustomer={onViewCustomer}
           />
 
           {/* Footer with Summary */}
           <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
             <p>
               Showing <span className="font-medium text-slate-900 dark:text-slate-100">{filteredCustomers.length}</span>{' '}
-              visitor{filteredCustomers.length !== 1 ? 's' : ''}
+              customer{filteredCustomers.length !== 1 ? 's' : ''}
             </p>
           </div>
         </div>

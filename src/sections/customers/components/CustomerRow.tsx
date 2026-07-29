@@ -3,9 +3,10 @@ import type { Customer } from '@/../product/sections/customers/types'
 
 interface CustomerRowProps {
   customer: Customer
+  onClick?: () => void
 }
 
-export function CustomerRow({ customer }: CustomerRowProps) {
+export function CustomerRow({ customer, onClick }: CustomerRowProps) {
   // Mock data for pending challans - in real app, this would come from the customer object
   const pendingChallans = customer.totalIncidents || 0
   const pendingChallanAmount = (customer.totalIncidents || 0) * 1500 // Mock calculation
@@ -20,7 +21,8 @@ export function CustomerRow({ customer }: CustomerRowProps) {
 
   return (
     <div
-      className="flex items-center gap-3 px-4 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+      onClick={onClick}
+      className="flex items-center gap-3 px-4 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
     >
       {/* Visitor Name */}
       <div className="flex-1 min-w-0">

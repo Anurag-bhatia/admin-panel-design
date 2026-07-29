@@ -85,12 +85,17 @@ export function IncidentsTableHeader({
   const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [showAddMenu, setShowAddMenu] = useState(false)
+  const [showStatusMenu, setShowStatusMenu] = useState(false)
   const addIncidentRef = useRef<HTMLDivElement>(null)
+  const statusMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (addIncidentRef.current && !addIncidentRef.current.contains(e.target as Node)) {
         setShowAddMenu(false)
+      }
+      if (statusMenuRef.current && !statusMenuRef.current.contains(e.target as Node)) {
+        setShowStatusMenu(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -339,19 +344,64 @@ export function IncidentsTableHeader({
               <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 Status
               </label>
-              <select
-                value={filters.step || ''}
-                onChange={(e) =>
-                  handleFilterChange('step', e.target.value as IncidentStep)
-                }
-                className="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white min-w-[160px]"
-              >
-                <option value="">All Status</option>
-                {!isCases && <option value="screening">Screening</option>}
-                {!isCases && <option value="agentAssigned">Agent Assigned</option>}
-                <option value="lawyerAssigned">Lawyer Assigned</option>
-                {!isCases && <option value="validated">Validated</option>}
-              </select>
+              <div className="relative min-w-[180px]" ref={statusMenuRef}>
+                {(() => {
+                  const options: { value: IncidentStep; label: string }[] = [
+                    { value: 'screening', label: 'Screening' },
+                    { value: 'screenDone', label: 'Screen Done' },
+                    { value: 'failed', label: 'Failed' },
+                  ]
+                  const selected = filters.steps ?? []
+                  const summary =
+                    selected.length === 0
+                      ? 'All Status'
+                      : selected.length === 1
+                        ? options.find((o) => o.value === selected[0])?.label ??
+                          'All Status'
+                        : `${selected.length} selected`
+                  return (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setShowStatusMenu((v) => !v)}
+                        className="w-full flex items-center justify-between gap-2 px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                      >
+                        <span className="truncate">{summary}</span>
+                        <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                      </button>
+                      {showStatusMenu && (
+                        <div className="absolute left-0 top-full mt-1 z-20 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg py-1">
+                          {options.map((opt) => {
+                            const checked = selected.includes(opt.value)
+                            return (
+                              <button
+                                key={opt.value}
+                                type="button"
+                                onClick={() => {
+                                  const next = checked
+                                    ? selected.filter((s) => s !== opt.value)
+                                    : [...selected, opt.value]
+                                  handleFilterChange(
+                                    'steps',
+                                    next.length ? next : undefined,
+                                  )
+                                }}
+                                className={`w-full text-left px-3 py-1.5 text-sm cursor-pointer ${
+                                  checked
+                                    ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 font-medium'
+                                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'
+                                }`}
+                              >
+                                {opt.label}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </>
+                  )
+                })()}
+              </div>
             </div>
 
             {/* Assigned Agent Filter - only for challans */}

@@ -35,7 +35,7 @@ export function IncidentsSidebar({
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              <span>Cases</span>
+              <span>Cases (L1, L2)</span>
             </button>
 
             <button
@@ -49,7 +49,7 @@ export function IncidentsSidebar({
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              <span>Challans</span>
+              <span>Challans (L3, L4)</span>
             </button>
           </div>
         </div>
@@ -78,7 +78,7 @@ export function IncidentsSidebar({
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              <span>Cases</span>
+              <span>Cases (L1, L2)</span>
             </button>
 
             <button
@@ -92,7 +92,7 @@ export function IncidentsSidebar({
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              <span>Challans</span>
+              <span>Challans (L3, L4)</span>
             </button>
           </div>
         </div>

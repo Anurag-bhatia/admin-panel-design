@@ -88,7 +88,8 @@ const QUEUE_OPTIONS: { key: IncidentQueue; label: string }[] = [
   { key: 'settled', label: 'Settled' },
   { key: 'notSettled', label: 'Not Settled' },
   { key: 'hold', label: 'Hold' },
-  { key: 'refund', label: 'Refund' },
+  { key: 'refundRequested', label: 'Refund Requested' },
+  { key: 'refundCompleted', label: 'Refund Completed' },
 ]
 
 const STEP_META: Record<
@@ -99,6 +100,16 @@ const STEP_META: Record<
     label: 'Screening',
     className:
       'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+  },
+  screenDone: {
+    label: 'Screen Done',
+    className:
+      'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+  },
+  failed: {
+    label: 'Failed',
+    className:
+      'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
   },
   agentAssigned: {
     label: 'Agent Assigned',
@@ -323,12 +334,17 @@ export function IncidentRow({
               <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
             )
           }
-          const statuses =
+          const rawStatuses =
             incident.statuses && incident.statuses.length > 0
               ? incident.statuses
               : incident.step
                 ? [incident.step]
                 : []
+          const filtered = rawStatuses.filter(
+            (s) => s === 'screening' || s === 'screenDone' || s === 'failed'
+          )
+          const statuses: typeof filtered =
+            filtered.length > 0 ? filtered : ['screening']
           if (statuses.length === 0) {
             return (
               <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
@@ -352,7 +368,9 @@ export function IncidentRow({
       {/* Assigned Agent - hidden for cases */}
       {!isCases && (
         <td className="px-4 py-3">
-          {assignedAgent ? (
+          {incident.queue === 'newIncidents' ? (
+            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          ) : assignedAgent ? (
             <div className="flex items-center gap-2 min-w-0">
               <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300 flex-shrink-0">
                 {assignedAgent.name.charAt(0)}
@@ -369,7 +387,9 @@ export function IncidentRow({
 
       {/* Assigned Lawyer */}
       <td className="px-4 py-3">
-        {assignedLawyer ? (
+        {incident.queue === 'newIncidents' ? (
+          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+        ) : assignedLawyer ? (
           <span className="text-sm text-slate-700 dark:text-slate-300 truncate block">
             {assignedLawyer.name.replace('Adv. ', '')}
           </span>
@@ -404,7 +424,7 @@ export function IncidentRow({
                 {incident.queue === 'notSettled' ? (
                   <button
                     onClick={() => {
-                      handleMoveToQueue('refund')
+                      handleMoveToQueue('refundRequested')
                     }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                   >

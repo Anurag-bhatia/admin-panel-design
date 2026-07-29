@@ -8,9 +8,10 @@ export type IncidentQueue =
   | 'settled'
   | 'notSettled'
   | 'hold'
-  | 'refund'
+  | 'refundRequested'
+  | 'refundCompleted'
 
-export type IncidentStep = 'screening' | 'agentAssigned' | 'lawyerAssigned' | 'validated'
+export type IncidentStep = 'screening' | 'screenDone' | 'failed' | 'agentAssigned' | 'lawyerAssigned' | 'validated'
 
 export type IncidentStatus =
   | 'pending_screening'
@@ -160,7 +161,8 @@ export interface QueueCounts {
   settled: number
   notSettled: number
   hold: number
-  refund: number
+  refundRequested: number
+  refundCompleted: number
 }
 
 export interface Pagination {
@@ -221,7 +223,7 @@ export interface IncidentFilters {
   type?: IncidentType
   challanType?: ChallanType
   status?: IncidentStatus
-  step?: IncidentStep
+  steps?: IncidentStep[]
   assignedAgentId?: string
   assignedLawyerId?: string
   dateFrom?: string

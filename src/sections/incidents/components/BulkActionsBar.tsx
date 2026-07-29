@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import {
   X,
-  Search,
   UserPlus,
   Scale,
   ArrowRight,
@@ -31,7 +30,8 @@ const QUEUE_OPTIONS: { key: IncidentQueue; label: string }[] = [
   { key: 'settled', label: 'Settled' },
   { key: 'notSettled', label: 'Not Settled' },
   { key: 'hold', label: 'Hold' },
-  { key: 'refund', label: 'Refund' },
+  { key: 'refundRequested', label: 'Refund Requested' },
+  { key: 'refundCompleted', label: 'Refund Completed' },
 ]
 
 export function BulkActionsBar({
@@ -127,7 +127,7 @@ export function BulkActionsBar({
             {/* Special actions for Not Settled - only Send to Refund */}
             {activeQueue === 'notSettled' ? (
               <button
-                onClick={() => onMoveQueue?.('refund')}
+                onClick={() => onMoveQueue?.('refundRequested')}
                 className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
               >
                 <ArrowRight className="h-4 w-4" />
@@ -135,45 +135,14 @@ export function BulkActionsBar({
               </button>
             ) : (
               <>
-                {/* Screen - hidden for cases */}
-                {!isCases && (
-                  <button
-                    onClick={() => {
-                      if (activeQueue === 'newIncidents') {
-                        onScreen?.()
-                      }
-                    }}
-                    disabled={activeQueue !== 'newIncidents'}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                      activeQueue !== 'newIncidents'
-                        ? 'text-slate-500 cursor-not-allowed'
-                        : 'text-white hover:bg-slate-700'
-                    }`}
-                  >
-                    <Search className="h-4 w-4" />
-                    <span>Screen</span>
-                  </button>
-                )}
-
-                {/* Divider */}
-                <div className="w-px h-6 bg-slate-700 mx-1" />
-
                 {/* Assign Agent - hidden for cases */}
                 {!isCases && (
                   <button
                     onClick={() => {
-                      if (!isNewIncidents) {
-                        setShowQueueDropdown(false)
-                        onAssignAgent?.()
-                      }
+                      setShowQueueDropdown(false)
+                      onAssignAgent?.()
                     }}
-                    disabled={isNewIncidents}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                      isNewIncidents
-                        ? 'text-slate-500 cursor-not-allowed'
-                        : 'text-white hover:bg-slate-700'
-                    }`}
-                    title={isNewIncidents ? 'Available once moved to In Progress' : undefined}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
                   >
                     <UserPlus className="h-4 w-4" />
                     <span>Assign Agent</span>
@@ -203,18 +172,8 @@ export function BulkActionsBar({
                 {/* Move Queue */}
                 <div className="relative">
                   <button
-                    onClick={() => {
-                      if (isCases || !isNewIncidents) {
-                        setShowQueueDropdown(!showQueueDropdown)
-                      }
-                    }}
-                    disabled={!isCases && isNewIncidents}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                      !isCases && isNewIncidents
-                        ? 'text-slate-500 cursor-not-allowed'
-                        : 'text-white hover:bg-slate-700'
-                    }`}
-                    title={!isCases && isNewIncidents ? 'Available once moved to In Progress' : undefined}
+                    onClick={() => setShowQueueDropdown(!showQueueDropdown)}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
                   >
                     <ArrowRight className="h-4 w-4" />
                     <span>Move Queue</span>

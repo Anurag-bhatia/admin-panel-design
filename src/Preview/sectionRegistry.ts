@@ -81,8 +81,8 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     icon: UserPlus,
   },
   subscribers: {
-    label: 'Subscribers',
-    description: 'Active client account management and relationship tracking for B2B fleet operators and companies.',
+    label: 'Users',
+    description: 'Manage customers (individual users) and subscribers (B2B fleet operators and companies) under one Users section.',
     icon: Users,
   },
   customers: {

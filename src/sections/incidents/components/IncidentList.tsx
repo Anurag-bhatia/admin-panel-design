@@ -159,7 +159,8 @@ export function IncidentList({
       settled: myIncidents.filter((inc) => inc.queue === 'settled').length,
       notSettled: myIncidents.filter((inc) => inc.queue === 'notSettled').length,
       hold: myIncidents.filter((inc) => inc.queue === 'hold').length,
-      refund: myIncidents.filter((inc) => inc.queue === 'refund').length,
+      refundRequested: myIncidents.filter((inc) => inc.queue === 'refundRequested').length,
+      refundCompleted: myIncidents.filter((inc) => inc.queue === 'refundCompleted').length,
     }
   }, [sidebarView, queueCounts, incidents, isCases])
 

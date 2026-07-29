@@ -26,7 +26,7 @@ import type {
 
 type ViewMode = 'list' | 'detail' | 'screenResults'
 
-type ModalType = 'addChallan' | 'addCase' | 'assignAgent' | 'assignLawyer' | 'moveQueue' | 'bulkUpdate' | null
+type ModalType = 'addChallan' | 'addCase' | 'assignAgent' | 'assignLawyer' | 'moveQueue' | 'bulkUpdate' | 'assignAgentForMove' | null
 
 export default function IncidentListPreview() {
   // View state
@@ -111,6 +111,11 @@ export default function IncidentListPreview() {
   }
 
   const handleMoveQueue = (incidentIds: string[], queue?: IncidentQueue) => {
+    if (queue === 'inProgress') {
+      setSelectedIncidentIds(incidentIds)
+      setActiveModal('assignAgentForMove')
+      return
+    }
     if (queue) {
       console.log('Moving incidents:', incidentIds, 'to queue:', queue)
       setActiveModal(null)
@@ -147,39 +152,65 @@ export default function IncidentListPreview() {
   // Render detail view
   if (viewMode === 'detail' && selectedIncident && subscriber) {
     return (
-      <IncidentDetailView
-        incident={selectedIncident}
-        subscriber={subscriber}
-        assignedAgent={assignedAgent}
-        assignedLawyer={assignedLawyer}
-        followUps={followUps}
-        timelineActivities={timelineActivities}
-        documents={documents}
-        users={data.users as User[]}
-        lawyers={data.lawyers as Lawyer[]}
-        onBack={handleBack}
-        onAddFollowUp={(incidentId, followUp) => {
-          console.log('Add follow-up:', incidentId, followUp)
-        }}
-        onUploadDocument={(incidentId, file, type) => {
-          console.log('Upload document:', incidentId, file.name, type)
-        }}
-        onViewDocument={(documentId) => console.log('View document:', documentId)}
-        onDeleteDocument={(documentId) => console.log('Delete document:', documentId)}
-        onAssignAgent={(incidentId, agentId) => {
-          console.log('Assign agent:', agentId, 'to incident:', incidentId)
-        }}
-        onAssignLawyer={(incidentId, lawyerId) => {
-          console.log('Assign lawyer:', lawyerId, 'to incident:', incidentId)
-        }}
-        onMoveQueue={(incidentId, queue) => {
-          console.log('Move incident:', incidentId, 'to queue:', queue)
-        }}
-        onScreen={(incidentId) => handleScreen([incidentId])}
-        onUpdate={(incidentId, updates) => {
-          console.log('Update incident:', incidentId, updates)
-        }}
-      />
+      <>
+        <IncidentDetailView
+          incident={selectedIncident}
+          subscriber={subscriber}
+          assignedAgent={assignedAgent}
+          assignedLawyer={assignedLawyer}
+          followUps={followUps}
+          timelineActivities={timelineActivities}
+          documents={documents}
+          users={data.users as User[]}
+          lawyers={data.lawyers as Lawyer[]}
+          onBack={handleBack}
+          onAddFollowUp={(incidentId, followUp) => {
+            console.log('Add follow-up:', incidentId, followUp)
+          }}
+          onUploadDocument={(incidentId, file, type) => {
+            console.log('Upload document:', incidentId, file.name, type)
+          }}
+          onViewDocument={(documentId) => console.log('View document:', documentId)}
+          onDeleteDocument={(documentId) => console.log('Delete document:', documentId)}
+          onAssignAgent={(incidentId, agentId) => {
+            console.log('Assign agent:', agentId, 'to incident:', incidentId)
+          }}
+          onAssignLawyer={(incidentId, lawyerId) => {
+            console.log('Assign lawyer:', lawyerId, 'to incident:', incidentId)
+          }}
+          onMoveQueue={(incidentId, queue) => {
+            if (queue === 'inProgress') {
+              setSelectedIncidentIds([incidentId])
+              setActiveModal('assignAgentForMove')
+              return
+            }
+            console.log('Move incident:', incidentId, 'to queue:', queue)
+          }}
+          onScreen={(incidentId) => handleScreen([incidentId])}
+          onUpdate={(incidentId, updates) => {
+            console.log('Update incident:', incidentId, updates)
+          }}
+        />
+
+        {activeModal === 'assignAgentForMove' && (
+          <AssignAgentModal
+            selectedCount={selectedIncidentIds.length}
+            users={data.users as User[]}
+            onAssign={(agentId, notes) => {
+              console.log(
+                'Move to In Progress + assign agent:',
+                agentId,
+                'incidents:',
+                selectedIncidentIds,
+                'notes:',
+                notes,
+              )
+              setActiveModal(null)
+            }}
+            onClose={() => setActiveModal(null)}
+          />
+        )}
+      </>
     )
   }
 
@@ -244,6 +275,26 @@ export default function IncidentListPreview() {
           selectedCount={selectedIncidentIds.length}
           users={data.users as User[]}
           onAssign={(agentId, notes) => handleAssignAgent(selectedIncidentIds, agentId, notes)}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+
+      {/* Assign Agent Modal (when moving to In Progress) */}
+      {activeModal === 'assignAgentForMove' && (
+        <AssignAgentModal
+          selectedCount={selectedIncidentIds.length}
+          users={data.users as User[]}
+          onAssign={(agentId, notes) => {
+            console.log(
+              'Move to In Progress + assign agent:',
+              agentId,
+              'incidents:',
+              selectedIncidentIds,
+              'notes:',
+              notes,
+            )
+            setActiveModal(null)
+          }}
           onClose={() => setActiveModal(null)}
         />
       )}

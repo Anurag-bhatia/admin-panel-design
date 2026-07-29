@@ -495,6 +495,12 @@ export function IncidentDetailView({
                               · {activeScreeningRun.timeLabel}
                             </span>
                           </div>
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-700 dark:text-cyan-300 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-cyan-800 rounded-lg hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-colors"
+                          >
+                            Show VCode
+                          </button>
                         </div>
                         <div className="p-6">
                           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-5">
