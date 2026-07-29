@@ -7,6 +7,7 @@ import {
   Upload,
   ChevronDown,
   Receipt,
+  Search,
 } from 'lucide-react'
 import type { IncidentQueue } from '@/../product/sections/incidents/types'
 import type { SettlementFees } from './IncidentRow'
@@ -135,6 +136,22 @@ export function BulkActionsBar({
               </button>
             ) : (
               <>
+                {/* Screen - challans only, on New Incidents and In Progress */}
+                {!isCases &&
+                  (activeQueue === 'newIncidents' ||
+                    activeQueue === 'inProgress') && (
+                    <button
+                      onClick={() => {
+                        setShowQueueDropdown(false)
+                        onScreen?.()
+                      }}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
+                    >
+                      <Search className="h-4 w-4" />
+                      <span>Screen</span>
+                    </button>
+                  )}
+
                 {/* Assign Agent - hidden for cases */}
                 {!isCases && (
                   <button

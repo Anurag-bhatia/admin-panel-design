@@ -339,14 +339,9 @@ export function IncidentRow({
             incident.queue === 'notSettled'
           ) {
             return (
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Total
-                </span>
-                <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                  ₹{incident.amount.toLocaleString('en-IN')}
-                </span>
-              </div>
+              <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                ₹{incident.amount.toLocaleString('en-IN')}
+              </span>
             )
           }
           if (
@@ -354,14 +349,9 @@ export function IncidentRow({
             incident.queue === 'refundCompleted'
           ) {
             return (
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Refunded
-                </span>
-                <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                  ₹{incident.amount.toLocaleString('en-IN')}
-                </span>
-              </div>
+              <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                ₹{incident.amount.toLocaleString('en-IN')}
+              </span>
             )
           }
           const rawStatuses =

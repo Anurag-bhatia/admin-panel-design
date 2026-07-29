@@ -1,5 +1,14 @@
 import { useState } from 'react'
-import { ArrowLeft, Car, AlertCircle, FileText, User } from 'lucide-react'
+import {
+  ArrowLeft,
+  Car,
+  AlertCircle,
+  FileText,
+  User,
+  Truck,
+  ChevronDown,
+  Calendar,
+} from 'lucide-react'
 import type {
   Customer,
   Vehicle,
@@ -7,7 +16,12 @@ import type {
   Challan,
 } from '@/../product/sections/customers/types'
 
-type TabType = 'details' | 'incidents' | 'challans'
+type TabType =
+  | 'details'
+  | 'vehicles'
+  | 'incidents'
+  | 'pendingChallans'
+  | 'challans'
 
 interface CustomerDetailProps {
   customer: Customer
@@ -21,7 +35,9 @@ interface CustomerDetailProps {
 
 const TABS: { key: TabType; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { key: 'details', label: 'Details', icon: User },
+  { key: 'vehicles', label: 'Vehicles', icon: Car },
   { key: 'incidents', label: 'Incidents', icon: AlertCircle },
+  { key: 'pendingChallans', label: 'Pending Challans', icon: FileText },
   { key: 'challans', label: 'Challans', icon: FileText },
 ]
 
@@ -82,6 +98,20 @@ export function CustomerDetail({
   onViewChallan,
 }: CustomerDetailProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
+  const [expandedVehicle, setExpandedVehicle] = useState<string | null>(null)
+  const [challanSubTab, setChallanSubTab] = useState<
+    Record<string, 'pending' | 'paid'>
+  >({})
+
+  const challansByVehicle = challans.reduce<Record<string, Challan[]>>(
+    (acc, ch) => {
+      const key = ch.vehicleNumber || 'Unassigned'
+      if (!acc[key]) acc[key] = []
+      acc[key].push(ch)
+      return acc
+    },
+    {},
+  )
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 lg:p-8">
@@ -194,47 +224,51 @@ export function CustomerDetail({
                 </div>
               </div>
 
-              <div className="border-t border-slate-200/60 dark:border-slate-700/60 mb-8" />
-
-              <div>
-                <SectionHeader>Vehicles ({vehicles.length})</SectionHeader>
-                {vehicles.length === 0 ? (
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    No vehicles registered
-                  </p>
-                ) : (
-                  <div className="space-y-2">
-                    {vehicles.map((v) => (
-                      <div
-                        key={v.id}
-                        className="flex items-center gap-4 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50"
-                      >
-                        <div className="w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                          <Car className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                            {v.vehicleNumber}
-                          </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">
-                            {v.make} {v.model} · {v.vehicleType}
-                          </p>
-                        </div>
-                        <span
-                          className={`text-xs font-medium px-2 py-0.5 rounded ${
-                            v.status === 'active'
-                              ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                          }`}
-                        >
-                          {v.status === 'active' ? 'Active' : 'Inactive'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
+          </div>
+        )}
+
+        {/* Vehicles Tab */}
+        {activeTab === 'vehicles' && (
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-6">
+              Vehicles ({vehicles.length})
+            </h2>
+            {vehicles.length === 0 ? (
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                No vehicles registered
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {vehicles.map((v) => (
+                  <div
+                    key={v.id}
+                    className="flex items-center gap-4 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                      <Car className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        {v.vehicleNumber}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {v.make} {v.model} · {v.vehicleType}
+                      </p>
+                    </div>
+                    <span
+                      className={`text-xs font-medium px-2 py-0.5 rounded ${
+                        v.status === 'active'
+                          ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                      }`}
+                    >
+                      {v.status === 'active' ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -303,6 +337,156 @@ export function CustomerDetail({
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Pending Challans Tab */}
+        {activeTab === 'pendingChallans' && (
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">
+              Linked Challans ({challans.length})
+            </h2>
+            {challans.length === 0 ? (
+              <div className="text-center py-12">
+                <AlertCircle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-500 dark:text-slate-400">
+                  No challans linked to this customer yet
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {Object.entries(challansByVehicle).map(
+                  ([vehicleNumber, vehicleChallans]) => {
+                    const isExpanded = expandedVehicle === vehicleNumber
+                    const currentSubTab =
+                      challanSubTab[vehicleNumber] || 'pending'
+                    const pendingChallans = vehicleChallans.filter(
+                      (c) => c.paymentStatus === 'pending',
+                    )
+                    const paidChallans = vehicleChallans.filter(
+                      (c) => c.paymentStatus !== 'pending',
+                    )
+                    const visible =
+                      currentSubTab === 'pending'
+                        ? pendingChallans
+                        : paidChallans
+
+                    return (
+                      <div
+                        key={vehicleNumber}
+                        className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden"
+                      >
+                        <button
+                          onClick={() =>
+                            setExpandedVehicle(
+                              isExpanded ? null : vehicleNumber,
+                            )
+                          }
+                          className="w-full flex items-center justify-between px-4 py-3.5 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Truck className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                            <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">
+                              {vehicleNumber}
+                            </span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                              ({vehicleChallans.length} challan
+                              {vehicleChallans.length !== 1 ? 's' : ''})
+                            </span>
+                          </div>
+                          <ChevronDown
+                            className={`w-4 h-4 text-slate-400 transition-transform ${
+                              isExpanded ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+
+                        {isExpanded && (
+                          <div className="border-t border-slate-200 dark:border-slate-700">
+                            <div className="flex gap-0 border-b border-slate-200 dark:border-slate-700">
+                              <button
+                                onClick={() =>
+                                  setChallanSubTab({
+                                    ...challanSubTab,
+                                    [vehicleNumber]: 'pending',
+                                  })
+                                }
+                                className={`px-4 py-2.5 text-xs font-medium transition-colors ${
+                                  currentSubTab === 'pending'
+                                    ? 'text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400'
+                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                                }`}
+                              >
+                                Pending ({pendingChallans.length})
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setChallanSubTab({
+                                    ...challanSubTab,
+                                    [vehicleNumber]: 'paid',
+                                  })
+                                }
+                                className={`px-4 py-2.5 text-xs font-medium transition-colors ${
+                                  currentSubTab === 'paid'
+                                    ? 'text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400'
+                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                                }`}
+                              >
+                                Paid ({paidChallans.length})
+                              </button>
+                            </div>
+
+                            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                              {visible.length === 0 ? (
+                                <div className="py-8 text-center text-sm text-slate-400">
+                                  No {currentSubTab} challans for this vehicle
+                                </div>
+                              ) : (
+                                visible.map((ch) => (
+                                  <div
+                                    key={ch.id}
+                                    onClick={() => onViewChallan?.(ch.id)}
+                                    className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 cursor-pointer"
+                                  >
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2.5">
+                                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">
+                                          {ch.challanType}
+                                        </p>
+                                        <span
+                                          className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+                                            STATUS_BADGE[ch.paymentStatus] ??
+                                            'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                                          }`}
+                                        >
+                                          {ch.paymentStatus}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-4 mt-2">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                                          {ch.challanId}
+                                        </span>
+                                        <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                                          <Calendar className="w-3 h-3" />
+                                          {formatDate(ch.issuedDate)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <p className="text-base font-semibold text-slate-900 dark:text-slate-50 ml-4">
+                                      ₹{ch.amount?.toLocaleString('en-IN')}
+                                    </p>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  },
+                )}
               </div>
             )}
           </div>
