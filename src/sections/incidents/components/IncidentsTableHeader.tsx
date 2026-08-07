@@ -84,9 +84,13 @@ export function IncidentsTableHeader({
   const [filters, setFilters] = useState<IncidentFilters>({})
   const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false)
   const [showAttachChallansModal, setShowAttachChallansModal] = useState(false)
+  const [showImportModal, setShowImportModal] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [attachFiles, setAttachFiles] = useState<File[]>([])
+  const [importFile, setImportFile] = useState<File | null>(null)
+  const [isImportDragging, setIsImportDragging] = useState(false)
   const attachFilesInputRef = useRef<HTMLInputElement>(null)
+  const importFileInputRef = useRef<HTMLInputElement>(null)
   const [showAddMenu, setShowAddMenu] = useState(false)
   const [showStatusMenu, setShowStatusMenu] = useState(false)
   const [showBulkActionsMenu, setShowBulkActionsMenu] = useState(false)
@@ -219,6 +223,12 @@ export function IncidentsTableHeader({
                   className="w-full px-4 py-2 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Attach {isCases ? 'cases' : 'challans'}
+                </button>
+                <button
+                  onClick={() => { setShowImportModal(true); setShowBulkActionsMenu(false) }}
+                  className="w-full px-4 py-2 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  Import {isCases ? 'cases' : 'challans'}
                 </button>
               </div>
             )}
@@ -739,6 +749,129 @@ export function IncidentsTableHeader({
                 className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg transition-colors"
               >
                 Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import Challans/Cases Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl max-w-md w-full">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                Import {isCases ? 'Cases' : 'Challans'}
+              </h2>
+              <button
+                onClick={() => { setShowImportModal(false); setImportFile(null) }}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5 text-slate-500" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Upload an Excel or CSV file
+                </p>
+                <button
+                  onClick={() => {
+                    const templateData = isCases
+                      ? 'Case Number,Case Type,State,Amount,Offence\nCS012024123456,onSpot,Delhi,2500,Over Speeding'
+                      : 'Challan Number,Type,Challan Type,State,Amount,Offence\nDL012024123456,payAndClose,court,Delhi,2500,Over Speeding'
+                    const blob = new Blob([templateData], { type: 'text/csv' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = isCases ? 'import_cases_template.csv' : 'import_challans_template.csv'
+                    a.click()
+                    URL.revokeObjectURL(url)
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Download sample
+                </button>
+              </div>
+
+              <div
+                onDragOver={(e) => { e.preventDefault(); setIsImportDragging(true) }}
+                onDragLeave={(e) => { e.preventDefault(); setIsImportDragging(false) }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  setIsImportDragging(false)
+                  const file = e.dataTransfer.files[0]
+                  if (file) setImportFile(file)
+                }}
+                onClick={() => importFileInputRef.current?.click()}
+                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+                  isImportDragging
+                    ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
+                    : importFile
+                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+                    : 'border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <input
+                  ref={importFileInputRef}
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) setImportFile(file)
+                    e.target.value = ''
+                  }}
+                  className="hidden"
+                />
+
+                {importFile ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <FileSpreadsheet className="h-10 w-10 text-emerald-500" />
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">
+                      {importFile.name}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {(importFile.size / 1024).toFixed(1)} KB
+                    </p>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setImportFile(null) }}
+                      className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                    >
+                      Remove file
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2">
+                    <Upload className="h-10 w-10 text-slate-400" />
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">
+                      Drop your file here or click to browse
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Supports Excel (.xlsx, .xls) and CSV (.csv) files
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-700">
+              <button
+                onClick={() => { setShowImportModal(false); setImportFile(null) }}
+                className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setShowImportModal(false); setImportFile(null) }}
+                disabled={!importFile}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg transition-colors"
+              >
+                Upload & Import
               </button>
             </div>
           </div>
