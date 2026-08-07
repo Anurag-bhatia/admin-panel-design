@@ -218,7 +218,7 @@ export function IncidentsTableHeader({
                   onClick={() => { setShowAttachChallansModal(true); setShowBulkActionsMenu(false) }}
                   className="w-full px-4 py-2 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
-                  Update {isCases ? 'cases' : 'challans'}
+                  Attach {isCases ? 'cases' : 'challans'}
                 </button>
               </div>
             )}
@@ -655,18 +655,23 @@ export function IncidentsTableHeader({
                 Upload Receipts (PDF, JPG, PNG, WEBP)
               </p>
 
-              <div className="flex items-stretch border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => attachFilesInputRef.current?.click()}
-                  className="px-4 py-2 text-sm font-medium text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors whitespace-nowrap"
-                >
-                  Choose files
-                </button>
-                <div className="flex-1 flex items-center px-4 text-sm text-slate-400 dark:text-slate-500">
-                  {attachFiles.length === 0
-                    ? 'No file chosen'
-                    : `${attachFiles.length} file${attachFiles.length > 1 ? 's' : ''} chosen`}
-                </div>
+              <div
+                onDragOver={(e) => { e.preventDefault() }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  const dropped = Array.from(e.dataTransfer.files || [])
+                  if (dropped.length) setAttachFiles((prev) => [...prev, ...dropped])
+                }}
+                onClick={() => attachFilesInputRef.current?.click()}
+                className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-6 text-center cursor-pointer hover:border-cyan-400 dark:hover:border-cyan-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                <Upload className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+                <p className="text-sm font-medium text-slate-900 dark:text-white">
+                  Drop files here or click to browse
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  You can select multiple files
+                </p>
                 <input
                   ref={attachFilesInputRef}
                   type="file"
@@ -674,11 +679,41 @@ export function IncidentsTableHeader({
                   accept=".pdf,.jpg,.jpeg,.png,.webp"
                   onChange={(e) => {
                     const files = e.target.files ? Array.from(e.target.files) : []
-                    setAttachFiles(files)
+                    if (files.length) setAttachFiles((prev) => [...prev, ...files])
+                    e.target.value = ''
                   }}
                   className="hidden"
                 />
               </div>
+
+              {attachFiles.length > 0 && (
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {attachFiles.map((file, index) => (
+                    <div
+                      key={`${file.name}-${index}`}
+                      className="flex items-center justify-between gap-3 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                          {file.name}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {(file.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setAttachFiles((prev) => prev.filter((_, i) => i !== index))
+                        }}
+                        className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors"
+                      >
+                        <X className="h-4 w-4 text-slate-500" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="space-y-2 text-sm text-cyan-600 dark:text-cyan-400">
                 <p>Maximum 100 files per batch.</p>
