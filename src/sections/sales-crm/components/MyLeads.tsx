@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Calendar, Clock, ChevronDown, MoreVertical, Eye, Phone, MapPin, Truck, Building2 } from 'lucide-react'
+import { Calendar, ChevronDown, MoreVertical, Eye, Phone, MapPin, Truck, Building2 } from 'lucide-react'
 import type { MyLeadsProps, Lead } from '@/../product/sections/sales-crm/my-leads-types'
 import type { Lead as LeadBase, TimelineActivity as TimelineActivityBase, User as UserBase } from '@/../product/sections/sales-crm/types'
 import { LeadDetailView } from './LeadDetailView'
@@ -200,42 +200,6 @@ export function MyLeads({
           </div>
           <p className="text-sm text-slate-600 dark:text-slate-400">{today}</p>
         </div>
-
-        {/* Today's Meetings */}
-        {todaysMeetings.length > 0 && (
-          <div className="mb-6 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
-                Today's Meetings
-              </h2>
-            </div>
-            <div className="space-y-2">
-              {todaysMeetings.map(meeting => (
-                <div
-                  key={meeting.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                  onClick={() => setSelectedLeadId(meeting.leadId)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col items-center justify-center w-16 h-16 rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
-                      <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400">
-                        {meeting.timeSlot.split(':')[0]}
-                      </span>
-                      <span className="text-xs text-cyan-600 dark:text-cyan-400">
-                        {meeting.timeSlot.split(' ')[1]}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-slate-900 dark:text-white">{meeting.leadName}</p>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">{meeting.meetingType} • {meeting.duration}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Tabs */}
         <div className="mb-6">

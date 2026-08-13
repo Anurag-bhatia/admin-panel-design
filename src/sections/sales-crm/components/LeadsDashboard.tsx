@@ -222,6 +222,7 @@ export function LeadsDashboard({
           onUploadDocument={() => {
             setUploadDocLeadId(selectedLead.id)
           }}
+          onAddQuotation={() => setShowQuotationModal(true)}
         />
 
         {/* Modals for detail view */}
@@ -292,7 +293,6 @@ export function LeadsDashboard({
             <LeadsListHeader
               onCreateLead={() => setShowAddModal(true)}
               onBulkUpload={() => setShowBulkUploadModal(true)}
-              onAddQuotation={() => setShowQuotationModal(true)}
             />
           </div>
 

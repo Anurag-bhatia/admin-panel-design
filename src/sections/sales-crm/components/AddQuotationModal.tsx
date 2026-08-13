@@ -2,17 +2,17 @@ import { useMemo, useState } from 'react'
 import {
   ArrowLeft,
   Search,
-  Package,
   Layers,
   Wrench,
   Check,
   Plus,
   Minus,
   Download,
+  Send,
 } from 'lucide-react'
 import type { Lead } from '@/../product/sections/sales-crm/types'
 
-type QuotationType = 'subscription' | 'subscription-addons' | 'pay-per-service'
+type QuotationType = 'subscription-addons' | 'pay-per-service'
 
 interface SubscriptionPlan {
   id: string
@@ -95,10 +95,17 @@ const defaultValidTill = () => {
 export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalProps) {
   const [customerSearch, setCustomerSearch] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [sendModal, setSendModal] = useState<{ open: boolean; email: string; subject: string; message: string; sent: boolean }>({
+    open: false,
+    email: '',
+    subject: '',
+    message: '',
+    sent: false,
+  })
 
   const [formData, setFormData] = useState<QuotationDraft>({
     leadId: '',
-    type: 'subscription',
+    type: 'subscription-addons',
     planId: null,
     addonIds: [],
     serviceId: null,
@@ -127,7 +134,8 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
   }, [formData.type, selectedAddons])
 
   const subtotal = basePrice + addonsPrice
-  const discountAmount = Math.min(formData.overallDiscount, subtotal)
+  const discountPercent = Math.min(100, Math.max(0, formData.overallDiscount))
+  const discountAmount = Math.round((subtotal * discountPercent) / 100)
   const finalAmount = Math.max(0, subtotal - discountAmount)
 
   const filteredLeads = useMemo(() => {
@@ -159,6 +167,23 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
   const handleSave = (isDraft: boolean) => {
     if (!validate()) return
     onSave(formData, isDraft)
+  }
+
+  const handleSendToCustomer = () => {
+    if (!validate()) return
+    const customerName = selectedLead?.companyAlias || selectedLead?.companyName || 'Customer'
+    setSendModal({
+      open: true,
+      email: selectedLead?.emailId || '',
+      subject: `Quotation from LOTS247 for ${customerName}`,
+      message: `Hi ${selectedLead?.contactPerson || 'there'},\n\nPlease find attached the quotation for your review. Feel free to reach out if you have any questions.\n\nBest regards,\nLOTS247 Team`,
+      sent: false,
+    })
+  }
+
+  const handleConfirmSend = () => {
+    setSendModal(prev => ({ ...prev, sent: true }))
+    onSave(formData, false)
   }
 
   const handleDownloadPdf = () => {
@@ -230,7 +255,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
         <div class="amount">${escape(l.amount)}</div>
       </div>`).join('')}
     <div class="line"><div class="title" style="font-weight:400; color:#475569;">Subtotal</div><div class="amount">${escape(formatCurrency(subtotal))}</div></div>
-    ${discountAmount > 0 ? `<div class="line discount"><div class="title" style="font-weight:400;">Discount</div><div class="amount">− ${escape(formatCurrency(discountAmount))}</div></div>` : ''}
+    ${discountAmount > 0 ? `<div class="line discount"><div class="title" style="font-weight:400;">Discount (${discountPercent}%)</div><div class="amount">− ${escape(formatCurrency(discountAmount))}</div></div>` : ''}
     <div class="line total"><div class="title">Final Amount</div><div class="amount">${escape(formatCurrency(finalAmount))}</div></div>
   </div>
 
@@ -260,7 +285,6 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     } rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500`
 
   const typeCards: { id: QuotationType; title: string; icon: JSX.Element }[] = [
-    { id: 'subscription', title: 'Subscription', icon: <Package className="w-4 h-4" /> },
     { id: 'subscription-addons', title: 'Sub + Add-ons', icon: <Layers className="w-4 h-4" /> },
     { id: 'pay-per-service', title: 'Pay-per-Service', icon: <Wrench className="w-4 h-4" /> },
   ]
@@ -290,14 +314,22 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Download PDF</span>
           </button>
+          <button
+            type="button"
+            onClick={handleSendToCustomer}
+            className="flex items-center gap-1.5 px-3 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors"
+          >
+            <Send className="w-4 h-4" />
+            <span className="hidden sm:inline">Send to Customer</span>
+          </button>
         </div>
       </div>
 
       {/* Split body */}
       <div className="flex-1 flex flex-col lg:flex-row lg:items-start">
         {/* Form (left) */}
-        <div className="w-full lg:w-1/2 xl:w-[55%] border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        <div className="w-full lg:w-1/2 xl:w-[55%]">
+          <div className="p-4 sm:p-6 lg:p-8 space-y-3">
             {/* Customer */}
             <FormSection title="Customer / Lead" error={errors.leadId}>
               {selectedLead ? (
@@ -394,7 +426,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
             </FormSection>
 
             {/* Plans / Services */}
-            {(formData.type === 'subscription' || formData.type === 'subscription-addons') && (
+            {formData.type === 'subscription-addons' && (
               <FormSection title="Subscription Plan" error={errors.planId}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {SUBSCRIPTION_PLANS.map(plan => {
@@ -404,7 +436,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                         key={plan.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, planId: plan.id })}
-                        className={`text-left p-3 rounded-lg border transition-colors ${
+                        className={`text-left p-5 rounded-lg border transition-colors min-h-[120px] flex flex-col justify-between ${
                           selected
                             ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 ring-1 ring-cyan-500'
                             : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
@@ -417,10 +449,27 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                             <span className="text-[10px] font-normal text-slate-500">{plan.billingCycle}</span>
                           </p>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{plan.description}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">{plan.description}</p>
                       </button>
                     )
                   })}
+                </div>
+              </FormSection>
+            )}
+
+            {formData.type === 'subscription-addons' && (
+              <FormSection title="Discount">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={formData.overallDiscount || ''}
+                    onChange={e => setFormData({ ...formData, overallDiscount: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })}
+                    placeholder="0"
+                    className={inputClass(false)}
+                  />
+                  <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Percentage (%)</span>
                 </div>
               </FormSection>
             )}
@@ -511,24 +560,23 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                     </button>
                   </div>
                 </FormSection>
+
+                <FormSection title="Discount">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={formData.overallDiscount || ''}
+                      onChange={e => setFormData({ ...formData, overallDiscount: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })}
+                      placeholder="0"
+                      className={inputClass(false)}
+                    />
+                    <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Percentage (%)</span>
+                  </div>
+                </FormSection>
               </>
             )}
-
-            {/* Discount */}
-            <FormSection title="Discount">
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min={0}
-                  max={subtotal}
-                  value={formData.overallDiscount || ''}
-                  onChange={e => setFormData({ ...formData, overallDiscount: Math.max(0, parseInt(e.target.value) || 0) })}
-                  placeholder="0"
-                  className={inputClass(false)}
-                />
-                <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Flat amount (₹)</span>
-              </div>
-            </FormSection>
 
             {/* Terms & Validity */}
             <FormSection title="Terms & Validity">
@@ -577,11 +625,12 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
               <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-cyan-600 text-white flex items-center justify-center text-xs font-bold">Q</div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Quotation</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                      {selectedLead?.companyAlias || selectedLead?.companyName || 'Customer Name'}
+                    </p>
                   </div>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-                    Issued {new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
                   </p>
                 </div>
                 <div className="text-right">
@@ -642,7 +691,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex items-center justify-between text-sm text-emerald-700 dark:text-emerald-400">
-                      <span>Discount</span>
+                      <span>Discount ({discountPercent}%)</span>
                       <span>− {formatCurrency(discountAmount)}</span>
                     </div>
                   )}
@@ -670,13 +719,97 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
           </div>
         </div>
       </div>
+
+      {sendModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-950/70 px-4">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            {sendModal.sent ? (
+              <div className="p-8 text-center">
+                <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Quotation Sent</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                  We've emailed the quotation to <span className="font-medium text-slate-700 dark:text-slate-300">{sendModal.email}</span>.
+                </p>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                  <h3 className="text-base font-semibold text-slate-900 dark:text-white">Send Quotation</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Review the details before sending.</p>
+                </div>
+                <div className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">To</label>
+                    <input
+                      type="email"
+                      value={sendModal.email}
+                      onChange={e => setSendModal(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="customer@example.com"
+                      className={inputClass(false)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Subject</label>
+                    <input
+                      type="text"
+                      value={sendModal.subject}
+                      onChange={e => setSendModal(prev => ({ ...prev, subject: e.target.value }))}
+                      className={inputClass(false)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Message</label>
+                    <textarea
+                      rows={10}
+                      value={sendModal.message}
+                      onChange={e => setSendModal(prev => ({ ...prev, message: e.target.value }))}
+                      className={inputClass(false) + ' resize-y min-h-[220px]'}
+                    />
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <Download className="w-3.5 h-3.5" />
+                    The quotation PDF will be attached automatically.
+                  </div>
+                </div>
+                <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2 bg-slate-50 dark:bg-slate-900/40">
+                  <button
+                    type="button"
+                    onClick={() => setSendModal(prev => ({ ...prev, open: false }))}
+                    className="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmSend}
+                    disabled={!sendModal.email.trim()}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-600/40 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Send className="w-4 h-4" />
+                    Send
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 function FormSection({ title, hint, error, children }: { title: string; hint?: string; error?: string; children: React.ReactNode }) {
   return (
-    <div className="pb-6 border-b border-slate-100 dark:border-slate-800 last:border-b-0 last:pb-0">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5">
       <div className="flex items-baseline justify-between mb-3">
         <h3 className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight">{title}</h3>
         {hint && <span className="text-[10px] uppercase tracking-wider text-slate-400">{hint}</span>}
