@@ -230,9 +230,29 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
   .total .amount { font-weight: 700; font-size: 16px; }
   .discount { color: #047857; }
   pre { font-family: inherit; white-space: pre-wrap; font-size: 12px; color: #334155; margin: 8px 0 0; }
+  .issuer { display: flex; align-items: flex-start; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; margin-bottom: 20px; }
+  .issuer .logo { width: 112px; height: 64px; background: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0 12px; box-sizing: border-box; }
+  .issuer .logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .issuer .info { font-size: 11px; line-height: 1.5; color: #334155; }
+  .issuer .info .name { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+  .issuer .info .gst { font-weight: 600; color: #0f172a; margin-top: 4px; }
   @media print { body { padding: 24px; } }
 </style></head>
 <body>
+  <div class="issuer">
+    <div class="logo">
+      <img src="${window.location.origin}/lawyered-logo.webp" alt="Lawyered" />
+    </div>
+    <div class="info">
+      <div class="name">Sproutech Solutions Private Limited</div>
+      <div>Company ID : U74900DL2015PTC285360</div>
+      <div>IA Accel, LG-007-02, Lower Ground Floor, MGF Metropolis Mall, MG Road, Gurugram,</div>
+      <div>Gurugram, Haryana - 122002, India</div>
+      <div>Phone No: 7838105852, 7003670389 | Email: accounts@lawyered.in</div>
+      <div class="gst">GST No : 06AAWCS2817C1Z9</div>
+    </div>
+  </div>
+
   <div class="row">
     <div>
       <div class="muted" style="text-transform: uppercase; letter-spacing: 0.05em;">Quotation for</div>
@@ -621,6 +641,9 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
         <div className="flex-1 lg:w-1/2 xl:w-[45%] bg-slate-100 dark:bg-slate-950/60">
           <div className="lg:sticky lg:top-0 p-4 sm:p-6 lg:p-8">
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
+              {/* Issuer header */}
+              <IssuerHeader />
+
               {/* Paper header */}
               <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4">
                 <div>
@@ -828,6 +851,24 @@ function PreviewLine({ title, subtitle, amount }: { title: string; subtitle?: st
         {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
       </div>
       <p className="text-sm font-medium text-slate-900 dark:text-white shrink-0 tabular-nums">{amount}</p>
+    </div>
+  )
+}
+
+export function IssuerHeader() {
+  return (
+    <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-start gap-4">
+      <div className="w-28 h-16 bg-black rounded flex items-center justify-center shrink-0 px-3">
+        <img src="/lawyered-logo.webp" alt="Lawyered" className="max-w-full max-h-full object-contain" />
+      </div>
+      <div className="min-w-0 flex-1 text-[11px] leading-snug text-slate-700 dark:text-slate-300">
+        <p className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">Sproutech Solutions Private Limited</p>
+        <p>Company ID : U74900DL2015PTC285360</p>
+        <p>IA Accel, LG-007-02, Lower Ground Floor, MGF Metropolis Mall, MG Road, Gurugram,</p>
+        <p>Gurugram, Haryana - 122002, India</p>
+        <p>Phone No: 7838105852, 7003670389 | Email: accounts@lawyered.in</p>
+        <p className="font-semibold text-slate-900 dark:text-white mt-1">GST No : 06AAWCS2817C1Z9</p>
+      </div>
     </div>
   )
 }

@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock, Download, Pencil } from 'lucide-react'
 import type { Lead, TimelineActivity, Document, User as UserType } from '@/../product/sections/sales-crm/types'
+import { IssuerHeader } from './AddQuotationModal'
 
-type TabType = 'details' | 'documents'
+type TabType = 'details' | 'documents' | 'quotations'
 
 interface LeadDetailViewProps {
   lead: Lead
@@ -16,9 +17,11 @@ interface LeadDetailViewProps {
   onAddFollowUp?: () => void
   onUploadDocument?: () => void
   onAddQuotation?: () => void
+  onModifyQuotation?: () => void
+  onDownloadQuotation?: () => void
 }
 
-export function LeadDetailView({ lead, timelineActivities, documents, users, onClose, onEdit, onAssign, onChangeStatus, onAddFollowUp, onUploadDocument, onAddQuotation }: LeadDetailViewProps) {
+export function LeadDetailView({ lead, timelineActivities, documents, users, onClose, onEdit, onAssign, onChangeStatus, onAddFollowUp, onUploadDocument, onAddQuotation, onModifyQuotation, onDownloadQuotation }: LeadDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
   const [showMoveMenu, setShowMoveMenu] = useState(false)
 
@@ -64,9 +67,14 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
     const icons = {
       details: <Building2 className="w-4 h-4" />,
       documents: <FileText className="w-4 h-4" />,
+      quotations: <FileText className="w-4 h-4" />,
     }
     return icons[tab]
   }
+
+  const availableTabs: TabType[] = lead.status === 'quotations'
+    ? ['details', 'documents', 'quotations']
+    : ['details', 'documents']
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 lg:p-8">
@@ -154,7 +162,7 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
         {/* Tabs */}
         <div className="mb-6 -mx-6 lg:-mx-8 px-6 lg:px-8 overflow-x-auto">
           <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit min-w-full">
-            {(['details', 'documents'] as TabType[]).map((tab) => (
+            {availableTabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -307,6 +315,93 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Quotations Tab */}
+        {activeTab === 'quotations' && (
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Quotation Preview</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">QTN-{lead.id.replace('LEAD-', '')} &middot; Issued {formatDate(lead.lastActivityDate)}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onModifyQuotation ?? onAddQuotation}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Modify Quotation
+                </button>
+                <button
+                  onClick={onDownloadQuotation}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Download PDF
+                </button>
+              </div>
+            </div>
+
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-950 overflow-hidden">
+              <IssuerHeader />
+              <div className="p-6 sm:p-8">
+              <div className="flex items-start justify-between mb-6 pb-6 border-b border-slate-200 dark:border-slate-800 flex-wrap gap-4">
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Quotation for</p>
+                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-50 mt-1">{lead.companyAlias || lead.companyName}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{lead.contactPerson} &middot; {lead.emailId}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">From</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 mt-1">LOTS247</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Valid till {formatDate(lead.lastActivityDate)}</p>
+                </div>
+              </div>
+
+              <table className="w-full text-sm mb-6">
+                <thead>
+                  <tr className="text-left text-xs text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                    <th className="py-2 font-medium">Item</th>
+                    <th className="py-2 font-medium text-right">Qty</th>
+                    <th className="py-2 font-medium text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="text-slate-900 dark:text-slate-50">
+                  <tr className="border-b border-slate-100 dark:border-slate-800">
+                    <td className="py-3">Standard Fleet Plan</td>
+                    <td className="py-3 text-right">1</td>
+                    <td className="py-3 text-right">₹15,000</td>
+                  </tr>
+                  <tr className="border-b border-slate-100 dark:border-slate-800">
+                    <td className="py-3">Priority Support</td>
+                    <td className="py-3 text-right">1</td>
+                    <td className="py-3 text-right">₹2,000</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div className="ml-auto max-w-xs space-y-2 text-sm">
+                <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                  <span>Subtotal</span>
+                  <span>₹17,000</span>
+                </div>
+                <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                  <span>Discount (0%)</span>
+                  <span>-₹0</span>
+                </div>
+                <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                  <span>GST (18%)</span>
+                  <span>₹3,060</span>
+                </div>
+                <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-800 font-semibold text-slate-900 dark:text-slate-50">
+                  <span>Total</span>
+                  <span>₹20,060</span>
+                </div>
+              </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

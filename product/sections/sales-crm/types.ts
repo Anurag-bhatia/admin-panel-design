@@ -31,7 +31,7 @@ export interface Lead {
 export interface TimelineActivity {
   id: string
   leadId: string
-  type: 'created' | 'assignment' | 'status_change' | 'follow_up' | 'document_upload' | 'note'
+  type: 'created' | 'assignment' | 'status_change' | 'follow_up' | 'document_upload' | 'note' | 'quotation_created'
   performedBy: string
   performedByName: string
   timestamp: string

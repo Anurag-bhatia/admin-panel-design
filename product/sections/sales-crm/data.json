@@ -455,6 +455,18 @@
       }
     },
     {
+      "id": "ACT-001A",
+      "leadId": "LLD-1191901",
+      "type": "quotation_created",
+      "performedBy": "USR-003",
+      "performedByName": "Amit Patel",
+      "timestamp": "2024-01-24T16:10:00Z",
+      "description": "Quotation created",
+      "details": {
+        "notes": "QTN-1191901 for Standard Fleet plan with Priority Support add-on. Total ₹20,060 incl. GST."
+      }
+    },
+    {
       "id": "ACT-002",
       "leadId": "LLD-1191901",
       "type": "follow_up",
