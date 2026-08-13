@@ -3,7 +3,6 @@ import {
   X,
   ArrowRight,
   UserPlus,
-  Upload,
   ChevronDown,
 } from 'lucide-react'
 import type { Lead } from '@/../product/sections/sales-crm/types'
@@ -13,7 +12,6 @@ interface BulkActionsBarProps {
   onClearSelection: () => void
   onMoveStatus?: (status: Lead['status']) => void
   onAssignOwner?: () => void
-  onBulkUpdate?: () => void
 }
 
 const STATUS_OPTIONS: { key: Lead['status']; label: string }[] = [
@@ -32,7 +30,6 @@ export function BulkActionsBar({
   onClearSelection,
   onMoveStatus,
   onAssignOwner,
-  onBulkUpdate,
 }: BulkActionsBarProps) {
   const [showStatusDropdown, setShowStatusDropdown] = useState(false)
 
@@ -101,21 +98,6 @@ export function BulkActionsBar({
           >
             <UserPlus className="h-4 w-4" />
             <span>Assign Owner</span>
-          </button>
-
-          {/* Divider */}
-          <div className="w-px h-6 bg-slate-700 mx-1" />
-
-          {/* Bulk Update */}
-          <button
-            onClick={() => {
-              setShowStatusDropdown(false)
-              onBulkUpdate?.()
-            }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-cyan-400 hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <Upload className="h-4 w-4" />
-            <span>Bulk Update</span>
           </button>
         </div>
       </div>

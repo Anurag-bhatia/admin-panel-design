@@ -3,6 +3,7 @@ import { Search, Filter, TrendingUp, Users, Target } from 'lucide-react'
 import type { LeadsProps, Lead } from '@/../product/sections/sales-crm/types'
 import { LeadsTable } from './LeadsTable'
 import { AddLeadModal } from './AddLeadModal'
+import { AddQuotationModal } from './AddQuotationModal'
 import { BulkUploadModal } from './BulkUploadModal'
 import { LeadDetailView } from './LeadDetailView'
 import { AssignLeadModal } from './AssignLeadModal'
@@ -43,6 +44,7 @@ export function LeadsDashboard({
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false)
+  const [showQuotationModal, setShowQuotationModal] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
   const [assignLeadId, setAssignLeadId] = useState<string | null>(null)
@@ -183,6 +185,20 @@ export function LeadsDashboard({
     { key: 'lost', label: 'Lost' },
   ]
 
+  // If the Add Quotation builder is open, render it inline (keeps app sidebar visible)
+  if (showQuotationModal) {
+    return (
+      <AddQuotationModal
+        leads={leads}
+        onSave={(data, isDraft) => {
+          console.log('Save quotation', { data, isDraft })
+          setShowQuotationModal(false)
+        }}
+        onClose={() => setShowQuotationModal(false)}
+      />
+    )
+  }
+
   // If a lead is selected, show detail view
   if (selectedLead) {
     return (
@@ -276,6 +292,7 @@ export function LeadsDashboard({
             <LeadsListHeader
               onCreateLead={() => setShowAddModal(true)}
               onBulkUpload={() => setShowBulkUploadModal(true)}
+              onAddQuotation={() => setShowQuotationModal(true)}
             />
           </div>
 
@@ -288,8 +305,7 @@ export function LeadsDashboard({
                   <Users className="w-4 h-4 text-cyan-600" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-0.5">{metrics.total}</div>
-              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Across all stages</p>
+              <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{metrics.total}</div>
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-3 sm:p-4 shadow-sm">
@@ -299,8 +315,7 @@ export function LeadsDashboard({
                   <Target className="w-4 h-4 text-orange-600" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-0.5">{metrics.newLeads}</div>
-              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Pending assignment</p>
+              <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{metrics.newLeads}</div>
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-3 sm:p-4 shadow-sm">
@@ -310,8 +325,7 @@ export function LeadsDashboard({
                   <TrendingUp className="w-4 h-4 text-green-600" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-0.5">{metrics.converted}</div>
-              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Successfully closed</p>
+              <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{metrics.converted}</div>
             </div>
           </div>
         </div>
@@ -498,7 +512,6 @@ export function LeadsDashboard({
             onClearSelection={() => setSelectedLeads(new Set())}
             onMoveStatus={handleBulkMoveStatus}
             onAssignOwner={handleBulkAssignOwner}
-            onBulkUpdate={() => setShowBulkUploadModal(true)}
           />
         )}
 

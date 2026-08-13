@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock } from 'lucide-react'
 import type { Lead, TimelineActivity, Document, User as UserType } from '@/../product/sections/sales-crm/types'
 
 type TabType = 'details' | 'documents'
@@ -20,6 +20,7 @@ interface LeadDetailViewProps {
 export function LeadDetailView({ lead, timelineActivities, documents, users, onClose, onEdit, onAssign, onChangeStatus, onAddFollowUp, onUploadDocument }: LeadDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
   const [showStatusMenu, setShowStatusMenu] = useState(false)
+  const [showMoveMenu, setShowMoveMenu] = useState(false)
 
   const leadTimeline = timelineActivities.filter(activity => activity.leadId === lead.id)
   const leadDocuments = documents.filter(doc => doc.leadId === lead.id)
@@ -39,6 +40,7 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
   const handleStatusChange = (newStatus: Lead['status']) => {
     onChangeStatus?.(lead.id, newStatus)
     setShowStatusMenu(false)
+    setShowMoveMenu(false)
   }
 
   const getStatusBadgeClasses = (status: Lead['status']) => {
@@ -141,6 +143,39 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
               <MessageSquare className="w-4 h-4" />
               <span className="hidden sm:inline">Follow-up</span>
             </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowMoveMenu(!showMoveMenu)}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+              >
+                <ArrowRight className="w-4 h-4" />
+                <span className="hidden sm:inline">Move Ticket</span>
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              {showMoveMenu && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowMoveMenu(false)} />
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-20">
+                    <div className="py-1 max-h-60 overflow-y-auto">
+                      {statusOptions.map(option => (
+                        <button
+                          key={option.value}
+                          onClick={() => handleStatusChange(option.value)}
+                          className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between ${
+                            lead.status === option.value ? 'bg-slate-50 dark:bg-slate-700' : ''
+                          }`}
+                        >
+                          <span className="text-slate-900 dark:text-white">{option.label}</span>
+                          {lead.status === option.value && (
+                            <div className="w-2 h-2 rounded-full bg-cyan-600" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
             <button
               onClick={onAssign}
               className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"

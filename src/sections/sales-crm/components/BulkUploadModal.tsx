@@ -157,7 +157,7 @@ export function BulkUploadModal({ onUpload, onDownloadTemplate, onClose }: BulkU
         {/* Content */}
         <div className="p-6 space-y-6">
           {/* Upload File */}
-          <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600 p-4">
+          <div>
             <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3">
               Upload Your File
             </h3>
