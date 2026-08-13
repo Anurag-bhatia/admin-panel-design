@@ -673,6 +673,7 @@
     "Cold Call",
     "LinkedIn",
     "Trade Show",
+    "Physical Meeting",
     "Partner",
     "Email Campaign",
     "Other"
@@ -680,7 +681,8 @@
   "serviceTypes": [
     "Fleet Operator",
     "Corporate",
-    "Individual"
+    "Individual",
+    "Other"
   ],
   "serviceSubTypes": {
     "Fleet Operator": [
@@ -700,6 +702,9 @@
     "Individual": [
       "Small Business Owner",
       "Owner-Operator"
+    ],
+    "Other": [
+      "Other"
     ]
   },
   "activityTypes": [

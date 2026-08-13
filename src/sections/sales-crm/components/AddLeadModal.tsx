@@ -17,6 +17,47 @@ const STEPS = [
   { id: 3, title: 'Location', shortTitle: 'Location' },
 ]
 
+const INDIAN_STATES_CITIES: Record<string, string[]> = {
+  'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Nellore', 'Tirupati', 'Kurnool', 'Rajahmundry', 'Kakinada'],
+  'Arunachal Pradesh': ['Itanagar', 'Naharlagun', 'Pasighat', 'Tawang'],
+  'Assam': ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Nagaon', 'Tinsukia'],
+  'Bihar': ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Darbhanga', 'Purnia'],
+  'Chhattisgarh': ['Raipur', 'Bhilai', 'Bilaspur', 'Korba', 'Durg'],
+  'Goa': ['Panaji', 'Margao', 'Vasco da Gama', 'Mapusa'],
+  'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar', 'Gandhinagar'],
+  'Haryana': ['Gurugram', 'Faridabad', 'Panipat', 'Ambala', 'Karnal', 'Hisar', 'Rohtak'],
+  'Himachal Pradesh': ['Shimla', 'Manali', 'Dharamshala', 'Solan', 'Mandi'],
+  'Jharkhand': ['Ranchi', 'Jamshedpur', 'Dhanbad', 'Bokaro', 'Hazaribagh'],
+  'Karnataka': ['Bengaluru', 'Mysuru', 'Mangaluru', 'Hubballi', 'Belagavi', 'Davangere', 'Ballari'],
+  'Kerala': ['Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur', 'Kollam', 'Kannur'],
+  'Madhya Pradesh': ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior', 'Ujjain', 'Sagar'],
+  'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Aurangabad', 'Solapur', 'Thane', 'Navi Mumbai', 'Kolhapur'],
+  'Manipur': ['Imphal', 'Thoubal', 'Bishnupur'],
+  'Meghalaya': ['Shillong', 'Tura', 'Jowai'],
+  'Mizoram': ['Aizawl', 'Lunglei', 'Champhai'],
+  'Nagaland': ['Kohima', 'Dimapur', 'Mokokchung'],
+  'Odisha': ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Berhampur', 'Sambalpur'],
+  'Punjab': ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda', 'Mohali'],
+  'Rajasthan': ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Ajmer', 'Bikaner'],
+  'Sikkim': ['Gangtok', 'Namchi', 'Gyalshing'],
+  'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tirunelveli', 'Erode', 'Vellore'],
+  'Telangana': ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam'],
+  'Tripura': ['Agartala', 'Udaipur', 'Dharmanagar'],
+  'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Ghaziabad', 'Agra', 'Varanasi', 'Meerut', 'Prayagraj', 'Noida', 'Bareilly', 'Aligarh'],
+  'Uttarakhand': ['Dehradun', 'Haridwar', 'Roorkee', 'Haldwani', 'Rudrapur'],
+  'West Bengal': ['Kolkata', 'Howrah', 'Durgapur', 'Asansol', 'Siliguri', 'Bardhaman'],
+  'Andaman and Nicobar Islands': ['Port Blair'],
+  'Chandigarh': ['Chandigarh'],
+  'Dadra and Nagar Haveli and Daman and Diu': ['Daman', 'Silvassa', 'Diu'],
+  'Delhi': ['New Delhi', 'North Delhi', 'South Delhi', 'East Delhi', 'West Delhi'],
+  'Jammu and Kashmir': ['Srinagar', 'Jammu', 'Anantnag', 'Baramulla'],
+  'Ladakh': ['Leh', 'Kargil'],
+  'Lakshadweep': ['Kavaratti'],
+  'Puducherry': ['Puducherry', 'Karaikal', 'Yanam', 'Mahe'],
+}
+
+const INDIAN_STATES = Object.keys(INDIAN_STATES_CITIES).sort()
+
 export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSubmit, onClose }: AddLeadModalProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<LeadFormData>({
@@ -51,9 +92,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
       if (!formData.lotsFor) newErrors.lotsFor = 'Service Type is required'
       if (!formData.numberOfTrucks || formData.numberOfTrucks <= 0) newErrors.numberOfTrucks = 'Number of Vehicles must be greater than 0'
     } else if (step === 1) {
-      if (!formData.companyAlias) newErrors.companyAlias = 'Company Alias is required'
       if (!formData.companyName) newErrors.companyName = 'Company Name is required'
-      if (!formData.gstNumber) newErrors.gstNumber = 'GST Number is required'
     } else if (step === 2) {
       if (!formData.contactPerson) newErrors.contactPerson = 'POC Name is required'
       if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone Number is required'
@@ -62,8 +101,6 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
       if (!formData.country) newErrors.country = 'Country is required'
       if (!formData.state) newErrors.state = 'State is required'
       if (!formData.city) newErrors.city = 'City is required'
-      if (!formData.area) newErrors.area = 'Area is required'
-      if (!formData.addressLane) newErrors.addressLane = 'Address Lane is required'
       if (!formData.pinCode) newErrors.pinCode = 'Pin Code is required'
     }
 
@@ -239,10 +276,9 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
                     className={selectClass(!!errors.lotsFor)}
                   >
                     <option value="">Select Service Type</option>
-                    <option value="CAAS">CAAS</option>
-                    <option value="LAAS">LAAS</option>
-                    <option value="Wills">Wills</option>
+                    <option value="ChallanPay">ChallanPay</option>
                     <option value="LOTS247">LOTS247</option>
+                    <option value="Wills24">Wills24</option>
                   </select>
                   {errors.lotsFor && <p className="mt-1 text-xs text-red-500">{errors.lotsFor}</p>}
                 </div>
@@ -272,7 +308,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    Company Alias <span className="text-red-500">*</span>
+                    Company Alias
                   </label>
                   <input
                     type="text"
@@ -300,7 +336,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    GST Number <span className="text-red-500">*</span>
+                    GST Number
                   </label>
                   <input
                     type="text"
@@ -388,13 +424,16 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
                     State <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.state}
-                    onChange={e => setFormData({ ...formData, state: e.target.value })}
-                    placeholder="Maharashtra"
-                    className={inputClass(!!errors.state)}
-                  />
+                    onChange={e => setFormData({ ...formData, state: e.target.value, city: '' })}
+                    className={selectClass(!!errors.state)}
+                  >
+                    <option value="">Select State</option>
+                    {INDIAN_STATES.map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
                   {errors.state && <p className="mt-1 text-xs text-red-500">{errors.state}</p>}
                 </div>
 
@@ -402,19 +441,23 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
                     City <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.city}
                     onChange={e => setFormData({ ...formData, city: e.target.value })}
-                    placeholder="Mumbai"
-                    className={inputClass(!!errors.city)}
-                  />
+                    disabled={!formData.state}
+                    className={`${selectClass(!!errors.city)} disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    <option value="">Select City</option>
+                    {(INDIAN_STATES_CITIES[formData.state] || []).map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
                   {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city}</p>}
                 </div>
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    Area <span className="text-red-500">*</span>
+                    Area
                   </label>
                   <input
                     type="text"
@@ -428,7 +471,7 @@ export function AddLeadModal({ leadSources, serviceTypes, serviceSubTypes, onSub
 
                 <div className="md:col-span-2">
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
-                    Address Lane <span className="text-red-500">*</span>
+                    Address Lane
                   </label>
                   <input
                     type="text"
