@@ -92,7 +92,7 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                 className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
               >
                 <FileText className="w-4 h-4" />
-                <span className="hidden sm:inline">+ Add Quotation</span>
+                <span className="hidden sm:inline">Add Quotation</span>
               </button>
             )}
             <button
@@ -223,7 +223,6 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InfoField label="Assigned To" value={assignedUser ? assignedUser.fullName : 'Unassigned'} />
                     {assignedUser && <InfoField label="Role" value={assignedUser.role} />}
-                    {lead.assignedTeam && <InfoField label="Team" value={lead.assignedTeam} />}
                   </div>
                 </div>
 
@@ -240,14 +239,8 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
 
             {/* Right: Activity Timeline */}
             <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">Activity Timeline</h3>
-                <button
-                  onClick={onAddFollowUp}
-                  className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
-                >
-                  + Add
-                </button>
               </div>
 
               {leadTimeline.length === 0 ? (
@@ -256,21 +249,24 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                   <p className="text-sm text-slate-500 dark:text-slate-400">No activities yet</p>
                 </div>
               ) : (
-                <div className="space-y-4 max-h-[600px] overflow-y-auto">
-                  {leadTimeline.map(activity => (
-                    <div key={activity.id} className="flex gap-3">
-                      <div className="w-1.5 h-1.5 bg-cyan-600 rounded-full mt-2 shrink-0" />
-                      <div className="flex-1 pb-4 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50 mb-0.5">{activity.description}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {activity.performedByName} &middot; {formatDateTime(activity.timestamp)}
-                        </p>
-                        {activity.details?.notes && (
-                          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5">{activity.details.notes}</p>
-                        )}
+                <div className="relative max-h-[600px] overflow-y-auto">
+                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-slate-200 dark:bg-slate-700" />
+                  <div className="space-y-5">
+                    {leadTimeline.map(activity => (
+                      <div key={activity.id} className="relative flex gap-4">
+                        <div className="w-4 h-4 rounded-full border-2 border-cyan-600 bg-white dark:bg-slate-900 shrink-0 mt-0.5 z-10" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-900 dark:text-slate-50 mb-0.5">{activity.description}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {activity.performedByName} &middot; {formatDateTime(activity.timestamp)}
+                          </p>
+                          {activity.details?.notes && (
+                            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5">{activity.details.notes}</p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
