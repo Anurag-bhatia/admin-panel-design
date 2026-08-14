@@ -76,7 +76,7 @@ export function LinkedIncidentTab({ snapshot }: LinkedIncidentTabProps) {
                   Vehicle Number
                 </label>
                 <p className="text-sm font-mono text-slate-900 dark:text-white">
-                  {snapshot.vehicleNumber}
+                  {snapshot.vehicleNumber.replace(/-/g, '')}
                 </p>
               </div>
 
@@ -85,7 +85,7 @@ export function LinkedIncidentTab({ snapshot }: LinkedIncidentTabProps) {
                   Challan Number
                 </label>
                 <p className="text-sm font-mono text-slate-900 dark:text-white">
-                  {snapshot.challanNumber}
+                  {snapshot.challanNumber.replace(/-/g, '')}
                 </p>
               </div>
 
@@ -137,43 +137,10 @@ export function LinkedIncidentTab({ snapshot }: LinkedIncidentTabProps) {
                 </p>
               </div>
 
-              {snapshot.resolvedOn && (
-                <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                    Resolved On
-                  </label>
-                  <p className="text-sm text-slate-900 dark:text-white">
-                    {formatDateTime(snapshot.resolvedOn)}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Timeline Summary */}
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-            Timeline Summary
-          </h2>
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
-            <div className="space-y-3">
-              {snapshot.timelineSummary.map((entry, index) => (
-                <div key={index} className="relative pl-8">
-                  {index < snapshot.timelineSummary.length - 1 && (
-                    <div className="absolute left-[11px] top-6 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700" />
-                  )}
-                  <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500" />
-                  </div>
-                  <p className="text-sm text-slate-700 dark:text-slate-300 pb-3">
-                    {entry}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   MoreHorizontal,
-  UserPlus,
+  ArrowRightLeft,
   AlertTriangle,
   ChevronDown,
 } from 'lucide-react'
@@ -9,21 +9,42 @@ import {
 import type {
   Dispute,
   DisputePriority,
+  DisputeStatus,
 } from '@/../product/sections/disputes/types'
+import { AssignDepartmentModal } from './AssignDepartmentModal'
 
 interface DisputeRowProps {
   dispute: Dispute
   isSelected: boolean
+  showDepartment?: boolean
   onSelect: (selected: boolean) => void
   onView?: () => void
-  onAssignReviewer?: () => void
+  onMoveStage?: (stage: DisputeStatus) => void
   onEscalate?: () => void
   onChangePriority?: (priority: DisputePriority) => void
 }
 
+const MOVE_STAGE_OPTIONS: { key: DisputeStatus; label: string }[] = [
+  { key: 'new_incident', label: 'New Incident' },
+  { key: 'in_progress', label: 'In Progress' },
+  { key: 'assigned', label: 'Assigned' },
+  { key: 'transfer_to_department', label: 'Transfer to Department' },
+  { key: 'reroute', label: 'Reroute' },
+  { key: 'settled', label: 'Settled' },
+  { key: 'hold', label: 'Hold' },
+]
+
 const TYPE_LABELS: Record<string, { label: string; className: string }> = {
   refund: {
     label: 'Refund',
+    className: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400',
+  },
+  '48hr_refund': {
+    label: '48 hr Refund',
+    className: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400',
+  },
+  tat_breach_refund: {
+    label: 'TAT Breach Refund',
     className: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400',
   },
   service: {
@@ -35,7 +56,7 @@ const TYPE_LABELS: Record<string, { label: string; className: string }> = {
     className: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
   },
   legal_escalation: {
-    label: 'Legal',
+    label: 'Legal Escalation',
     className: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
   },
 }
@@ -92,14 +113,17 @@ function formatTime(dateString: string): string {
 export function DisputeRow({
   dispute,
   isSelected,
+  showDepartment = false,
   onSelect,
   onView,
-  onAssignReviewer,
+  onMoveStage,
   onEscalate,
   onChangePriority,
 }: DisputeRowProps) {
   const [showMenu, setShowMenu] = useState(false)
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false)
+  const [showMoveDropdown, setShowMoveDropdown] = useState(false)
+  const [showDepartmentModal, setShowDepartmentModal] = useState(false)
 
   const typeConfig = TYPE_LABELS[dispute.disputeType] || { label: dispute.disputeType, className: '' }
   const priorityConfig = PRIORITY_LABELS[dispute.priority] || { label: dispute.priority, className: '' }
@@ -124,7 +148,7 @@ export function DisputeRow({
       {/* Dispute ID */}
       <td className="px-4 py-3">
         <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">
-          {dispute.disputeId}
+          {dispute.disputeId.replace(/-/g, '')}
         </span>
       </td>
 
@@ -146,13 +170,6 @@ export function DisputeRow({
           className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${typeConfig.className}`}
         >
           {typeConfig.label}
-        </span>
-      </td>
-
-      {/* Raised By */}
-      <td className="px-4 py-3">
-        <span className="text-sm text-slate-700 dark:text-slate-300">
-          {RAISED_BY_LABELS[dispute.raisedBy] || dispute.raisedBy}
         </span>
       </td>
 
@@ -189,33 +206,14 @@ export function DisputeRow({
         </div>
       </td>
 
-      {/* Assigned To */}
-      <td className="px-4 py-3">
-        {dispute.assignedTo ? (
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-full bg-cyan-600 flex items-center justify-center text-xs font-medium text-white">
-              {dispute.assignedTo.charAt(0)}
-            </div>
-            <span className="text-sm text-slate-700 dark:text-slate-300">
-              {dispute.assignedTo.split(' ')[0]}
-            </span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-400 dark:text-slate-500">
-              ?
-            </div>
-            <span className="text-sm text-slate-400 dark:text-slate-500">Unassigned</span>
-          </div>
-        )}
-      </td>
-
-      {/* Source */}
-      <td className="px-4 py-3">
-        <span className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-[120px] block">
-          {dispute.source}
-        </span>
-      </td>
+      {/* Department (only in Transfer to Department queue) */}
+      {showDepartment && (
+        <td className="px-4 py-3">
+          <span className="text-sm text-slate-700 dark:text-slate-300">
+            {dispute.transferredToDepartment || '—'}
+          </span>
+        </td>
+      )}
 
       {/* Actions Menu */}
       <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
@@ -234,20 +232,44 @@ export function DisputeRow({
                 onClick={() => {
                   setShowMenu(false)
                   setShowPriorityDropdown(false)
+                  setShowMoveDropdown(false)
                 }}
               />
               <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
-                {/* Assign Reviewer */}
-                <button
-                  onClick={() => {
-                    onAssignReviewer?.()
-                    setShowMenu(false)
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  Assign Reviewer
-                </button>
+                {/* Move Ticket */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowMoveDropdown(!showMoveDropdown)}
+                    className="w-full flex items-center justify-between gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                  >
+                    <span className="flex items-center gap-2">
+                      <ArrowRightLeft className="h-4 w-4" />
+                      Move Ticket
+                    </span>
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                  {showMoveDropdown && (
+                    <div className="absolute right-full top-0 mr-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1">
+                      {MOVE_STAGE_OPTIONS.filter((s) => s.key !== dispute.status).map((stage) => (
+                        <button
+                          key={stage.key}
+                          onClick={() => {
+                            setShowMenu(false)
+                            setShowMoveDropdown(false)
+                            if (stage.key === 'transfer_to_department') {
+                              setShowDepartmentModal(true)
+                            } else {
+                              onMoveStage?.(stage.key)
+                            }
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                        >
+                          {stage.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 <div className="border-t border-slate-100 dark:border-slate-700 my-1" />
 
@@ -288,6 +310,14 @@ export function DisputeRow({
             </>
           )}
         </div>
+
+        {showDepartmentModal && (
+          <AssignDepartmentModal
+            currentDepartment={dispute.transferredToDepartment}
+            onAssign={() => setShowDepartmentModal(false)}
+            onClose={() => setShowDepartmentModal(false)}
+          />
+        )}
       </td>
     </tr>
   )

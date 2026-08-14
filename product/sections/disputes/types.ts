@@ -2,9 +2,9 @@
 // Data Types
 // =============================================================================
 
-export type DisputeType = 'refund' | 'service' | 'payment' | 'legal_escalation'
+export type DisputeType = 'refund' | 'service' | 'payment' | 'legal_escalation' | '48hr_refund' | 'tat_breach_refund'
 
-export type DisputeStatus = 'open' | 'in_progress' | 'hold' | 'refund_raised' | 'not_settled' | 'settled'
+export type DisputeStatus = 'new_incident' | 'in_progress' | 'assigned' | 'transfer_to_department' | 'reroute' | 'settled' | 'not_settled' | 'hold'
 
 export type DisputePriority = 'low' | 'medium' | 'high' | 'critical'
 
@@ -79,6 +79,7 @@ export interface Dispute {
   createdOn: string
   lastUpdated: string
   assignedTo: string | null
+  transferredToDepartment: string | null
   source: string
   slaDeadline: string
   slaDays: number
@@ -90,12 +91,14 @@ export interface Dispute {
 }
 
 export interface StageCounts {
-  open: number
+  new_incident: number
   in_progress: number
-  hold: number
-  refund_raised: number
-  not_settled: number
+  assigned: number
+  transfer_to_department: number
+  reroute: number
   settled: number
+  not_settled: number
+  hold: number
 }
 
 export interface Reviewer {

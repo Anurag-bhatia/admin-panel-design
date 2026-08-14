@@ -7,10 +7,11 @@ interface StageTabsProps {
 }
 
 const STAGE_CONFIG: { key: DisputeStatus; label: string }[] = [
-  { key: 'open', label: 'Open' },
+  { key: 'new_incident', label: 'New Incident' },
   { key: 'in_progress', label: 'In Progress' },
-  { key: 'refund_raised', label: 'Refund Raised' },
-  { key: 'not_settled', label: 'Not Settled' },
+  { key: 'assigned', label: 'Assigned' },
+  { key: 'transfer_to_department', label: 'Transfer to Department' },
+  { key: 'reroute', label: 'Reroute' },
   { key: 'settled', label: 'Settled' },
   { key: 'hold', label: 'Hold' },
 ]

@@ -17,6 +17,8 @@ import { LinkedIncidentTab } from './LinkedIncidentTab'
 import { InvestigationTab } from './InvestigationTab'
 import { EvidenceTab } from './EvidenceTab'
 import { DisputeActivityTab, type DisputeFollowUp } from './DisputeActivityTab'
+import { AssignReviewerModal } from './AssignReviewerModal'
+import { AssignDepartmentModal } from './AssignDepartmentModal'
 
 type TabType = 'summary' | 'linkedIncident' | 'investigation' | 'evidence' | 'activity'
 
@@ -73,8 +75,9 @@ export function DisputeDetailView({
   onAddFollowUp,
 }: DisputeDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('activity')
-  const [showReviewerDropdown, setShowReviewerDropdown] = useState(false)
+  const [showReviewerModal, setShowReviewerModal] = useState(false)
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
+  const [showDepartmentModal, setShowDepartmentModal] = useState(false)
 
   const getSlaInfo = () => {
     const now = new Date()
@@ -94,10 +97,10 @@ export function DisputeDetailView({
   const priorityConfig = PRIORITY_LABELS[dispute.priority] || { label: dispute.priority, className: '' }
 
   // Determine which actions are available based on stage
-  const canEscalate = dispute.status === 'open' || dispute.status === 'in_progress'
-  const canApproveRefund = dispute.status === 'in_progress' || dispute.status === 'refund_raised'
-  const canReject = dispute.status === 'open' || dispute.status === 'in_progress' || dispute.status === 'refund_raised'
-  const canClose = dispute.status === 'in_progress' || dispute.status === 'refund_raised'
+  const canEscalate = dispute.status === 'new_incident' || dispute.status === 'in_progress' || dispute.status === 'assigned'
+  const canApproveRefund = dispute.status === 'in_progress' || dispute.status === 'assigned' || dispute.status === 'reroute'
+  const canReject = dispute.status === 'new_incident' || dispute.status === 'in_progress' || dispute.status === 'assigned' || dispute.status === 'reroute'
+  const canClose = dispute.status === 'in_progress' || dispute.status === 'assigned' || dispute.status === 'reroute'
   const isTerminal = dispute.status === 'settled' || dispute.status === 'not_settled'
 
   const tabs: { key: TabType; label: string }[] = [
@@ -122,7 +125,7 @@ export function DisputeDetailView({
             </button>
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-semibold text-slate-900 dark:text-white font-mono">
-                {dispute.disputeId}
+                {dispute.disputeId.replace(/-/g, '')}
               </h1>
               <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${priorityConfig.className}`}>
                 {priorityConfig.label}
@@ -149,10 +152,11 @@ export function DisputeDetailView({
                 />
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
                   {[
-                    { key: 'open', label: 'Open' },
+                    { key: 'new_incident', label: 'New Incident' },
                     { key: 'in_progress', label: 'In Progress' },
-                    { key: 'refund_raised', label: 'Refund Raised' },
-                    { key: 'not_settled', label: 'Not Settled' },
+                    { key: 'assigned', label: 'Assigned' },
+                    { key: 'transfer_to_department', label: 'Transfer to Department' },
+                    { key: 'reroute', label: 'Reroute' },
                     { key: 'settled', label: 'Settled' },
                     { key: 'hold', label: 'Hold' },
                   ]
@@ -161,8 +165,12 @@ export function DisputeDetailView({
                       <button
                         key={stage.key}
                         onClick={() => {
-                          onCloseDispute?.(dispute.id)
                           setShowMoveDropdown(false)
+                          if (stage.key === 'transfer_to_department') {
+                            setShowDepartmentModal(true)
+                          } else {
+                            onCloseDispute?.(dispute.id)
+                          }
                         }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                       >
@@ -253,41 +261,13 @@ export function DisputeDetailView({
                       {dispute.assignedTo || 'No reviewer assigned'}
                     </span>
                   </div>
-                  {!isTerminal && (
-                    <button
-                      onClick={() => setShowReviewerDropdown(!showReviewerDropdown)}
-                      className="text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium"
-                    >
-                      {dispute.assignedTo ? 'Change' : 'Assign'}
-                    </button>
-                  )}
+                  <button
+                    onClick={() => setShowReviewerModal(true)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 rounded-md transition-colors"
+                  >
+                    {dispute.assignedTo ? 'Change' : 'Assign'}
+                  </button>
                 </div>
-
-                {showReviewerDropdown && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setShowReviewerDropdown(false)}
-                    />
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
-                      {reviewers.map((reviewer) => (
-                        <button
-                          key={reviewer.id}
-                          onClick={() => {
-                            onAssignReviewer?.(dispute.id, reviewer.id)
-                            setShowReviewerDropdown(false)
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                        >
-                          <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs">
-                            {reviewer.name.charAt(0)}
-                          </div>
-                          <span>{reviewer.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
               </div>
 
               {/* Past Assignments */}
@@ -373,17 +353,36 @@ export function DisputeDetailView({
                   />
                 )}
                 {activeTab === 'activity' && (
-                  <DisputeActivityTab
-                    followUps={followUps}
-                    activities={dispute.activityLog}
-                    onAddFollowUp={(followUp) => onAddFollowUp?.(dispute.id, followUp)}
-                  />
+                  <DisputeActivityTab activities={dispute.activityLog} />
                 )}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {showReviewerModal && (
+        <AssignReviewerModal
+          selectedCount={1}
+          reviewers={reviewers}
+          currentReviewerId={reviewers.find((r) => r.name === dispute.assignedTo)?.id || null}
+          onAssign={(reviewerId) => {
+            onAssignReviewer?.(dispute.id, reviewerId)
+            setShowReviewerModal(false)
+          }}
+          onClose={() => setShowReviewerModal(false)}
+        />
+      )}
+
+      {showDepartmentModal && (
+        <AssignDepartmentModal
+          currentDepartment={dispute.transferredToDepartment}
+          onAssign={() => {
+            setShowDepartmentModal(false)
+          }}
+          onClose={() => setShowDepartmentModal(false)}
+        />
+      )}
     </div>
   )
 }

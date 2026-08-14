@@ -54,7 +54,7 @@ export function DisputeList({
   const [sidebarView, setSidebarView] = useState<'all' | 'my'>('all')
 
   // Active stage
-  const [activeStage, setActiveStage] = useState<DisputeStatus>('open')
+  const [activeStage, setActiveStage] = useState<DisputeStatus>('new_incident')
 
   // Search
   const [searchQuery, setSearchQuery] = useState('')
@@ -126,12 +126,14 @@ export function DisputeList({
 
     const myDisputes = disputes.filter((d) => d.assignedTo === currentUserName)
     return {
-      open: myDisputes.filter((d) => d.status === 'open').length,
+      new_incident: myDisputes.filter((d) => d.status === 'new_incident').length,
       in_progress: myDisputes.filter((d) => d.status === 'in_progress').length,
-      hold: myDisputes.filter((d) => d.status === 'hold').length,
-      refund_raised: myDisputes.filter((d) => d.status === 'refund_raised').length,
-      not_settled: myDisputes.filter((d) => d.status === 'not_settled').length,
+      assigned: myDisputes.filter((d) => d.status === 'assigned').length,
+      transfer_to_department: myDisputes.filter((d) => d.status === 'transfer_to_department').length,
+      reroute: myDisputes.filter((d) => d.status === 'reroute').length,
       settled: myDisputes.filter((d) => d.status === 'settled').length,
+      not_settled: myDisputes.filter((d) => d.status === 'not_settled').length,
+      hold: myDisputes.filter((d) => d.status === 'hold').length,
     }
   }, [sidebarView, stageCounts, disputes])
 
@@ -194,9 +196,6 @@ export function DisputeList({
                   Type
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Raised By
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Priority
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -205,12 +204,11 @@ export function DisputeList({
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Updated
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Assigned To
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Source
-                </th>
+                {activeStage === 'transfer_to_department' && (
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Department
+                  </th>
+                )}
                 <th className="px-4 py-3 text-left">
                   <span className="sr-only">Actions</span>
                 </th>
@@ -220,7 +218,7 @@ export function DisputeList({
               {displayedDisputes.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={11}
+                    colSpan={activeStage === 'transfer_to_department' ? 9 : 8}
                     className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
@@ -254,11 +252,9 @@ export function DisputeList({
                     key={dispute.id}
                     dispute={dispute}
                     isSelected={selectedIds.has(dispute.id)}
+                    showDepartment={activeStage === 'transfer_to_department'}
                     onSelect={(checked) => handleSelectOne(dispute.id, checked)}
                     onView={() => onViewDispute?.(dispute.id)}
-                    onAssignReviewer={() =>
-                      onAssignReviewer?.(dispute.id)
-                    }
                     onEscalate={() => onEscalate?.(dispute.id)}
                     onChangePriority={(priority) =>
                       onChangePriority?.(dispute.id, priority)

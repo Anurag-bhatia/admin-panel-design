@@ -6,6 +6,8 @@ interface SummaryTabProps {
 
 const TYPE_LABELS: Record<string, string> = {
   refund: 'Refund Dispute',
+  '48hr_refund': '48 hr Refund',
+  tat_breach_refund: 'TAT Breach Refund',
   service: 'Service Dispute',
   payment: 'Payment Dispute',
   legal_escalation: 'Legal Escalation',
@@ -18,25 +20,37 @@ const RAISED_BY_LABELS: Record<string, string> = {
 }
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  open: {
-    label: 'Open',
+  new_incident: {
+    label: 'New Incident',
     className: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
   },
   in_progress: {
     label: 'In Progress',
     className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
   },
-  refund_raised: {
-    label: 'Refund Raised',
+  assigned: {
+    label: 'Assigned',
+    className: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+  },
+  transfer_to_department: {
+    label: 'Transfer to Department',
+    className: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400',
+  },
+  reroute: {
+    label: 'Reroute',
     className: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+  },
+  settled: {
+    label: 'Settled',
+    className: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
   },
   not_settled: {
     label: 'Not Settled',
     className: 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
   },
-  settled: {
-    label: 'Settled',
-    className: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+  hold: {
+    label: 'Hold',
+    className: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
   },
 }
 
@@ -77,7 +91,7 @@ export function SummaryTab({ dispute }: SummaryTabProps) {
                   Dispute ID
                 </label>
                 <p className="text-sm font-mono font-semibold text-slate-900 dark:text-white">
-                  {dispute.disputeId}
+                  {dispute.disputeId.replace(/-/g, '')}
                 </p>
               </div>
 

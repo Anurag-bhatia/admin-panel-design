@@ -139,6 +139,8 @@ export function CreateDisputeModal({ onCreateDispute, onClose }: CreateDisputeMo
               >
                 <option value="">Select type</option>
                 <option value="refund">Refund</option>
+                <option value="48hr_refund">48 hr Refund</option>
+                <option value="tat_breach_refund">TAT Breach Refund</option>
                 <option value="service">Service</option>
                 <option value="payment">Payment</option>
                 <option value="legal_escalation">Legal Escalation</option>
@@ -177,6 +179,8 @@ export function CreateDisputeModal({ onCreateDispute, onClose }: CreateDisputeMo
               <option value="WhatsApp">WhatsApp</option>
               <option value="IVR">IVR</option>
               <option value="Internal">Internal</option>
+              <option value="SMS">SMS</option>
+              <option value="Social Media">Social Media</option>
             </select>
           </div>
 
