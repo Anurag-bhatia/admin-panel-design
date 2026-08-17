@@ -26,6 +26,7 @@ export interface DisputeDetailViewProps {
   dispute: Dispute
   reviewers: Reviewer[]
   followUps: DisputeFollowUp[]
+  allDisputes?: Dispute[]
   onBack?: () => void
   onAssignReviewer?: (disputeId: string, reviewerId: string) => void
   onEscalate?: (disputeId: string) => void
@@ -37,6 +38,7 @@ export interface DisputeDetailViewProps {
   onViewDocument?: (documentId: string) => void
   onDeleteDocument?: (documentId: string) => void
   onAddFollowUp?: (disputeId: string, followUp: { outcome: string; activity: string }) => void
+  onViewDispute?: (disputeId: string) => void
 }
 
 const PRIORITY_LABELS: Record<string, { label: string; className: string }> = {
@@ -62,6 +64,7 @@ export function DisputeDetailView({
   dispute,
   reviewers,
   followUps,
+  allDisputes = [],
   onBack,
   onAssignReviewer,
   onEscalate,
@@ -73,6 +76,7 @@ export function DisputeDetailView({
   onViewDocument,
   onDeleteDocument,
   onAddFollowUp,
+  onViewDispute,
 }: DisputeDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('activity')
   const [showReviewerModal, setShowReviewerModal] = useState(false)
@@ -150,11 +154,10 @@ export function DisputeDetailView({
                   className="fixed inset-0 z-10"
                   onClick={() => setShowMoveDropdown(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20">
                   {[
                     { key: 'new_incident', label: 'New Incident' },
                     { key: 'in_progress', label: 'In Progress' },
-                    { key: 'assigned', label: 'Assigned' },
                     { key: 'transfer_to_department', label: 'Transfer to Department' },
                     { key: 'reroute', label: 'Reroute' },
                     { key: 'settled', label: 'Settled' },
@@ -172,7 +175,7 @@ export function DisputeDetailView({
                             onCloseDispute?.(dispute.id)
                           }
                         }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                        className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 whitespace-nowrap"
                       >
                         {stage.label}
                       </button>
@@ -336,7 +339,16 @@ export function DisputeDetailView({
                   <SummaryTab dispute={dispute} />
                 )}
                 {activeTab === 'linkedIncident' && (
-                  <LinkedIncidentTab snapshot={dispute.linkedIncidentSnapshot} />
+                  <LinkedIncidentTab
+                    snapshot={dispute.linkedIncidentSnapshot}
+                    linkedDisputes={allDisputes.filter(
+                      (d) =>
+                        d.id !== dispute.id &&
+                        d.linkedEntity.type === dispute.linkedEntity.type &&
+                        d.linkedEntity.id === dispute.linkedEntity.id
+                    )}
+                    onViewDispute={onViewDispute}
+                  />
                 )}
                 {activeTab === 'investigation' && (
                   <InvestigationTab

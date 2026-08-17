@@ -266,7 +266,7 @@ export function DisputeRow({
                     <ChevronDown className="h-3 w-3" />
                   </button>
                   {showMoveDropdown && (
-                    <div className="absolute right-full top-0 mr-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1">
+                    <div className="absolute right-full top-0 mr-1 w-52 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1">
                       {MOVE_STAGE_OPTIONS.filter((s) => s.key !== dispute.status).map((stage) => (
                         <button
                           key={stage.key}
@@ -279,7 +279,7 @@ export function DisputeRow({
                               onMoveStage?.(stage.key)
                             }
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                          className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 whitespace-nowrap"
                         >
                           {stage.label}
                         </button>

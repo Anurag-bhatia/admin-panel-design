@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Building2, Search } from 'lucide-react'
 
 interface AssignDepartmentModalProps {
@@ -35,7 +36,7 @@ export function AssignDepartmentModal({
     }
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl max-w-md w-full">
         {/* Header */}
@@ -152,6 +153,7 @@ export function AssignDepartmentModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
