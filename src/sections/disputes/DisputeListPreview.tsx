@@ -65,7 +65,9 @@ export default function DisputeListPreview() {
           dispute={selectedDispute}
           reviewers={data.reviewers as Reviewer[]}
           followUps={SAMPLE_FOLLOW_UPS}
+          allDisputes={data.disputes as Dispute[]}
           onBack={handleBack}
+          onViewDispute={(id) => setSelectedDisputeId(id)}
           onAssignReviewer={(disputeId, reviewerId) =>
             console.log('Assign reviewer:', reviewerId, 'to dispute:', disputeId)
           }
@@ -115,6 +117,9 @@ export default function DisputeListPreview() {
           onBulkChangePriority={(ids, priority) =>
             console.log('Bulk change priority:', priority, 'for disputes:', ids)
           }
+          onBulkMoveStage={(ids, stage, department) =>
+            console.log('Bulk move stage:', stage, 'department:', department, 'for disputes:', ids)
+          }
           onExport={(ids) => console.log('Export disputes:', ids)}
           onSearch={(query) => console.log('Search:', query)}
           onFilter={(filters) => console.log('Filter:', filters)}
@@ -137,8 +142,13 @@ export default function DisputeListPreview() {
       {/* Create Dispute Modal */}
       {activeModal === 'create' && (
         <CreateDisputeModal
+          existingDisputes={data.disputes as Dispute[]}
           onCreateDispute={(formData) => {
             console.log('Create dispute:', formData)
+            setActiveModal(null)
+          }}
+          onMerge={(existingId, formData) => {
+            console.log('Merge into dispute:', existingId, 'with new details:', formData)
             setActiveModal(null)
           }}
           onClose={() => setActiveModal(null)}

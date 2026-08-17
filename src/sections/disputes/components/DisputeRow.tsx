@@ -27,7 +27,6 @@ interface DisputeRowProps {
 const MOVE_STAGE_OPTIONS: { key: DisputeStatus; label: string }[] = [
   { key: 'new_incident', label: 'New Incident' },
   { key: 'in_progress', label: 'In Progress' },
-  { key: 'assigned', label: 'Assigned' },
   { key: 'transfer_to_department', label: 'Transfer to Department' },
   { key: 'reroute', label: 'Reroute' },
   { key: 'settled', label: 'Settled' },
@@ -43,21 +42,25 @@ const TYPE_LABELS: Record<string, { label: string; className: string }> = {
     label: '48 hr Refund',
     className: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400',
   },
-  tat_breach_refund: {
-    label: 'TAT Breach Refund',
+  tat_breach: {
+    label: 'TAT Breach',
     className: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400',
   },
-  service: {
-    label: 'Service',
-    className: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
-  },
-  payment: {
-    label: 'Payment',
+  payment_issue: {
+    label: 'Payment Issue',
     className: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
   },
   legal_escalation: {
     label: 'Legal Escalation',
     className: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
+  },
+  information_missing: {
+    label: 'Information Missing',
+    className: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
+  },
+  incorrect_data: {
+    label: 'Incorrect Data',
+    className: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
   },
 }
 
@@ -173,15 +176,6 @@ export function DisputeRow({
         </span>
       </td>
 
-      {/* Priority */}
-      <td className="px-4 py-3">
-        <span
-          className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${priorityConfig.className}`}
-        >
-          {priorityConfig.label}
-        </span>
-      </td>
-
       {/* Created On */}
       <td className="px-4 py-3">
         <div>
@@ -206,6 +200,15 @@ export function DisputeRow({
         </div>
       </td>
 
+      {/* Priority */}
+      <td className="px-4 py-3">
+        <span
+          className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${priorityConfig.className}`}
+        >
+          {priorityConfig.label}
+        </span>
+      </td>
+
       {/* Department (only in Transfer to Department queue) */}
       {showDepartment && (
         <td className="px-4 py-3">
@@ -214,6 +217,20 @@ export function DisputeRow({
           </span>
         </td>
       )}
+
+      {/* Product */}
+      <td className="px-4 py-3">
+        <span className="text-sm text-slate-700 dark:text-slate-300">
+          {dispute.product}
+        </span>
+      </td>
+
+      {/* Source */}
+      <td className="px-4 py-3">
+        <span className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-[140px] block">
+          {dispute.source}
+        </span>
+      </td>
 
       {/* Actions Menu */}
       <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>

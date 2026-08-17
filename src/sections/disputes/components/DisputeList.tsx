@@ -25,6 +25,7 @@ export interface DisputeListProps {
   onChangePriority?: (id: string, priority: DisputePriority) => void
   onBulkAssignReviewer?: (disputeIds: string[]) => void
   onBulkChangePriority?: (disputeIds: string[], priority: DisputePriority) => void
+  onBulkMoveStage?: (disputeIds: string[], stage: DisputeStatus, department?: string) => void
   onExport?: (disputeIds?: string[]) => void
   onSearch?: (query: string) => void
   onFilter?: (filters: DisputeFilters) => void
@@ -44,6 +45,7 @@ export function DisputeList({
   onChangePriority,
   onBulkAssignReviewer,
   onBulkChangePriority,
+  onBulkMoveStage,
   onExport,
   onSearch,
   onFilter,
@@ -59,6 +61,9 @@ export function DisputeList({
   // Search
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Filters (client-side)
+  const [filters, setFilters] = useState<DisputeFilters>({})
+
   // Selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
@@ -73,8 +78,27 @@ export function DisputeList({
       filtered = filtered.filter((dispute) => dispute.assignedTo === currentUserName)
     }
 
+    if (filters.type) {
+      filtered = filtered.filter((d) => d.disputeType === filters.type)
+    }
+    if (filters.priority) {
+      filtered = filtered.filter((d) => d.priority === filters.priority)
+    }
+    if (filters.assignedTo) {
+      filtered = filtered.filter((d) => d.assignedTo === filters.assignedTo)
+    }
+    if (filters.department) {
+      filtered = filtered.filter((d) => d.transferredToDepartment === filters.department)
+    }
+    if (filters.dateFrom) {
+      filtered = filtered.filter((d) => d.createdOn >= filters.dateFrom!)
+    }
+    if (filters.dateTo) {
+      filtered = filtered.filter((d) => d.createdOn <= filters.dateTo!)
+    }
+
     return filtered
-  }, [disputes, activeStage, sidebarView])
+  }, [disputes, activeStage, sidebarView, filters])
 
   // Search filtering (client-side demo)
   const displayedDisputes = useMemo(() => {
@@ -167,7 +191,10 @@ export function DisputeList({
           }}
           onBulkUpdate={onBulkUpdate}
           onCreateDispute={onCreateDispute}
-          onFilter={onFilter}
+          onFilter={(f) => {
+            setFilters(f)
+            onFilter?.(f)
+          }}
         />
 
         {/* Table */}
@@ -196,19 +223,25 @@ export function DisputeList({
                   Type
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Priority
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Created
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Updated
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Priority
                 </th>
                 {activeStage === 'transfer_to_department' && (
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Department
                   </th>
                 )}
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Product
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Source
+                </th>
                 <th className="px-4 py-3 text-left">
                   <span className="sr-only">Actions</span>
                 </th>
@@ -218,7 +251,7 @@ export function DisputeList({
               {displayedDisputes.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={activeStage === 'transfer_to_department' ? 9 : 8}
+                    colSpan={activeStage === 'transfer_to_department' ? 11 : 10}
                     className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
@@ -280,13 +313,15 @@ export function DisputeList({
       {selectedIds.size > 0 && (
         <DisputeBulkActionsBar
           selectedCount={selectedIds.size}
+          currentStage={activeStage}
           onClearSelection={() => setSelectedIds(new Set())}
-          onAssignReviewer={() =>
-            onBulkAssignReviewer?.(selectedArray)
-          }
           onChangePriority={(priority) =>
             onBulkChangePriority?.(selectedArray, priority)
           }
+          onMoveStage={(stage, department) => {
+            onBulkMoveStage?.(selectedArray, stage, department)
+            setSelectedIds(new Set())
+          }}
         />
       )}
     </div>
