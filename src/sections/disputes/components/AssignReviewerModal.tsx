@@ -46,7 +46,7 @@ export function AssignReviewerModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
           <div>
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Assign Reviewer
+              Assign
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
               {selectedCount === 1

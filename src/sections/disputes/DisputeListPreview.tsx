@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import data from '@/../product/sections/disputes/data.json'
 import { DisputeList } from './components/DisputeList'
 import { DisputeDetailView } from './components/DisputeDetailView'
@@ -44,6 +44,16 @@ export default function DisputeListPreview() {
   const [selectedDisputeId, setSelectedDisputeId] = useState<string | null>(null)
   const [activeModal, setActiveModal] = useState<ModalType>(null)
   const [assignDisputeIds, setAssignDisputeIds] = useState<string[]>([])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const disputeId = params.get('disputeId')
+    if (disputeId && data.disputes.some((d) => d.id === disputeId)) {
+      setSelectedDisputeId(disputeId)
+      setViewMode('detail')
+    }
+  }, [])
 
   const selectedDispute = data.disputes.find(d => d.id === selectedDisputeId) as Dispute | undefined
 

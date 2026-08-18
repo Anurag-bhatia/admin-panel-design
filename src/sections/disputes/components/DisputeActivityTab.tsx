@@ -1,15 +1,4 @@
-import {
-  Plus,
-  UserPlus,
-  ArrowUpRight,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Clock,
-  FileText,
-  Upload,
-  MessageSquare,
-} from 'lucide-react'
+import { Clock } from 'lucide-react'
 import type { ActivityLogEntry } from '@/../product/sections/disputes/types'
 
 export interface DisputeFollowUp {
@@ -24,68 +13,31 @@ interface DisputeActivityTabProps {
   activities: ActivityLogEntry[]
 }
 
-const ACTION_CONFIG: Record<
-  string,
-  { icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string }
-> = {
-  created: {
-    icon: Plus,
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
-  },
-  assigned: {
-    icon: UserPlus,
-    color: 'text-blue-600 dark:text-blue-400',
-    bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-  },
-  escalated: {
-    icon: ArrowUpRight,
-    color: 'text-red-600 dark:text-red-400',
-    bgColor: 'bg-red-100 dark:bg-red-900/30',
-  },
-  priority: {
-    icon: AlertTriangle,
-    color: 'text-amber-600 dark:text-amber-400',
-    bgColor: 'bg-amber-100 dark:bg-amber-900/30',
-  },
-  resolved: {
-    icon: CheckCircle,
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
-  },
-  rejected: {
-    icon: XCircle,
-    color: 'text-red-600 dark:text-red-400',
-    bgColor: 'bg-red-100 dark:bg-red-900/30',
-  },
-  status: {
-    icon: Clock,
-    color: 'text-orange-600 dark:text-orange-400',
-    bgColor: 'bg-orange-100 dark:bg-orange-900/30',
-  },
-  evidence: {
-    icon: Upload,
-    color: 'text-slate-600 dark:text-slate-400',
-    bgColor: 'bg-slate-100 dark:bg-slate-700',
-  },
-  investigation: {
-    icon: FileText,
-    color: 'text-indigo-600 dark:text-indigo-400',
-    bgColor: 'bg-indigo-100 dark:bg-indigo-900/30',
-  },
-  follow_up_added: {
-    icon: MessageSquare,
-    color: 'text-indigo-600 dark:text-indigo-400',
-    bgColor: 'bg-indigo-100 dark:bg-indigo-900/30',
-  },
+const ACTION_CHIP_CLASSES: Record<string, string> = {
+  created: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+  assigned: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+  reviewer: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+  escalated: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+  priority: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+  resolved: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+  settled: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+  rejected: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+  status: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+  evidence: 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
+  investigation: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+  note: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+  follow: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+  merged: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+  transferred: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400',
+  moved: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
 }
 
-function getActionConfig(action: string) {
+function getChipClass(action: string): string {
   const lower = action.toLowerCase()
-  for (const [key, config] of Object.entries(ACTION_CONFIG)) {
-    if (lower.includes(key)) return config
+  for (const key of Object.keys(ACTION_CHIP_CLASSES)) {
+    if (lower.includes(key)) return ACTION_CHIP_CLASSES[key]
   }
-  return { icon: Clock, color: 'text-slate-600 dark:text-slate-400', bgColor: 'bg-slate-100 dark:bg-slate-700' }
+  return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
 }
 
 function formatDate(dateString: string): string {
@@ -110,15 +62,6 @@ export function DisputeActivityTab({ activities }: DisputeActivityTabProps) {
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   )
 
-  const groupedActivities = sortedActivities.reduce((groups, act) => {
-    const date = formatDate(act.timestamp)
-    if (!groups[date]) {
-      groups[date] = []
-    }
-    groups[date].push(act)
-    return groups
-  }, {} as Record<string, ActivityLogEntry[]>)
-
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -140,51 +83,31 @@ export function DisputeActivityTab({ activities }: DisputeActivityTabProps) {
           </p>
         </div>
       ) : (
-        <div className="space-y-8">
-          {Object.entries(groupedActivities).map(([date, dateActivities]) => (
-            <div key={date}>
-              <div className="sticky top-0 bg-slate-50 dark:bg-slate-950 py-2 mb-4 z-10">
-                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                  {date}
-                </span>
+        <div className="space-y-4">
+          {sortedActivities.map((act, index) => (
+            <div key={act.id} className="relative pl-8 pb-6 last:pb-0">
+              {index < sortedActivities.length - 1 && (
+                <div className="absolute left-[11px] top-6 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700" />
+              )}
+              <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+                <div className="w-2.5 h-2.5 rounded-full bg-cyan-500" />
               </div>
-              <div className="space-y-4">
-                {dateActivities.map((act, index) => {
-                  const config = getActionConfig(act.action)
-                  const Icon = config.icon
-
-                  return (
-                    <div key={act.id} className="relative pl-10">
-                      {index < dateActivities.length - 1 && (
-                        <div className="absolute left-[15px] top-8 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700" />
-                      )}
-                      <div
-                        className={`absolute left-0 top-0 w-8 h-8 rounded-full flex items-center justify-center ${config.bgColor}`}
-                      >
-                        <Icon className={`h-4 w-4 ${config.color}`} />
-                      </div>
-                      <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <p className="text-sm text-slate-900 dark:text-white">
-                              {act.details}
-                            </p>
-                            <div className="flex items-center gap-3 mt-2 text-xs text-slate-500 dark:text-slate-400">
-                              <span className="flex items-center gap-1">
-                                <div className="h-4 w-4 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[9px] font-medium">
-                                  {act.performedBy.charAt(0)}
-                                </div>
-                                {act.performedBy}
-                              </span>
-                              <span>•</span>
-                              <span>{formatTime(act.timestamp)}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+                <div className="flex items-start justify-between gap-4 mb-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getChipClass(act.action)}`}
+                    >
+                      {act.action}
+                    </span>
+                  </div>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                    {formatDate(act.timestamp)} at {formatTime(act.timestamp)}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-700 dark:text-slate-300">
+                  {act.details}
+                </p>
               </div>
             </div>
           ))}

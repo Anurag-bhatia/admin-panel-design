@@ -8,7 +8,7 @@
       "linkedIncidentSnapshot": "A read-only summary of the incident connected to the dispute, showing its outcome, timeline, and financial result."
     },
     "relationships": [
-      "Each Dispute links to an Incident, Subscriber, Customer, or Payment reference \u2014 no standalone disputes allowed",
+      "Each Dispute links to an Incident, Subscriber, Customer, or Payment reference — no standalone disputes allowed",
       "Each Dispute has many Investigation Notes (added by reviewers during review)",
       "Each Dispute has many Evidence items (uploaded by either party)",
       "Each Dispute has many Activity Log entries (auto-generated audit trail)",
@@ -22,14 +22,14 @@
       "linkedEntity": {
         "type": "incident",
         "id": "IRN-78234",
-        "label": "IRN-78234 \u2014 Rajesh Transport Co."
+        "label": "IRN-78234 — Rajesh Transport Co."
       },
       "subscriberName": "Rajesh Transport Co.",
       "subscriberId": "SUB-1042",
       "customerName": null,
       "disputeType": "refund",
       "reason": "Refund not processed after challan was disposed by court",
-      "description": "Subscriber claims that challan CH-DL-2025-98234 was disposed by the Delhi court on 12 Jan 2026, but the refund of \u20b94,500 has not been credited to their account. They have submitted the court disposal certificate as evidence. The incident was marked as 'Not Settled' but subscriber disputes this classification.",
+      "description": "Subscriber claims that challan CH-DL-2025-98234 was disposed by the Delhi court on 12 Jan 2026, but the refund of ₹4,500 has not been credited to their account. They have submitted the court disposal certificate as evidence. The incident was marked as 'Not Settled' but subscriber disputes this classification.",
       "raisedBy": "subscriber",
       "priority": "high",
       "status": "new_incident",
@@ -37,7 +37,7 @@
       "lastUpdated": "2026-02-18T09:30:00Z",
       "assignedTo": "Neha Kapoor",
       "transferredToDepartment": null,
-      "source": "Incident Detail View",
+      "source": "Email",
       "slaDeadline": "2026-02-28T09:30:00Z",
       "slaDays": 10,
       "disputedAmount": 4500,
@@ -58,11 +58,11 @@
           "refundStatus": "Pending"
         },
         "timelineSummary": [
-          "05 Dec 2025 \u2014 Challan received, added to New Incidents",
-          "06 Dec 2025 \u2014 Screened, valid challan confirmed",
-          "08 Dec 2025 \u2014 Assigned to Adv. Priya Sharma",
-          "12 Jan 2026 \u2014 Court hearing, challan disposed",
-          "15 Jan 2026 \u2014 Marked as Not Settled (disputed by subscriber)"
+          "05 Dec 2025 — Challan received, added to New Incidents",
+          "06 Dec 2025 — Screened, valid challan confirmed",
+          "08 Dec 2025 — Assigned to Adv. Priya Sharma",
+          "12 Jan 2026 — Court hearing, challan disposed",
+          "15 Jan 2026 — Marked as Not Settled (disputed by subscriber)"
         ]
       },
       "investigationNotes": [],
@@ -84,7 +84,8 @@
           "timestamp": "2026-02-18T09:30:00Z",
           "details": "Dispute raised from Incident Detail View for IRN-78234"
         }
-      ]
+      ],
+      "product": "ChallanPay"
     },
     {
       "id": "dsp-002",
@@ -92,12 +93,12 @@
       "linkedEntity": {
         "type": "payment",
         "id": "PAY-45201",
-        "label": "PAY-45201 \u2014 BlueDart Logistics"
+        "label": "PAY-45201 — BlueDart Logistics"
       },
       "subscriberName": "BlueDart Logistics",
       "subscriberId": "SUB-2087",
       "customerName": null,
-      "disputeType": "service",
+      "disputeType": "information_missing",
       "reason": "Lawyer failed to appear at court hearing",
       "description": "Subscriber reports that the assigned lawyer Adv. Manish Gupta did not appear at the scheduled court hearing on 10 Feb 2026 for challan CH-MH-2025-45210. As a result, the hearing was postponed by 30 days and the challan is now at risk of exceeding the 45-day TAT. Subscriber is demanding reassignment and expedited resolution.",
       "raisedBy": "subscriber",
@@ -107,7 +108,7 @@
       "lastUpdated": "2026-02-20T11:45:00Z",
       "assignedTo": "Neha Kapoor",
       "transferredToDepartment": "Finance & Accounts",
-      "source": "Support Module",
+      "source": "WhatsApp",
       "slaDeadline": "2026-02-25T14:20:00Z",
       "slaDays": 14,
       "disputedAmount": null,
@@ -128,11 +129,11 @@
           "refundStatus": "N/A"
         },
         "timelineSummary": [
-          "28 Dec 2025 \u2014 Challan received",
-          "29 Dec 2025 \u2014 Screened and validated",
-          "02 Jan 2026 \u2014 Assigned to Adv. Manish Gupta",
-          "10 Feb 2026 \u2014 Court hearing missed by lawyer",
-          "11 Feb 2026 \u2014 Dispute raised by subscriber"
+          "28 Dec 2025 — Challan received",
+          "29 Dec 2025 — Screened and validated",
+          "02 Jan 2026 — Assigned to Adv. Manish Gupta",
+          "10 Feb 2026 — Court hearing missed by lawyer",
+          "11 Feb 2026 — Dispute raised by subscriber"
         ]
       },
       "investigationNotes": [
@@ -203,22 +204,23 @@
           "timestamp": "2026-02-17T16:35:00Z",
           "details": "Uploaded notification-log-screenshot.png"
         }
-      ]
+      ],
+      "product": "LOTS247"
     },
     {
       "id": "dsp-003",
       "disputeId": "DID-10423",
       "linkedEntity": {
         "type": "incident",
-        "id": "IRN-78502",
-        "label": "IRN-78502 \u2014 Sharma Fleet Services"
+        "id": "IRN-78234",
+        "label": "Rajesh Transport Co. — Overspeeding challan"
       },
       "subscriberName": "Sharma Fleet Services",
       "subscriberId": "SUB-3045",
       "customerName": null,
-      "disputeType": "payment",
+      "disputeType": "payment_issue",
       "reason": "Double charge on monthly subscription",
-      "description": "Subscriber was charged twice for the January 2026 subscription \u2014 once on 01 Jan and again on 03 Jan. Total overcharge of \u20b915,000. Subscriber requests immediate reversal of the duplicate payment.",
+      "description": "Subscriber was charged twice for the January 2026 subscription — once on 01 Jan and again on 03 Jan. Total overcharge of ₹15,000. Subscriber requests immediate reversal of the duplicate payment.",
       "raisedBy": "subscriber",
       "priority": "high",
       "status": "settled",
@@ -226,32 +228,32 @@
       "lastUpdated": "2026-01-12T15:30:00Z",
       "assignedTo": "Vikram Singh",
       "transferredToDepartment": null,
-      "source": "Manual (Admin)",
+      "source": "IVR",
       "slaDeadline": "2026-01-15T11:00:00Z",
       "slaDays": 10,
       "disputedAmount": 15000,
       "linkedIncidentSnapshot": {
-        "incidentId": "IRN-78502",
-        "subscriberName": "Sharma Fleet Services",
-        "vehicleNumber": "DL-08-CD-4521",
-        "challanNumber": "CH-DL-2025-88121",
-        "type": "Pay & Close",
-        "outcome": "Settled",
-        "assignedLawyer": null,
-        "createdOn": "2025-12-28T09:15:00Z",
-        "resolvedOn": "2026-01-03T10:20:00Z",
+        "incidentId": "IRN-78234",
+        "subscriberName": "Rajesh Transport Co.",
+        "vehicleNumber": "DL-01-AB-1234",
+        "challanNumber": "CH-DL-2025-98234",
+        "type": "Contest",
+        "outcome": "Not Settled",
+        "assignedLawyer": "Adv. Priya Sharma",
+        "createdOn": "2025-12-05T10:00:00Z",
+        "resolvedOn": "2026-01-15T14:30:00Z",
         "financialOutcome": {
-          "challanAmount": 15000,
-          "amountPaid": 30000,
-          "refundDue": 15000,
-          "refundStatus": "Refunded"
+          "challanAmount": 5000,
+          "amountPaid": 500,
+          "refundDue": 4500,
+          "refundStatus": "Pending"
         },
         "timelineSummary": [
-          "28 Dec 2025 \u2014 Challan uploaded via subscription auto-debit",
-          "01 Jan 2026 \u2014 Auto-debit attempt timed out at gateway",
-          "03 Jan 2026 \u2014 Retry succeeded; duplicate charge recorded",
-          "05 Jan 2026 \u2014 Subscriber raised dispute",
-          "12 Jan 2026 \u2014 Duplicate charge of \u20b915,000 reversed via NEFT"
+          "05 Dec 2025 — Challan received, added to New Incidents",
+          "06 Dec 2025 — Screened, valid challan confirmed",
+          "08 Dec 2025 — Assigned to Adv. Priya Sharma",
+          "12 Jan 2026 — Court hearing, challan disposed",
+          "15 Jan 2026 — Marked as Not Settled (disputed by subscriber)"
         ]
       },
       "investigationNotes": [
@@ -265,7 +267,7 @@
           "id": "note-004",
           "author": "Vikram Singh",
           "timestamp": "2026-01-12T15:00:00Z",
-          "content": "Refund of \u20b915,000 processed via NEFT. Transaction ID: NEFT-2026-01-12-8834. Subscriber confirmed receipt. Closing dispute as resolved."
+          "content": "Refund of ₹15,000 processed via NEFT. Transaction ID: NEFT-2026-01-12-8834. Subscriber confirmed receipt. Closing dispute as resolved."
         }
       ],
       "evidence": [
@@ -321,7 +323,7 @@
           "action": "Refund Approved",
           "performedBy": "Vikram Singh",
           "timestamp": "2026-01-12T14:45:00Z",
-          "details": "Refund of \u20b915,000 approved. Sent to finance for processing."
+          "details": "Refund of ₹15,000 approved. Sent to finance for processing."
         },
         {
           "id": "act-011",
@@ -330,7 +332,8 @@
           "timestamp": "2026-01-12T15:30:00Z",
           "details": "Refund credited. Dispute closed as Resolved."
         }
-      ]
+      ],
+      "product": "RSP"
     },
     {
       "id": "dsp-004",
@@ -338,14 +341,14 @@
       "linkedEntity": {
         "type": "vehicle",
         "id": "DL08CX5432",
-        "label": "DL08CX5432 \u2014 Delhivery Pvt. Ltd."
+        "label": "DL08CX5432 — Delhivery Pvt. Ltd."
       },
       "subscriberName": "Delhivery Pvt. Ltd.",
       "subscriberId": "SUB-1001",
       "customerName": "Suresh Kumar (Driver)",
       "disputeType": "legal_escalation",
       "reason": "Challan resolution resulted in incorrect penalty amount",
-      "description": "The driver Suresh Kumar was asked to pay \u20b98,000 as penalty after the contest hearing, but the original challan amount was only \u20b92,000. Subscriber alleges the lawyer negotiated a worse outcome than simply paying the original fine. They are threatening legal action against the company and demanding compensation for the difference plus damages. This has been escalated due to the legal threat and the amount involved.",
+      "description": "The driver Suresh Kumar was asked to pay ₹8,000 as penalty after the contest hearing, but the original challan amount was only ₹2,000. Subscriber alleges the lawyer negotiated a worse outcome than simply paying the original fine. They are threatening legal action against the company and demanding compensation for the difference plus damages. This has been escalated due to the legal threat and the amount involved.",
       "raisedBy": "customer",
       "priority": "critical",
       "status": "reroute",
@@ -353,7 +356,7 @@
       "lastUpdated": "2026-02-22T17:00:00Z",
       "assignedTo": "Priya Malhotra",
       "transferredToDepartment": null,
-      "source": "Incident Detail View",
+      "source": "Internal",
       "slaDeadline": "2026-02-15T08:45:00Z",
       "slaDays": 14,
       "disputedAmount": 6000,
@@ -374,11 +377,11 @@
           "refundStatus": "N/A"
         },
         "timelineSummary": [
-          "10 Nov 2025 \u2014 Challan received from Delhivery batch upload",
-          "11 Nov 2025 \u2014 Screened, valid for contest",
-          "15 Nov 2025 \u2014 Assigned to Adv. Rakesh Jain",
-          "20 Jan 2026 \u2014 Court hearing, penalty imposed at \u20b98,000",
-          "20 Jan 2026 \u2014 Marked as Settled"
+          "10 Nov 2025 — Challan received from Delhivery batch upload",
+          "11 Nov 2025 — Screened, valid for contest",
+          "15 Nov 2025 — Assigned to Adv. Rakesh Jain",
+          "20 Jan 2026 — Court hearing, penalty imposed at ₹8,000",
+          "20 Jan 2026 — Marked as Settled"
         ]
       },
       "investigationNotes": [
@@ -392,13 +395,13 @@
           "id": "note-006",
           "author": "Priya Malhotra",
           "timestamp": "2026-02-10T14:30:00Z",
-          "content": "Escalating to legal head. The subscriber's legal team has sent a formal notice. We need to determine liability \u2014 was this a screening failure or an unforeseeable court decision? Recommending partial compensation of \u20b96,000 (the difference) as goodwill."
+          "content": "Escalating to legal head. The subscriber's legal team has sent a formal notice. We need to determine liability — was this a screening failure or an unforeseeable court decision? Recommending partial compensation of ₹6,000 (the difference) as goodwill."
         },
         {
           "id": "note-007",
           "author": "Arjun Nair (Legal Head)",
           "timestamp": "2026-02-15T10:00:00Z",
-          "content": "Reviewed the case. This is a screening gap \u2014 prior violations should have been checked. Approving \u20b96,000 compensation. Also flagging this as a process improvement item for the screening workflow."
+          "content": "Reviewed the case. This is a screening gap — prior violations should have been checked. Approving ₹6,000 compensation. Also flagging this as a process improvement item for the screening workflow."
         }
       ],
       "evidence": [
@@ -470,7 +473,8 @@
           "timestamp": "2026-02-10T14:35:00Z",
           "details": "Status changed from Under Review to Escalated"
         }
-      ]
+      ],
+      "product": "ChallanPay"
     },
     {
       "id": "dsp-005",
@@ -478,14 +482,14 @@
       "linkedEntity": {
         "type": "subscriber",
         "id": "SUB-4012",
-        "label": "SUB-4012 \u2014 FastTrack Movers"
+        "label": "SUB-4012 — FastTrack Movers"
       },
       "subscriberName": "FastTrack Movers",
       "subscriberId": "SUB-4012",
       "customerName": null,
       "disputeType": "refund",
-      "reason": "Refund amount incorrect \u2014 partial instead of full",
-      "description": "Subscriber received a refund of \u20b91,200 but claims the full challan amount of \u20b93,500 should have been refunded since the challan was disposed. Finance team processed partial refund deducting service charges, but subscriber says no service charge clause exists in their contract.",
+      "reason": "Refund amount incorrect — partial instead of full",
+      "description": "Subscriber received a refund of ₹1,200 but claims the full challan amount of ₹3,500 should have been refunded since the challan was disposed. Finance team processed partial refund deducting service charges, but subscriber says no service charge clause exists in their contract.",
       "raisedBy": "subscriber",
       "priority": "medium",
       "status": "in_progress",
@@ -493,7 +497,7 @@
       "lastUpdated": "2026-02-21T10:00:00Z",
       "assignedTo": "Vikram Singh",
       "transferredToDepartment": null,
-      "source": "Financials Tab",
+      "source": "SMS",
       "slaDeadline": "2026-02-22T16:00:00Z",
       "slaDays": 7,
       "disputedAmount": 2300,
@@ -511,14 +515,14 @@
           "challanAmount": 3500,
           "amountPaid": 0,
           "refundDue": 3500,
-          "refundStatus": "Partial (\u20b91,200 processed)"
+          "refundStatus": "Partial (₹1,200 processed)"
         },
         "timelineSummary": [
-          "20 Nov 2025 \u2014 Challan received",
-          "21 Nov 2025 \u2014 Screened, valid",
-          "25 Nov 2025 \u2014 Assigned to Adv. Sunita Devi",
-          "28 Jan 2026 \u2014 Challan disposed, moved to Refund queue",
-          "05 Feb 2026 \u2014 Partial refund of \u20b91,200 processed"
+          "20 Nov 2025 — Challan received",
+          "21 Nov 2025 — Screened, valid",
+          "25 Nov 2025 — Assigned to Adv. Sunita Devi",
+          "28 Jan 2026 — Challan disposed, moved to Refund queue",
+          "05 Feb 2026 — Partial refund of ₹1,200 processed"
         ]
       },
       "investigationNotes": [
@@ -526,7 +530,7 @@
           "id": "note-008",
           "author": "Vikram Singh",
           "timestamp": "2026-02-19T11:00:00Z",
-          "content": "Pulled the subscriber's contract (SUB-4012). Contract version dated Aug 2025 does not mention service charge deductions on refunds. The \u20b92,300 deduction appears to be incorrectly applied. Checking with finance on the deduction logic."
+          "content": "Pulled the subscriber's contract (SUB-4012). Contract version dated Aug 2025 does not mention service charge deductions on refunds. The ₹2,300 deduction appears to be incorrectly applied. Checking with finance on the deduction logic."
         }
       ],
       "evidence": [
@@ -569,20 +573,21 @@
           "timestamp": "2026-02-17T09:30:00Z",
           "details": "Status changed from Open to Under Review"
         }
-      ]
+      ],
+      "product": "LOTS247"
     },
     {
       "id": "dsp-006",
       "disputeId": "DID-10426",
       "linkedEntity": {
         "type": "incident",
-        "id": "IRN-79104",
-        "label": "IRN-79104 \u2014 Gupta Carriers Pvt. Ltd."
+        "id": "IRN-78234",
+        "label": "Rajesh Transport Co. — Overspeeding challan"
       },
       "subscriberName": "Gupta Carriers Pvt. Ltd.",
       "subscriberId": "SUB-5023",
       "customerName": null,
-      "disputeType": "service",
+      "disputeType": "incorrect_data",
       "reason": "Bulk challans not processed within TAT",
       "description": "Subscriber uploaded a batch of 45 challans on 10 Jan 2026. As of today, 12 challans are still in New Incidents queue and have not been screened. The 45-day TAT is at risk for all 12. Subscriber is demanding immediate processing and SLA credit.",
       "raisedBy": "subscriber",
@@ -592,31 +597,32 @@
       "lastUpdated": "2026-02-20T10:30:00Z",
       "assignedTo": "Neha Kapoor",
       "transferredToDepartment": null,
-      "source": "Support Module",
+      "source": "Social Media",
       "slaDeadline": "2026-03-02T10:30:00Z",
       "slaDays": 10,
       "disputedAmount": null,
       "linkedIncidentSnapshot": {
-        "incidentId": "IRN-79104",
-        "subscriberName": "Gupta Carriers Pvt. Ltd.",
-        "vehicleNumber": "HR-55-EK-7812",
-        "challanNumber": "CH-HR-2026-11245",
-        "type": "Pay & Close",
-        "outcome": "Pending",
-        "assignedLawyer": null,
-        "createdOn": "2026-01-10T14:20:00Z",
-        "resolvedOn": null,
+        "incidentId": "IRN-78234",
+        "subscriberName": "Rajesh Transport Co.",
+        "vehicleNumber": "DL-01-AB-1234",
+        "challanNumber": "CH-DL-2025-98234",
+        "type": "Contest",
+        "outcome": "Not Settled",
+        "assignedLawyer": "Adv. Priya Sharma",
+        "createdOn": "2025-12-05T10:00:00Z",
+        "resolvedOn": "2026-01-15T14:30:00Z",
         "financialOutcome": {
-          "challanAmount": 2000,
-          "amountPaid": 0,
-          "refundDue": 0,
-          "refundStatus": "N/A"
+          "challanAmount": 5000,
+          "amountPaid": 500,
+          "refundDue": 4500,
+          "refundStatus": "Pending"
         },
         "timelineSummary": [
-          "10 Jan 2026 \u2014 Bulk upload received (45 challans)",
-          "10 Jan 2026 \u2014 Added to New Incidents queue",
-          "20 Feb 2026 \u2014 Still unscreened; TAT breach flagged",
-          "20 Feb 2026 \u2014 Subscriber raised dispute for delayed processing"
+          "05 Dec 2025 — Challan received, added to New Incidents",
+          "06 Dec 2025 — Screened, valid challan confirmed",
+          "08 Dec 2025 — Assigned to Adv. Priya Sharma",
+          "12 Jan 2026 — Court hearing, challan disposed",
+          "15 Jan 2026 — Marked as Not Settled (disputed by subscriber)"
         ]
       },
       "investigationNotes": [],
@@ -638,7 +644,8 @@
           "timestamp": "2026-02-20T10:30:00Z",
           "details": "Converted from Support Ticket TKT-5102. 12 of 45 challans stuck in New Incidents."
         }
-      ]
+      ],
+      "product": "RSP"
     },
     {
       "id": "dsp-007",
@@ -646,14 +653,14 @@
       "linkedEntity": {
         "type": "payment",
         "id": "PAY-45890",
-        "label": "PAY-45890 \u2014 Metro Logistics"
+        "label": "PAY-45890 — Metro Logistics"
       },
       "subscriberName": "Metro Logistics",
       "subscriberId": "SUB-2050",
       "customerName": "Ravi Yadav (Driver)",
       "disputeType": "refund",
       "reason": "Claims challan was already paid before submission",
-      "description": "Customer Ravi Yadav says he already paid the challan fine of \u20b92,000 directly at the RTO before the subscriber submitted it for resolution. The challan was processed through the system and lawyer fees of \u20b9800 were deducted. Customer wants a full refund of \u20b92,800 (original fine + lawyer fees). Investigation found the claim to be false \u2014 no prior payment record exists at the RTO.",
+      "description": "Customer Ravi Yadav says he already paid the challan fine of ₹2,000 directly at the RTO before the subscriber submitted it for resolution. The challan was processed through the system and lawyer fees of ₹800 were deducted. Customer wants a full refund of ₹2,800 (original fine + lawyer fees). Investigation found the claim to be false — no prior payment record exists at the RTO.",
       "raisedBy": "customer",
       "priority": "low",
       "status": "settled",
@@ -661,7 +668,7 @@
       "lastUpdated": "2026-02-03T11:00:00Z",
       "assignedTo": "Neha Kapoor",
       "transferredToDepartment": null,
-      "source": "Support Module",
+      "source": "Email",
       "slaDeadline": "2026-02-03T13:00:00Z",
       "slaDays": 14,
       "disputedAmount": 2800,
@@ -682,9 +689,9 @@
           "refundStatus": "N/A"
         },
         "timelineSummary": [
-          "15 Oct 2025 \u2014 Challan received",
-          "16 Oct 2025 \u2014 Screened, Pay & Close",
-          "02 Nov 2025 \u2014 Payment processed, settled"
+          "15 Oct 2025 — Challan received",
+          "16 Oct 2025 — Screened, Pay & Close",
+          "02 Nov 2025 — Payment processed, settled"
         ]
       },
       "investigationNotes": [
@@ -737,7 +744,8 @@
           "timestamp": "2026-02-03T11:00:00Z",
           "details": "No evidence provided within grace period. Claim unsubstantiated."
         }
-      ]
+      ],
+      "product": "ChallanPay"
     },
     {
       "id": "dsp-008",
@@ -745,14 +753,14 @@
       "linkedEntity": {
         "type": "vehicle",
         "id": "MH12EF7801",
-        "label": "MH12EF7801 \u2014 ABC Trucking Co."
+        "label": "MH12EF7801 — ABC Trucking Co."
       },
       "subscriberName": "ABC Trucking Co.",
       "subscriberId": "SUB-1089",
       "customerName": null,
-      "disputeType": "payment",
+      "disputeType": "payment_issue",
       "reason": "Commission charged despite challan being dismissed",
-      "description": "Subscriber reports that a lawyer commission of \u20b91,500 was deducted for incident IRN-80102 even though the challan was dismissed by the court (no action required). Since no legal work resulted in the dismissal, subscriber argues the commission should not apply. The contract states commissions are only for successful contestations.",
+      "description": "Subscriber reports that a lawyer commission of ₹1,500 was deducted for incident IRN-80102 even though the challan was dismissed by the court (no action required). Since no legal work resulted in the dismissal, subscriber argues the commission should not apply. The contract states commissions are only for successful contestations.",
       "raisedBy": "internal",
       "priority": "medium",
       "status": "settled",
@@ -760,7 +768,7 @@
       "lastUpdated": "2026-02-08T16:00:00Z",
       "assignedTo": "Vikram Singh",
       "transferredToDepartment": null,
-      "source": "Financials Tab",
+      "source": "WhatsApp",
       "slaDeadline": "2026-02-07T09:00:00Z",
       "slaDays": 10,
       "disputedAmount": 1500,
@@ -781,11 +789,11 @@
           "refundStatus": "N/A"
         },
         "timelineSummary": [
-          "01 Dec 2025 \u2014 Challan received",
-          "02 Dec 2025 \u2014 Screened, valid for contest",
-          "05 Dec 2025 \u2014 Assigned to Adv. Deepak Patel",
-          "18 Jan 2026 \u2014 Court dismissed the challan",
-          "18 Jan 2026 \u2014 Marked as Settled, commission of \u20b91,500 auto-calculated"
+          "01 Dec 2025 — Challan received",
+          "02 Dec 2025 — Screened, valid for contest",
+          "05 Dec 2025 — Assigned to Adv. Deepak Patel",
+          "18 Jan 2026 — Court dismissed the challan",
+          "18 Jan 2026 — Marked as Settled, commission of ₹1,500 auto-calculated"
         ]
       },
       "investigationNotes": [
@@ -799,7 +807,7 @@
           "id": "note-013",
           "author": "Vikram Singh",
           "timestamp": "2026-02-05T14:00:00Z",
-          "content": "Discussed with finance and product team. Commission reversal approved. Also flagging this as a product bug \u2014 commission should not auto-trigger on court dismissals. Created internal ticket PROD-892 for the fix."
+          "content": "Discussed with finance and product team. Commission reversal approved. Also flagging this as a product bug — commission should not auto-trigger on court dismissals. Created internal ticket PROD-892 for the fix."
         }
       ],
       "evidence": [
@@ -839,7 +847,7 @@
           "action": "Refund Approved",
           "performedBy": "Vikram Singh",
           "timestamp": "2026-02-05T14:30:00Z",
-          "details": "Commission reversal of \u20b91,500 approved. Sent to finance."
+          "details": "Commission reversal of ₹1,500 approved. Sent to finance."
         },
         {
           "id": "act-030",
@@ -848,15 +856,16 @@
           "timestamp": "2026-02-08T16:00:00Z",
           "details": "Commission reversed. Product bug flagged. Dispute closed."
         }
-      ]
+      ],
+      "product": "LOTS247"
     },
     {
       "id": "dsp-009",
       "disputeId": "DID-10429",
       "linkedEntity": {
         "type": "incident",
-        "id": "IRN-82011",
-        "label": "IRN-82011 \u2014 Kumar Roadlines"
+        "id": "IRN-79104",
+        "label": "IRN-82011 — Kumar Roadlines"
       },
       "subscriberName": "Kumar Roadlines",
       "subscriberId": "SUB-3011",
@@ -875,7 +884,30 @@
       "slaDeadline": "2026-06-30T09:00:00Z",
       "slaDays": 14,
       "disputedAmount": 4500,
-      "linkedIncidentSnapshot": null,
+      "linkedIncidentSnapshot": {
+        "incidentId": "IRN-78234",
+        "subscriberName": "Rajesh Transport Co.",
+        "vehicleNumber": "DL-01-AB-1234",
+        "challanNumber": "CH-DL-2025-98234",
+        "type": "Contest",
+        "outcome": "Not Settled",
+        "assignedLawyer": "Adv. Priya Sharma",
+        "createdOn": "2025-12-05T10:00:00Z",
+        "resolvedOn": "2026-01-15T14:30:00Z",
+        "financialOutcome": {
+          "challanAmount": 5000,
+          "amountPaid": 500,
+          "refundDue": 4500,
+          "refundStatus": "Pending"
+        },
+        "timelineSummary": [
+          "05 Dec 2025 — Challan received, added to New Incidents",
+          "06 Dec 2025 — Screened, valid challan confirmed",
+          "08 Dec 2025 — Assigned to Adv. Priya Sharma",
+          "12 Jan 2026 — Court hearing, challan disposed",
+          "15 Jan 2026 — Marked as Not Settled (disputed by subscriber)"
+        ]
+      },
       "investigationNotes": [],
       "evidence": [],
       "activityLog": [
@@ -886,7 +918,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "RSP"
     },
     {
       "id": "dsp-010",
@@ -894,12 +927,12 @@
       "linkedEntity": {
         "type": "payment",
         "id": "PAY-46102",
-        "label": "PAY-46102 \u2014 Sanket Freight"
+        "label": "PAY-46102 — Sanket Freight"
       },
       "subscriberName": "Sanket Freight",
       "subscriberId": "SUB-3022",
       "customerName": null,
-      "disputeType": "payment",
+      "disputeType": "payment_issue",
       "reason": "Amount debited twice for same challan",
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
@@ -924,7 +957,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "ChallanPay"
     },
     {
       "id": "dsp-011",
@@ -932,12 +966,12 @@
       "linkedEntity": {
         "type": "subscriber",
         "id": "SUB-3033",
-        "label": "SUB-3033 \u2014 Kohli Transport"
+        "label": "SUB-3033 — Kohli Transport"
       },
       "subscriberName": "Kohli Transport",
       "subscriberId": "SUB-3033",
       "customerName": null,
-      "disputeType": "service",
+      "disputeType": "information_missing",
       "reason": "Multiple challans not screened within TAT",
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
@@ -962,7 +996,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "LOTS247"
     },
     {
       "id": "dsp-012",
@@ -970,13 +1005,13 @@
       "linkedEntity": {
         "type": "incident",
         "id": "IRN-82445",
-        "label": "IRN-82445 \u2014 Delhi Logistics Hub"
+        "label": "IRN-82445 — Delhi Logistics Hub"
       },
       "subscriberName": "Delhi Logistics Hub",
       "subscriberId": "SUB-3044",
       "customerName": null,
-      "disputeType": "tat_breach_refund",
-      "reason": "TAT breach \u2014 refund requested",
+      "disputeType": "tat_breach",
+      "reason": "TAT breach — refund requested",
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
       "priority": "high",
@@ -1000,7 +1035,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "RSP"
     },
     {
       "id": "dsp-013",
@@ -1008,7 +1044,7 @@
       "linkedEntity": {
         "type": "vehicle",
         "id": "MH14PK3092",
-        "label": "MH14PK3092 \u2014 Prime Movers"
+        "label": "MH14PK3092 — Prime Movers"
       },
       "subscriberName": "Prime Movers",
       "subscriberId": "SUB-3055",
@@ -1023,7 +1059,7 @@
       "lastUpdated": "2026-06-12T15:30:00Z",
       "assignedTo": "Priya Malhotra",
       "transferredToDepartment": null,
-      "source": "Support Module",
+      "source": "IVR",
       "slaDeadline": "2026-06-30T09:00:00Z",
       "slaDays": 14,
       "disputedAmount": 6500,
@@ -1038,7 +1074,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "ChallanPay"
     },
     {
       "id": "dsp-014",
@@ -1046,12 +1083,12 @@
       "linkedEntity": {
         "type": "incident",
         "id": "IRN-82680",
-        "label": "IRN-82680 \u2014 Chennai Cargo Co."
+        "label": "IRN-82680 — Chennai Cargo Co."
       },
       "subscriberName": "Chennai Cargo Co.",
       "subscriberId": "SUB-3066",
       "customerName": null,
-      "disputeType": "service",
+      "disputeType": "incorrect_data",
       "reason": "Lawyer coordination delayed by 5 days",
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
@@ -1061,7 +1098,7 @@
       "lastUpdated": "2026-06-12T15:30:00Z",
       "assignedTo": "Neha Kapoor",
       "transferredToDepartment": null,
-      "source": "Support Module",
+      "source": "Internal",
       "slaDeadline": "2026-06-30T09:00:00Z",
       "slaDays": 14,
       "disputedAmount": null,
@@ -1076,7 +1113,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "LOTS247"
     },
     {
       "id": "dsp-015",
@@ -1084,17 +1122,17 @@
       "linkedEntity": {
         "type": "incident",
         "id": "IRN-82910",
-        "label": "IRN-82910 \u2014 Bharat Transports"
+        "label": "IRN-82910 — Bharat Transports"
       },
       "subscriberName": "Bharat Transports",
       "subscriberId": "SUB-3077",
       "customerName": null,
       "disputeType": "legal_escalation",
-      "reason": "Court notice received \u2014 escalation required",
+      "reason": "Court notice received — escalation required",
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
       "priority": "critical",
-      "status": "assigned",
+      "status": "in_progress",
       "createdOn": "2026-06-05T09:00:00Z",
       "lastUpdated": "2026-06-12T15:30:00Z",
       "assignedTo": "Arjun Nair",
@@ -1114,7 +1152,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "RSP"
     },
     {
       "id": "dsp-016",
@@ -1122,7 +1161,7 @@
       "linkedEntity": {
         "type": "payment",
         "id": "PAY-46512",
-        "label": "PAY-46512 \u2014 Speedy Movers"
+        "label": "PAY-46512 — Speedy Movers"
       },
       "subscriberName": "Speedy Movers",
       "subscriberId": "SUB-3088",
@@ -1132,7 +1171,7 @@
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
       "priority": "high",
-      "status": "assigned",
+      "status": "in_progress",
       "createdOn": "2026-06-05T09:00:00Z",
       "lastUpdated": "2026-06-12T15:30:00Z",
       "assignedTo": "Vikram Singh",
@@ -1152,7 +1191,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "ChallanPay"
     },
     {
       "id": "dsp-017",
@@ -1160,22 +1200,22 @@
       "linkedEntity": {
         "type": "incident",
         "id": "IRN-83122",
-        "label": "IRN-83122 \u2014 Nova Freight"
+        "label": "IRN-83122 — Nova Freight"
       },
       "subscriberName": "Nova Freight",
       "subscriberId": "SUB-3099",
       "customerName": null,
-      "disputeType": "service",
+      "disputeType": "information_missing",
       "reason": "Screening quality complaint",
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
       "priority": "medium",
-      "status": "assigned",
+      "status": "in_progress",
       "createdOn": "2026-06-05T09:00:00Z",
       "lastUpdated": "2026-06-12T15:30:00Z",
       "assignedTo": "Priya Malhotra",
       "transferredToDepartment": null,
-      "source": "Support Module",
+      "source": "SMS",
       "slaDeadline": "2026-06-30T09:00:00Z",
       "slaDays": 14,
       "disputedAmount": null,
@@ -1190,7 +1230,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "LOTS247"
     },
     {
       "id": "dsp-018",
@@ -1198,12 +1239,12 @@
       "linkedEntity": {
         "type": "payment",
         "id": "PAY-46988",
-        "label": "PAY-46988 \u2014 Sunrise Logistics"
+        "label": "PAY-46988 — Sunrise Logistics"
       },
       "subscriberName": "Sunrise Logistics",
       "subscriberId": "SUB-3110",
       "customerName": null,
-      "disputeType": "payment",
+      "disputeType": "payment_issue",
       "reason": "Gateway settlement mismatch",
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
@@ -1228,7 +1269,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "RSP"
     },
     {
       "id": "dsp-019",
@@ -1236,7 +1278,7 @@
       "linkedEntity": {
         "type": "incident",
         "id": "IRN-83455",
-        "label": "IRN-83455 \u2014 Continental Movers"
+        "label": "IRN-83455 — Continental Movers"
       },
       "subscriberName": "Continental Movers",
       "subscriberId": "SUB-3121",
@@ -1266,7 +1308,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "ChallanPay"
     },
     {
       "id": "dsp-020",
@@ -1274,7 +1317,7 @@
       "linkedEntity": {
         "type": "incident",
         "id": "IRN-83801",
-        "label": "IRN-83801 \u2014 Ganga Transports"
+        "label": "IRN-83801 — Ganga Transports"
       },
       "subscriberName": "Ganga Transports",
       "subscriberId": "SUB-3132",
@@ -1289,7 +1332,7 @@
       "lastUpdated": "2026-06-12T15:30:00Z",
       "assignedTo": "Vikram Singh",
       "transferredToDepartment": null,
-      "source": "Support Module",
+      "source": "Social Media",
       "slaDeadline": "2026-06-30T09:00:00Z",
       "slaDays": 14,
       "disputedAmount": 4200,
@@ -1304,7 +1347,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "LOTS247"
     },
     {
       "id": "dsp-021",
@@ -1312,12 +1356,12 @@
       "linkedEntity": {
         "type": "vehicle",
         "id": "DL03QR4415",
-        "label": "DL03QR4415 \u2014 Yash Freight"
+        "label": "DL03QR4415 — Yash Freight"
       },
       "subscriberName": "Yash Freight",
       "subscriberId": "SUB-3143",
       "customerName": null,
-      "disputeType": "service",
+      "disputeType": "incorrect_data",
       "reason": "Rerouted to Ops queue after review",
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
@@ -1342,7 +1386,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "RSP"
     },
     {
       "id": "dsp-022",
@@ -1350,7 +1395,7 @@
       "linkedEntity": {
         "type": "incident",
         "id": "IRN-84210",
-        "label": "IRN-84210 \u2014 Elite Cargo"
+        "label": "IRN-84210 — Elite Cargo"
       },
       "subscriberName": "Elite Cargo",
       "subscriberId": "SUB-3154",
@@ -1380,7 +1425,8 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "ChallanPay"
     },
     {
       "id": "dsp-023",
@@ -1388,12 +1434,12 @@
       "linkedEntity": {
         "type": "payment",
         "id": "PAY-47201",
-        "label": "PAY-47201 \u2014 Skyline Movers"
+        "label": "PAY-47201 — Skyline Movers"
       },
       "subscriberName": "Skyline Movers",
       "subscriberId": "SUB-3165",
       "customerName": null,
-      "disputeType": "payment",
+      "disputeType": "payment_issue",
       "reason": "Duplicate charge reversed",
       "description": "Auto-generated sample dispute used to populate the queue with representative rows.",
       "raisedBy": "subscriber",
@@ -1418,13 +1464,14 @@
           "timestamp": "2026-06-05T09:00:00Z",
           "details": "Auto-generated dispute."
         }
-      ]
+      ],
+      "product": "LOTS247"
     }
   ],
   "stageCounts": {
     "new_incident": 5,
-    "in_progress": 4,
-    "assigned": 3,
+    "in_progress": 7,
+    "assigned": 0,
     "transfer_to_department": 3,
     "reroute": 3,
     "settled": 5,

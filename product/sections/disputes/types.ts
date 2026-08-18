@@ -2,7 +2,7 @@
 // Data Types
 // =============================================================================
 
-export type DisputeType = 'refund' | 'service' | 'payment' | 'legal_escalation' | '48hr_refund' | 'tat_breach_refund'
+export type DisputeType = 'refund' | 'payment_issue' | 'legal_escalation' | '48hr_refund' | 'tat_breach' | 'information_missing' | 'incorrect_data'
 
 export type DisputeStatus = 'new_incident' | 'in_progress' | 'assigned' | 'transfer_to_department' | 'reroute' | 'settled' | 'not_settled' | 'hold'
 
@@ -81,6 +81,7 @@ export interface Dispute {
   assignedTo: string | null
   transferredToDepartment: string | null
   source: string
+  product: string
   slaDeadline: string
   slaDays: number
   disputedAmount: number | null

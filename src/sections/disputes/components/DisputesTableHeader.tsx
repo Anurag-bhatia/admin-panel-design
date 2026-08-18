@@ -6,9 +6,19 @@ export interface DisputeFilters {
   type?: DisputeType
   priority?: DisputePriority
   assignedTo?: string
+  department?: string
   dateFrom?: string
   dateTo?: string
 }
+
+const DEPARTMENT_OPTIONS = [
+  'Operations',
+  'Legal',
+  'Accounts',
+  'Marketing',
+  'Product',
+  'Finance & Accounts',
+]
 
 interface DisputesTableHeaderProps {
   reviewers: Reviewer[]
@@ -117,9 +127,12 @@ export function DisputesTableHeader({
               >
                 <option value="">All Types</option>
                 <option value="refund">Refund</option>
-                <option value="service">Service</option>
-                <option value="payment">Payment</option>
+                <option value="48hr_refund">48 hr Refund</option>
+                <option value="tat_breach">TAT Breach</option>
+                <option value="payment_issue">Payment Issue</option>
                 <option value="legal_escalation">Legal Escalation</option>
+                <option value="information_missing">Information Missing</option>
+                <option value="incorrect_data">Incorrect Data</option>
               </select>
             </div>
 
@@ -155,6 +168,25 @@ export function DisputesTableHeader({
                 {reviewers.map((reviewer) => (
                   <option key={reviewer.id} value={reviewer.name}>
                     {reviewer.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Department Filter */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                Department
+              </label>
+              <select
+                value={filters.department || ''}
+                onChange={(e) => handleFilterChange('department', e.target.value)}
+                className="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white min-w-[160px]"
+              >
+                <option value="">All Departments</option>
+                {DEPARTMENT_OPTIONS.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
                   </option>
                 ))}
               </select>

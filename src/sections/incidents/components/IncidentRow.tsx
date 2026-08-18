@@ -274,46 +274,68 @@ export function IncidentRow({
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {incident.subscriberId}
           </p>
-          <p className="mt-1 font-mono text-xs text-slate-700 dark:text-slate-300">
+          <span className="mt-1 inline-flex items-center px-2 py-0.5 rounded font-mono text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
             {incident.vehicle}
-          </p>
+          </span>
         </div>
       </td>
 
-      {/* Type (Type + Challan/Case Type badges) */}
+      {/* Challan No / Amount - challans only */}
+      {!isCases && (
+        <td className="px-4 py-3">
+          <p className="font-mono text-sm font-medium text-slate-900 dark:text-white">
+            {incident.challanNumber}
+          </p>
+          <p className="mt-2 text-xs font-medium text-slate-900 dark:text-white">
+            ₹{incident.amount.toLocaleString('en-IN')}
+          </p>
+        </td>
+      )}
+
+      {/* Type (Case Type badges for cases; Challan Type only for challans) */}
       <td className="px-4 py-3">
         <div className="flex flex-wrap items-center gap-1">
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-              isCases
-                ? incident.type === 'onSpot'
-                  ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-                  : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                : incident.type === 'contest'
-                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-            }`}
-          >
-            {TYPE_LABELS[incident.type]}
-          </span>
-          {isCases
-            ? incident.caseCategory && (
+          {isCases ? (
+            <>
+              <span
+                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                  incident.type === 'onSpot'
+                    ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
+                    : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                }`}
+              >
+                {TYPE_LABELS[incident.type]}
+              </span>
+              {incident.caseCategory && (
                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400">
                   {CASE_CATEGORY_LABELS[incident.caseCategory] || incident.caseCategory}
                 </span>
-              )
-            : (incident.challanType === 'court' || incident.challanType === 'online') && (
-                <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                    incident.challanType === 'court'
-                      ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400'
-                      : 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
-                  }`}
-                >
-                  {CHALLAN_TYPE_LABELS[incident.challanType]}
-                </span>
               )}
+            </>
+          ) : (
+            (incident.challanType === 'court' || incident.challanType === 'online') && (
+              <span
+                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                  incident.challanType === 'court'
+                    ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400'
+                    : 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
+                }`}
+              >
+                {CHALLAN_TYPE_LABELS[incident.challanType]}
+              </span>
+            )
+          )}
         </div>
+      </td>
+
+      {/* Created */}
+      <td className="px-4 py-3">
+        <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
+          {formatDate(incident.createdAt)}
+        </p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          {formatTime(incident.createdAt)}
+        </p>
       </td>
 
       {/* Last Updated */}
@@ -335,18 +357,11 @@ export function IncidentRow({
             )
           }
           if (
-            incident.queue === 'settled' ||
-            incident.queue === 'notSettled'
-          ) {
-            return (
-              <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                ₹{incident.amount.toLocaleString('en-IN')}
-              </span>
-            )
-          }
-          if (
-            incident.queue === 'refundRequested' ||
-            incident.queue === 'refundCompleted'
+            isCases &&
+            (incident.queue === 'settled' ||
+              incident.queue === 'notSettled' ||
+              incident.queue === 'refundRequested' ||
+              incident.queue === 'refundCompleted')
           ) {
             return (
               <span className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -405,18 +420,20 @@ export function IncidentRow({
         </td>
       )}
 
-      {/* Assigned Lawyer */}
-      <td className="px-4 py-3">
-        {incident.queue === 'newIncidents' ? (
-          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-        ) : assignedLawyer ? (
-          <span className="text-sm text-slate-700 dark:text-slate-300 truncate block">
-            {assignedLawyer.name.replace('Adv. ', '')}
-          </span>
-        ) : (
-          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-        )}
-      </td>
+      {/* Assigned Lawyer - cases only */}
+      {isCases && (
+        <td className="px-4 py-3">
+          {incident.queue === 'newIncidents' ? (
+            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          ) : assignedLawyer ? (
+            <span className="text-sm text-slate-700 dark:text-slate-300 truncate block">
+              {assignedLawyer.name.replace('Adv. ', '')}
+            </span>
+          ) : (
+            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          )}
+        </td>
+      )}
 
       {/* Actions Menu */}
       <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
@@ -620,7 +637,7 @@ export function IncidentRow({
     {/* Settlement Modal */}
     {showSettlementModal && (
       <tr>
-        <td colSpan={isCases ? 10 : 11} className="p-0">
+        <td colSpan={isCases ? 9 : 10} className="p-0">
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div
               className="absolute inset-0 bg-black/50"

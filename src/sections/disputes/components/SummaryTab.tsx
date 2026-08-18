@@ -5,12 +5,13 @@ interface SummaryTabProps {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  refund: 'Refund Dispute',
+  refund: 'Refund',
   '48hr_refund': '48 hr Refund',
-  tat_breach_refund: 'TAT Breach Refund',
-  service: 'Service Dispute',
-  payment: 'Payment Dispute',
+  tat_breach: 'TAT Breach',
+  payment_issue: 'Payment Issue',
   legal_escalation: 'Legal Escalation',
+  information_missing: 'Information Missing',
+  incorrect_data: 'Incorrect Data',
 }
 
 const RAISED_BY_LABELS: Record<string, string> = {

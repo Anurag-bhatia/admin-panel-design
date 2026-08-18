@@ -220,11 +220,13 @@ export function IncidentList({
               <col className="w-12" />
               <col className="w-40" />
               <col className="w-64" />
+              {!isCases && <col className="w-40" />}
+              <col className="w-32" />
               <col className="w-32" />
               <col className="w-32" />
               <col className="w-36" />
               {!isCases && <col className="w-40" />}
-              <col className="w-40" />
+              {isCases && <col className="w-40" />}
               <col className="w-12" />
             </colgroup>
             <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
@@ -246,29 +248,41 @@ export function IncidentList({
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Subscriber / Vehicle
                 </th>
+                {!isCases && (
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Challan No / Amount
+                  </th>
+                )}
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Type
+                  {isCases ? 'Type' : 'Challan'}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Created
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Updated
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {activeQueue === 'settled' || activeQueue === 'notSettled'
-                    ? 'Total Amount'
-                    : activeQueue === 'refundRequested'
-                      ? 'Requested Amount'
-                      : activeQueue === 'refundCompleted'
-                        ? 'Refunded Amount'
-                        : 'Status'}
+                  {isCases
+                    ? activeQueue === 'settled' || activeQueue === 'notSettled'
+                      ? 'Total Amount'
+                      : activeQueue === 'refundRequested'
+                        ? 'Requested Amount'
+                        : activeQueue === 'refundCompleted'
+                          ? 'Refunded Amount'
+                          : 'Status'
+                    : 'Status'}
                 </th>
                 {!isCases && (
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Agent
+                    Employee
                   </th>
                 )}
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Lawyer
-                </th>
+                {isCases && (
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Lawyer
+                  </th>
+                )}
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   <span className="sr-only">Actions</span>
                 </th>
@@ -278,7 +292,7 @@ export function IncidentList({
               {displayedIncidents.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={isCases ? 8 : 9}
+                    colSpan={isCases ? 9 : 10}
                     className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
