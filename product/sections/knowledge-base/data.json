@@ -1,0 +1,345 @@
+{
+  "_meta": {
+    "models": {
+      "entries": "Each entry is a knowledge-base resource shown in the app. Every entry has a category (template, FAQ, guide, checklist, regulation, judgement, circular) that decides how the content is rendered to the end user."
+    }
+  },
+  "entries": [
+    {
+      "id": "kb-001",
+      "category": "template",
+      "title": "Accident Affidavit Template",
+      "description": "Ready-to-use affidavit format for motor accident insurance claims on ₹100 non-judicial stamp paper.",
+      "tags": ["accident", "insurance", "affidavit"],
+      "publishedOn": "2026-03-15T10:00:00Z",
+      "updatedOn": "2026-03-15T10:00:00Z",
+      "authorName": "Arjun Nair",
+      "status": "published",
+      "content": {
+        "kind": "template",
+        "template": {
+          "fileName": "accident-affidavit-template.docx",
+          "fileFormat": "DOCX",
+          "fileSize": "42 KB",
+          "previewNote": "Print on ₹100 non-judicial stamp paper, get it notarised, and attach to the insurance claim file."
+        }
+      }
+    },
+    {
+      "id": "kb-002",
+      "category": "template",
+      "title": "RTI Application for Vehicle Records",
+      "description": "Standard RTI application format to request vehicle ownership, challan records, or registration details from the RTO.",
+      "tags": ["rti", "rto", "vehicle records"],
+      "publishedOn": "2026-02-08T09:00:00Z",
+      "updatedOn": "2026-02-08T09:00:00Z",
+      "authorName": "Priya Malhotra",
+      "status": "published",
+      "content": {
+        "kind": "template",
+        "template": {
+          "fileName": "rti-vehicle-records.pdf",
+          "fileFormat": "PDF",
+          "fileSize": "128 KB",
+          "previewNote": "Enclose a postal order of ₹10 payable to the Public Information Officer of the concerned RTO."
+        }
+      }
+    },
+    {
+      "id": "kb-003",
+      "category": "faq",
+      "title": "Challan & Traffic Violation FAQs",
+      "description": "Common questions about traffic challans — disputing wrong challans, payment deadlines, Lok Adalat, and licence suspension.",
+      "tags": ["challan", "traffic", "lok adalat"],
+      "publishedOn": "2026-03-22T14:00:00Z",
+      "updatedOn": "2026-03-22T14:00:00Z",
+      "authorName": "Vikram Singh",
+      "status": "published",
+      "content": {
+        "kind": "faq",
+        "items": [
+          {
+            "question": "What should I do if I receive a wrong challan?",
+            "answer": "Raise a dispute within 60 days on the Parivahan portal or contest it in the nearest traffic court. Attach photos, GPS data, or any evidence that shows the vehicle was not at the reported location."
+          },
+          {
+            "question": "How long do I have to pay a challan before extra penalties apply?",
+            "answer": "Most states allow 60 days from the challan date. Beyond that, the case is forwarded to the Virtual Court and additional court fees may apply."
+          },
+          {
+            "question": "Can I get a discount at Lok Adalat?",
+            "answer": "Yes. Lok Adalats regularly waive 30–50% of the fine for compoundable violations. Check state notifications for upcoming Lok Adalat dates."
+          },
+          {
+            "question": "Will unpaid challans affect my driving licence renewal?",
+            "answer": "Unresolved challans older than 90 days can block licence renewal, RC transfer, and NOC issuance in most states."
+          }
+        ]
+      }
+    },
+    {
+      "id": "kb-004",
+      "category": "faq",
+      "title": "Insurance Claims & Coverage FAQs",
+      "description": "Answers to frequently asked questions about motor insurance claims, third-party coverage, claim denials, and IDV.",
+      "tags": ["insurance", "claims", "third-party"],
+      "publishedOn": "2026-03-18T11:00:00Z",
+      "updatedOn": "2026-03-18T11:00:00Z",
+      "authorName": "Neha Kapoor",
+      "status": "published",
+      "content": {
+        "kind": "faq",
+        "items": [
+          {
+            "question": "What documents are required to file a motor insurance claim?",
+            "answer": "FIR copy, driving licence, registration certificate, insurance policy, repair estimate, and photographs of the damage."
+          },
+          {
+            "question": "Can a claim be denied for not intimating within 24 hours?",
+            "answer": "Yes. Most insurers require intimation within 24–48 hours. Delayed intimation is a common denial reason — always call the toll-free helpline first."
+          },
+          {
+            "question": "How is the Insured Declared Value (IDV) calculated?",
+            "answer": "IDV is the manufacturer’s listed selling price minus depreciation based on the vehicle’s age (5% for <6 months, up to 50% for 4–5 years)."
+          }
+        ]
+      }
+    },
+    {
+      "id": "kb-005",
+      "category": "guide",
+      "title": "How to Transfer Vehicle Ownership Across States",
+      "description": "Complete step-by-step guide for interstate vehicle ownership transfer including NOC, Form 29/30, fees, and timelines.",
+      "tags": ["ownership", "transfer", "noc", "interstate"],
+      "publishedOn": "2026-03-10T10:00:00Z",
+      "updatedOn": "2026-03-10T10:00:00Z",
+      "authorName": "Arjun Nair",
+      "status": "published",
+      "content": {
+        "kind": "guide",
+        "steps": [
+          {
+            "title": "Obtain NOC from the current RTO",
+            "body": "Submit Form 28 in triplicate along with RC, insurance, PUC, and address proof. The NOC is issued within 15–30 days and stays valid for 6 months."
+          },
+          {
+            "title": "Pay road tax refund and re-register in the new state",
+            "body": "File Form DT for road tax refund in the origin state and pay lifetime road tax in the destination state before re-registration."
+          },
+          {
+            "title": "Submit Form 29 and Form 30 in the new state",
+            "body": "Form 29 is the notice of ownership transfer; Form 30 is the report of transfer. Both must be signed by the seller and the buyer."
+          },
+          {
+            "title": "Get a new registration mark and updated RC",
+            "body": "The destination RTO issues a fresh registration number. The updated RC arrives by post within 30 days."
+          }
+        ]
+      }
+    },
+    {
+      "id": "kb-006",
+      "category": "guide",
+      "title": "What to Do After a Road Accident — Step-by-Step Guide",
+      "description": "Immediate actions, evidence collection, FIR filing, insurance intimation, and legal steps after a vehicle accident.",
+      "tags": ["accident", "fir", "insurance"],
+      "publishedOn": "2026-03-25T09:00:00Z",
+      "updatedOn": "2026-03-25T09:00:00Z",
+      "authorName": "Vikram Singh",
+      "status": "published",
+      "content": {
+        "kind": "guide",
+        "steps": [
+          {
+            "title": "Ensure safety and provide first aid",
+            "body": "Move the vehicle off the carriageway if safe. Call 112 or 108 for medical help. Do not move injured persons unless trained."
+          },
+          {
+            "title": "Collect on-spot evidence",
+            "body": "Photograph vehicle positions, damage, licence plates, injuries, road signs, and skid marks. Note down witness names and phone numbers."
+          },
+          {
+            "title": "File an FIR at the nearest police station",
+            "body": "An FIR is mandatory for third-party claims and damages above ₹50,000. Retain the FIR copy — you will need it for insurance intimation."
+          },
+          {
+            "title": "Intimate the insurer within 24 hours",
+            "body": "Call the toll-free number, note down the claim intimation number, and upload documents through the insurer’s app or portal."
+          }
+        ]
+      }
+    },
+    {
+      "id": "kb-007",
+      "category": "checklist",
+      "title": "Vehicle Ownership Compliance Checklist",
+      "description": "Essential compliance checklist for every vehicle owner — documents, renewals, and inspections that must be current.",
+      "tags": ["compliance", "ownership"],
+      "publishedOn": "2026-03-05T10:00:00Z",
+      "updatedOn": "2026-03-05T10:00:00Z",
+      "authorName": "Priya Malhotra",
+      "status": "published",
+      "content": {
+        "kind": "checklist",
+        "items": [
+          "Valid Registration Certificate (RC) with correct owner name",
+          "Active motor insurance policy (third-party at minimum)",
+          "Pollution Under Control (PUC) certificate valid for the current period",
+          "Original driving licence for the vehicle class",
+          "Fitness certificate (for commercial vehicles) renewed on schedule",
+          "Road tax paid up to date for the state of registration",
+          "No pending challans older than 60 days on the Parivahan portal",
+          "Permit and route authorisation (for commercial and transport vehicles)"
+        ]
+      }
+    },
+    {
+      "id": "kb-008",
+      "category": "checklist",
+      "title": "Fleet Compliance Audit Checklist",
+      "description": "Quarterly compliance audit checklist for fleet operators covering vehicles, drivers, and documentation.",
+      "tags": ["fleet", "compliance", "audit"],
+      "publishedOn": "2026-03-12T10:00:00Z",
+      "updatedOn": "2026-03-12T10:00:00Z",
+      "authorName": "Ravi Mehta",
+      "status": "published",
+      "content": {
+        "kind": "checklist",
+        "items": [
+          "All vehicle RCs verified against fleet register",
+          "Fitness certificates renewed for every commercial vehicle",
+          "Driver licences validated and expiry dates logged",
+          "Fastag balances above ₹500 across the fleet",
+          "GPS and speed governor certificates in place",
+          "Insurance policies renewed with correct IDV",
+          "Route permits current for every operating state",
+          "Pending challans reviewed and disposed monthly"
+        ]
+      }
+    },
+    {
+      "id": "kb-009",
+      "category": "regulation",
+      "title": "Motor Vehicles Act 2019 — Key Penalty Provisions",
+      "description": "Summary of updated penalty amounts under the Motor Vehicles (Amendment) Act 2019 for common traffic offences.",
+      "tags": ["mv act", "penalty", "regulation"],
+      "publishedOn": "2026-01-20T10:00:00Z",
+      "updatedOn": "2026-01-20T10:00:00Z",
+      "authorName": "Arjun Nair",
+      "status": "published",
+      "content": {
+        "kind": "regulation",
+        "regulation": {
+          "citation": "Motor Vehicles (Amendment) Act 2019, Sections 177–210",
+          "jurisdiction": "India — all states unless notified otherwise",
+          "bodyText": "The Motor Vehicles (Amendment) Act 2019 revised penalty amounts across the board. Driving without a licence attracts ₹5,000, drunken driving ₹10,000 and up to 6 months imprisonment on first offence, over-speeding ₹1,000 for LMV and ₹2,000 for MMV, and dangerous driving ₹5,000. Juvenile offences make the guardian or vehicle owner liable with fines up to ₹25,000 and 3 years imprisonment. States are empowered to notify graded fine reductions."
+        }
+      }
+    },
+    {
+      "id": "kb-010",
+      "category": "regulation",
+      "title": "Central Motor Vehicles Rules 1989 — Registration Timelines",
+      "description": "Statutory timelines for vehicle registration, transfer, and re-registration under CMVR 1989.",
+      "tags": ["cmvr", "registration"],
+      "publishedOn": "2026-02-02T10:00:00Z",
+      "updatedOn": "2026-02-02T10:00:00Z",
+      "authorName": "Priya Malhotra",
+      "status": "published",
+      "content": {
+        "kind": "regulation",
+        "regulation": {
+          "citation": "Central Motor Vehicles Rules 1989, Rule 47 & Rule 55",
+          "jurisdiction": "India — CMVR applies uniformly",
+          "bodyText": "Rule 47 requires a vehicle to be registered within 7 days of delivery in the state of first use. Rule 55 requires the transferor to report transfer of ownership within 14 days (same state) or 45 days (inter-state). Failure to comply attracts a compounding fee under Section 177 of the MV Act."
+        }
+      }
+    },
+    {
+      "id": "kb-011",
+      "category": "judgement",
+      "title": "M.R. Krishna Murthi v. New India Assurance (2019)",
+      "description": "Supreme Court judgement clarifying insurer’s liability for pay-and-recover in third-party claims when driver had no valid licence.",
+      "tags": ["insurance", "third-party", "supreme court"],
+      "publishedOn": "2026-01-15T10:00:00Z",
+      "updatedOn": "2026-01-15T10:00:00Z",
+      "authorName": "Arjun Nair",
+      "status": "published",
+      "content": {
+        "kind": "judgement",
+        "judgement": {
+          "caseTitle": "M.R. Krishna Murthi v. New India Assurance Co. Ltd.",
+          "court": "Supreme Court of India",
+          "decidedOn": "2019-03-05",
+          "citation": "(2019) 4 SCC 415",
+          "holding": "Insurance company must pay the third-party claim first and can recover from the owner-driver only if a breach of policy condition is established with evidence.",
+          "summary": "The Court reiterated the pay-and-recover principle: even where a defence of licence breach is raised, the insurer cannot deny an award to the third-party claimant. Recovery from the insured is a subsequent step that requires proof of wilful breach."
+        }
+      }
+    },
+    {
+      "id": "kb-012",
+      "category": "judgement",
+      "title": "United India Insurance v. Sunil Kumar (2017)",
+      "description": "Landmark ruling on the scope of “no-fault liability” under Section 163A of the Motor Vehicles Act.",
+      "tags": ["insurance", "no-fault", "163a"],
+      "publishedOn": "2026-01-28T10:00:00Z",
+      "updatedOn": "2026-01-28T10:00:00Z",
+      "authorName": "Vikram Singh",
+      "status": "published",
+      "content": {
+        "kind": "judgement",
+        "judgement": {
+          "caseTitle": "United India Insurance Co. Ltd. v. Sunil Kumar",
+          "court": "Supreme Court of India",
+          "decidedOn": "2017-12-15",
+          "citation": "(2018) 2 SCC 231",
+          "holding": "A claimant electing compensation under Section 163A cannot subsequently prove negligence and claim under Section 166.",
+          "summary": "The Court held that Sections 163A and 166 are mutually exclusive remedies. Once no-fault compensation is claimed and awarded, the claimant is barred from re-agitating the same cause of action on fault grounds."
+        }
+      }
+    },
+    {
+      "id": "kb-013",
+      "category": "circular",
+      "title": "MoRTH Circular — Fastag Mandatory for All Vehicles",
+      "description": "Ministry of Road Transport & Highways circular mandating Fastag for all commercial and private vehicles from Jan 2021 onwards.",
+      "tags": ["fastag", "morth", "toll"],
+      "publishedOn": "2026-01-10T10:00:00Z",
+      "updatedOn": "2026-01-10T10:00:00Z",
+      "authorName": "Ravi Mehta",
+      "status": "published",
+      "content": {
+        "kind": "circular",
+        "circular": {
+          "issuedBy": "Ministry of Road Transport & Highways (MoRTH)",
+          "issuedOn": "2020-12-24",
+          "circularNumber": "RT-25036/122/2020-MVL",
+          "subject": "Mandatory affixation of Fastag on all four-wheeler vehicles",
+          "body": "In exercise of powers conferred under the CMVR 1989, all four-wheeler vehicles registered on or after 1 December 2017 must be affixed with a valid Fastag. Failure attracts double toll at every plaza and non-issue of fitness certificate on renewal."
+        }
+      }
+    },
+    {
+      "id": "kb-014",
+      "category": "circular",
+      "title": "IRDAI Circular — Long-Term Third-Party Cover",
+      "description": "IRDAI circular introducing 3-year long-term third-party motor insurance cover for private cars and 5-year for two-wheelers.",
+      "tags": ["irdai", "insurance", "third-party"],
+      "publishedOn": "2026-02-14T10:00:00Z",
+      "updatedOn": "2026-02-14T10:00:00Z",
+      "authorName": "Neha Kapoor",
+      "status": "published",
+      "content": {
+        "kind": "circular",
+        "circular": {
+          "issuedBy": "Insurance Regulatory and Development Authority of India (IRDAI)",
+          "issuedOn": "2018-08-28",
+          "circularNumber": "IRDAI/NL/CIR/MOTP/158/09/2018",
+          "subject": "Long-term motor third-party insurance for new vehicles",
+          "body": "All new private cars sold on or after 1 September 2018 shall carry a 3-year third-party liability cover, and new two-wheelers a 5-year cover, at the point of sale. Non-compliance disqualifies the policy from acceptance at RTOs."
+        }
+      }
+    }
+  ]
+}

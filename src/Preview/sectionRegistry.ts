@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   FileInput,
   Gift,
+  BookOpen,
 } from 'lucide-react'
 
 // Lazy-loaded section preview components
@@ -66,6 +67,9 @@ const ProposalListPreview = React.lazy(() =>
 )
 const RewardsConfigPreview = React.lazy(() =>
   import('../sections/rewards-config/RewardsConfigPreview')
+)
+const KnowledgeBasePreview = React.lazy(() =>
+  import('../sections/knowledge-base/KnowledgeBasePreview')
 )
 
 // Section metadata mapping
@@ -150,6 +154,11 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     description: 'State-level reward configuration for Operations Cost, Margin, and Lawyered CV/NCV margins. Email-allow-listed access with versioned change history.',
     icon: Gift,
   },
+  'knowledge-base': {
+    label: 'Knowledge Base',
+    description: 'Admin backend for legal guides, templates, FAQs, checklists, regulations, judgements, and circulars that end users see in the app.',
+    icon: BookOpen,
+  },
 }
 
 // Component mapping for implemented sections
@@ -170,6 +179,7 @@ export const SECTION_COMPONENTS: Record<string, React.ComponentType<any> | null>
   'settled-challans': SettledChallansPreview,
   proposals: ProposalListPreview,
   'rewards-config': RewardsConfigPreview,
+  'knowledge-base': KnowledgeBasePreview,
 }
 
 // Ordered list of section IDs for consistent navigation
@@ -190,6 +200,7 @@ export const SECTION_IDS = [
   'settled-challans',
   'proposals',
   'rewards-config',
+  'knowledge-base',
 ] as const
 
 // Sections hidden from sidebar navigation (kept in registry for data access)
