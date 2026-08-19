@@ -19,6 +19,7 @@ import { EvidenceTab } from './EvidenceTab'
 import { DisputeActivityTab, type DisputeFollowUp } from './DisputeActivityTab'
 import { AssignReviewerModal } from './AssignReviewerModal'
 import { AssignDepartmentModal } from './AssignDepartmentModal'
+import { SettleDisputeModal } from './SettleDisputeModal'
 
 type TabType = 'summary' | 'linkedIncident' | 'investigation' | 'evidence' | 'activity'
 
@@ -82,6 +83,7 @@ export function DisputeDetailView({
   const [showReviewerModal, setShowReviewerModal] = useState(false)
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
   const [showDepartmentModal, setShowDepartmentModal] = useState(false)
+  const [showSettleModal, setShowSettleModal] = useState(false)
 
   const getSlaInfo = () => {
     const now = new Date()
@@ -171,6 +173,8 @@ export function DisputeDetailView({
                           setShowMoveDropdown(false)
                           if (stage.key === 'transfer_to_department') {
                             setShowDepartmentModal(true)
+                          } else if (stage.key === 'settled') {
+                            setShowSettleModal(true)
                           } else {
                             onCloseDispute?.(dispute.id)
                           }
@@ -393,6 +397,17 @@ export function DisputeDetailView({
             setShowDepartmentModal(false)
           }}
           onClose={() => setShowDepartmentModal(false)}
+        />
+      )}
+
+      {showSettleModal && (
+        <SettleDisputeModal
+          onSettle={(resolution) => {
+            console.log('Settle dispute:', dispute.id, 'resolution:', resolution)
+            onCloseDispute?.(dispute.id)
+            setShowSettleModal(false)
+          }}
+          onClose={() => setShowSettleModal(false)}
         />
       )}
     </div>

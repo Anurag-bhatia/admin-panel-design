@@ -10,6 +10,7 @@ import type {
   DisputeStatus,
 } from '@/../product/sections/disputes/types'
 import { AssignDepartmentModal } from './AssignDepartmentModal'
+import { SettleDisputeModal } from './SettleDisputeModal'
 
 interface DisputeBulkActionsBarProps {
   selectedCount: number
@@ -45,6 +46,7 @@ export function DisputeBulkActionsBar({
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false)
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
   const [showDepartmentModal, setShowDepartmentModal] = useState(false)
+  const [showSettleModal, setShowSettleModal] = useState(false)
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 duration-300">
@@ -129,6 +131,8 @@ export function DisputeBulkActionsBar({
                         setShowMoveDropdown(false)
                         if (stage.key === 'transfer_to_department') {
                           setShowDepartmentModal(true)
+                        } else if (stage.key === 'settled') {
+                          setShowSettleModal(true)
                         } else {
                           onMoveStage?.(stage.key)
                         }
@@ -152,6 +156,17 @@ export function DisputeBulkActionsBar({
             setShowDepartmentModal(false)
           }}
           onClose={() => setShowDepartmentModal(false)}
+        />
+      )}
+
+      {showSettleModal && (
+        <SettleDisputeModal
+          onSettle={(resolution) => {
+            console.log('Bulk settle disputes with resolution:', resolution)
+            onMoveStage?.('settled')
+            setShowSettleModal(false)
+          }}
+          onClose={() => setShowSettleModal(false)}
         />
       )}
     </div>

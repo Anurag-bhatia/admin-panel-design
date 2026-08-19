@@ -12,6 +12,7 @@ import type {
   DisputeStatus,
 } from '@/../product/sections/disputes/types'
 import { AssignDepartmentModal } from './AssignDepartmentModal'
+import { SettleDisputeModal } from './SettleDisputeModal'
 
 interface DisputeRowProps {
   dispute: Dispute
@@ -127,6 +128,7 @@ export function DisputeRow({
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false)
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
   const [showDepartmentModal, setShowDepartmentModal] = useState(false)
+  const [showSettleModal, setShowSettleModal] = useState(false)
 
   const typeConfig = TYPE_LABELS[dispute.disputeType] || { label: dispute.disputeType, className: '' }
   const priorityConfig = PRIORITY_LABELS[dispute.priority] || { label: dispute.priority, className: '' }
@@ -275,6 +277,8 @@ export function DisputeRow({
                             setShowMoveDropdown(false)
                             if (stage.key === 'transfer_to_department') {
                               setShowDepartmentModal(true)
+                            } else if (stage.key === 'settled') {
+                              setShowSettleModal(true)
                             } else {
                               onMoveStage?.(stage.key)
                             }
@@ -333,6 +337,17 @@ export function DisputeRow({
             currentDepartment={dispute.transferredToDepartment}
             onAssign={() => setShowDepartmentModal(false)}
             onClose={() => setShowDepartmentModal(false)}
+          />
+        )}
+
+        {showSettleModal && (
+          <SettleDisputeModal
+            onSettle={(resolution) => {
+              console.log('Settle dispute:', dispute.id, 'resolution:', resolution)
+              onMoveStage?.('settled')
+              setShowSettleModal(false)
+            }}
+            onClose={() => setShowSettleModal(false)}
           />
         )}
       </td>
