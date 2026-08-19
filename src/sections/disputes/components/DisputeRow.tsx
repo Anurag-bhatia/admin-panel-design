@@ -13,6 +13,9 @@ import type {
 } from '@/../product/sections/disputes/types'
 import { AssignDepartmentModal } from './AssignDepartmentModal'
 import { SettleDisputeModal } from './SettleDisputeModal'
+import { RerouteDisputeModal } from './RerouteDisputeModal'
+import { MoveToInProgressModal } from './MoveToInProgressModal'
+import { HoldDisputeModal } from './HoldDisputeModal'
 
 interface DisputeRowProps {
   dispute: Dispute
@@ -129,6 +132,9 @@ export function DisputeRow({
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
   const [showDepartmentModal, setShowDepartmentModal] = useState(false)
   const [showSettleModal, setShowSettleModal] = useState(false)
+  const [showRerouteModal, setShowRerouteModal] = useState(false)
+  const [showInProgressModal, setShowInProgressModal] = useState(false)
+  const [showHoldModal, setShowHoldModal] = useState(false)
 
   const typeConfig = TYPE_LABELS[dispute.disputeType] || { label: dispute.disputeType, className: '' }
   const priorityConfig = PRIORITY_LABELS[dispute.priority] || { label: dispute.priority, className: '' }
@@ -277,8 +283,14 @@ export function DisputeRow({
                             setShowMoveDropdown(false)
                             if (stage.key === 'transfer_to_department') {
                               setShowDepartmentModal(true)
+                            } else if (stage.key === 'reroute') {
+                              setShowRerouteModal(true)
                             } else if (stage.key === 'settled') {
                               setShowSettleModal(true)
+                            } else if (stage.key === 'in_progress') {
+                              setShowInProgressModal(true)
+                            } else if (stage.key === 'hold') {
+                              setShowHoldModal(true)
                             } else {
                               onMoveStage?.(stage.key)
                             }
@@ -348,6 +360,39 @@ export function DisputeRow({
               setShowSettleModal(false)
             }}
             onClose={() => setShowSettleModal(false)}
+          />
+        )}
+
+        {showRerouteModal && (
+          <RerouteDisputeModal
+            onReroute={(details) => {
+              console.log('Reroute dispute:', dispute.id, 'details:', details)
+              onMoveStage?.('reroute')
+              setShowRerouteModal(false)
+            }}
+            onClose={() => setShowRerouteModal(false)}
+          />
+        )}
+
+        {showInProgressModal && (
+          <MoveToInProgressModal
+            onConfirm={(notes) => {
+              console.log('Move dispute to In Progress:', dispute.id, 'notes:', notes)
+              onMoveStage?.('in_progress')
+              setShowInProgressModal(false)
+            }}
+            onClose={() => setShowInProgressModal(false)}
+          />
+        )}
+
+        {showHoldModal && (
+          <HoldDisputeModal
+            onConfirm={(reason, attachments) => {
+              console.log('Move dispute to Hold:', dispute.id, 'reason:', reason, 'attachments:', attachments)
+              onMoveStage?.('hold')
+              setShowHoldModal(false)
+            }}
+            onClose={() => setShowHoldModal(false)}
           />
         )}
       </td>

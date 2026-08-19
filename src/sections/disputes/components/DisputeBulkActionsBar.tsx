@@ -11,6 +11,9 @@ import type {
 } from '@/../product/sections/disputes/types'
 import { AssignDepartmentModal } from './AssignDepartmentModal'
 import { SettleDisputeModal } from './SettleDisputeModal'
+import { RerouteDisputeModal } from './RerouteDisputeModal'
+import { MoveToInProgressModal } from './MoveToInProgressModal'
+import { HoldDisputeModal } from './HoldDisputeModal'
 
 interface DisputeBulkActionsBarProps {
   selectedCount: number
@@ -47,6 +50,9 @@ export function DisputeBulkActionsBar({
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
   const [showDepartmentModal, setShowDepartmentModal] = useState(false)
   const [showSettleModal, setShowSettleModal] = useState(false)
+  const [showRerouteModal, setShowRerouteModal] = useState(false)
+  const [showInProgressModal, setShowInProgressModal] = useState(false)
+  const [showHoldModal, setShowHoldModal] = useState(false)
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 duration-300">
@@ -131,8 +137,14 @@ export function DisputeBulkActionsBar({
                         setShowMoveDropdown(false)
                         if (stage.key === 'transfer_to_department') {
                           setShowDepartmentModal(true)
+                        } else if (stage.key === 'reroute') {
+                          setShowRerouteModal(true)
                         } else if (stage.key === 'settled') {
                           setShowSettleModal(true)
+                        } else if (stage.key === 'in_progress') {
+                          setShowInProgressModal(true)
+                        } else if (stage.key === 'hold') {
+                          setShowHoldModal(true)
                         } else {
                           onMoveStage?.(stage.key)
                         }
@@ -167,6 +179,39 @@ export function DisputeBulkActionsBar({
             setShowSettleModal(false)
           }}
           onClose={() => setShowSettleModal(false)}
+        />
+      )}
+
+      {showRerouteModal && (
+        <RerouteDisputeModal
+          onReroute={(details) => {
+            console.log('Bulk reroute disputes with details:', details)
+            onMoveStage?.('reroute')
+            setShowRerouteModal(false)
+          }}
+          onClose={() => setShowRerouteModal(false)}
+        />
+      )}
+
+      {showInProgressModal && (
+        <MoveToInProgressModal
+          onConfirm={(notes) => {
+            console.log('Bulk move disputes to In Progress with notes:', notes)
+            onMoveStage?.('in_progress')
+            setShowInProgressModal(false)
+          }}
+          onClose={() => setShowInProgressModal(false)}
+        />
+      )}
+
+      {showHoldModal && (
+        <HoldDisputeModal
+          onConfirm={(reason, attachments) => {
+            console.log('Bulk move disputes to Hold with reason:', reason, 'attachments:', attachments)
+            onMoveStage?.('hold')
+            setShowHoldModal(false)
+          }}
+          onClose={() => setShowHoldModal(false)}
         />
       )}
     </div>

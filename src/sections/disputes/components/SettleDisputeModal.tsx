@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { X, CheckCircle, ChevronDown } from 'lucide-react'
 
 interface SettleDisputeModalProps {
-  onSettle?: (resolution: string) => void
+  onSettle?: (resolution: string, notes: string) => void
   onClose?: () => void
 }
 
@@ -18,6 +18,7 @@ const RESOLUTION_OPTIONS = [
 export function SettleDisputeModal({ onSettle, onClose }: SettleDisputeModalProps) {
   const [selected, setSelected] = useState<string | null>(null)
   const [otherText, setOtherText] = useState('')
+  const [notes, setNotes] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
 
   const isOther = selected === 'Other'
@@ -26,7 +27,7 @@ export function SettleDisputeModal({ onSettle, onClose }: SettleDisputeModalProp
   const handleSettle = () => {
     if (!canSubmit || !selected) return
     const resolution = isOther ? otherText.trim() : selected
-    onSettle?.(resolution)
+    onSettle?.(resolution, notes.trim())
   }
 
   return createPortal(
@@ -37,9 +38,6 @@ export function SettleDisputeModal({ onSettle, onClose }: SettleDisputeModalProp
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
               Settle Dispute
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              Select a resolution to move this dispute to Settled
-            </p>
           </div>
           <button
             onClick={onClose}
@@ -106,6 +104,19 @@ export function SettleDisputeModal({ onSettle, onClose }: SettleDisputeModalProp
               />
             </div>
           )}
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Notes
+            </label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Add any additional notes..."
+              rows={3}
+              className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white resize-none"
+            />
+          </div>
         </div>
 
         <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-700">

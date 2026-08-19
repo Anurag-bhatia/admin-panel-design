@@ -4,7 +4,7 @@ import { X, Building2, Search } from 'lucide-react'
 
 interface AssignDepartmentModalProps {
   currentDepartment?: string | null
-  onAssign?: (department: string) => void
+  onAssign?: (department: string, person: string) => void
   onClose?: () => void
 }
 
@@ -24,16 +24,18 @@ export function AssignDepartmentModal({
   const [selected, setSelected] = useState<string | null>(currentDepartment || null)
   const [search, setSearch] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
+  const [person, setPerson] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const filteredDepartments = DEPARTMENTS.filter((d) =>
     d.toLowerCase().includes(search.toLowerCase())
   )
 
+  const canSubmit = selected !== null && person.trim().length > 0
+
   const handleAssign = () => {
-    if (selected) {
-      onAssign?.(selected)
-    }
+    if (!canSubmit || !selected) return
+    onAssign?.(selected, person.trim())
   }
 
   return createPortal(
@@ -45,9 +47,6 @@ export function AssignDepartmentModal({
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
               Transfer to Department
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              Select a department to route this dispute to
-            </p>
           </div>
           <button
             onClick={onClose}
@@ -134,6 +133,19 @@ export function AssignDepartmentModal({
               </div>
             )}
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Person Name
+            </label>
+            <input
+              type="text"
+              value={person}
+              onChange={(e) => setPerson(e.target.value)}
+              placeholder="Enter the person handling this ticket..."
+              className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
+            />
+          </div>
         </div>
 
         {/* Actions */}
@@ -146,7 +158,7 @@ export function AssignDepartmentModal({
           </button>
           <button
             onClick={handleAssign}
-            disabled={!selected}
+            disabled={!canSubmit}
             className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg transition-colors"
           >
             Transfer

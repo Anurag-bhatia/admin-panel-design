@@ -20,6 +20,9 @@ import { DisputeActivityTab, type DisputeFollowUp } from './DisputeActivityTab'
 import { AssignReviewerModal } from './AssignReviewerModal'
 import { AssignDepartmentModal } from './AssignDepartmentModal'
 import { SettleDisputeModal } from './SettleDisputeModal'
+import { RerouteDisputeModal } from './RerouteDisputeModal'
+import { MoveToInProgressModal } from './MoveToInProgressModal'
+import { HoldDisputeModal } from './HoldDisputeModal'
 
 type TabType = 'summary' | 'linkedIncident' | 'investigation' | 'evidence' | 'activity'
 
@@ -84,6 +87,9 @@ export function DisputeDetailView({
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
   const [showDepartmentModal, setShowDepartmentModal] = useState(false)
   const [showSettleModal, setShowSettleModal] = useState(false)
+  const [showRerouteModal, setShowRerouteModal] = useState(false)
+  const [showInProgressModal, setShowInProgressModal] = useState(false)
+  const [showHoldModal, setShowHoldModal] = useState(false)
 
   const getSlaInfo = () => {
     const now = new Date()
@@ -173,8 +179,14 @@ export function DisputeDetailView({
                           setShowMoveDropdown(false)
                           if (stage.key === 'transfer_to_department') {
                             setShowDepartmentModal(true)
+                          } else if (stage.key === 'reroute') {
+                            setShowRerouteModal(true)
                           } else if (stage.key === 'settled') {
                             setShowSettleModal(true)
+                          } else if (stage.key === 'in_progress') {
+                            setShowInProgressModal(true)
+                          } else if (stage.key === 'hold') {
+                            setShowHoldModal(true)
                           } else {
                             onCloseDispute?.(dispute.id)
                           }
@@ -408,6 +420,39 @@ export function DisputeDetailView({
             setShowSettleModal(false)
           }}
           onClose={() => setShowSettleModal(false)}
+        />
+      )}
+
+      {showRerouteModal && (
+        <RerouteDisputeModal
+          onReroute={(details) => {
+            console.log('Reroute dispute:', dispute.id, 'details:', details)
+            onCloseDispute?.(dispute.id)
+            setShowRerouteModal(false)
+          }}
+          onClose={() => setShowRerouteModal(false)}
+        />
+      )}
+
+      {showInProgressModal && (
+        <MoveToInProgressModal
+          onConfirm={(notes) => {
+            console.log('Move dispute to In Progress:', dispute.id, 'notes:', notes)
+            onCloseDispute?.(dispute.id)
+            setShowInProgressModal(false)
+          }}
+          onClose={() => setShowInProgressModal(false)}
+        />
+      )}
+
+      {showHoldModal && (
+        <HoldDisputeModal
+          onConfirm={(reason, attachments) => {
+            console.log('Move dispute to Hold:', dispute.id, 'reason:', reason, 'attachments:', attachments)
+            onCloseDispute?.(dispute.id)
+            setShowHoldModal(false)
+          }}
+          onClose={() => setShowHoldModal(false)}
         />
       )}
     </div>
