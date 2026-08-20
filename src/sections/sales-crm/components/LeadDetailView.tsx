@@ -1,9 +1,17 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock, Download, Pencil } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock, Download, Pencil, Truck } from 'lucide-react'
 import type { Lead, TimelineActivity, Document, User as UserType } from '@/../product/sections/sales-crm/types'
 import { IssuerHeader } from './AddQuotationModal'
+import { VehicleAnalysisModal } from './VehicleAnalysisModal'
 
-type TabType = 'details' | 'documents' | 'quotations'
+type TabType = 'details' | 'documents' | 'quotations' | 'pre-sales'
+
+const TAB_LABELS: Record<TabType, string> = {
+  details: 'Details',
+  documents: 'Documents',
+  quotations: 'Quotations',
+  'pre-sales': 'Pre-Sales',
+}
 
 interface LeadDetailViewProps {
   lead: Lead
@@ -24,10 +32,17 @@ interface LeadDetailViewProps {
 export function LeadDetailView({ lead, timelineActivities, documents, users, onClose, onEdit, onAssign, onChangeStatus, onAddFollowUp, onUploadDocument, onAddQuotation, onModifyQuotation, onDownloadQuotation }: LeadDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
   const [showMoveMenu, setShowMoveMenu] = useState(false)
+  const [showVehicleAnalysis, setShowVehicleAnalysis] = useState(false)
 
   const leadTimeline = timelineActivities.filter(activity => activity.leadId === lead.id)
   const leadDocuments = documents.filter(doc => doc.leadId === lead.id)
   const assignedUser = users.find(u => u.id === lead.assignedTo)
+
+  const pastAnalyses: { id: string; fileName: string; analyzedAt: string; vehicleCount: number; analyzedBy: string }[] = [
+    { id: 'VA-003', fileName: `${lead.companyAlias || lead.companyName}-fleet-aug.xlsx`, analyzedAt: '2026-08-18T14:22:00', vehicleCount: 42, analyzedBy: assignedUser?.fullName ?? 'Rahul Verma' },
+    { id: 'VA-002', fileName: `${lead.companyAlias || lead.companyName}-fleet-jul.xlsx`, analyzedAt: '2026-07-30T10:08:00', vehicleCount: 38, analyzedBy: assignedUser?.fullName ?? 'Rahul Verma' },
+    { id: 'VA-001', fileName: `${lead.companyAlias || lead.companyName}-initial-fleet.csv`, analyzedAt: '2026-07-12T16:45:00', vehicleCount: 35, analyzedBy: 'Priya Nair' },
+  ]
 
   const statusOptions: { value: Lead['status']; label: string }[] = [
     { value: 'new', label: 'New' },
@@ -68,13 +83,14 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
       details: <Building2 className="w-4 h-4" />,
       documents: <FileText className="w-4 h-4" />,
       quotations: <FileText className="w-4 h-4" />,
+      'pre-sales': <Truck className="w-4 h-4" />,
     }
     return icons[tab]
   }
 
   const availableTabs: TabType[] = lead.status === 'quotations'
-    ? ['details', 'documents', 'quotations']
-    : ['details', 'documents']
+    ? ['details', 'documents', 'quotations', 'pre-sales']
+    : ['details', 'documents', 'pre-sales']
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 lg:p-8">
@@ -173,7 +189,7 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                 }`}
               >
                 {getTabIcon(tab)}
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {TAB_LABELS[tab]}
               </button>
             ))}
           </div>
@@ -404,7 +420,75 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
             </div>
           </div>
         )}
+
+        {/* Pre-Sales Tab */}
+        {activeTab === 'pre-sales' && (
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+            <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Pre-Sales Tools</h2>
+              <button
+                onClick={() => setShowVehicleAnalysis(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                <Upload className="w-4 h-4" />
+                Vehicle Analysis
+              </button>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-3">Past Analyses</h3>
+              {pastAnalyses.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-700 rounded-lg">
+                  <Truck className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No analyses run yet</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Click Vehicle Analysis to upload a sheet</p>
+                </div>
+              ) : (
+                <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 dark:text-slate-400">
+                      <tr>
+                        <th className="text-left px-4 py-3 font-medium">File</th>
+                        <th className="text-left px-4 py-3 font-medium">Analyzed On</th>
+                        <th className="text-right px-4 py-3 font-medium">Vehicles</th>
+                        <th className="text-right px-4 py-3 font-medium">Analyzed By</th>
+                        <th className="text-right px-4 py-3 font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {pastAnalyses.map(analysis => (
+                        <tr key={analysis.id} className="text-slate-900 dark:text-slate-50">
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                              <span className="font-medium">{analysis.fileName}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{formatDateTime(analysis.analyzedAt)}</td>
+                          <td className="px-4 py-3 text-right">{analysis.vehicleCount}</td>
+                          <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-300">{analysis.analyzedBy}</td>
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-700 dark:text-cyan-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/30 rounded-md transition-colors"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              Download
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
+
+      {showVehicleAnalysis && (
+        <VehicleAnalysisModal onClose={() => setShowVehicleAnalysis(false)} />
+      )}
     </div>
   )
 }
