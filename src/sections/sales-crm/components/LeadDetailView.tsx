@@ -284,9 +284,6 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                           <p className="text-xs text-slate-500 dark:text-slate-400">
                             {activity.performedByName} &middot; {formatDateTime(activity.timestamp)}
                           </p>
-                          {activity.details?.notes && (
-                            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5">{activity.details.notes}</p>
-                          )}
                         </div>
                       </div>
                     ))}

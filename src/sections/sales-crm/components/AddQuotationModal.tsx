@@ -5,8 +5,6 @@ import {
   Layers,
   Wrench,
   Check,
-  Plus,
-  Minus,
   Download,
   Send,
 } from 'lucide-react'
@@ -22,27 +20,46 @@ interface SubscriptionPlan {
   description: string
 }
 
+type AddonCategory = 'caas' | 'rto' | 'laas' | 'api'
+
+interface ChallanMeta {
+  pendingAmount: number
+  totalChallans: number
+  courtChallans: number
+  onlineChallans: number
+}
+
 interface Addon {
   id: string
   name: string
   price: number
   unit: string
+  category: AddonCategory
+  challanMeta?: ChallanMeta
 }
 
-interface ServiceItem {
-  id: string
-  name: string
-  price: number
-  unit: string
+const SAMPLE_CHALLAN_META: ChallanMeta = {
+  pendingAmount: 125000,
+  totalChallans: 87,
+  courtChallans: 12,
+  onlineChallans: 75,
 }
+
+const ADDON_CATEGORIES: { id: AddonCategory; label: string }[] = [
+  { id: 'caas', label: 'CAAS' },
+  { id: 'rto', label: 'RTO' },
+  { id: 'laas', label: 'LAAS' },
+  { id: 'api', label: 'API' },
+]
 
 export interface QuotationDraft {
   leadId: string
   type: QuotationType
   planId: string | null
   addonIds: string[]
-  serviceId: string | null
-  quantity: number
+  addonDiscounts: Record<string, number>
+  addonQuantities: Record<string, number>
+  addonPerHitPrices: Record<string, number>
   overallDiscount: number
   validTill: string
   terms: string
@@ -56,26 +73,43 @@ interface AddQuotationModalProps {
 }
 
 const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
-  { id: 'plan-basic', name: 'Basic Fleet', price: 5000, billingCycle: '/month', description: 'Up to 10 vehicles, standard support' },
-  { id: 'plan-standard', name: 'Standard Fleet', price: 15000, billingCycle: '/month', description: 'Up to 50 vehicles, priority support' },
-  { id: 'plan-premium', name: 'Premium Fleet', price: 35000, billingCycle: '/month', description: 'Up to 200 vehicles, dedicated success manager' },
-  { id: 'plan-enterprise', name: 'Enterprise Fleet', price: 75000, billingCycle: '/month', description: 'Unlimited vehicles, custom SLAs' },
+  { id: 'plan-sarathi', name: 'Sarathi', price: 999, billingCycle: '/year', description: '' },
+  { id: 'plan-udrive', name: 'Udrive', price: 999, billingCycle: '/year', description: '' },
+  { id: 'plan-vcare', name: 'Vcare', price: 100000, billingCycle: '/year', description: '' },
+  { id: 'plan-bsafe', name: 'Bsafe', price: 50000, billingCycle: '/year', description: '' },
 ]
 
 const ADDONS: Addon[] = [
-  { id: 'addon-vehicles', name: 'Additional Vehicles', price: 500, unit: 'per vehicle / month' },
-  { id: 'addon-priority', name: 'Priority Support', price: 2000, unit: '/month' },
-  { id: 'addon-api', name: 'API Access', price: 5000, unit: '/month' },
-  { id: 'addon-reports', name: 'Custom Reports', price: 3000, unit: '/month' },
-  { id: 'addon-account-mgr', name: 'Dedicated Account Manager', price: 10000, unit: '/month' },
-]
+  // CaaS — Challan as a Service
+  { id: 'caas-bulk', name: 'Bulk Challans', price: 0, unit: '', category: 'caas', challanMeta: SAMPLE_CHALLAN_META },
+  { id: 'caas-ppt', name: 'Pay per Transaction Challans', price: 0, unit: '', category: 'caas', challanMeta: SAMPLE_CHALLAN_META },
 
-const SERVICES: ServiceItem[] = [
-  { id: 'svc-screening', name: 'Challan Screening', price: 100, unit: 'per incident' },
-  { id: 'svc-consult', name: 'Case Consultation', price: 2500, unit: 'per case' },
-  { id: 'svc-lawyer', name: 'Lawyer Assignment', price: 5000, unit: 'per case' },
-  { id: 'svc-filing', name: 'Document Filing', price: 500, unit: 'per document' },
-  { id: 'svc-court', name: 'Court Representation', price: 15000, unit: 'per appearance' },
+  // RTO — Document & RTO Assistance
+  { id: 'rto-rc-renewal', name: 'RC Renewal', price: 0, unit: '', category: 'rto' },
+  { id: 'rto-rc-retrieval', name: 'RC Retrieval', price: 0, unit: '', category: 'rto' },
+  { id: 'rto-license-renewal', name: 'License Renewal', price: 0, unit: '', category: 'rto' },
+  { id: 'rto-license-retrieval', name: 'License Retrieval', price: 0, unit: '', category: 'rto' },
+  { id: 'rto-fitness-renewal', name: 'Fitness Renewal', price: 0, unit: '', category: 'rto' },
+  { id: 'rto-fitness-retrieval', name: 'Fitness Retrieval', price: 0, unit: '', category: 'rto' },
+  { id: 'rto-ownership-transfer', name: 'Ownership Transfer', price: 0, unit: '', category: 'rto' },
+  { id: 'rto-number-updating', name: 'Number Updating', price: 0, unit: '', category: 'rto' },
+
+  // LaaS — Legal as a Service
+  { id: 'laas-oncall', name: '24×7 On Call Legal Support', price: 0, unit: '', category: 'laas' },
+  { id: 'laas-onsite', name: 'On-Site Lawyer Support', price: 0, unit: '', category: 'laas' },
+  { id: 'laas-theft', name: 'Theft', price: 0, unit: '', category: 'laas' },
+  { id: 'laas-detention', name: 'Detention', price: 0, unit: '', category: 'laas' },
+  { id: 'laas-bail', name: 'Bail', price: 0, unit: '', category: 'laas' },
+  { id: 'laas-accidents', name: 'Accidents', price: 0, unit: '', category: 'laas' },
+  { id: 'laas-firs', name: 'FIRs', price: 0, unit: '', category: 'laas' },
+  { id: 'laas-superdari', name: 'Superdari', price: 0, unit: '', category: 'laas' },
+  { id: 'laas-impound', name: 'Vehicle Impounding', price: 0, unit: '', category: 'laas' },
+  { id: 'laas-eway', name: 'E-Way Bill Issues', price: 0, unit: '', category: 'laas' },
+
+  // API
+  { id: 'api-challan', name: 'Challan API', price: 0, unit: '', category: 'api' },
+  { id: 'api-dl', name: 'DL API', price: 0, unit: '', category: 'api' },
+  { id: 'api-rc', name: 'RC API', price: 0, unit: '', category: 'api' },
 ]
 
 const DEFAULT_TERMS = `1. This quotation is valid for the period mentioned above.
@@ -95,6 +129,7 @@ const defaultValidTill = () => {
 export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalProps) {
   const [customerSearch, setCustomerSearch] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [activeAddonCategory, setActiveAddonCategory] = useState<AddonCategory>('caas')
   const [sendModal, setSendModal] = useState<{ open: boolean; email: string; subject: string; message: string; sent: boolean }>({
     open: false,
     email: '',
@@ -108,8 +143,9 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     type: 'subscription-addons',
     planId: null,
     addonIds: [],
-    serviceId: null,
-    quantity: 1,
+    addonDiscounts: {},
+    addonQuantities: {},
+    addonPerHitPrices: {},
     overallDiscount: 0,
     validTill: defaultValidTill(),
     terms: DEFAULT_TERMS,
@@ -119,19 +155,22 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
   const selectedLead = useMemo(() => leads.find(l => l.id === formData.leadId) || null, [leads, formData.leadId])
   const selectedPlan = useMemo(() => SUBSCRIPTION_PLANS.find(p => p.id === formData.planId) || null, [formData.planId])
   const selectedAddons = useMemo(() => ADDONS.filter(a => formData.addonIds.includes(a.id)), [formData.addonIds])
-  const selectedService = useMemo(() => SERVICES.find(s => s.id === formData.serviceId) || null, [formData.serviceId])
 
   const basePrice = useMemo(() => {
-    if (formData.type === 'pay-per-service') {
-      return selectedService ? selectedService.price * Math.max(1, formData.quantity) : 0
-    }
+    if (formData.type === 'pay-per-service') return 0
     return selectedPlan ? selectedPlan.price : 0
-  }, [formData.type, formData.quantity, selectedPlan, selectedService])
+  }, [formData.type, selectedPlan])
 
   const addonsPrice = useMemo(() => {
-    if (formData.type !== 'subscription-addons') return 0
-    return selectedAddons.reduce((sum, a) => sum + a.price, 0)
-  }, [formData.type, selectedAddons])
+    return selectedAddons.reduce((sum, a) => {
+      const discountPct = Math.min(100, Math.max(0, formData.addonDiscounts[a.id] || 0))
+      const qty = Math.max(1, formData.addonQuantities[a.id] || 1)
+      const unitPrice = a.category === 'api'
+        ? Math.max(0, formData.addonPerHitPrices[a.id] || 0)
+        : a.price
+      return sum + Math.round(unitPrice * qty * (1 - discountPct / 100))
+    }, 0)
+  }, [selectedAddons, formData.addonDiscounts, formData.addonQuantities, formData.addonPerHitPrices])
 
   const subtotal = basePrice + addonsPrice
   const discountPercent = Math.min(100, Math.max(0, formData.overallDiscount))
@@ -154,8 +193,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     const next: Record<string, string> = {}
     if (!formData.leadId) next.leadId = 'Please select a customer'
     if (formData.type === 'pay-per-service') {
-      if (!formData.serviceId) next.serviceId = 'Please select a service'
-      if (!formData.quantity || formData.quantity <= 0) next.quantity = 'Quantity must be greater than 0'
+      if (formData.addonIds.length === 0) next.addonIds = 'Please select at least one service'
     } else {
       if (!formData.planId) next.planId = 'Please select a plan'
     }
@@ -195,16 +233,20 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     if (formData.type !== 'pay-per-service' && selectedPlan) {
       lines.push({ title: selectedPlan.name, subtitle: selectedPlan.description, amount: formatCurrency(selectedPlan.price) })
     }
-    if (formData.type === 'subscription-addons') {
-      for (const a of selectedAddons) {
-        lines.push({ title: a.name, subtitle: a.unit, amount: formatCurrency(a.price) })
-      }
-    }
-    if (formData.type === 'pay-per-service' && selectedService) {
+    for (const a of selectedAddons) {
+      const pct = Math.min(100, Math.max(0, formData.addonDiscounts[a.id] || 0))
+      const qty = Math.max(1, formData.addonQuantities[a.id] || 1)
+      const unitPrice = a.category === 'api'
+        ? Math.max(0, formData.addonPerHitPrices[a.id] || 0)
+        : a.price
+      const amount = Math.round(unitPrice * qty * (1 - pct / 100))
+      const qtyLabel = a.category === 'api' ? 'credits' : ''
+      const qtyPart = qty > 1 ? `× ${qty}${qtyLabel ? ` ${qtyLabel}` : ''}` : (qtyLabel ? `${qty} ${qtyLabel}` : '')
+      const perHitPart = a.category === 'api' && unitPrice > 0 ? `${formatCurrency(unitPrice)}/hit` : ''
       lines.push({
-        title: selectedService.name,
-        subtitle: `${selectedService.unit} × ${formData.quantity}`,
-        amount: formatCurrency(selectedService.price * formData.quantity),
+        title: a.name,
+        subtitle: [a.unit, perHitPart, qtyPart, pct > 0 ? `${pct}% off` : ''].filter(Boolean).join(' · '),
+        amount: formatCurrency(amount),
       })
     }
 
@@ -427,8 +469,6 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                           ...formData,
                           type: card.id,
                           planId: card.id === 'pay-per-service' ? null : formData.planId,
-                          addonIds: card.id === 'subscription-addons' ? formData.addonIds : [],
-                          serviceId: card.id === 'pay-per-service' ? formData.serviceId : null,
                         })
                       }
                       className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-lg border text-xs font-medium transition-colors ${
@@ -456,7 +496,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                         key={plan.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, planId: plan.id })}
-                        className={`text-left p-5 rounded-lg border transition-colors min-h-[120px] flex flex-col justify-between ${
+                        className={`text-left p-4 rounded-lg border transition-colors ${
                           selected
                             ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 ring-1 ring-cyan-500'
                             : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
@@ -469,7 +509,9 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                             <span className="text-[10px] font-normal text-slate-500">{plan.billingCycle}</span>
                           </p>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">{plan.description}</p>
+                        {plan.description && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">{plan.description}</p>
+                        )}
                       </button>
                     )
                   })}
@@ -477,126 +519,186 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
               </FormSection>
             )}
 
-            {formData.type === 'subscription-addons' && (
-              <FormSection title="Discount">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    min={0}
-                    max={100}
-                    value={formData.overallDiscount || ''}
-                    onChange={e => setFormData({ ...formData, overallDiscount: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })}
-                    placeholder="0"
-                    className={inputClass(false)}
-                  />
-                  <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Percentage (%)</span>
-                </div>
-              </FormSection>
-            )}
+            <FormSection title="Discount">
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={formData.overallDiscount || ''}
+                  onChange={e => setFormData({ ...formData, overallDiscount: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })}
+                  placeholder="0"
+                  className={inputClass(false)}
+                />
+                <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Percentage (%)</span>
+              </div>
+            </FormSection>
 
-            {formData.type === 'subscription-addons' && (
-              <FormSection title="Add-ons" hint="Choose one or more">
-                <div className="space-y-2">
-                  {ADDONS.map(addon => {
-                    const selected = formData.addonIds.includes(addon.id)
+            <FormSection title={formData.type === 'pay-per-service' ? 'Services' : 'Add-ons'} error={errors.addonIds}>
+                <div className="flex items-center gap-1 mb-3 border-b border-slate-200 dark:border-slate-800">
+                  {ADDON_CATEGORIES.map(cat => {
+                    const active = activeAddonCategory === cat.id
+                    const selectedCount = ADDONS.filter(a => a.category === cat.id && formData.addonIds.includes(a.id)).length
                     return (
                       <button
-                        key={addon.id}
+                        key={cat.id}
                         type="button"
+                        onClick={() => setActiveAddonCategory(cat.id)}
+                        className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                          active
+                            ? 'border-cyan-500 text-cyan-700 dark:text-cyan-300'
+                            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        {cat.label}
+                        {selectedCount > 0 && (
+                          <span className={`ml-1.5 inline-flex items-center justify-center rounded-full text-[10px] px-1.5 py-0.5 ${active ? 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
+                            {selectedCount}
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+                <div className="space-y-2">
+                  {ADDONS.filter(a => a.category === activeAddonCategory).map(addon => {
+                    const selected = formData.addonIds.includes(addon.id)
+                    const discountValue = formData.addonDiscounts[addon.id] ?? 0
+                    const quantityValue = formData.addonQuantities[addon.id] ?? 1
+                    const perHitValue = formData.addonPerHitPrices[addon.id] ?? 0
+                    const isApi = addon.category === 'api'
+                    const qtyLabel = isApi ? 'credits' : 'qty'
+                    return (
+                      <div
+                        key={addon.id}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => toggleAddon(addon.id)}
-                        className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-colors ${
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            toggleAddon(addon.id)
+                          }
+                        }}
+                        className={`w-full px-3 py-3 rounded-lg border text-left transition-colors cursor-pointer ${
                           selected
                             ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
                             : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                         }`}
                       >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${selected ? 'border-cyan-600 bg-cyan-600' : 'border-slate-300 dark:border-slate-600'}`}>
-                            {selected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3 min-w-0 flex-1">
+                            <div className={`w-4 h-4 mt-0.5 rounded border-2 flex items-center justify-center shrink-0 ${selected ? 'border-cyan-600 bg-cyan-600' : 'border-slate-300 dark:border-slate-600'}`}>
+                              {selected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{addon.name}</p>
+                              {addon.unit && (
+                                <p className="text-xs text-slate-500 dark:text-slate-400">{addon.unit}</p>
+                              )}
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{addon.name}</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">{addon.unit}</p>
+                          <div className="flex items-center gap-3 shrink-0">
+                            {!isApi && (
+                              <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300">{formatCurrency(addon.price)}</p>
+                            )}
+                            {isApi && (
+                              <label
+                                className="flex items-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-1 focus-within:ring-cyan-500 focus-within:border-cyan-500 w-36"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <span className="px-2 py-1.5 text-xs text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">₹</span>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  step="0.01"
+                                  value={perHitValue || ''}
+                                  placeholder="0"
+                                  onChange={(e) => {
+                                    const raw = e.target.value === '' ? 0 : Number(e.target.value)
+                                    const price = Math.max(0, isNaN(raw) ? 0 : raw)
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      addonPerHitPrices: { ...prev.addonPerHitPrices, [addon.id]: price },
+                                    }))
+                                  }}
+                                  onKeyDown={(e) => e.stopPropagation()}
+                                  aria-label={`Per hit price for ${addon.name}`}
+                                  className="w-full min-w-0 px-2 py-1.5 text-sm text-right bg-transparent text-slate-900 dark:text-white focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                />
+                                <span className="px-2 py-1.5 text-xs text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 whitespace-nowrap">per hit</span>
+                              </label>
+                            )}
+                            <label
+                              className={`flex items-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-1 focus-within:ring-cyan-500 focus-within:border-cyan-500 ${isApi ? 'w-32' : 'w-24'}`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <input
+                                type="number"
+                                min={1}
+                                value={quantityValue}
+                                placeholder="1"
+                                onChange={(e) => {
+                                  const raw = e.target.value === '' ? 1 : Number(e.target.value)
+                                  const qty = Math.max(1, isNaN(raw) ? 1 : Math.floor(raw))
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    addonQuantities: { ...prev.addonQuantities, [addon.id]: qty },
+                                  }))
+                                }}
+                                onKeyDown={(e) => e.stopPropagation()}
+                                aria-label={`${qtyLabel} for ${addon.name}`}
+                                className="w-full min-w-0 px-2 py-1.5 text-sm text-right bg-transparent text-slate-900 dark:text-white focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                              />
+                              <span className="px-2 py-1.5 text-xs text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 whitespace-nowrap">{qtyLabel}</span>
+                            </label>
+                            <label
+                              className="flex items-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-1 focus-within:ring-cyan-500 focus-within:border-cyan-500 w-24"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <input
+                                type="number"
+                                min={0}
+                                max={100}
+                                value={discountValue || ''}
+                                placeholder="0"
+                                onChange={(e) => {
+                                  const raw = e.target.value === '' ? 0 : Number(e.target.value)
+                                  const pct = Math.min(100, Math.max(0, isNaN(raw) ? 0 : raw))
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    addonDiscounts: { ...prev.addonDiscounts, [addon.id]: pct },
+                                  }))
+                                }}
+                                onKeyDown={(e) => e.stopPropagation()}
+                                aria-label={`Discount for ${addon.name}`}
+                                className="w-full min-w-0 px-2 py-1.5 text-sm text-right bg-transparent text-slate-900 dark:text-white focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                              />
+                              <span className="px-2 py-1.5 text-xs text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 whitespace-nowrap">% off</span>
+                            </label>
                           </div>
                         </div>
-                        <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300 shrink-0">{formatCurrency(addon.price)}</p>
-                      </button>
+                        {addon.challanMeta && (
+                          <div className="mt-3 pl-7 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 px-3 py-2">
+                              <p className="text-xs text-slate-500 dark:text-slate-400">Total Pending Challan Amount</p>
+                              <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-white">{formatCurrency(addon.challanMeta.pendingAmount)}</p>
+                            </div>
+                            <div className="rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 px-3 py-2">
+                              <p className="text-xs text-slate-500 dark:text-slate-400">Number of Challans</p>
+                              <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-300">
+                                Online <span className="font-semibold text-slate-900 dark:text-white">{addon.challanMeta.onlineChallans}</span>
+                                <span className="mx-1.5 text-slate-400 dark:text-slate-500">·</span>
+                                Court <span className="font-semibold text-slate-900 dark:text-white">{addon.challanMeta.courtChallans}</span>
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     )
                   })}
                 </div>
               </FormSection>
-            )}
-
-            {formData.type === 'pay-per-service' && (
-              <>
-                <FormSection title="Service" error={errors.serviceId}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {SERVICES.map(svc => {
-                      const selected = formData.serviceId === svc.id
-                      return (
-                        <button
-                          key={svc.id}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, serviceId: svc.id })}
-                          className={`text-left p-3 rounded-lg border transition-colors ${
-                            selected
-                              ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 ring-1 ring-cyan-500'
-                              : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white">{svc.name}</p>
-                            <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300">{formatCurrency(svc.price)}</p>
-                          </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{svc.unit}</p>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </FormSection>
-
-                <FormSection title="Quantity / Credits / Incidents" error={errors.quantity}>
-                  <div className="flex items-center gap-2 max-w-[240px]">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, quantity: Math.max(1, formData.quantity - 1) })}
-                      className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <input
-                      type="number"
-                      min={1}
-                      value={formData.quantity}
-                      onChange={e => setFormData({ ...formData, quantity: Math.max(1, parseInt(e.target.value) || 1) })}
-                      className={inputClass(!!errors.quantity) + ' text-center'}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, quantity: formData.quantity + 1 })}
-                      className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-                </FormSection>
-
-                <FormSection title="Discount">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={formData.overallDiscount || ''}
-                      onChange={e => setFormData({ ...formData, overallDiscount: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })}
-                      placeholder="0"
-                      className={inputClass(false)}
-                    />
-                    <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Percentage (%)</span>
-                  </div>
-                </FormSection>
-              </>
-            )}
 
             {/* Terms & Validity */}
             <FormSection title="Terms & Validity">
@@ -691,16 +793,25 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                   {formData.type !== 'pay-per-service' && selectedPlan && (
                     <PreviewLine title={selectedPlan.name} subtitle={selectedPlan.description} amount={formatCurrency(selectedPlan.price)} />
                   )}
-                  {formData.type === 'subscription-addons' && selectedAddons.map(a => (
-                    <PreviewLine key={a.id} title={a.name} subtitle={a.unit} amount={formatCurrency(a.price)} />
-                  ))}
-                  {formData.type === 'pay-per-service' && selectedService && (
-                    <PreviewLine
-                      title={selectedService.name}
-                      subtitle={`${selectedService.unit} × ${formData.quantity}`}
-                      amount={formatCurrency(selectedService.price * formData.quantity)}
-                    />
-                  )}
+                  {selectedAddons.map(a => {
+                    const pct = Math.min(100, Math.max(0, formData.addonDiscounts[a.id] || 0))
+                    const qty = Math.max(1, formData.addonQuantities[a.id] || 1)
+                    const unitPrice = a.category === 'api'
+                      ? Math.max(0, formData.addonPerHitPrices[a.id] || 0)
+                      : a.price
+                    const amount = Math.round(unitPrice * qty * (1 - pct / 100))
+                    const qtyLabel = a.category === 'api' ? 'credits' : ''
+                    const qtyPart = qty > 1 ? `× ${qty}${qtyLabel ? ` ${qtyLabel}` : ''}` : (qtyLabel ? `${qty} ${qtyLabel}` : '')
+                    const perHitPart = a.category === 'api' && unitPrice > 0 ? `${formatCurrency(unitPrice)}/hit` : ''
+                    return (
+                      <PreviewLine
+                        key={a.id}
+                        title={a.name}
+                        subtitle={[a.unit, perHitPart, qtyPart, pct > 0 ? `${pct}% off` : ''].filter(Boolean).join(' · ')}
+                        amount={formatCurrency(amount)}
+                      />
+                    )
+                  })}
                   {basePrice === 0 && addonsPrice === 0 && (
                     <div className="px-6 py-8 text-center text-xs text-slate-400 italic">Select a plan or service to see line items.</div>
                   )}
