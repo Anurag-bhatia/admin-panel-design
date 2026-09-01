@@ -113,7 +113,7 @@ const ADDONS: Addon[] = [
   { id: 'api-rc', name: 'RC API', price: 0, unit: '', category: 'api' },
 ]
 
-const PPT_STATE_OPTIONS = ['Delhi', 'Haryana', 'Rajasthan', 'Uttar Pradesh', 'Uttarakhand', 'Maharashtra', 'Karnataka', 'Punjab', 'Gujarat', 'West Bengal']
+const PPT_TYPE_OPTIONS = ['Express', 'Regular']
 
 const DEFAULT_TERMS = `1. This quotation is valid for the period mentioned above.
 2. Payment terms: 50% advance, balance on delivery.
@@ -810,15 +810,15 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                                   </div>
                                 </div>
                                 <div className="pt-3">
-                                  <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Select State</label>
+                                  <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Select Type</label>
                                   <select
                                     value={pptQuotation.state}
                                     onChange={(e) => setPptQuotation(prev => ({ ...prev, state: e.target.value }))}
                                     onKeyDown={(e) => e.stopPropagation()}
                                     className="w-full px-2.5 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
                                   >
-                                    <option value="">Select state</option>
-                                    {PPT_STATE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    <option value="">Select type</option>
+                                    {PPT_TYPE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                   </select>
                                 </div>
                               </div>
