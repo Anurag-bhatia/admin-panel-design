@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   ArrowLeft,
   Search,
@@ -7,6 +7,8 @@ import {
   Check,
   Download,
   Send,
+  Paperclip,
+  X,
 } from 'lucide-react'
 import type { Lead } from '@/../product/sections/sales-crm/types'
 
@@ -63,7 +65,6 @@ export interface QuotationDraft {
   overallDiscount: number
   validTill: string
   terms: string
-  notes: string
 }
 
 interface AddQuotationModalProps {
@@ -112,6 +113,8 @@ const ADDONS: Addon[] = [
   { id: 'api-rc', name: 'RC API', price: 0, unit: '', category: 'api' },
 ]
 
+const PPT_STATE_OPTIONS = ['Delhi', 'Haryana', 'Rajasthan', 'Uttar Pradesh', 'Uttarakhand', 'Maharashtra', 'Karnataka', 'Punjab', 'Gujarat', 'West Bengal']
+
 const DEFAULT_TERMS = `1. This quotation is valid for the period mentioned above.
 2. Payment terms: 50% advance, balance on delivery.
 3. GST @ 18% is applicable on the final amount.
@@ -130,13 +133,23 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
   const [customerSearch, setCustomerSearch] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [activeAddonCategory, setActiveAddonCategory] = useState<AddonCategory>('caas')
-  const [sendModal, setSendModal] = useState<{ open: boolean; email: string; subject: string; message: string; sent: boolean }>({
+  const [pptQuotation, setPptQuotation] = useState<{ onlineCount: string; onlineDiscount: string; courtCount: string; courtDiscount: string; state: string }>({
+    onlineCount: '',
+    onlineDiscount: '',
+    courtCount: '',
+    courtDiscount: '',
+    state: '',
+  })
+  const [sendModal, setSendModal] = useState<{ open: boolean; email: string; cc: string; subject: string; message: string; attachments: File[]; sent: boolean }>({
     open: false,
     email: '',
+    cc: '',
     subject: '',
     message: '',
+    attachments: [],
     sent: false,
   })
+  const attachmentInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState<QuotationDraft>({
     leadId: '',
@@ -149,7 +162,6 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     overallDiscount: 0,
     validTill: defaultValidTill(),
     terms: DEFAULT_TERMS,
-    notes: '',
   })
 
   const selectedLead = useMemo(() => leads.find(l => l.id === formData.leadId) || null, [leads, formData.leadId])
@@ -164,6 +176,11 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
   const addonsPrice = useMemo(() => {
     return selectedAddons.reduce((sum, a) => {
       const discountPct = Math.min(100, Math.max(0, formData.addonDiscounts[a.id] || 0))
+      const isBulkChallan = a.id === 'caas-bulk'
+      if (isBulkChallan) {
+        const base = a.challanMeta?.pendingAmount ?? 0
+        return sum + Math.round(base * (1 - discountPct / 100))
+      }
       const qty = Math.max(1, formData.addonQuantities[a.id] || 1)
       const unitPrice = a.category === 'api'
         ? Math.max(0, formData.addonPerHitPrices[a.id] || 0)
@@ -213,10 +230,21 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     setSendModal({
       open: true,
       email: selectedLead?.emailId || '',
+      cc: '',
       subject: `Quotation from LOTS247 for ${customerName}`,
       message: `Hi ${selectedLead?.contactPerson || 'there'},\n\nPlease find attached the quotation for your review. Feel free to reach out if you have any questions.\n\nBest regards,\nLOTS247 Team`,
+      attachments: [],
       sent: false,
     })
+  }
+
+  const handleAddAttachments = (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    setSendModal(prev => ({ ...prev, attachments: [...prev.attachments, ...Array.from(files)] }))
+  }
+
+  const handleRemoveAttachment = (index: number) => {
+    setSendModal(prev => ({ ...prev, attachments: prev.attachments.filter((_, i) => i !== index) }))
   }
 
   const handleConfirmSend = () => {
@@ -235,6 +263,15 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     }
     for (const a of selectedAddons) {
       const pct = Math.min(100, Math.max(0, formData.addonDiscounts[a.id] || 0))
+      if (a.id === 'caas-bulk' && a.challanMeta) {
+        const amount = Math.round(a.challanMeta.pendingAmount * (1 - pct / 100))
+        lines.push({
+          title: a.name,
+          subtitle: [`Pending ${formatCurrency(a.challanMeta.pendingAmount)}`, pct > 0 ? `${pct}% off` : ''].filter(Boolean).join(' · '),
+          amount: formatCurrency(amount),
+        })
+        continue
+      }
       const qty = Math.max(1, formData.addonQuantities[a.id] || 1)
       const unitPrice = a.category === 'api'
         ? Math.max(0, formData.addonPerHitPrices[a.id] || 0)
@@ -346,7 +383,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
       hasError ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
     } rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500`
 
-  const typeCards: { id: QuotationType; title: string; icon: JSX.Element }[] = [
+  const typeCards: { id: QuotationType; title: string; icon: ReactNode }[] = [
     { id: 'subscription-addons', title: 'Sub + Add-ons', icon: <Layers className="w-4 h-4" /> },
     { id: 'pay-per-service', title: 'Pay-per-Service', icon: <Wrench className="w-4 h-4" /> },
   ]
@@ -535,30 +572,25 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
             </FormSection>
 
             <FormSection title={formData.type === 'pay-per-service' ? 'Services' : 'Add-ons'} error={errors.addonIds}>
-                <div className="flex items-center gap-1 mb-3 border-b border-slate-200 dark:border-slate-800">
-                  {ADDON_CATEGORIES.map(cat => {
-                    const active = activeAddonCategory === cat.id
-                    const selectedCount = ADDONS.filter(a => a.category === cat.id && formData.addonIds.includes(a.id)).length
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => setActiveAddonCategory(cat.id)}
-                        className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                          active
-                            ? 'border-cyan-500 text-cyan-700 dark:text-cyan-300'
-                            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                        }`}
-                      >
-                        {cat.label}
-                        {selectedCount > 0 && (
-                          <span className={`ml-1.5 inline-flex items-center justify-center rounded-full text-[10px] px-1.5 py-0.5 ${active ? 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
-                            {selectedCount}
-                          </span>
-                        )}
-                      </button>
-                    )
-                  })}
+                <div className="mb-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+                  <label htmlFor="service-type" className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+                    Service Type
+                  </label>
+                  <select
+                    id="service-type"
+                    value={activeAddonCategory}
+                    onChange={e => setActiveAddonCategory(e.target.value as AddonCategory)}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  >
+                    {ADDON_CATEGORIES.map(cat => {
+                      const selectedCount = ADDONS.filter(a => a.category === cat.id && formData.addonIds.includes(a.id)).length
+                      return (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.label}{selectedCount > 0 ? ` (${selectedCount})` : ''}
+                        </option>
+                      )
+                    })}
+                  </select>
                 </div>
                 <div className="space-y-2">
                   {ADDONS.filter(a => a.category === activeAddonCategory).map(addon => {
@@ -567,6 +599,8 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                     const quantityValue = formData.addonQuantities[addon.id] ?? 1
                     const perHitValue = formData.addonPerHitPrices[addon.id] ?? 0
                     const isApi = addon.category === 'api'
+                    const isChallanService = !!addon.challanMeta
+                    const isPpt = addon.id === 'caas-ppt'
                     const qtyLabel = isApi ? 'credits' : 'qty'
                     return (
                       <div
@@ -599,8 +633,13 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                             </div>
                           </div>
                           <div className="flex items-center gap-3 shrink-0">
-                            {!isApi && (
+                            {!isApi && !isChallanService && (
                               <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300">{formatCurrency(addon.price)}</p>
+                            )}
+                            {addon.id === 'caas-bulk' && addon.challanMeta && (
+                              <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300 tabular-nums">
+                                {formatCurrency(Math.round(addon.challanMeta.pendingAmount * (1 - (discountValue || 0) / 100)))}
+                              </p>
                             )}
                             {isApi && (
                               <label
@@ -629,53 +668,62 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                                 <span className="px-2 py-1.5 text-xs text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 whitespace-nowrap">per hit</span>
                               </label>
                             )}
-                            <label
-                              className={`flex items-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-1 focus-within:ring-cyan-500 focus-within:border-cyan-500 ${isApi ? 'w-32' : 'w-24'}`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <input
-                                type="number"
-                                min={1}
-                                value={quantityValue}
-                                placeholder="1"
-                                onChange={(e) => {
-                                  const raw = e.target.value === '' ? 1 : Number(e.target.value)
-                                  const qty = Math.max(1, isNaN(raw) ? 1 : Math.floor(raw))
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    addonQuantities: { ...prev.addonQuantities, [addon.id]: qty },
-                                  }))
-                                }}
-                                onKeyDown={(e) => e.stopPropagation()}
-                                aria-label={`${qtyLabel} for ${addon.name}`}
-                                className="w-full min-w-0 px-2 py-1.5 text-sm text-right bg-transparent text-slate-900 dark:text-white focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                              />
-                              <span className="px-2 py-1.5 text-xs text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 whitespace-nowrap">{qtyLabel}</span>
-                            </label>
-                            <label
-                              className="flex items-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-1 focus-within:ring-cyan-500 focus-within:border-cyan-500 w-24"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <input
-                                type="number"
-                                min={0}
-                                max={100}
-                                value={discountValue || ''}
-                                placeholder="0"
-                                onChange={(e) => {
-                                  const raw = e.target.value === '' ? 0 : Number(e.target.value)
-                                  const pct = Math.min(100, Math.max(0, isNaN(raw) ? 0 : raw))
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    addonDiscounts: { ...prev.addonDiscounts, [addon.id]: pct },
-                                  }))
-                                }}
-                                onKeyDown={(e) => e.stopPropagation()}
-                                aria-label={`Discount for ${addon.name}`}
-                                className="w-full min-w-0 px-2 py-1.5 text-sm text-right bg-transparent text-slate-900 dark:text-white focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                              />
-                              <span className="px-2 py-1.5 text-xs text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 whitespace-nowrap">% off</span>
-                            </label>
+                            {!isChallanService && (
+                              <label
+                                className={`flex items-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-1 focus-within:ring-cyan-500 focus-within:border-cyan-500 ${isApi ? 'w-32' : 'w-24'}`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  type="number"
+                                  min={1}
+                                  value={quantityValue}
+                                  placeholder="1"
+                                  onChange={(e) => {
+                                    const raw = e.target.value === '' ? 1 : Number(e.target.value)
+                                    const qty = Math.max(1, isNaN(raw) ? 1 : Math.floor(raw))
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      addonQuantities: { ...prev.addonQuantities, [addon.id]: qty },
+                                    }))
+                                  }}
+                                  onKeyDown={(e) => e.stopPropagation()}
+                                  aria-label={`${qtyLabel} for ${addon.name}`}
+                                  className="w-full min-w-0 px-2 py-1.5 text-sm text-right bg-transparent text-slate-900 dark:text-white focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                />
+                                <span className="px-2 py-1.5 text-xs text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 whitespace-nowrap">{qtyLabel}</span>
+                              </label>
+                            )}
+                            {!isPpt && (
+                            <div className="flex items-center gap-2">
+                              {isChallanService && (
+                                <span className="text-xs font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">Deal Percentage</span>
+                              )}
+                              <label
+                                className="flex items-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-1 focus-within:ring-cyan-500 focus-within:border-cyan-500 w-24"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={100}
+                                  value={discountValue || ''}
+                                  placeholder="0"
+                                  onChange={(e) => {
+                                    const raw = e.target.value === '' ? 0 : Number(e.target.value)
+                                    const pct = Math.min(100, Math.max(0, isNaN(raw) ? 0 : raw))
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      addonDiscounts: { ...prev.addonDiscounts, [addon.id]: pct },
+                                    }))
+                                  }}
+                                  onKeyDown={(e) => e.stopPropagation()}
+                                  aria-label={`Discount for ${addon.name}`}
+                                  className="w-full min-w-0 px-2 py-1.5 text-sm text-right bg-transparent text-slate-900 dark:text-white focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                />
+                                <span className="px-2 py-1.5 text-xs text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 whitespace-nowrap">% off</span>
+                              </label>
+                            </div>
+                            )}
                           </div>
                         </div>
                         {addon.challanMeta && (
@@ -694,6 +742,89 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                             </div>
                           </div>
                         )}
+                        {isPpt && (
+                          <div className="mt-4 pl-7" onClick={(e) => e.stopPropagation()}>
+                            <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
+                              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Quotation</p>
+                              <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-3">
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Number of Online Challans</label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      value={pptQuotation.onlineCount}
+                                      onChange={(e) => setPptQuotation(prev => ({ ...prev, onlineCount: e.target.value.replace(/[^0-9]/g, '') }))}
+                                      onKeyDown={(e) => e.stopPropagation()}
+                                      placeholder="0"
+                                      className="w-full px-2.5 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Discount (%)</label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      max={100}
+                                      value={pptQuotation.onlineDiscount}
+                                      onChange={(e) => {
+                                        const raw = e.target.value.replace(/[^0-9]/g, '')
+                                        const clamped = raw === '' ? '' : String(Math.min(100, Math.max(0, Number(raw))))
+                                        setPptQuotation(prev => ({ ...prev, onlineDiscount: clamped }))
+                                      }}
+                                      onKeyDown={(e) => e.stopPropagation()}
+                                      placeholder="0"
+                                      className="w-full px-2.5 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 py-3">
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Number of Court Challans</label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      value={pptQuotation.courtCount}
+                                      onChange={(e) => setPptQuotation(prev => ({ ...prev, courtCount: e.target.value.replace(/[^0-9]/g, '') }))}
+                                      onKeyDown={(e) => e.stopPropagation()}
+                                      placeholder="0"
+                                      className="w-full px-2.5 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Discount (%)</label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      max={100}
+                                      value={pptQuotation.courtDiscount}
+                                      onChange={(e) => {
+                                        const raw = e.target.value.replace(/[^0-9]/g, '')
+                                        const clamped = raw === '' ? '' : String(Math.min(100, Math.max(0, Number(raw))))
+                                        setPptQuotation(prev => ({ ...prev, courtDiscount: clamped }))
+                                      }}
+                                      onKeyDown={(e) => e.stopPropagation()}
+                                      placeholder="0"
+                                      className="w-full px-2.5 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="pt-3">
+                                  <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Select State</label>
+                                  <select
+                                    value={pptQuotation.state}
+                                    onChange={(e) => setPptQuotation(prev => ({ ...prev, state: e.target.value }))}
+                                    onKeyDown={(e) => e.stopPropagation()}
+                                    className="w-full px-2.5 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
+                                  >
+                                    <option value="">Select state</option>
+                                    {PPT_STATE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )
                   })}
@@ -702,7 +833,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
 
             {/* Terms & Validity */}
             <FormSection title="Terms & Validity">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                     Valid Till <span className="text-red-500">*</span>
@@ -716,16 +847,6 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                   {errors.validTill && <p className="mt-1 text-xs text-red-500">{errors.validTill}</p>}
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Internal Notes</label>
-                  <input
-                    type="text"
-                    value={formData.notes}
-                    onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Not shown to customer"
-                    className={inputClass(false)}
-                  />
-                </div>
-                <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Terms & Conditions</label>
                   <textarea
                     rows={5}
@@ -795,6 +916,17 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                   )}
                   {selectedAddons.map(a => {
                     const pct = Math.min(100, Math.max(0, formData.addonDiscounts[a.id] || 0))
+                    if (a.id === 'caas-bulk' && a.challanMeta) {
+                      const amount = Math.round(a.challanMeta.pendingAmount * (1 - pct / 100))
+                      return (
+                        <PreviewLine
+                          key={a.id}
+                          title={a.name}
+                          subtitle={[`Pending ${formatCurrency(a.challanMeta.pendingAmount)}`, pct > 0 ? `${pct}% off` : ''].filter(Boolean).join(' · ')}
+                          amount={formatCurrency(amount)}
+                        />
+                      )
+                    }
                     const qty = Math.max(1, formData.addonQuantities[a.id] || 1)
                     const unitPrice = a.category === 'api'
                       ? Math.max(0, formData.addonPerHitPrices[a.id] || 0)
@@ -842,13 +974,6 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                 <p className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Terms & Conditions</p>
                 <pre className="whitespace-pre-wrap text-xs leading-relaxed text-slate-700 dark:text-slate-300 font-sans">{formData.terms || '—'}</pre>
               </div>
-
-              {formData.notes && (
-                <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-amber-50 dark:bg-amber-900/10">
-                  <p className="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-400 mb-1">Internal Notes (not shown to customer)</p>
-                  <p className="text-xs text-slate-700 dark:text-slate-300">{formData.notes}</p>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -892,6 +1017,16 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                     />
                   </div>
                   <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">CC</label>
+                    <input
+                      type="text"
+                      value={sendModal.cc}
+                      onChange={e => setSendModal(prev => ({ ...prev, cc: e.target.value }))}
+                      placeholder="comma-separated emails"
+                      className={inputClass(false)}
+                    />
+                  </div>
+                  <div>
                     <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Subject</label>
                     <input
                       type="text"
@@ -909,9 +1044,47 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                       className={inputClass(false) + ' resize-y min-h-[220px]'}
                     />
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                    <Download className="w-3.5 h-3.5" />
-                    The quotation PDF will be attached automatically.
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Attachments</label>
+                    <input
+                      ref={attachmentInputRef}
+                      type="file"
+                      multiple
+                      onChange={e => {
+                        handleAddAttachments(e.target.files)
+                        if (attachmentInputRef.current) attachmentInputRef.current.value = ''
+                      }}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => attachmentInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <Paperclip className="w-3.5 h-3.5" />
+                      Add attachment
+                    </button>
+                    {sendModal.attachments.length > 0 && (
+                      <ul className="mt-2 space-y-1.5">
+                        {sendModal.attachments.map((f, i) => (
+                          <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                            <span className="flex items-center gap-1.5 min-w-0 text-xs text-slate-700 dark:text-slate-300">
+                              <Paperclip className="w-3 h-3 shrink-0" />
+                              <span className="truncate">{f.name}</span>
+                              <span className="text-slate-400 dark:text-slate-500 shrink-0">({(f.size / 1024).toFixed(1)} KB)</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveAttachment(i)}
+                              className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400"
+                              aria-label={`Remove ${f.name}`}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
                 <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2 bg-slate-50 dark:bg-slate-900/40">

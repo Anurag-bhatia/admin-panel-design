@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react'
-import { X, Upload, Download, AlertCircle, CheckCircle, Loader2, RefreshCw, Wallet, MapPin, IndianRupee } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { X, Upload, Download, AlertCircle, CheckCircle, Loader2, FilePlus2, ChevronDown } from 'lucide-react'
 
 interface VehicleAnalysisModalProps {
   onClose: () => void
+  onCreateQuotation?: () => void
 }
 
 type ModalStage = 'upload' | 'analyzing' | 'results'
@@ -50,19 +51,39 @@ const AMOUNT_PENDING_COURT: AmountRow[] = [
 
 const formatINR = (n: number) => `₹${n.toLocaleString('en-IN')}`
 
+const SUMMARY = {
+  totalVehicles: 6,
+  pendingAmount: 512100,
+  pendingChallans: 317,
+  oldestPendingSince: '12 Mar 2023',
+}
+
 const sumRow = <T extends { vehicles: number; challans: number; amount: number }>(rows: T[]) =>
   rows.reduce(
     (acc, r) => ({ vehicles: Math.max(acc.vehicles, r.vehicles), challans: acc.challans + r.challans, amount: acc.amount + r.amount }),
     { vehicles: 0, challans: 0, amount: 0 },
   )
 
-export function VehicleAnalysisModal({ onClose }: VehicleAnalysisModalProps) {
+export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnalysisModalProps) {
   const [stage, setStage] = useState<ModalStage>('upload')
   const [vehicleCount, setVehicleCount] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
+  const [downloadMenuOpen, setDownloadMenuOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const downloadMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!downloadMenuOpen) return
+    const handleClick = (e: MouseEvent) => {
+      if (downloadMenuRef.current && !downloadMenuRef.current.contains(e.target as Node)) {
+        setDownloadMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [downloadMenuOpen])
 
   const parsedVehicleCount = Number.parseInt(vehicleCount, 10)
   const canAnalyze = !!file && parsedVehicleCount > 0
@@ -111,14 +132,11 @@ export function VehicleAnalysisModal({ onClose }: VehicleAnalysisModalProps) {
     setTimeout(() => setStage('results'), 1800)
   }
 
-  const handleReset = () => {
-    setFile(null)
-    setVehicleCount('')
-    setErrors([])
-    setStage('upload')
-  }
+  const handleDownload = (format: 'xls' | 'pdf') => {
+    setDownloadMenuOpen(false)
+    const ext = format === 'xls' ? 'xls' : 'pdf'
+    const mime = format === 'xls' ? 'application/vnd.ms-excel' : 'application/pdf'
 
-  const handleDownload = () => {
     const lines: string[] = []
     const push = (parts: (string | number)[]) => lines.push(parts.map(p => (typeof p === 'string' && p.includes(',') ? `"${p}"` : String(p))).join(','))
 
@@ -156,13 +174,18 @@ export function VehicleAnalysisModal({ onClose }: VehicleAnalysisModalProps) {
     const amountCourtTotal = sumRow(AMOUNT_PENDING_COURT)
     push(['Grand Total', amountCourtTotal.vehicles, amountCourtTotal.challans, amountCourtTotal.amount])
 
-    const blob = new Blob([lines.join('\n')], { type: 'text/csv' })
+    const blob = new Blob([lines.join('\n')], { type: mime })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'vehicle-analysis-report.csv'
+    a.download = `vehicle-analysis-report.${ext}`
     a.click()
     window.URL.revokeObjectURL(url)
+  }
+
+  const handleCreateQuotation = () => {
+    onCreateQuotation?.()
+    onClose()
   }
 
   const maxWidthClass = stage === 'results' ? 'max-w-5xl' : 'max-w-lg'
@@ -264,15 +287,22 @@ export function VehicleAnalysisModal({ onClose }: VehicleAnalysisModalProps) {
             <div className="flex flex-col items-center justify-center py-16">
               <Loader2 className="w-10 h-10 text-cyan-600 dark:text-cyan-400 animate-spin mb-4" />
               <p className="text-base font-medium text-slate-900 dark:text-slate-100">Analyzing fleet…</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Checking challans, insurance, and fitness for each vehicle</p>
             </div>
           )}
 
           {stage === 'results' && (
             <div className="space-y-8">
+              {/* Summary */}
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <SummaryTile label="Total Vehicles" value={SUMMARY.totalVehicles.toLocaleString('en-IN')} />
+                <SummaryTile label="Pending Challan Amount" value={formatINR(SUMMARY.pendingAmount)} />
+                <SummaryTile label="Pending Challans" value={SUMMARY.pendingChallans.toLocaleString('en-IN')} />
+                <SummaryTile label="Oldest Pending Since" value={SUMMARY.oldestPendingSince} />
+              </section>
+
               {/* Overall Challan Status */}
               <section>
-                <SectionHeading icon={<Wallet className="w-4 h-4" />} title="Overall Challan Status" />
+                <SectionHeading title="Overall Challan Status" />
                 <ReportTable
                   columns={['Challan Status', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
                   rows={OVERALL_STATUS.map(r => [r.label, r.vehicles, r.challans, formatINR(r.amount)])}
@@ -285,7 +315,7 @@ export function VehicleAnalysisModal({ onClose }: VehicleAnalysisModalProps) {
 
               {/* State Wise Challan */}
               <section>
-                <SectionHeading icon={<MapPin className="w-4 h-4" />} title="State Wise Challan" />
+                <SectionHeading title="State Wise Challan" />
                 <div className="space-y-4">
                   <SubReport
                     label="PENDING ONLINE"
@@ -310,7 +340,7 @@ export function VehicleAnalysisModal({ onClose }: VehicleAnalysisModalProps) {
 
               {/* Amount Range */}
               <section>
-                <SectionHeading icon={<IndianRupee className="w-4 h-4" />} title="Amount Range" />
+                <SectionHeading title="Amount Range" />
                 <div className="space-y-4">
                   <SubReport
                     label="PENDING ONLINE"
@@ -340,11 +370,11 @@ export function VehicleAnalysisModal({ onClose }: VehicleAnalysisModalProps) {
         <div className="border-t border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-700/50">
           {stage === 'results' ? (
             <button
-              onClick={handleReset}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              onClick={handleCreateQuotation}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
             >
-              <RefreshCw className="w-4 h-4" />
-              Analyze Another
+              <FilePlus2 className="w-4 h-4" />
+              Create Quotation
             </button>
           ) : (
             <div />
@@ -369,13 +399,34 @@ export function VehicleAnalysisModal({ onClose }: VehicleAnalysisModalProps) {
             )}
 
             {stage === 'results' && (
-              <button
-                onClick={handleDownload}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-cyan-600 hover:bg-cyan-700 transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                Download Report
-              </button>
+              <div className="relative" ref={downloadMenuRef}>
+                <button
+                  onClick={() => setDownloadMenuOpen(o => !o)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-cyan-600 hover:bg-cyan-700 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Report
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                {downloadMenuOpen && (
+                  <div className="absolute right-0 bottom-full mb-2 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden z-10">
+                    <button
+                      onClick={() => handleDownload('xls')}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download as XLS
+                    </button>
+                    <button
+                      onClick={() => handleDownload('pdf')}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left border-t border-slate-100 dark:border-slate-700"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download as PDF
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -384,14 +435,18 @@ export function VehicleAnalysisModal({ onClose }: VehicleAnalysisModalProps) {
   )
 }
 
-function SectionHeading({ icon, title }: { icon: React.ReactNode; title: string }) {
+function SummaryTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center gap-2 mb-3">
-      <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-        {icon}
-      </div>
-      <h3 className="text-base font-semibold text-emerald-700 dark:text-emerald-400">{title}</h3>
+    <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-800">
+      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">{label}</p>
+      <p className="text-xl font-semibold text-slate-900 dark:text-slate-50">{value}</p>
     </div>
+  )
+}
+
+function SectionHeading({ title }: { title: string }) {
+  return (
+    <h3 className="text-base font-semibold text-emerald-700 dark:text-emerald-400 mb-3">{title}</h3>
   )
 }
 
