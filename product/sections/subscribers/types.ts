@@ -297,6 +297,8 @@ export interface SubscriberReport {
   category: ReportCategory
   generatedAt: string
   fileSize: number | null
+  subscriptionId?: string
+  subscriptionName?: string
   // Monthly report fields
   period?: string
   periodStart?: string

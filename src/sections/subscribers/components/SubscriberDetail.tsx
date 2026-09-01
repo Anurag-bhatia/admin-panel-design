@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3, RefreshCw, Loader2, Shield } from 'lucide-react'
 import type { Subscriber, Subscription, User as UserType, Vehicle, SubscriberReport } from '@/../product/sections/subscribers/types'
 import { AddSubscriberModal } from './AddSubscriberModal'
@@ -80,6 +80,7 @@ export function SubscriberDetail({
   const [vehicleSearch, setVehicleSearch] = useState('')
   const [vehicleStatusFilter, setVehicleStatusFilter] = useState<string>('')
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('')
+  const [vehicleSubscriptionFilter, setVehicleSubscriptionFilter] = useState<string>('')
   const [showVehicleFilters, setShowVehicleFilters] = useState(false)
   const [vehiclePage, setVehiclePage] = useState(1)
   const vehiclePageSize = 5
@@ -103,6 +104,10 @@ export function SubscriberDetail({
   const [checkChallanResults, setCheckChallanResults] = useState<any[]>([])
   const [checkChallanResultTab, setCheckChallanResultTab] = useState<'pending' | 'paid'>('pending')
   const [incidentReportSearch, setIncidentReportSearch] = useState('')
+  const [incidentSubscriptionFilter, setIncidentSubscriptionFilter] = useState<string>('')
+  const [incidentVehicleFilter, setIncidentVehicleFilter] = useState<string>('')
+  const [monthlyReportSubscriptionFilter, setMonthlyReportSubscriptionFilter] = useState<string>('')
+  const [incidentReportSubscriptionFilter, setIncidentReportSubscriptionFilter] = useState<string>('')
 
   // Permissions state
   const [permissions, setPermissions] = useState<Record<string, boolean>>({
@@ -186,6 +191,23 @@ export function SubscriberDetail({
     return grouped
   }, [challans])
 
+  // Map each vehicle to a subscription name (round-robin over the subscriber's
+  // subscriptions) so the UI has something meaningful to filter and display.
+  const vehicleSubscriptionMap = useMemo(() => {
+    const map: Record<string, string> = {}
+    const subs = subscriptions ?? []
+    if (subs.length === 0) return map
+    vehicles.forEach((v, idx) => {
+      map[v.id] = subs[idx % subs.length].subscriptionName
+    })
+    return map
+  }, [vehicles, subscriptions])
+
+  const vehicleSubscriptionNames = useMemo(() => {
+    const names = new Set((subscriptions ?? []).map(s => s.subscriptionName).filter(Boolean))
+    return Array.from(names)
+  }, [subscriptions])
+
   // Filter vehicles
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((v) => {
@@ -198,9 +220,10 @@ export function SubscriberDetail({
       }
       if (vehicleStatusFilter && v.status !== vehicleStatusFilter) return false
       if (vehicleTypeFilter && v.vehicleType !== vehicleTypeFilter) return false
+      if (vehicleSubscriptionFilter && vehicleSubscriptionMap[v.id] !== vehicleSubscriptionFilter) return false
       return true
     })
-  }, [vehicles, vehicleSearch, vehicleStatusFilter, vehicleTypeFilter])
+  }, [vehicles, vehicleSearch, vehicleStatusFilter, vehicleTypeFilter, vehicleSubscriptionFilter, vehicleSubscriptionMap])
 
   const vehicleTotalPages = Math.ceil(filteredVehicles.length / vehiclePageSize)
   const paginatedVehicles = useMemo(() => {
@@ -226,14 +249,17 @@ export function SubscriberDetail({
   }, [reports])
 
   const filteredIncidentReports = useMemo(() => {
-    if (!incidentReportSearch) return incidentReports
     const q = incidentReportSearch.toLowerCase()
-    return incidentReports.filter(r =>
-      (r.incidentId && r.incidentId.toLowerCase().includes(q)) ||
-      (r.incidentVehicle && r.incidentVehicle.toLowerCase().includes(q)) ||
-      (r.reportType && r.reportType.toLowerCase().includes(q))
-    )
-  }, [incidentReports, incidentReportSearch])
+    return incidentReports.filter(r => {
+      if (incidentReportSubscriptionFilter && r.subscriptionId !== incidentReportSubscriptionFilter) return false
+      if (!q) return true
+      return (
+        (r.incidentId && r.incidentId.toLowerCase().includes(q)) ||
+        (r.incidentVehicle && r.incidentVehicle.toLowerCase().includes(q)) ||
+        (r.reportType && r.reportType.toLowerCase().includes(q))
+      )
+    })
+  }, [incidentReports, incidentReportSearch, incidentReportSubscriptionFilter])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
@@ -671,53 +697,102 @@ export function SubscriberDetail({
           )}
 
           {/* Incidents Tab */}
-          {activeTab === 'incidents' && (
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Linked Incidents ({incidents.length})</h2>
-              {incidents.length === 0 ? (
-                <div className="text-center py-12">
-                  <AlertTriangle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-500 dark:text-slate-400">No incidents linked to this subscriber yet</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident ID</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {incidents.map((incident) => (
-                        <tr key={incident.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{incident.id}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{incident.vehicleNumber}</td>
-                          <td className="px-4 py-3">
-                            <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
-                              {incident.status}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(incident.date)}</td>
-                          <td className="px-4 py-3">
-                            <button
-                              onClick={() => onViewIncident?.(incident.id)}
-                              className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
-                            >
-                              View Details
-                            </button>
-                          </td>
-                        </tr>
+          {activeTab === 'incidents' && (() => {
+            const subscriptionOptions = subscriptions ?? (subscription ? [subscription] : [])
+            const vehicleOptions = Array.from(
+              new Set(incidents.map((i) => i.vehicleNumber).filter(Boolean)),
+            )
+            const filteredIncidents = incidents.filter((inc) => {
+              if (incidentSubscriptionFilter && inc.subscriptionId !== incidentSubscriptionFilter) return false
+              if (incidentVehicleFilter && inc.vehicleNumber !== incidentVehicleFilter) return false
+              return true
+            })
+            return (
+              <div>
+                <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                    Linked Incidents ({filteredIncidents.length})
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={incidentSubscriptionFilter}
+                      onChange={(e) => setIncidentSubscriptionFilter(e.target.value)}
+                      className="pl-3 pr-8 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.1rem] bg-[right_0.5rem_center] bg-no-repeat"
+                    >
+                      <option value="">All Subscriptions</option>
+                      {subscriptionOptions.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.subscriptionName}
+                        </option>
                       ))}
-                    </tbody>
-                  </table>
+                    </select>
+                    <select
+                      value={incidentVehicleFilter}
+                      onChange={(e) => setIncidentVehicleFilter(e.target.value)}
+                      className="pl-3 pr-8 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.1rem] bg-[right_0.5rem_center] bg-no-repeat"
+                    >
+                      <option value="">All Vehicles</option>
+                      {vehicleOptions.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
+                {filteredIncidents.length === 0 ? (
+                  <div className="text-center py-12">
+                    <AlertTriangle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-500 dark:text-slate-400">
+                      {incidents.length === 0
+                        ? 'No incidents linked to this subscriber yet'
+                        : 'No incidents match the selected filters'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscription</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Date</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {filteredIncidents.map((incident) => (
+                          <tr key={incident.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{incident.id}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                              {incident.subscriptionName ?? <span className="text-slate-400">—</span>}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{incident.vehicleNumber}</td>
+                            <td className="px-4 py-3">
+                              <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium">
+                                {incident.status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(incident.date)}</td>
+                            <td className="px-4 py-3">
+                              <button
+                                onClick={() => onViewIncident?.(incident.id)}
+                                className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
+                              >
+                                View Details
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
 
           {/* Documents Tab */}
           {activeTab === 'documents' && (
@@ -845,9 +920,21 @@ export function SubscriberDetail({
                           <option key={t} value={t}>{t}</option>
                         ))}
                       </select>
-                      {(vehicleStatusFilter || vehicleTypeFilter || vehicleSearch) && (
+                      {vehicleSubscriptionNames.length > 0 && (
+                        <select
+                          value={vehicleSubscriptionFilter}
+                          onChange={e => { setVehicleSubscriptionFilter(e.target.value); setVehiclePage(1) }}
+                          className="pl-3 pr-8 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                        >
+                          <option value="">All Subscriptions</option>
+                          {vehicleSubscriptionNames.map(name => (
+                            <option key={name} value={name}>{name}</option>
+                          ))}
+                        </select>
+                      )}
+                      {(vehicleStatusFilter || vehicleTypeFilter || vehicleSubscriptionFilter || vehicleSearch) && (
                         <button
-                          onClick={() => { setVehicleStatusFilter(''); setVehicleTypeFilter(''); setVehicleSearch('') }}
+                          onClick={() => { setVehicleStatusFilter(''); setVehicleTypeFilter(''); setVehicleSubscriptionFilter(''); setVehicleSearch('') }}
                           className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
                         >
                           Clear all
@@ -868,7 +955,7 @@ export function SubscriberDetail({
                   <Search className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                   <p className="text-slate-500 dark:text-slate-400 text-sm">No vehicles match your search or filters</p>
                   <button
-                    onClick={() => { setVehicleStatusFilter(''); setVehicleTypeFilter(''); setVehicleSearch('') }}
+                    onClick={() => { setVehicleStatusFilter(''); setVehicleTypeFilter(''); setVehicleSubscriptionFilter(''); setVehicleSearch('') }}
                     className="mt-2 text-sm text-cyan-600 dark:text-cyan-400 hover:underline"
                   >
                     Clear filters
@@ -883,6 +970,7 @@ export function SubscriberDetail({
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Type</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Make</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Model</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscription</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Registration Date</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
@@ -895,6 +983,7 @@ export function SubscriberDetail({
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300 capitalize">{vehicle.vehicleType}</td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicle.make}</td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicle.model}</td>
+                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{vehicleSubscriptionMap[vehicle.id] ?? '—'}</td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(vehicle.registrationDate)}</td>
                           <td className="px-4 py-3">
                             <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
@@ -1143,38 +1232,74 @@ export function SubscriberDetail({
             <div>
               {/* Monthly Closure Reports */}
               <div>
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Monthly Closure Reports</h2>
-                {monthlyReports.length === 0 ? (
-                  <div className="text-center py-10">
-                    <BarChart3 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                    <p className="text-sm text-slate-500 dark:text-slate-400">No monthly reports generated yet</p>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-slate-200 dark:border-slate-800">
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Period</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Report Type</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Format</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Generated</th>
-                          <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                        {monthlyReports.map((report) => (
-                          <tr key={report.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{report.period || '—'}</td>
-                            <td className="px-4 py-3"><ReportTypeBadge type={report.reportType} /></td>
-                            <td className="px-4 py-3"><FormatBadge format={report.format} /></td>
-                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(report.generatedAt)}</td>
-                            <td className="px-4 py-3 text-right"><ReportAction report={report} onDownload={onDownloadReport} onRetry={onRetryReport} /></td>
+                <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Monthly Closure Reports</h2>
+                  {monthlyReports.length > 0 && (
+                    <select
+                      value={monthlyReportSubscriptionFilter}
+                      onChange={(e) => setMonthlyReportSubscriptionFilter(e.target.value)}
+                      className="pl-3 pr-8 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.1rem] bg-[right_0.5rem_center] bg-no-repeat"
+                    >
+                      <option value="">All Subscriptions</option>
+                      {(subscriptions ?? (subscription ? [subscription] : [])).map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.subscriptionName}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                {(() => {
+                  const filteredMonthlyReports = monthlyReportSubscriptionFilter
+                    ? monthlyReports.filter((r) => r.subscriptionId === monthlyReportSubscriptionFilter)
+                    : monthlyReports
+                  if (monthlyReports.length === 0) {
+                    return (
+                      <div className="text-center py-10">
+                        <BarChart3 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                        <p className="text-sm text-slate-500 dark:text-slate-400">No monthly reports generated yet</p>
+                      </div>
+                    )
+                  }
+                  if (filteredMonthlyReports.length === 0) {
+                    return (
+                      <div className="text-center py-10">
+                        <BarChart3 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                        <p className="text-sm text-slate-500 dark:text-slate-400">No reports match the selected subscription</p>
+                      </div>
+                    )
+                  }
+                  return (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-slate-200 dark:border-slate-800">
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Period</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscription</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Report Type</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Format</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Generated</th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Action</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                        </thead>
+                        <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                          {filteredMonthlyReports.map((report) => (
+                            <tr key={report.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                              <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{report.period || '—'}</td>
+                              <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                                {report.subscriptionName ?? <span className="text-slate-400">—</span>}
+                              </td>
+                              <td className="px-4 py-3"><ReportTypeBadge type={report.reportType} /></td>
+                              <td className="px-4 py-3"><FormatBadge format={report.format} /></td>
+                              <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(report.generatedAt)}</td>
+                              <td className="px-4 py-3 text-right"><ReportAction report={report} onDownload={onDownloadReport} onRetry={onRetryReport} /></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )
+                })()}
               </div>
 
               {/* Divider */}
@@ -1182,18 +1307,32 @@ export function SubscriberDetail({
 
               {/* Incident Reports */}
               <div>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                   <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Incident Reports</h2>
                   {incidentReports.length > 0 && (
-                    <div className="relative w-64">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input
-                        type="text"
-                        placeholder="Search by ID, vehicle, type..."
-                        value={incidentReportSearch}
-                        onChange={e => setIncidentReportSearch(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                      />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <select
+                        value={incidentReportSubscriptionFilter}
+                        onChange={(e) => setIncidentReportSubscriptionFilter(e.target.value)}
+                        className="pl-3 pr-8 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.1rem] bg-[right_0.5rem_center] bg-no-repeat"
+                      >
+                        <option value="">All Subscriptions</option>
+                        {(subscriptions ?? (subscription ? [subscription] : [])).map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.subscriptionName}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="relative w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input
+                          type="text"
+                          placeholder="Search by ID, vehicle, type..."
+                          value={incidentReportSearch}
+                          onChange={e => setIncidentReportSearch(e.target.value)}
+                          className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1219,6 +1358,7 @@ export function SubscriberDetail({
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800">
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subscription</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Report Type</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Format</th>
@@ -1231,6 +1371,9 @@ export function SubscriberDetail({
                         {filteredIncidentReports.map((report) => (
                           <tr key={report.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                             <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{report.incidentId || '—'}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                              {report.subscriptionName ?? <span className="text-slate-400">—</span>}
+                            </td>
                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{report.incidentVehicle || '—'}</td>
                             <td className="px-4 py-3"><ReportTypeBadge type={report.reportType} /></td>
                             <td className="px-4 py-3"><FormatBadge format={report.format} /></td>
@@ -1931,22 +2074,47 @@ function ReportStatusBadge({ status }: { status: string }) {
 }
 
 function ReportAction({ report, onDownload }: { report: SubscriberReport; onDownload?: (id: string) => void; onRetry?: (id: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isOpen) return
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isOpen])
+
   return (
-    <div className="inline-flex items-center gap-2">
+    <div className="relative inline-flex" ref={menuRef}>
       <button
-        onClick={() => onDownload?.(report.id)}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-md transition-colors"
+        onClick={() => setIsOpen((v) => !v)}
+        className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+        aria-label="Report actions"
       >
-        <Download className="w-3.5 h-3.5" />
-        Download
+        <MoreVertical className="w-4 h-4" />
       </button>
-      <button
-        onClick={() => console.log('View report:', report.id)}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
-      >
-        <Eye className="w-3.5 h-3.5" />
-        View Report
-      </button>
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-10 py-1">
+          <button
+            onClick={() => { onDownload?.(report.id); setIsOpen(false) }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+          >
+            <Download className="w-4 h-4" />
+            Download
+          </button>
+          <button
+            onClick={() => { console.log('View report:', report.id); setIsOpen(false) }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+          >
+            <Eye className="w-4 h-4" />
+            View Report
+          </button>
+        </div>
+      )}
     </div>
   )
 }

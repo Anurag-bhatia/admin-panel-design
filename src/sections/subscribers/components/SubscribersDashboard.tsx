@@ -60,21 +60,25 @@ export function SubscribersDashboard({
   const subscriberDrivers = selectedSubscriber ? drivers.filter((drv: any) => drv.subscriberId === selectedSubscriber.id) : []
   const subscriberFollowUps = selectedSubscriber ? followUps.filter((fup: any) => fup.subscriberId === selectedSubscriber.id) : []
 
-  // Sample incidents data
-  const incidents = selectedSubscriber ? [
-    {
-      id: 'IRN-124501',
-      vehicleNumber: 'MH02AB1234',
-      status: 'Resolved',
-      date: '2024-01-20T10:30:00Z'
-    },
-    {
-      id: 'IRN-124502',
-      vehicleNumber: 'MH02CD5678',
-      status: 'In Progress',
-      date: '2024-01-25T14:15:00Z'
-    }
-  ] : []
+  // Sample incidents data — attach a subscription per incident (rotate through subscriber's plans)
+  const incidents = selectedSubscriber
+    ? (() => {
+        const baseIncidents = [
+          { id: 'IRN-124501', vehicleNumber: 'MH02AB1234', status: 'Resolved', date: '2024-01-20T10:30:00Z' },
+          { id: 'IRN-124502', vehicleNumber: 'MH02CD5678', status: 'In Progress', date: '2024-01-25T14:15:00Z' },
+          { id: 'IRN-124503', vehicleNumber: 'MH02AB1234', status: 'Screening', date: '2024-02-08T09:20:00Z' },
+          { id: 'IRN-124504', vehicleNumber: 'MH04EF9012', status: 'Resolved', date: '2024-02-14T16:45:00Z' },
+        ]
+        return baseIncidents.map((inc, i) => {
+          const sub = subscriberSubscriptions[i % Math.max(1, subscriberSubscriptions.length)]
+          return {
+            ...inc,
+            subscriptionId: sub?.id ?? null,
+            subscriptionName: sub?.subscriptionName ?? null,
+          }
+        })
+      })()
+    : []
 
   // Sample challans data
   const challans = selectedSubscriber ? [
@@ -116,17 +120,23 @@ export function SubscribersDashboard({
   ] : []
 
   // Sample reports data
-  const reports = selectedSubscriber ? [
-    { id: 'RPT-001', subscriberId: selectedSubscriber.id, reportType: 'MIS' as const, format: 'CSV' as const, status: 'ready' as const, category: 'monthly' as const, generatedAt: '2026-03-01T06:00:00Z', fileSize: 245760, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
-    { id: 'RPT-002', subscriberId: selectedSubscriber.id, reportType: 'MIS-Challan' as const, format: 'CSV' as const, status: 'ready' as const, category: 'monthly' as const, generatedAt: '2026-03-01T06:05:00Z', fileSize: 184320, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
-    { id: 'RPT-003', subscriberId: selectedSubscriber.id, reportType: 'MIS' as const, format: 'CSV' as const, status: 'generating' as const, category: 'monthly' as const, generatedAt: '2026-03-06T06:00:00Z', fileSize: null, period: 'March 2026', periodStart: '2026-03-01', periodEnd: '2026-03-31' },
-    { id: 'RPT-004', subscriberId: selectedSubscriber.id, reportType: 'MIS-Challan' as const, format: 'CSV' as const, status: 'failed' as const, category: 'monthly' as const, generatedAt: '2026-02-01T06:00:00Z', fileSize: null, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
-    { id: 'RPT-005', subscriberId: selectedSubscriber.id, reportType: 'MIS' as const, format: 'CSV' as const, status: 'ready' as const, category: 'monthly' as const, generatedAt: '2026-02-01T06:00:00Z', fileSize: 312400, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
-    { id: 'RPT-006', subscriberId: selectedSubscriber.id, reportType: 'ICR' as const, format: 'PDF' as const, status: 'ready' as const, category: 'incident' as const, generatedAt: '2026-02-15T10:30:00Z', fileSize: 524288, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
-    { id: 'RPT-007', subscriberId: selectedSubscriber.id, reportType: 'ISR' as const, format: 'PDF' as const, status: 'ready' as const, category: 'incident' as const, generatedAt: '2026-02-15T10:35:00Z', fileSize: 412672, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
-    { id: 'RPT-008', subscriberId: selectedSubscriber.id, reportType: 'ICR' as const, format: 'PDF' as const, status: 'generating' as const, category: 'incident' as const, generatedAt: '2026-03-05T14:20:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
-    { id: 'RPT-009', subscriberId: selectedSubscriber.id, reportType: 'ISR' as const, format: 'PDF' as const, status: 'failed' as const, category: 'incident' as const, generatedAt: '2026-03-04T09:00:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
-  ] : []
+  const reports = selectedSubscriber ? (() => {
+    const pick = (i: number) => {
+      const sub = subscriberSubscriptions[i % Math.max(1, subscriberSubscriptions.length)]
+      return { subscriptionId: sub?.id, subscriptionName: sub?.subscriptionName }
+    }
+    return [
+    { id: 'RPT-001', subscriberId: selectedSubscriber.id, ...pick(0), reportType: 'MIS' as const, format: 'CSV' as const, status: 'ready' as const, category: 'monthly' as const, generatedAt: '2026-03-01T06:00:00Z', fileSize: 245760, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
+    { id: 'RPT-002', subscriberId: selectedSubscriber.id, ...pick(1), reportType: 'MIS-Challan' as const, format: 'CSV' as const, status: 'ready' as const, category: 'monthly' as const, generatedAt: '2026-03-01T06:05:00Z', fileSize: 184320, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
+    { id: 'RPT-003', subscriberId: selectedSubscriber.id, ...pick(2), reportType: 'MIS' as const, format: 'CSV' as const, status: 'generating' as const, category: 'monthly' as const, generatedAt: '2026-03-06T06:00:00Z', fileSize: null, period: 'March 2026', periodStart: '2026-03-01', periodEnd: '2026-03-31' },
+    { id: 'RPT-004', subscriberId: selectedSubscriber.id, ...pick(0), reportType: 'MIS-Challan' as const, format: 'CSV' as const, status: 'failed' as const, category: 'monthly' as const, generatedAt: '2026-02-01T06:00:00Z', fileSize: null, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
+    { id: 'RPT-005', subscriberId: selectedSubscriber.id, ...pick(1), reportType: 'MIS' as const, format: 'CSV' as const, status: 'ready' as const, category: 'monthly' as const, generatedAt: '2026-02-01T06:00:00Z', fileSize: 312400, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
+    { id: 'RPT-006', subscriberId: selectedSubscriber.id, ...pick(0), reportType: 'ICR' as const, format: 'PDF' as const, status: 'ready' as const, category: 'incident' as const, generatedAt: '2026-02-15T10:30:00Z', fileSize: 524288, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
+    { id: 'RPT-007', subscriberId: selectedSubscriber.id, ...pick(0), reportType: 'ISR' as const, format: 'PDF' as const, status: 'ready' as const, category: 'incident' as const, generatedAt: '2026-02-15T10:35:00Z', fileSize: 412672, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
+    { id: 'RPT-008', subscriberId: selectedSubscriber.id, ...pick(1), reportType: 'ICR' as const, format: 'PDF' as const, status: 'generating' as const, category: 'incident' as const, generatedAt: '2026-03-05T14:20:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
+    { id: 'RPT-009', subscriberId: selectedSubscriber.id, ...pick(1), reportType: 'ISR' as const, format: 'PDF' as const, status: 'failed' as const, category: 'incident' as const, generatedAt: '2026-03-04T09:00:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
+    ]
+  })() : []
 
   // If a subscriber is selected, show detail view
   if (selectedSubscriber) {
