@@ -11,11 +11,12 @@ import { SubscribersDashboard } from './components/SubscribersDashboard'
 import { CustomerList } from '../customers/components/CustomerList'
 import { CustomerDetail } from '../customers/components/CustomerDetail'
 
-type UsersTab = 'customers' | 'subscribers'
+type UsersTab = 'customers' | 'subscribers' | 'multi-subscribers'
 
 const TABS: { key: UsersTab; label: string }[] = [
   { key: 'customers', label: 'Customers' },
   { key: 'subscribers', label: 'Subscribers' },
+  { key: 'multi-subscribers', label: 'Multi-Subscribers' },
 ]
 
 export default function SubscribersDashboardPreview() {
@@ -59,7 +60,18 @@ export default function SubscribersDashboardPreview() {
 
       {/* Main content */}
       <div className="flex-1 min-w-0 overflow-auto">
-        {activeTab === 'customers' ? (
+        {activeTab === 'multi-subscribers' ? (
+          <div className="flex h-full items-center justify-center p-8">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                Multi-Subscribers
+              </h2>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Coming soon.
+              </p>
+            </div>
+          </div>
+        ) : activeTab === 'customers' ? (
           selectedCustomer ? (
             <CustomerDetail
               customer={selectedCustomer}

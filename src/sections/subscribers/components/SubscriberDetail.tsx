@@ -3,11 +3,12 @@ import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle
 import type { Subscriber, Subscription, User as UserType, Vehicle, SubscriberReport } from '@/../product/sections/subscribers/types'
 import { AddSubscriberModal } from './AddSubscriberModal'
 
-type TabType = 'details' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'team' | 'api-catalogue' | 'report' | 'permissions'
+type TabType = 'details' | 'subscriptions' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'team' | 'api-catalogue' | 'report' | 'permissions'
 
 interface SubscriberDetailProps {
   subscriber: Subscriber
   subscription: Subscription | null
+  subscriptions?: Subscription[]
   assignedUser: UserType | null
   incidents?: any[]
   challans?: any[]
@@ -41,6 +42,7 @@ interface SubscriberDetailProps {
 export function SubscriberDetail({
   subscriber,
   subscription,
+  subscriptions,
   assignedUser,
   incidents = [],
   challans = [],
@@ -294,6 +296,7 @@ export function SubscriberDetail({
   const getTabIcon = (tab: TabType) => {
     const icons = {
       details: <Building2 className="w-4 h-4" />,
+      subscriptions: <CreditCard className="w-4 h-4" />,
       challans: <AlertCircle className="w-4 h-4" />,
       incidents: <AlertTriangle className="w-4 h-4" />,
       documents: <FileText className="w-4 h-4" />,
@@ -341,7 +344,7 @@ export function SubscriberDetail({
         {/* Tabs */}
         <div className="mb-6 -mx-6 lg:-mx-8 px-6 lg:px-8 overflow-x-auto">
           <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit min-w-full">
-            {(['details', 'vehicles', 'incidents', 'challans', 'documents', 'team', 'api-catalogue', 'report', 'permissions'] as TabType[]).map((tab) => (
+            {(['details', 'subscriptions', 'vehicles', 'incidents', 'challans', 'documents', 'team', 'api-catalogue', 'report', 'permissions'] as TabType[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -479,6 +482,71 @@ export function SubscriberDetail({
 
         {/* Tab Content */}
         <div className={`bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 overflow-visible ${activeTab === 'details' ? 'hidden' : ''}`}>
+          {/* Subscriptions Tab */}
+          {activeTab === 'subscriptions' && (() => {
+            const list = subscriptions ?? (subscription ? [subscription] : [])
+            const activeIdx = list.findIndex((s) => s.id === subscription?.id)
+            return (
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                    Subscriptions ({list.length})
+                  </h2>
+                </div>
+                {list.length === 0 ? (
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    No subscriptions yet.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {list.map((sub, i) => {
+                      const isActive = i === activeIdx
+                      return (
+                        <div
+                          key={sub.id}
+                          className={`rounded-lg border p-4 transition-colors ${
+                            isActive
+                              ? 'border-cyan-300 dark:border-cyan-700 bg-cyan-50/40 dark:bg-cyan-900/10'
+                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                                  {sub.subscriptionName}
+                                </p>
+                                {isActive && (
+                                  <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300">
+                                    Selected
+                                  </span>
+                                )}
+                              </div>
+                              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                {sub.planType} · {new Date(sub.startDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} – {new Date(sub.endDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              </p>
+                              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                Vehicles: <span className="text-slate-700 dark:text-slate-300">{sub.vehiclesCount}</span>
+                              </p>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(sub.totalAmount)}
+                              </p>
+                              <p className="mt-1 text-xs capitalize text-slate-500 dark:text-slate-400">
+                                {sub.paymentStatus.replace('_', ' ')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          })()}
+
           {/* Challans Tab */}
           {activeTab === 'challans' && (
             <div>

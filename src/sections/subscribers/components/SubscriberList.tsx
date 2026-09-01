@@ -11,6 +11,7 @@ import type {
 } from '@/../product/sections/subscribers/types'
 import { AddSubscriberModal } from './AddSubscriberModal'
 import { BulkUploadModal } from './BulkUploadModal'
+import { SubscriptionsListModal } from './SubscriptionsListModal'
 
 // Icons
 const SearchIcon = () => (
@@ -141,24 +142,6 @@ function ActionsMenu({
   )
 }
 
-// Format currency
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
-// Format date
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
 export function SubscriberList({
   subscribers,
   subscriptions,
@@ -177,7 +160,13 @@ export function SubscriberList({
   utmSources = [],
   vehicleTypes = [],
   userTypes = [],
-}: SubscribersProps & { utmSources?: string[]; vehicleTypes?: string[]; userTypes?: string[] }) {
+  onViewSubscription,
+}: SubscribersProps & {
+  utmSources?: string[]
+  vehicleTypes?: string[]
+  userTypes?: string[]
+  onViewSubscription?: (subscriberId: string, subscriptionId: string) => void
+}) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>('')
@@ -200,6 +189,7 @@ export function SubscriberList({
   // Modal state
   const [showAddModal, setShowAddModal] = useState(false)
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false)
+  const [subscriptionsModalSubscriberId, setSubscriptionsModalSubscriberId] = useState<string | null>(null)
   const [notification, setNotification] = useState<string | null>(null)
 
   // Close partner dropdown on click outside
@@ -221,10 +211,23 @@ export function SubscriberList({
     return partners.filter(p => p.name.toLowerCase().includes(partnerSearch.toLowerCase()))
   }, [partners, partnerSearch])
 
-  // Create subscription lookup map
+  // Create subscription lookup map (first subscription per subscriber)
   const subscriptionMap = useMemo(() => {
     const map = new Map<string, Subscription>()
-    subscriptions.forEach((sub) => map.set(sub.subscriberId, sub))
+    subscriptions.forEach((sub) => {
+      if (!map.has(sub.subscriberId)) map.set(sub.subscriberId, sub)
+    })
+    return map
+  }, [subscriptions])
+
+  // Group subscriptions by subscriber
+  const subscriptionsBySubscriber = useMemo(() => {
+    const map = new Map<string, Subscription[]>()
+    subscriptions.forEach((sub) => {
+      const list = map.get(sub.subscriberId) ?? []
+      list.push(sub)
+      map.set(sub.subscriberId, list)
+    })
     return map
   }, [subscriptions])
 
@@ -611,8 +614,8 @@ export function SubscriberList({
                   <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
                     POC
                   </th>
-                  <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
-                    Subscription
+                  <th className="text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
+                    Subscriptions
                   </th>
                   <th className="text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-4 py-3">
                     Vehicles
@@ -627,8 +630,6 @@ export function SubscriberList({
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {paginatedSubscribers.map((subscriber) => {
-                  const subscription = subscriptionMap.get(subscriber.id)
-
                   return (
                     <tr
                       key={subscriber.id}
@@ -658,20 +659,25 @@ export function SubscriberList({
                       </td>
 
 
-                      {/* Subscription */}
-                      <td className="px-4 py-4">
-                        {subscription ? (
-                          <div>
-                            <p className="text-sm text-slate-900 dark:text-white">
-                              {subscription.subscriptionName}
-                            </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                              {subscription.planType} · {formatDate(subscription.startDate)} - {formatDate(subscription.endDate)}
-                            </p>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-slate-400">No subscription</span>
-                        )}
+                      {/* Subscriptions count */}
+                      <td
+                        className="px-4 py-4 text-right"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {(() => {
+                          const count = subscriptionsBySubscriber.get(subscriber.id)?.length ?? 0
+                          if (count === 0) {
+                            return <span className="text-sm text-slate-400">0</span>
+                          }
+                          return (
+                            <button
+                              onClick={() => setSubscriptionsModalSubscriberId(subscriber.id)}
+                              className="inline-flex items-center justify-center min-w-8 px-2 py-1 rounded-md text-sm font-medium text-cyan-700 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-colors"
+                            >
+                              {count}
+                            </button>
+                          )
+                        })()}
                       </td>
 
                       {/* Vehicles */}
@@ -800,6 +806,28 @@ export function SubscriberList({
           onClose={() => setShowBulkUploadModal(false)}
         />
       )}
+
+      {subscriptionsModalSubscriberId && (() => {
+        const subscriber = subscribers.find((s) => s.id === subscriptionsModalSubscriberId)
+        const subs = subscriptionsBySubscriber.get(subscriptionsModalSubscriberId) ?? []
+        if (!subscriber) return null
+        return (
+          <SubscriptionsListModal
+            subscriberName={subscriber.subscriberName}
+            subscriptions={subs}
+            onSelect={(subscriptionId) => {
+              const id = subscriptionsModalSubscriberId
+              setSubscriptionsModalSubscriberId(null)
+              if (onViewSubscription && id) {
+                onViewSubscription(id, subscriptionId)
+              } else if (onViewDetails && id) {
+                onViewDetails(id)
+              }
+            }}
+            onClose={() => setSubscriptionsModalSubscriberId(null)}
+          />
+        )
+      })()}
 
       {/* Notification Toast */}
       {notification && (

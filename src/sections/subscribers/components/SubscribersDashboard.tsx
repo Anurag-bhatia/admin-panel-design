@@ -43,9 +43,17 @@ export function SubscribersDashboard({
   onViewIncident
 }: SubscribersDashboardProps) {
   const [selectedSubscriberId, setSelectedSubscriberId] = useState<string | null>(null)
+  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<string | null>(null)
 
   const selectedSubscriber = selectedSubscriberId ? subscribers.find(s => s.id === selectedSubscriberId) : null
-  const selectedSubscription = selectedSubscriber ? subscriptions.find(sub => sub.subscriberId === selectedSubscriber.id) : null
+  const subscriberSubscriptions = selectedSubscriber
+    ? subscriptions.filter(sub => sub.subscriberId === selectedSubscriber.id)
+    : []
+  const selectedSubscription = selectedSubscriber
+    ? (selectedSubscriptionId
+        ? subscriptions.find(sub => sub.id === selectedSubscriptionId)
+        : subscriberSubscriptions[0])
+    : null
   const assignedUser = selectedSubscriber ? users.find(u => u.id === selectedSubscriber.assignedOwner) : null
   const subscriberDocuments = selectedSubscriber ? documents.filter((doc: any) => doc.subscriberId === selectedSubscriber.id) : []
   const subscriberVehicles = selectedSubscriber ? vehicles.filter((veh: any) => veh.subscriberId === selectedSubscriber.id) : []
@@ -126,6 +134,7 @@ export function SubscribersDashboard({
       <SubscriberDetail
         subscriber={selectedSubscriber}
         subscription={selectedSubscription || null}
+        subscriptions={subscriberSubscriptions}
         assignedUser={assignedUser || null}
         incidents={incidents}
         challans={challans}
@@ -137,7 +146,10 @@ export function SubscribersDashboard({
         onDownloadReport={(id) => console.log('Download report:', id)}
         onRetryReport={(id) => console.log('Retry report:', id)}
         onSaveApiCatalogue={(id, config) => console.log('Save API config:', id, config)}
-        onBack={() => setSelectedSubscriberId(null)}
+        onBack={() => {
+          setSelectedSubscriberId(null)
+          setSelectedSubscriptionId(null)
+        }}
         onEdit={(id) => console.log('Edit subscriber:', id)}
         onUploadDocument={(subscriberId, file) => console.log('Upload document:', subscriberId, file.name)}
         onDeleteDocument={(subscriberId, docId) => console.log('Delete document:', subscriberId, docId)}
@@ -167,7 +179,14 @@ export function SubscribersDashboard({
       utmSources={utmSources}
       vehicleTypes={vehicleTypes}
       userTypes={userTypes}
-      onViewDetails={(id) => setSelectedSubscriberId(id)}
+      onViewDetails={(id) => {
+        setSelectedSubscriptionId(null)
+        setSelectedSubscriberId(id)
+      }}
+      onViewSubscription={(subscriberId, subscriptionId) => {
+        setSelectedSubscriptionId(subscriptionId)
+        setSelectedSubscriberId(subscriberId)
+      }}
       onEdit={(id) => console.log('Edit subscriber:', id)}
       onAddSubscriber={() => console.log('Add subscriber')}
       onBulkUpload={() => console.log('Bulk upload')}
