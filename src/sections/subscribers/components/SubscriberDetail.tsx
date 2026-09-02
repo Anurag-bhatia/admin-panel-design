@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3, RefreshCw, Loader2, Shield } from 'lucide-react'
+import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3, RefreshCw, Loader2, Shield, Plus } from 'lucide-react'
 import type { Subscriber, Subscription, User as UserType, Vehicle, SubscriberReport } from '@/../product/sections/subscribers/types'
 import { AddSubscriberModal } from './AddSubscriberModal'
 
@@ -96,6 +96,17 @@ export function SubscriberDetail({
   const [showUploadDocModal, setShowUploadDocModal] = useState(false)
   const [uploadDocCategory, setUploadDocCategory] = useState('')
   const [uploadDocFile, setUploadDocFile] = useState<File | null>(null)
+  const [showAddSubscriptionModal, setShowAddSubscriptionModal] = useState(false)
+  const [newSubscriptionName, setNewSubscriptionName] = useState('')
+  const [newSubscriptionNotes, setNewSubscriptionNotes] = useState('')
+  const newSubscriptionDates = useMemo(() => {
+    const start = new Date()
+    const end = new Date(start)
+    end.setFullYear(end.getFullYear() + 1)
+    end.setDate(end.getDate() - 1)
+    const fmt = (d: Date) => d.toISOString().slice(0, 10)
+    return { startDate: fmt(start), endDate: fmt(end) }
+  }, [showAddSubscriptionModal])
 
   // Check New Challan state
   const [showCheckChallanModal, setShowCheckChallanModal] = useState(false)
@@ -511,13 +522,19 @@ export function SubscriberDetail({
           {/* Subscriptions Tab */}
           {activeTab === 'subscriptions' && (() => {
             const list = subscriptions ?? (subscription ? [subscription] : [])
-            const activeIdx = list.findIndex((s) => s.id === subscription?.id)
             return (
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
                     Subscriptions ({list.length})
                   </h2>
+                  <button
+                    onClick={() => setShowAddSubscriptionModal(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Subscription
+                  </button>
                 </div>
                 {list.length === 0 ? (
                   <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -525,16 +542,11 @@ export function SubscriberDetail({
                   </p>
                 ) : (
                   <div className="space-y-3">
-                    {list.map((sub, i) => {
-                      const isActive = i === activeIdx
+                    {list.map((sub) => {
                       return (
                         <div
                           key={sub.id}
-                          className={`rounded-lg border p-4 transition-colors ${
-                            isActive
-                              ? 'border-cyan-300 dark:border-cyan-700 bg-cyan-50/40 dark:bg-cyan-900/10'
-                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
-                          }`}
+                          className="rounded-lg border p-4 transition-colors border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="min-w-0">
@@ -542,11 +554,6 @@ export function SubscriberDetail({
                                 <p className="text-sm font-semibold text-slate-900 dark:text-white">
                                   {sub.subscriptionName}
                                 </p>
-                                {isActive && (
-                                  <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300">
-                                    Selected
-                                  </span>
-                                )}
                               </div>
                               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                 {sub.planType} · {new Date(sub.startDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} – {new Date(sub.endDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -1469,6 +1476,98 @@ export function SubscriberDetail({
           }}
           onClose={() => setShowEditModal(false)}
         />
+      )}
+
+      {/* Add Subscription Modal */}
+      {showAddSubscriptionModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Add Subscription</h3>
+              <button
+                onClick={() => { setShowAddSubscriptionModal(false); setNewSubscriptionName(''); setNewSubscriptionNotes('') }}
+                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Select Subscription <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={newSubscriptionName}
+                  onChange={e => setNewSubscriptionName(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                >
+                  <option value="">Choose Subscription</option>
+                  <option value="Udrive">Udrive</option>
+                  <option value="Bsafe">Bsafe</option>
+                  <option value="Vcare">Vcare</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={newSubscriptionDates.startDate}
+                    readOnly
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-600 dark:text-slate-300 cursor-not-allowed focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={newSubscriptionDates.endDate}
+                    readOnly
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-600 dark:text-slate-300 cursor-not-allowed focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Notes
+                </label>
+                <textarea
+                  value={newSubscriptionNotes}
+                  onChange={e => setNewSubscriptionNotes(e.target.value)}
+                  rows={4}
+                  placeholder="Add any notes about this subscription…"
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => { setShowAddSubscriptionModal(false); setNewSubscriptionName(''); setNewSubscriptionNotes('') }}
+                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (newSubscriptionName) {
+                    console.log('Create subscription:', newSubscriptionName, 'start:', newSubscriptionDates.startDate, 'end:', newSubscriptionDates.endDate, 'notes:', newSubscriptionNotes, 'for subscriber:', subscriber.id)
+                    setShowAddSubscriptionModal(false)
+                    setNewSubscriptionName('')
+                    setNewSubscriptionNotes('')
+                  }
+                }}
+                disabled={!newSubscriptionName}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Create Subscription
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Add Team Member Modal */}
