@@ -18,7 +18,6 @@ import type {
 
 export interface SettlementFees {
   totalAmountReceived: number
-  challanAmount: number
   convenienceFee: number
   gst: number
   gatewayCharges: number
@@ -168,7 +167,6 @@ export function IncidentRow({
   const [showSettlementModal, setShowSettlementModal] = useState(false)
   const [settlementFees, setSettlementFees] = useState<SettlementFees>({
     totalAmountReceived: 0,
-    challanAmount: 0,
     convenienceFee: 0,
     gst: 0,
     gatewayCharges: 0,
@@ -210,7 +208,7 @@ export function IncidentRow({
     setShowSettlementModal(false)
     setPendingQueue(null)
     setIsAddingExpense(false)
-    setSettlementFees({ totalAmountReceived: 0, challanAmount: 0, convenienceFee: 0, gst: 0, gatewayCharges: 0, discount: 0, lawyerCharge: 0, governmentCharge: 0, miscellaneousCharge: 0 })
+    setSettlementFees({ totalAmountReceived: 0, convenienceFee: 0, gst: 0, gatewayCharges: 0, discount: 0, lawyerCharge: 0, governmentCharge: 0, miscellaneousCharge: 0 })
   }
 
   const assignedAgent = users.find((u) => u.id === incident.assignedAgentId)
@@ -741,27 +739,6 @@ export function IncidentRow({
                             setSettlementFees({
                               ...settlementFees,
                               totalAmountReceived: parseFloat(e.target.value) || 0,
-                            })
-                          }
-                          placeholder="0.00"
-                          className="w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                        Challan Amount <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
-                        <input
-                          type="number"
-                          value={settlementFees.challanAmount || ''}
-                          onChange={(e) =>
-                            setSettlementFees({
-                              ...settlementFees,
-                              challanAmount: parseFloat(e.target.value) || 0,
                             })
                           }
                           placeholder="0.00"

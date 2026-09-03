@@ -6,7 +6,6 @@ interface AddExpenseModalProps {
   workType?: 'cases' | 'challans'
   onSubmit?: (expense: {
     totalAmountReceived: number
-    challanAmount: number
     convenienceFee: number
     gst: number
     gatewayCharges: number
@@ -23,7 +22,6 @@ export function AddExpenseModal({ incidentId, workType = 'challans', onSubmit, o
 
   // Challan fields
   const [totalAmountReceived, setTotalAmountReceived] = useState('')
-  const [challanAmount, setChallanAmount] = useState('')
   const [convenienceFee, setConvenienceFee] = useState('')
   const [gst, setGst] = useState('')
   const [gatewayCharges, setGatewayCharges] = useState('')
@@ -40,12 +38,11 @@ export function AddExpenseModal({ incidentId, workType = 'challans', onSubmit, o
     if (isCases) {
       if (!lawyerCharge || !governmentCharge) return
     } else {
-      if (!totalAmountReceived || !challanAmount) return
+      if (!totalAmountReceived) return
     }
 
     onSubmit?.({
       totalAmountReceived: parseFloat(totalAmountReceived) || 0,
-      challanAmount: parseFloat(challanAmount) || 0,
       convenienceFee: parseFloat(convenienceFee) || 0,
       gst: parseFloat(gst) || 0,
       gatewayCharges: parseFloat(gatewayCharges) || 0,
@@ -58,7 +55,7 @@ export function AddExpenseModal({ incidentId, workType = 'challans', onSubmit, o
 
   const isDisabled = isCases
     ? !lawyerCharge || !governmentCharge
-    : !totalAmountReceived || !challanAmount
+    : !totalAmountReceived
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -165,28 +162,6 @@ export function AddExpenseModal({ incidentId, workType = 'challans', onSubmit, o
                     type="number"
                     value={totalAmountReceived}
                     onChange={(e) => setTotalAmountReceived(e.target.value)}
-                    placeholder="0.00"
-                    min="0"
-                    step="0.01"
-                    className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Challan Amount */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Challan Amount <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                    ₹
-                  </span>
-                  <input
-                    type="number"
-                    value={challanAmount}
-                    onChange={(e) => setChallanAmount(e.target.value)}
                     placeholder="0.00"
                     min="0"
                     step="0.01"
