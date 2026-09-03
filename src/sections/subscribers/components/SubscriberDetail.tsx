@@ -5,6 +5,187 @@ import { AddSubscriberModal } from './AddSubscriberModal'
 
 type TabType = 'details' | 'subscriptions' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'team' | 'api-catalogue' | 'report' | 'permissions'
 
+type PermissionItem = { key: string; label: string }
+type PermissionGroup = { label?: string; items: PermissionItem[] }
+type PermissionCategory = { label: string; groups: PermissionGroup[] }
+
+const PERMISSION_CATEGORIES: PermissionCategory[] = [
+  {
+    label: 'Vehicle & Driver',
+    groups: [
+      {
+        label: 'Vehicle',
+        items: [
+          { key: 'vd.vehicle.add', label: 'Add Vehicle' },
+          { key: 'vd.vehicle.edit', label: 'Edit Vehicle' },
+          { key: 'vd.vehicle.deactivate', label: 'Deactivate Vehicle' },
+        ],
+      },
+      {
+        label: 'Compliance',
+        items: [
+          { key: 'vd.compliance.check', label: 'Check Compliance' },
+          { key: 'vd.compliance.upload', label: 'Upload Documents' },
+        ],
+      },
+      {
+        label: 'Challans',
+        items: [{ key: 'vd.challans.check', label: 'Check Challans' }],
+      },
+      {
+        label: 'Driver',
+        items: [
+          { key: 'vd.driver.add', label: 'Add Driver' },
+          { key: 'vd.driver.remove', label: 'Remove Driver' },
+          { key: 'vd.driver.assign', label: 'Assign Driver to Vehicle' },
+          { key: 'vd.driver.change', label: 'Change Driver' },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'Incidents',
+    groups: [
+      {
+        items: [
+          { key: 'inc.add', label: 'Add Incident' },
+          { key: 'inc.followup', label: 'Add Follow-up' },
+          { key: 'inc.view-reports', label: 'View Reports' },
+          { key: 'inc.download-reports', label: 'Download Reports' },
+          { key: 'inc.upload-docs', label: 'Upload Documents' },
+          { key: 'inc.export', label: 'Export Incidents' },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'Compliance',
+    groups: [
+      {
+        items: [
+          { key: 'cmp.view', label: 'View Compliance' },
+          { key: 'cmp.export', label: 'Export Summary' },
+        ],
+      },
+      {
+        label: 'Fleet Challans / RC / DL',
+        items: [
+          { key: 'cmp.fleet.view', label: 'View' },
+          { key: 'cmp.fleet.request-proposal', label: 'Request Proposal' },
+        ],
+      },
+      {
+        label: 'Vehicle View Report',
+        items: [{ key: 'cmp.vehicle-report.view', label: 'View' }],
+      },
+    ],
+  },
+  {
+    label: 'Proposal',
+    groups: [
+      {
+        items: [
+          { key: 'prop.view', label: 'View Proposal' },
+          { key: 'prop.request', label: 'Request Proposal' },
+          { key: 'prop.cancel', label: 'Cancel Proposal' },
+          { key: 'prop.notes', label: 'Add Notes' },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'Wallet',
+    groups: [{ items: [{ key: 'wallet.view', label: 'View Wallet' }] }],
+  },
+  {
+    label: 'Subscriptions',
+    groups: [
+      {
+        items: [{ key: 'subs.change-plan', label: 'Change Plan' }],
+      },
+      {
+        label: 'Team Management',
+        items: [
+          { key: 'subs.team.add', label: 'Add Member' },
+          { key: 'subs.team.remove', label: 'Remove Member' },
+          { key: 'subs.team.manager-access', label: 'Manager Access' },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'Profile',
+    groups: [{ items: [{ key: 'profile.edit', label: 'Edit Profile' }] }],
+  },
+]
+
+const ALL_PERMISSION_KEYS = PERMISSION_CATEGORIES.flatMap((c) =>
+  c.groups.flatMap((g) => g.items.map((i) => i.key)),
+)
+
+const permissionMap = (enabledKeys: string[]): Record<string, boolean> =>
+  Object.fromEntries(ALL_PERMISSION_KEYS.map((k) => [k, enabledKeys.includes(k)]))
+
+const ROLE_DEFINITIONS: {
+  name: string
+  badgeClass: string
+  permissions: Record<string, boolean>
+}[] = [
+  {
+    name: 'Admin',
+    badgeClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+    permissions: permissionMap(ALL_PERMISSION_KEYS),
+  },
+  {
+    name: 'Manager',
+    badgeClass: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+    permissions: permissionMap([
+      'vd.vehicle.add', 'vd.vehicle.edit', 'vd.vehicle.deactivate',
+      'vd.compliance.check', 'vd.compliance.upload',
+      'vd.challans.check',
+      'vd.driver.add', 'vd.driver.remove', 'vd.driver.assign', 'vd.driver.change',
+      'inc.add', 'inc.followup', 'inc.view-reports', 'inc.download-reports', 'inc.upload-docs', 'inc.export',
+      'cmp.view', 'cmp.export',
+      'cmp.fleet.view', 'cmp.fleet.request-proposal',
+      'cmp.vehicle-report.view',
+      'prop.view', 'prop.request', 'prop.notes',
+      'wallet.view',
+      'subs.team.add',
+      'profile.edit',
+    ]),
+  },
+  {
+    name: 'Member',
+    badgeClass: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    permissions: permissionMap([
+      'vd.compliance.check', 'vd.compliance.upload',
+      'vd.challans.check',
+      'inc.add', 'inc.followup', 'inc.view-reports', 'inc.download-reports', 'inc.upload-docs',
+      'cmp.view',
+      'cmp.fleet.view',
+      'cmp.vehicle-report.view',
+      'prop.view',
+      'wallet.view',
+      'profile.edit',
+    ]),
+  },
+  {
+    name: 'Viewer',
+    badgeClass: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+    permissions: permissionMap([
+      'vd.compliance.check',
+      'vd.challans.check',
+      'inc.view-reports', 'inc.download-reports',
+      'cmp.view',
+      'cmp.fleet.view',
+      'cmp.vehicle-report.view',
+      'prop.view',
+      'wallet.view',
+      'profile.edit',
+    ]),
+  },
+]
+
 interface SubscriberDetailProps {
   subscriber: Subscriber
   subscription: Subscription | null
@@ -88,7 +269,23 @@ export function SubscriberDetail({
   const [showAddTeamModal, setShowAddTeamModal] = useState(false)
   const [newTeamName, setNewTeamName] = useState('')
   const [newTeamEmail, setNewTeamEmail] = useState('')
+  const [newTeamPhone, setNewTeamPhone] = useState('')
   const [newTeamDesignation, setNewTeamDesignation] = useState('')
+  const [teamSubTab, setTeamSubTab] = useState<'members' | 'roles'>('members')
+  const [rolePermissions, setRolePermissions] = useState(ROLE_DEFINITIONS)
+
+  const toggleRolePermission = (roleName: string, permissionKey: string) => {
+    setRolePermissions((prev) =>
+      prev.map((role) =>
+        role.name === roleName
+          ? {
+              ...role,
+              permissions: { ...role.permissions, [permissionKey]: !role.permissions[permissionKey] },
+            }
+          : role,
+      ),
+    )
+  }
   const [showBulkUpdateVehicleModal, setShowBulkUpdateVehicleModal] = useState(false)
   const [bulkUpdateFile, setBulkUpdateFile] = useState<File | null>(null)
   const [isBulkUpdateDragging, setIsBulkUpdateDragging] = useState(false)
@@ -1089,35 +1286,113 @@ export function SubscriberDetail({
           {/* Team Tab */}
           {activeTab === 'team' && (
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Team Members ({teamMembers.length})</h2>
+              {/* Sub-tabs */}
+              <div className="flex items-center gap-6 border-b border-slate-200 dark:border-slate-800 mb-6">
                 <button
-                  onClick={() => setShowAddTeamModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                  onClick={() => setTeamSubTab('members')}
+                  className={`pb-3 text-sm font-medium border-b-2 transition-colors -mb-px ${
+                    teamSubTab === 'members'
+                      ? 'text-cyan-600 border-cyan-600'
+                      : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add Team Member
+                  Members
+                </button>
+                <button
+                  onClick={() => setTeamSubTab('roles')}
+                  className={`pb-3 text-sm font-medium border-b-2 transition-colors -mb-px ${
+                    teamSubTab === 'roles'
+                      ? 'text-cyan-600 border-cyan-600'
+                      : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
+                >
+                  Roles
                 </button>
               </div>
 
-              {teamMembers.length === 0 ? (
-                <div className="text-center py-12">
-                  <Users className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-500 dark:text-slate-400">No team members assigned yet</p>
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-3">
-                  {teamMembers.map((member) => (
-                    <div key={member.id} className="inline-flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                        {member.fullName.charAt(0).toUpperCase()}
+              {teamSubTab === 'members' && (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Team Members ({teamMembers.length})</h2>
+                    <button
+                      onClick={() => setShowAddTeamModal(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Add Team Member
+                    </button>
+                  </div>
+
+                  {teamMembers.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Users className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                      <p className="text-slate-500 dark:text-slate-400">No team members assigned yet</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-3">
+                      {teamMembers.map((member) => (
+                        <div key={member.id} className="inline-flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                            {member.fullName.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{member.fullName}</p>
+                            {member.email && <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{member.email}</p>}
+                            {member.role && <p className="text-xs text-slate-400 dark:text-slate-500">{member.role}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
+              {teamSubTab === 'roles' && (
+                <div className="space-y-4">
+                  {rolePermissions.map((role) => (
+                    <div key={role.name} className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                      <div className="px-6 py-4 bg-slate-50/60 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider ${role.badgeClass}`}>
+                          {role.name}
+                        </span>
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{member.fullName}</p>
-                        {member.email && <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{member.email}</p>}
-                        {member.role && <p className="text-xs text-slate-400 dark:text-slate-500">{member.role}</p>}
+                      <div className="px-6 py-5 space-y-6">
+                        {PERMISSION_CATEGORIES.map((category) => (
+                          <div key={category.label}>
+                            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                              {category.label}
+                            </h4>
+                            <div className="space-y-4">
+                              {category.groups.map((group, groupIdx) => (
+                                <div key={group.label ?? `group-${groupIdx}`}>
+                                  {group.label && (
+                                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                                      {group.label}
+                                    </p>
+                                  )}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                                    {group.items.map((item) => (
+                                      <label
+                                        key={item.key}
+                                        className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300 cursor-pointer"
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          checked={role.permissions[item.key] ?? false}
+                                          onChange={() => toggleRolePermission(role.name, item.key)}
+                                          className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 dark:bg-slate-700"
+                                        />
+                                        {item.label}
+                                      </label>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
@@ -1577,7 +1852,7 @@ export function SubscriberDetail({
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Add Team Member</h3>
               <button
-                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail(''); setNewTeamDesignation('') }}
+                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail(''); setNewTeamPhone(''); setNewTeamDesignation('') }}
                 className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
               >
                 <X className="w-5 h-5 text-slate-500" />
@@ -1611,6 +1886,18 @@ export function SubscriberDetail({
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={newTeamPhone}
+                  onChange={e => setNewTeamPhone(e.target.value)}
+                  placeholder="e.g., +91 98765 43210"
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Role
                 </label>
                 <select
@@ -1621,14 +1908,14 @@ export function SubscriberDetail({
                   <option value="">Select role</option>
                   <option value="Admin">Admin</option>
                   <option value="Manager">Manager</option>
+                  <option value="Member">Member</option>
                   <option value="Viewer">Viewer</option>
-                  <option value="Owner">Owner</option>
                 </select>
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
               <button
-                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail(''); setNewTeamDesignation('') }}
+                onClick={() => { setShowAddTeamModal(false); setNewTeamName(''); setNewTeamEmail(''); setNewTeamPhone(''); setNewTeamDesignation('') }}
                 className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
               >
                 Cancel
@@ -1636,10 +1923,11 @@ export function SubscriberDetail({
               <button
                 onClick={() => {
                   if (newTeamName.trim() && newTeamEmail.trim()) {
-                    console.log('Add team member:', newTeamName.trim(), newTeamEmail.trim(), newTeamDesignation.trim(), 'for subscriber:', subscriber.id)
+                    console.log('Add team member:', newTeamName.trim(), newTeamEmail.trim(), newTeamPhone.trim(), newTeamDesignation.trim(), 'for subscriber:', subscriber.id)
                     setShowAddTeamModal(false)
                     setNewTeamName('')
                     setNewTeamEmail('')
+                    setNewTeamPhone('')
                     setNewTeamDesignation('')
                   }
                 }}
