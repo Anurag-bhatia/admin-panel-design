@@ -7,6 +7,7 @@ import { AddCaseModal } from './components/AddCaseModal'
 import { AssignAgentModal } from './components/AssignAgentModal'
 import { AssignLawyerModal } from './components/AssignLawyerModal'
 import { MoveQueueModal } from './components/MoveQueueModal'
+import { MoveQueueDetailsModal } from './components/MoveQueueDetailsModal'
 import { BulkUpdateModal } from './components/BulkUpdateModal'
 import { ScreenResultsView } from './components/ScreenResultsView'
 import type {
@@ -36,6 +37,7 @@ export default function IncidentListPreview() {
   // Modal state
   const [activeModal, setActiveModal] = useState<ModalType>(null)
   const [selectedIncidentIds, setSelectedIncidentIds] = useState<string[]>([])
+  const [settledPreviewType, setSettledPreviewType] = useState<'challan' | 'case' | null>('challan')
 
   // Results state (for demo)
   const [screeningResults, setScreeningResults] = useState<ScreeningResult[]>([])
@@ -324,6 +326,25 @@ export default function IncidentListPreview() {
           selectedCount={selectedIncidentIds.length}
           onUpload={(file) => handleBulkUpdate(selectedIncidentIds, file)}
           onClose={() => setActiveModal(null)}
+        />
+      )}
+
+      {/* Move to Settled preview */}
+      {settledPreviewType && (
+        <MoveQueueDetailsModal
+          incidentId={
+            (
+              (data.incidents as Incident[]).find(
+                (i) => i.workType === settledPreviewType,
+              ) ?? (data.incidents[0] as Incident)
+            ).incidentId
+          }
+          stage="settled"
+          onSubmit={(payload) => {
+            console.log('Move to Settled payload:', payload)
+            setSettledPreviewType(null)
+          }}
+          onCancel={() => setSettledPreviewType(null)}
         />
       )}
     </>

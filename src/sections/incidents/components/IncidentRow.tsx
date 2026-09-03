@@ -15,6 +15,7 @@ import type {
   Lawyer,
   IncidentQueue,
 } from '@/../product/sections/incidents/types'
+import { MoveQueueDetailsModal } from './MoveQueueDetailsModal'
 
 export interface SettlementFees {
   totalAmountReceived: number
@@ -632,8 +633,30 @@ export function IncidentRow({
       </td>
     </tr>
 
-    {/* Settlement Modal */}
-    {showSettlementModal && (
+    {/* Settlement Modal — Settled uses the shared MoveQueueDetailsModal */}
+    {showSettlementModal && !isAddingExpense && pendingQueue === 'settled' && (
+      <tr>
+        <td colSpan={isCases ? 9 : 10} className="p-0">
+          <MoveQueueDetailsModal
+            incidentId={incident.incidentId}
+            stage="settled"
+            onSubmit={(payload) => {
+              console.log('Settled payload:', payload)
+              onMoveQueue?.('settled')
+              setShowSettlementModal(false)
+              setPendingQueue(null)
+            }}
+            onCancel={() => {
+              setShowSettlementModal(false)
+              setPendingQueue(null)
+            }}
+          />
+        </td>
+      </tr>
+    )}
+
+    {/* Settlement Modal — Not Settled / Add Expense keep the fee form */}
+    {showSettlementModal && (isAddingExpense || pendingQueue !== 'settled') && (
       <tr>
         <td colSpan={isCases ? 9 : 10} className="p-0">
           <div className="fixed inset-0 z-50 flex items-center justify-center">

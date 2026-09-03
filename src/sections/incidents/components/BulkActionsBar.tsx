@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import type { IncidentQueue } from '@/../product/sections/incidents/types'
 import type { SettlementFees } from './IncidentRow'
+import { MoveQueueDetailsModal } from './MoveQueueDetailsModal'
 
 interface BulkActionsBarProps {
   selectedCount: number
@@ -297,8 +298,26 @@ export function BulkActionsBar({
         </div>
       )}
 
-      {/* Settlement Modal */}
-      {showSettlementModal && (
+      {/* Settlement Modal — Settled uses the shared MoveQueueDetailsModal */}
+      {showSettlementModal && !isAddingExpense && pendingQueue === 'settled' && (
+        <MoveQueueDetailsModal
+          incidentId={`${selectedCount} selected ${isCases ? 'case' : 'challan'}${selectedCount > 1 ? 's' : ''}`}
+          stage="settled"
+          onSubmit={(payload) => {
+            console.log('Bulk settled payload:', payload)
+            onMoveQueue?.('settled')
+            setShowSettlementModal(false)
+            setPendingQueue(null)
+          }}
+          onCancel={() => {
+            setShowSettlementModal(false)
+            setPendingQueue(null)
+          }}
+        />
+      )}
+
+      {/* Settlement Modal — Not Settled / Add Expense keep the fee form */}
+      {showSettlementModal && (isAddingExpense || pendingQueue !== 'settled') && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
             className="absolute inset-0 bg-black/50"

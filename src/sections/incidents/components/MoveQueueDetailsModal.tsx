@@ -11,11 +11,12 @@ export type MoveQueueStage =
 export interface MoveQueueDetailsPayload {
   reason?: string
   notes?: string
-  caseTentativeAmount?: number
-  caseActualAmount?: number
   caseProfessionalFees?: number
   governmentFees?: number
   miscellaneousCharges?: number
+  resolutionNotes?: string
+  title?: string
+  subtitle?: string
 }
 
 interface MoveQueueDetailsModalProps {
@@ -33,6 +34,25 @@ const STAGE_META: Record<MoveQueueStage, { title: string; submitLabel: string }>
   hold: { title: 'Move to Hold', submitLabel: 'Move to Hold' },
 }
 
+const TITLE_OPTIONS = [
+  'Employee Has Been Assigned',
+  'Challan Not Settled due to Pending Transfer to Court',
+  'Challan Not Settled due to OTP Registered Number Unavailable',
+  'Challan not settled due to pending documents',
+  'Challan Not Settled due to Police Report Pending',
+  'The challan is on hold as we await the required document from you',
+  'Challan on Hold due to Pending OTP for Disposal',
+]
+
+const SUBTITLE_OPTIONS = [
+  'The incident has been closed following your request to settle the challan independently',
+  'Your challan could not be resolved as the OTP-registered number is not available with the client',
+  'The vehicle has been released',
+  'Great news! Your case has been successfully resolved under service level 2',
+  'Your vehicle has been removed from blacklist',
+  'Your vehicle has been successfully removed from blacklist.',
+]
+
 export function MoveQueueDetailsModal({
   incidentId,
   stage,
@@ -41,11 +61,12 @@ export function MoveQueueDetailsModal({
 }: MoveQueueDetailsModalProps) {
   const [reason, setReason] = useState('')
   const [notes, setNotes] = useState('')
-  const [caseTentativeAmount, setCaseTentativeAmount] = useState('')
-  const [caseActualAmount, setCaseActualAmount] = useState('')
   const [caseProfessionalFees, setCaseProfessionalFees] = useState('')
   const [governmentFees, setGovernmentFees] = useState('')
   const [miscellaneousCharges, setMiscellaneousCharges] = useState('')
+  const [resolutionNotes, setResolutionNotes] = useState('')
+  const [title, setTitle] = useState('')
+  const [subtitle, setSubtitle] = useState('')
 
   const meta = STAGE_META[stage]
 
@@ -56,10 +77,11 @@ export function MoveQueueDetailsModal({
     if (stage === 'hold') return !reason.trim()
     if (stage === 'settled') {
       return (
-        !caseTentativeAmount ||
-        !caseActualAmount ||
         !caseProfessionalFees ||
-        !governmentFees
+        !governmentFees ||
+        !resolutionNotes.trim() ||
+        !title ||
+        !subtitle
       )
     }
     return true
@@ -79,13 +101,14 @@ export function MoveQueueDetailsModal({
       onSubmit({ reason: reason.trim() })
     } else if (stage === 'settled') {
       onSubmit({
-        caseTentativeAmount: parseFloat(caseTentativeAmount) || 0,
-        caseActualAmount: parseFloat(caseActualAmount) || 0,
         caseProfessionalFees: parseFloat(caseProfessionalFees) || 0,
         governmentFees: parseFloat(governmentFees) || 0,
         miscellaneousCharges: miscellaneousCharges
           ? parseFloat(miscellaneousCharges) || 0
           : undefined,
+        resolutionNotes: resolutionNotes.trim(),
+        title,
+        subtitle,
       })
     }
   }
@@ -194,52 +217,9 @@ export function MoveQueueDetailsModal({
 
           {stage === 'settled' && (
             <>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Case Tentative Amount <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                      ₹
-                    </span>
-                    <input
-                      type="number"
-                      value={caseTentativeAmount}
-                      onChange={(e) => setCaseTentativeAmount(e.target.value)}
-                      placeholder="0.00"
-                      min="0"
-                      step="0.01"
-                      className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Case Actual Amount <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                      ₹
-                    </span>
-                    <input
-                      type="number"
-                      value={caseActualAmount}
-                      onChange={(e) => setCaseActualAmount(e.target.value)}
-                      placeholder="0.00"
-                      min="0"
-                      step="0.01"
-                      className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Case Professional Fees <span className="text-red-500">*</span>
+                  Professional Fees <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
@@ -297,6 +277,58 @@ export function MoveQueueDetailsModal({
                     className="w-full pl-8 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Resolution Notes <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={resolutionNotes}
+                  onChange={(e) => setResolutionNotes(e.target.value)}
+                  placeholder="Describe how the case was resolved"
+                  rows={3}
+                  className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-white resize-y"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                  required
+                >
+                  <option value="">Select a title</option>
+                  {TITLE_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Subtitle <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={subtitle}
+                  onChange={(e) => setSubtitle(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+                  required
+                >
+                  <option value="">Select a subtitle</option>
+                  {SUBTITLE_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
