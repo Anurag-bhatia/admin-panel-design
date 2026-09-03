@@ -1611,15 +1611,19 @@ export function SubscriberDetail({
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Designation
+                  Role
                 </label>
-                <input
-                  type="text"
+                <select
                   value={newTeamDesignation}
                   onChange={e => setNewTeamDesignation(e.target.value)}
-                  placeholder="e.g., Account Manager"
-                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                >
+                  <option value="">Select role</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Viewer">Viewer</option>
+                  <option value="Owner">Owner</option>
+                </select>
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">

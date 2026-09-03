@@ -906,7 +906,7 @@
       "id": "USR-001",
       "fullName": "Priya Sharma",
       "email": "priya.sharma@company.com",
-      "role": "Account Manager",
+      "role": "Admin",
       "team": "Sales",
       "status": "active"
     },
@@ -914,7 +914,7 @@
       "id": "USR-002",
       "fullName": "Rahul Verma",
       "email": "rahul.verma@company.com",
-      "role": "Senior Account Executive",
+      "role": "Manager",
       "team": "Sales",
       "status": "active"
     },
@@ -922,7 +922,7 @@
       "id": "USR-003",
       "fullName": "Amit Patel",
       "email": "amit.patel@company.com",
-      "role": "Key Account Manager",
+      "role": "Viewer",
       "team": "Enterprise",
       "status": "active"
     }
