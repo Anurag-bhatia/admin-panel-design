@@ -88,4 +88,18 @@ export interface RewardsConfigDashboardProps {
   currentUser: AllowlistedUser
   onAdd?: (draft: ConfigDraft) => void
   onUpdate?: (id: string, draft: ConfigDraft) => void
+  /**
+   * When true, the module header (title + Add button) is not rendered so the
+   * dashboard can be embedded inside a parent that owns its own header.
+   */
+  embedded?: boolean
+  /**
+   * When set, the product tabs are hidden and this product is used as the
+   * fixed active product.
+   */
+  lockedProduct?: Product
+  /**
+   * Optional heading override for the module header. Ignored when `embedded`.
+   */
+  titleOverride?: string
 }

@@ -32,11 +32,18 @@ export function RewardsConfigDashboard({
   states,
   onAdd,
   onUpdate,
+  embedded = false,
+  lockedProduct,
+  titleOverride,
 }: RewardsConfigDashboardProps) {
   const [view, setView] = useState<View>({ kind: 'list' })
-  const [activeProduct, setActiveProduct] = useState<Product>('challanPay')
+  const [activeProduct, setActiveProduct] = useState<Product>(
+    lockedProduct ?? 'challanPay',
+  )
   const [pendingSubmit, setPendingSubmit] = useState<PendingSubmit>(null)
   const [historyStateId, setHistoryStateId] = useState<string | null>(null)
+
+  const effectiveProduct = lockedProduct ?? activeProduct
 
   const productCounts = useMemo(
     () => ({
@@ -47,8 +54,8 @@ export function RewardsConfigDashboard({
   )
 
   const productConfigs = useMemo(
-    () => configs.filter((c) => c.product === activeProduct),
-    [configs, activeProduct],
+    () => configs.filter((c) => c.product === effectiveProduct),
+    [configs, effectiveProduct],
   )
 
   const existingStates = useMemo(
@@ -84,6 +91,8 @@ export function RewardsConfigDashboard({
     setView({ kind: 'list' })
   }
 
+  const listTitle = titleOverride ?? 'State-Level Reward Configurations'
+
   return (
     <div className="min-h-full bg-slate-50 dark:bg-slate-950">
       {/* Module header */}
@@ -101,12 +110,14 @@ export function RewardsConfigDashboard({
                   <ArrowLeft className="w-5 h-5" />
                 </button>
               )}
-              <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
-                {view.kind === 'list' && 'State-Level Reward Configurations'}
-                {view.kind === 'add' && 'Add Reward Configuration'}
-                {view.kind === 'edit' &&
-                  `Update Configuration — ${editingConfig?.state ?? ''}`}
-              </h1>
+              {(!embedded || view.kind !== 'list') && (
+                <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+                  {view.kind === 'list' && listTitle}
+                  {view.kind === 'add' && 'Add Reward Configuration'}
+                  {view.kind === 'edit' &&
+                    `Update Configuration — ${editingConfig?.state ?? ''}`}
+                </h1>
+              )}
             </div>
             <div className="flex items-center gap-3">
               {view.kind === 'list' && (
@@ -124,12 +135,12 @@ export function RewardsConfigDashboard({
         </div>
       </div>
 
-      {/* Product tabs (visible on list view) */}
-      {view.kind === 'list' && (
+      {/* Product tabs (visible on list view; hidden when a product is locked) */}
+      {view.kind === 'list' && !lockedProduct && (
         <div className="max-w-[1440px] mx-auto px-6 pt-6">
           <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
             {PRODUCT_TABS.map((tab) => {
-              const isActive = activeProduct === tab.key
+              const isActive = effectiveProduct === tab.key
               const count = productCounts[tab.key]
               return (
                 <button
@@ -165,7 +176,7 @@ export function RewardsConfigDashboard({
             mode="add"
             states={states}
             existingStates={existingStates}
-            defaultProduct={activeProduct}
+            defaultProduct={effectiveProduct}
             onCancel={() => setView({ kind: 'list' })}
             onSubmit={(draft) => setPendingSubmit({ kind: 'add', draft })}
           />
