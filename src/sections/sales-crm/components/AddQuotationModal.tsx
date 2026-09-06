@@ -1,10 +1,11 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   ArrowLeft,
   Search,
   Layers,
   Wrench,
   Check,
+  ChevronDown,
   Download,
   Send,
   Paperclip,
@@ -132,7 +133,9 @@ const defaultValidTill = () => {
 export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalProps) {
   const [customerSearch, setCustomerSearch] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [activeAddonCategory, setActiveAddonCategory] = useState<AddonCategory>('caas')
+  const [activeAddonCategories, setActiveAddonCategories] = useState<AddonCategory[]>(['caas'])
+  const [serviceTypeOpen, setServiceTypeOpen] = useState(false)
+  const serviceTypeRef = useRef<HTMLDivElement>(null)
   const [pptQuotation, setPptQuotation] = useState<{ onlineCount: string; onlineDiscount: string; courtCount: string; courtDiscount: string; state: string }>({
     onlineCount: '',
     onlineDiscount: '',
@@ -163,6 +166,23 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     validTill: defaultValidTill(),
     terms: DEFAULT_TERMS,
   })
+
+  useEffect(() => {
+    if (!serviceTypeOpen) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (serviceTypeRef.current && !serviceTypeRef.current.contains(e.target as Node)) {
+        setServiceTypeOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [serviceTypeOpen])
+
+  const toggleAddonCategory = (cat: AddonCategory) => {
+    setActiveAddonCategories(prev =>
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat],
+    )
+  }
 
   const selectedLead = useMemo(() => leads.find(l => l.id === formData.leadId) || null, [leads, formData.leadId])
   const selectedPlan = useMemo(() => SUBSCRIPTION_PLANS.find(p => p.id === formData.planId) || null, [formData.planId])
@@ -573,27 +593,61 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
 
             <FormSection title={formData.type === 'pay-per-service' ? 'Services' : 'Add-ons'} error={errors.addonIds}>
                 <div className="mb-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-                  <label htmlFor="service-type" className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
                     Service Type
                   </label>
-                  <select
-                    id="service-type"
-                    value={activeAddonCategory}
-                    onChange={e => setActiveAddonCategory(e.target.value as AddonCategory)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                  >
-                    {ADDON_CATEGORIES.map(cat => {
-                      const selectedCount = ADDONS.filter(a => a.category === cat.id && formData.addonIds.includes(a.id)).length
-                      return (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.label}{selectedCount > 0 ? ` (${selectedCount})` : ''}
-                        </option>
-                      )
-                    })}
-                  </select>
+                  <div className="relative" ref={serviceTypeRef}>
+                    <button
+                      type="button"
+                      onClick={() => setServiceTypeOpen(o => !o)}
+                      aria-haspopup="listbox"
+                      aria-expanded={serviceTypeOpen}
+                      className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    >
+                      <span className={`truncate text-left ${activeAddonCategories.length === 0 ? 'text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-50'}`}>
+                        {activeAddonCategories.length === 0
+                          ? 'Select service types'
+                          : ADDON_CATEGORIES.filter(c => activeAddonCategories.includes(c.id)).map(c => {
+                              const count = ADDONS.filter(a => a.category === c.id && formData.addonIds.includes(a.id)).length
+                              return count > 0 ? `${c.label} (${count})` : c.label
+                            }).join(', ')}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${serviceTypeOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {serviceTypeOpen && (
+                      <div
+                        role="listbox"
+                        aria-multiselectable="true"
+                        className="absolute z-20 mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg overflow-hidden"
+                      >
+                        {ADDON_CATEGORIES.map(cat => {
+                          const selected = activeAddonCategories.includes(cat.id)
+                          const count = ADDONS.filter(a => a.category === cat.id && formData.addonIds.includes(a.id)).length
+                          return (
+                            <button
+                              key={cat.id}
+                              type="button"
+                              role="option"
+                              aria-selected={selected}
+                              onClick={() => toggleAddonCategory(cat.id)}
+                              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                            >
+                              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${selected ? 'border-cyan-600 bg-cyan-600' : 'border-slate-300 dark:border-slate-600'}`}>
+                                {selected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                              </div>
+                              <span className="text-slate-900 dark:text-white flex-1">{cat.label}</span>
+                              {count > 0 && (
+                                <span className="text-xs text-slate-500 dark:text-slate-400">({count})</span>
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  {ADDONS.filter(a => a.category === activeAddonCategory).map(addon => {
+                  {ADDONS.filter(a => activeAddonCategories.includes(a.category)).map(addon => {
                     const selected = formData.addonIds.includes(addon.id)
                     const discountValue = formData.addonDiscounts[addon.id] ?? 0
                     const quantityValue = formData.addonQuantities[addon.id] ?? 1
