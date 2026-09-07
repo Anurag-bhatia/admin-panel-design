@@ -15,10 +15,8 @@ interface BulkActionsBarProps {
 }
 
 const STATUS_OPTIONS: { key: Lead['status']; label: string }[] = [
-  { key: 'new', label: 'New' },
   { key: 'assigned', label: 'Assigned' },
   { key: 'follow-up', label: 'Follow-up' },
-  { key: 'quotations', label: 'Quotations' },
   { key: 'projected', label: 'Projected' },
   { key: 'invoiced', label: 'Ready to Invoice' },
   { key: 'sales', label: 'Converted' },

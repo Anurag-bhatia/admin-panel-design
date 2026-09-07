@@ -45,7 +45,6 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
   ]
 
   const statusOptions: { value: Lead['status']; label: string }[] = [
-    { value: 'new', label: 'New' },
     { value: 'assigned', label: 'Assigned' },
     { value: 'follow-up', label: 'Follow-up' },
     { value: 'quotations', label: 'Quotations' },

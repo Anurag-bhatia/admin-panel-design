@@ -16,7 +16,6 @@ export function BulkMoveLead({ mode, selectedCount, users, onMove, onClose }: Bu
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const statusOptions = [
-    { value: 'new', label: 'New' },
     { value: 'assigned', label: 'Assigned' },
     { value: 'follow-up', label: 'Follow-up' },
     { value: 'quotations', label: 'Quotations' },
