@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, Pencil, Search, Layers, X } from 'lucide-react'
+import { Plus, Pencil, Search, Layers, X, History } from 'lucide-react'
 import rewardsData from '@/../product/sections/rewards-config/data.json'
 import type {
   RewardsConfig,
@@ -8,7 +8,13 @@ import type {
 } from '@/../product/sections/rewards-config/types'
 import { RewardsConfigDashboard } from './RewardsConfigDashboard'
 
-type SalesCategory = 'caas' | 'rto' | 'laas' | 'api'
+type SalesCategory = 'caas' | 'rto' | 'laas'
+
+interface SalesConfigHistoryEntry {
+  amount: number
+  changedBy: string
+  changedAt: string
+}
 
 interface SalesConfigRow {
   id: string
@@ -17,16 +23,30 @@ interface SalesConfigRow {
   amount: number
   lastUpdatedBy: string
   lastUpdatedAt: string
+  history: SalesConfigHistoryEntry[]
 }
 
 const CATEGORY_TABS: { key: SalesCategory; label: string }[] = [
   { key: 'caas', label: 'CAAS' },
   { key: 'rto', label: 'RTO' },
   { key: 'laas', label: 'LAAS' },
-  { key: 'api', label: 'API' },
 ]
 
-const INITIAL_ROWS: SalesConfigRow[] = [
+const SEED_HISTORIANS = ['Priya Sharma', 'Arjun Mehta', 'Rohan Kapoor']
+
+const seedHistory = (currentAmount: number, currentAt: string): SalesConfigHistoryEntry[] => {
+  const base = new Date(currentAt).getTime()
+  const step1 = new Date(base - 45 * 24 * 60 * 60 * 1000).toISOString()
+  const step2 = new Date(base - 120 * 24 * 60 * 60 * 1000).toISOString()
+  const prev1 = Math.max(0, Math.round(currentAmount * 0.9))
+  const prev2 = Math.max(0, Math.round(currentAmount * 0.75))
+  return [
+    { amount: prev1, changedBy: SEED_HISTORIANS[1], changedAt: step1 },
+    { amount: prev2, changedBy: SEED_HISTORIANS[2], changedAt: step2 },
+  ]
+}
+
+const RAW_ROWS: Omit<SalesConfigRow, 'history'>[] = [
   // CAAS
   { id: 'caas-bulk', category: 'caas', service: 'Bulk Challans', amount: 500, lastUpdatedBy: 'Priya Sharma', lastUpdatedAt: '2026-07-10' },
   { id: 'caas-ppt', category: 'caas', service: 'Pay per Transaction Challans', amount: 250, lastUpdatedBy: 'Arjun Mehta', lastUpdatedAt: '2026-06-22' },
@@ -50,11 +70,12 @@ const INITIAL_ROWS: SalesConfigRow[] = [
   { id: 'laas-superdari', category: 'laas', service: 'Superdari', amount: 4200, lastUpdatedBy: 'Arjun Mehta', lastUpdatedAt: '2026-06-18' },
   { id: 'laas-impound', category: 'laas', service: 'Vehicle Impounding', amount: 5500, lastUpdatedBy: 'Priya Sharma', lastUpdatedAt: '2026-07-03' },
   { id: 'laas-eway', category: 'laas', service: 'E-Way Bill Issues', amount: 3800, lastUpdatedBy: 'Rohan Kapoor', lastUpdatedAt: '2026-06-25' },
-  // API
-  { id: 'api-challan', category: 'api', service: 'Challan API', amount: 150, lastUpdatedBy: 'Priya Sharma', lastUpdatedAt: '2026-07-15' },
-  { id: 'api-dl', category: 'api', service: 'DL API', amount: 120, lastUpdatedBy: 'Priya Sharma', lastUpdatedAt: '2026-07-15' },
-  { id: 'api-rc', category: 'api', service: 'RC API', amount: 130, lastUpdatedBy: 'Arjun Mehta', lastUpdatedAt: '2026-05-18' },
 ]
+
+const INITIAL_ROWS: SalesConfigRow[] = RAW_ROWS.map((r) => ({
+  ...r,
+  history: seedHistory(r.amount, r.lastUpdatedAt),
+}))
 
 const formatCurrency = (value: number) =>
   `₹${value.toLocaleString('en-IN')}`
@@ -64,6 +85,7 @@ export function SalesConfigDashboard() {
   const [query, setQuery] = useState('')
   const [rowsState, setRowsState] = useState<SalesConfigRow[]>(INITIAL_ROWS)
   const [editingRow, setEditingRow] = useState<SalesConfigRow | null>(null)
+  const [historyRow, setHistoryRow] = useState<SalesConfigRow | null>(null)
   const [addingCategory, setAddingCategory] = useState<SalesCategory | null>(null)
   const [caasAddTrigger, setCaasAddTrigger] = useState(0)
 
@@ -90,15 +112,21 @@ export function SalesConfigDashboard() {
 
   const handleSaveAmount = (id: string, amount: number) => {
     setRowsState((prev) =>
-      prev.map((r) =>
-        r.id === id
-          ? {
-              ...r,
-              amount,
-              lastUpdatedAt: new Date().toISOString(),
-            }
-          : r,
-      ),
+      prev.map((r) => {
+        if (r.id !== id) return r
+        const priorEntry: SalesConfigHistoryEntry = {
+          amount: r.amount,
+          changedBy: r.lastUpdatedBy,
+          changedAt: r.lastUpdatedAt,
+        }
+        return {
+          ...r,
+          amount,
+          lastUpdatedBy: 'You',
+          lastUpdatedAt: new Date().toISOString(),
+          history: [priorEntry, ...r.history],
+        }
+      }),
     )
     setEditingRow(null)
   }
@@ -121,6 +149,7 @@ export function SalesConfigDashboard() {
       amount,
       lastUpdatedBy: 'You',
       lastUpdatedAt: new Date().toISOString(),
+      history: [],
     }
     setRowsState((prev) => [...prev, newRow])
     setAddingCategory(null)
@@ -132,7 +161,7 @@ export function SalesConfigDashboard() {
       <div>
         <div className="max-w-[1440px] mx-auto px-6 py-5">
           <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
-            Sales Reward Configurations
+            Configuration
           </h1>
         </div>
       </div>
@@ -222,9 +251,7 @@ export function SalesConfigDashboard() {
                     <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40">
                       <Th className="pl-5">#</Th>
                       <Th>Service</Th>
-                      <Th align="right">
-                        {activeCategory === 'api' ? 'Per Hit Price' : 'Amount'}
-                      </Th>
+                      <Th align="right">Amount</Th>
                       <Th>Last Updated By</Th>
                       <Th className="pr-5">Actions</Th>
                     </tr>
@@ -263,14 +290,24 @@ export function SalesConfigDashboard() {
                           </div>
                         </td>
                         <td className="py-3 pr-5 pl-3 w-px whitespace-nowrap">
-                          <button
-                            type="button"
-                            onClick={() => setEditingRow(row)}
-                            className="inline-flex items-center gap-1 px-2 py-1 text-[12px] font-medium rounded-md text-cyan-700 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/25 transition-colors"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                            <span>Edit</span>
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setEditingRow(row)}
+                              className="inline-flex items-center gap-1 px-2 py-1 text-[12px] font-medium rounded-md text-cyan-700 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/25 transition-colors"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                              <span>Edit</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setHistoryRow(row)}
+                              className="inline-flex items-center gap-1 px-2 py-1 text-[12px] font-medium rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                            >
+                              <History className="w-3.5 h-3.5" />
+                              <span>History</span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -304,6 +341,13 @@ export function SalesConfigDashboard() {
           category={addingCategory}
           onClose={() => setAddingCategory(null)}
           onSave={handleAddSubmit}
+        />
+      )}
+
+      {historyRow && (
+        <ServiceHistoryModal
+          row={historyRow}
+          onClose={() => setHistoryRow(null)}
         />
       )}
     </div>
@@ -357,7 +401,7 @@ function EditAmountModal({
               id="edit-amount-title"
               className="text-base font-semibold text-slate-900 dark:text-white"
             >
-              {row.category === 'api' ? 'Edit Per Hit Price' : 'Edit Amount'}
+              Edit Amount
             </h2>
             <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
               {row.service}
@@ -377,7 +421,7 @@ function EditAmountModal({
             htmlFor="amount-input"
             className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5"
           >
-            {row.category === 'api' ? 'Per Hit Price' : 'Amount'}
+            Amount
           </label>
           <div className="flex items-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-2 focus-within:ring-cyan-500 focus-within:border-transparent">
             <span className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
@@ -442,7 +486,6 @@ function AddConfigModal({
   const [amount, setAmount] = useState('')
   const [errors, setErrors] = useState<{ name?: string; amount?: string }>({})
 
-  const amountLabel = category === 'api' ? 'Per Hit Price' : 'Amount'
   const categoryLabel =
     CATEGORY_TABS.find((t) => t.key === category)?.label ?? category.toUpperCase()
 
@@ -539,7 +582,7 @@ function AddConfigModal({
               htmlFor="add-amount-input"
               className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5"
             >
-              {amountLabel}
+              Amount
             </label>
             <div className="flex items-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-2 focus-within:ring-cyan-500 focus-within:border-transparent">
               <span className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
@@ -626,4 +669,113 @@ function formatRelative(iso: string): string {
   if (months < 12) return `${months}mo ago`
   const years = Math.round(months / 12)
   return `${years}y ago`
+}
+
+function formatHistoryDate(iso: string): string {
+  const d = new Date(iso)
+  const day = d.getDate()
+  const month = d.toLocaleString('en-US', { month: 'short' })
+  const year = String(d.getFullYear()).slice(-2)
+  const hh = d.getHours()
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  const period = hh >= 12 ? 'PM' : 'AM'
+  const hour12 = hh % 12 === 0 ? 12 : hh % 12
+  return `${day} ${month} '${year}, ${hour12}:${mm} ${period}`
+}
+
+function ServiceHistoryModal({
+  row,
+  onClose,
+}: {
+  row: SalesConfigRow
+  onClose: () => void
+}) {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
+  const timeline: (SalesConfigHistoryEntry & { isCurrent: boolean })[] = [
+    { amount: row.amount, changedBy: row.lastUpdatedBy, changedAt: row.lastUpdatedAt, isCurrent: true },
+    ...row.history.map((h) => ({ ...h, isCurrent: false })),
+  ]
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div
+        className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl flex flex-col max-h-[85vh]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex-shrink-0">
+              <History className="w-[18px] h-[18px] text-slate-600 dark:text-slate-300" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                History – {row.service}
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Amount change log
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex-shrink-0"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          {timeline.length === 1 && row.history.length === 0 ? (
+            <div className="px-6 py-12 text-center">
+              <p className="text-sm text-slate-500 dark:text-slate-400">No changes recorded yet.</p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
+              {timeline.map((entry, idx) => (
+                <li key={`${entry.changedAt}-${idx}`} className="px-6 py-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block px-2 py-0.5 rounded tabular-nums text-[13px] font-semibold bg-cyan-50 text-cyan-800 dark:bg-cyan-900/25 dark:text-cyan-300">
+                          {formatCurrency(entry.amount)}
+                        </span>
+                        {entry.isCurrent && (
+                          <span className="text-[11px] font-medium uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                            Current
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                        by <span className="font-medium text-slate-700 dark:text-slate-200">{entry.changedBy}</span>
+                      </p>
+                    </div>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                      {formatHistoryDate(entry.changedAt)}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 rounded-b-2xl">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }

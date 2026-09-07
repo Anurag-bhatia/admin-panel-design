@@ -99,18 +99,15 @@ export function RewardsConfigTable({
                   <Th className="pl-5">#</Th>
                   <Th>State</Th>
                   <Th>Region</Th>
-                  <Th align="right">Ops %</Th>
-                  <Th align="right">Margin %</Th>
-                  <Th align="right" variant="cv">CV %</Th>
-                  <Th align="right" variant="cv" computed>
-                    <span className="block leading-tight">Max CV</span>
-                    <span className="block leading-tight">Reward %</span>
+                  <Th align="right">
+                    <span className="block leading-tight">Online</span>
+                    <span className="block leading-tight">Convenience Fee</span>
                   </Th>
-                  <Th align="right" variant="ncv">NCV %</Th>
-                  <Th align="right" variant="ncv" computed>
-                    <span className="block leading-tight">Max NCV</span>
-                    <span className="block leading-tight">Reward %</span>
+                  <Th align="right">
+                    <span className="block leading-tight">Court</span>
+                    <span className="block leading-tight">Convenience Fee</span>
                   </Th>
+                  <Th>Type</Th>
                   <Th>Last Updated By</Th>
                   <Th>Status</Th>
                   <Th className="pr-5">Actions</Th>
@@ -224,8 +221,9 @@ function Row({
   onEdit: () => void
   onHistory: () => void
 }) {
-  const maxCv = config.marginPct - config.lawyeredCvPct
-  const maxNcv = config.marginPct - config.lawyeredNcvPct
+  const onlineAmount = config.operationsCostPct * 25
+  const courtAmount = config.marginPct * 40
+  const isExpress = index % 2 === 1
 
   return (
     <tr className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
@@ -244,12 +242,19 @@ function Row({
       <td className="py-3 px-3 text-slate-500 dark:text-slate-400 text-[13px]">
         {config.region}
       </td>
-      <NumCell value={config.operationsCostPct} />
-      <NumCell value={config.marginPct} muted />
-      <NumCell value={config.lawyeredCvPct} variant="cv" />
-      <NumCell value={maxCv} variant="cv" computed />
-      <NumCell value={config.lawyeredNcvPct} variant="ncv" />
-      <NumCell value={maxNcv} variant="ncv" computed />
+      <AmountCell value={onlineAmount} />
+      <AmountCell value={courtAmount} />
+      <td className="py-3 px-3">
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider ${
+            isExpress
+              ? 'bg-amber-50 text-amber-800 dark:bg-amber-900/25 dark:text-amber-300'
+              : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+          }`}
+        >
+          {isExpress ? 'Express' : 'Regular'}
+        </span>
+      </td>
       <td className="py-3 px-3">
         <div className="flex flex-col leading-tight">
           <span className="text-[13px] text-slate-800 dark:text-slate-200 font-medium">
@@ -282,47 +287,11 @@ function Row({
   )
 }
 
-function NumCell({
-  value,
-  computed,
-  muted,
-  variant,
-}: {
-  value: number
-  computed?: boolean
-  muted?: boolean
-  variant?: 'cv' | 'ncv'
-}) {
-  const cvComputed =
-    'bg-cyan-50 text-cyan-800 dark:bg-cyan-900/25 dark:text-cyan-300'
-  const ncvComputed =
-    'bg-violet-50 text-violet-800 dark:bg-violet-900/25 dark:text-violet-300'
-  const cvPlain =
-    'bg-cyan-50/60 text-cyan-800 dark:bg-cyan-900/15 dark:text-cyan-300'
-  const ncvPlain =
-    'bg-violet-50/60 text-violet-800 dark:bg-violet-900/15 dark:text-violet-300'
-
-  const colorClass =
-    variant === 'cv'
-      ? computed
-        ? cvComputed
-        : cvPlain
-      : variant === 'ncv'
-        ? computed
-          ? ncvComputed
-          : ncvPlain
-        : computed
-          ? cvComputed
-          : muted
-            ? 'text-slate-500 dark:text-slate-400'
-            : 'text-slate-800 dark:text-slate-200'
-
+function AmountCell({ value }: { value: number }) {
   return (
     <td className="py-3 px-3 text-right">
-      <span
-        className={`inline-block px-2 py-0.5 rounded tabular-nums text-[13px] font-medium ${colorClass}`}
-      >
-        {value}%
+      <span className="inline-block px-2 py-0.5 rounded tabular-nums text-[13px] font-medium bg-cyan-50 text-cyan-800 dark:bg-cyan-900/25 dark:text-cyan-300">
+        ₹{value.toLocaleString('en-IN')}
       </span>
     </td>
   )

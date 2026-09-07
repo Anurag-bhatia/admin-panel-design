@@ -150,7 +150,7 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     icon: FileInput,
   },
   'rewards-config': {
-    label: 'Rewards Config',
+    label: 'Config',
     description: 'State-level reward configuration for Operations Cost, Margin, and Lawyered CV/NCV margins. Email-allow-listed access with versioned change history.',
     icon: Gift,
   },

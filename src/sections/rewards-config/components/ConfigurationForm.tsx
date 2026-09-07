@@ -94,6 +94,7 @@ export function ConfigurationForm({
   )
   const [errors, setErrors] = useState<ValidationErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const [challanType, setChallanType] = useState<'regular' | 'express'>('regular')
   const [rewardTierMode, setRewardTierMode] = useState<'flat' | 'range'>('flat')
   const [rangeLowPct, setRangeLowPct] = useState<number | null>(20)
   const [rangeHighPct, setRangeHighPct] = useState<number | null>(30)
@@ -157,7 +158,17 @@ export function ConfigurationForm({
                 />
               </Field>
 
-              <div className="hidden md:block" />
+              <Field label="Challan Type" required>
+                <Select
+                  value={challanType}
+                  placeholder="Select a type…"
+                  onChange={(v) => setChallanType(v as 'regular' | 'express')}
+                  options={[
+                    { value: 'regular', label: 'Regular' },
+                    { value: 'express', label: 'Express' },
+                  ]}
+                />
+              </Field>
 
               <Field
                 label="Select State"
