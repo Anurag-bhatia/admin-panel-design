@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { MoreVertical, Eye, UserPlus, Phone, Mail, MapPin, Truck, Building2, FileText, Receipt } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { MoreVertical, Eye, UserPlus, Phone, Mail, MapPin, Truck, Building2, FileText, Receipt, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Lead, User } from '@/../product/sections/sales-crm/types'
 
 interface LeadsTableProps {
@@ -28,6 +28,47 @@ export function LeadsTable({
   onSendInvoice
 }: LeadsTableProps) {
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
+
+  const totalPages = Math.max(1, Math.ceil(leads.length / pageSize))
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [leads.length])
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages)
+  }, [currentPage, totalPages])
+
+  const paginatedLeads = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return leads.slice(start, start + pageSize)
+  }, [leads, currentPage, pageSize])
+
+  const startItem = leads.length === 0 ? 0 : (currentPage - 1) * pageSize + 1
+  const endItem = Math.min(currentPage * pageSize, leads.length)
+
+  const getPageNumbers = () => {
+    const pages: (number | 'ellipsis')[] = []
+    const maxVisible = 5
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      pages.push(1)
+      if (currentPage > 3) pages.push('ellipsis')
+      const start = Math.max(2, currentPage - 1)
+      const end = Math.min(totalPages - 1, currentPage + 1)
+      for (let i = start; i <= end; i++) pages.push(i)
+      if (currentPage < totalPages - 2) pages.push('ellipsis')
+      if (totalPages > 1) pages.push(totalPages)
+    }
+
+    return pages
+  }
 
   const getStatusBadgeClasses = (status: Lead['status']) => {
     const baseClasses = 'px-2.5 py-1 text-xs font-medium rounded-full'
@@ -118,7 +159,7 @@ export function LeadsTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-            {leads.map(lead => (
+            {paginatedLeads.map(lead => (
               <tr
                 key={lead.id}
                 className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
@@ -191,10 +232,10 @@ export function LeadsTable({
                             <Eye className="w-4 h-4" />
                             View Details
                           </button>
-                          {lead.status !== 'sales' && lead.status !== 'lost' && (
+                          {onAssignLead && lead.status !== 'sales' && lead.status !== 'lost' && (
                             <button
                               onClick={() => {
-                                onAssignLead?.(lead.id)
+                                onAssignLead(lead.id)
                                 setOpenActionMenu(null)
                               }}
                               className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
@@ -203,29 +244,33 @@ export function LeadsTable({
                               Assign Lead
                             </button>
                           )}
-                          {(lead.status === 'invoiced' || lead.status === 'sales') && (
+                          {(onSendPI || onSendInvoice) && (lead.status === 'invoiced' || lead.status === 'sales') && (
                             <>
                               <div className="border-t border-slate-200 dark:border-slate-700 my-1" />
-                              <button
-                                onClick={() => {
-                                  onSendPI?.(lead)
-                                  setOpenActionMenu(null)
-                                }}
-                                className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
-                              >
-                                <FileText className="w-4 h-4" />
-                                Send PI
-                              </button>
-                              <button
-                                onClick={() => {
-                                  onSendInvoice?.(lead)
-                                  setOpenActionMenu(null)
-                                }}
-                                className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
-                              >
-                                <Receipt className="w-4 h-4" />
-                                Send Invoice
-                              </button>
+                              {onSendPI && (
+                                <button
+                                  onClick={() => {
+                                    onSendPI(lead)
+                                    setOpenActionMenu(null)
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                                >
+                                  <FileText className="w-4 h-4" />
+                                  Send PI
+                                </button>
+                              )}
+                              {onSendInvoice && (
+                                <button
+                                  onClick={() => {
+                                    onSendInvoice(lead)
+                                    setOpenActionMenu(null)
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                                >
+                                  <Receipt className="w-4 h-4" />
+                                  Send Invoice
+                                </button>
+                              )}
                             </>
                           )}
                         </div>
@@ -241,7 +286,7 @@ export function LeadsTable({
 
       {/* Mobile Cards */}
       <div className="lg:hidden divide-y divide-slate-200 dark:divide-slate-800">
-        {leads.map(lead => (
+        {paginatedLeads.map(lead => (
           <div
             key={lead.id}
             onClick={() => onViewLead?.(lead.id)}
@@ -288,6 +333,68 @@ export function LeadsTable({
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <div className="text-sm text-slate-500 dark:text-slate-400">
+          Showing{' '}
+          <span className="font-medium text-slate-700 dark:text-slate-300">{startItem}</span>{' '}
+          to{' '}
+          <span className="font-medium text-slate-700 dark:text-slate-300">{endItem}</span>{' '}
+          of{' '}
+          <span className="font-medium text-slate-700 dark:text-slate-300">{leads.length}</span>{' '}
+          results
+        </div>
+
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+              currentPage === 1
+                ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+
+          {getPageNumbers().map((page, index) =>
+            page === 'ellipsis' ? (
+              <span
+                key={`ellipsis-${index}`}
+                className="w-8 h-8 flex items-center justify-center text-slate-400"
+              >
+                ...
+              </span>
+            ) : (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`inline-flex items-center justify-center min-w-[32px] h-8 px-2 rounded-md text-sm font-medium transition-colors ${
+                  page === currentPage
+                    ? 'bg-cyan-500 text-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                {page}
+              </button>
+            )
+          )}
+
+          <button
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-colors ${
+              currentPage === totalPages
+                ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </div>
   )

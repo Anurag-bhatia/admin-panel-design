@@ -84,8 +84,9 @@ export function LeadsDashboard({
     }
   }
 
-  const handleBulkMoveStatus = (status: Lead['status']) => {
+  const handleBulkMoveStatus = (status: Lead['status'], notes: string) => {
     const leadIds = Array.from(selectedLeads)
+    console.log('Bulk move status:', leadIds, 'to:', status, 'notes:', notes)
     leadIds.forEach(id => onChangeStatus?.(id, status))
     setSelectedLeads(new Set())
   }

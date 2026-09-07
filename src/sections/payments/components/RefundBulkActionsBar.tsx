@@ -9,10 +9,12 @@ interface MoveOption {
 interface RefundBulkActionsBarProps {
   selectedCount: number
   actionLabel?: string
+  moveLabel?: string
   onClearSelection: () => void
   onMarkComplete?: () => void
   moveOptions?: MoveOption[]
-  onMove?: (targetStage: string) => void
+  onMove?: (targetStage: string, notes?: string) => void
+  moveRequiresNotes?: boolean
   onSendPI?: () => void
   onSendInvoice?: () => void
   onAddNote?: (note: string) => void
@@ -21,10 +23,12 @@ interface RefundBulkActionsBarProps {
 export function RefundBulkActionsBar({
   selectedCount,
   actionLabel = 'Mark as Complete',
+  moveLabel = 'Move',
   onClearSelection,
   onMarkComplete,
   moveOptions,
   onMove,
+  moveRequiresNotes = false,
   onSendPI,
   onSendInvoice,
   onAddNote,
@@ -32,6 +36,8 @@ export function RefundBulkActionsBar({
   const [showMoveMenu, setShowMoveMenu] = useState(false)
   const [showNoteModal, setShowNoteModal] = useState(false)
   const [noteText, setNoteText] = useState('')
+  const [pendingMove, setPendingMove] = useState<MoveOption | null>(null)
+  const [moveNotes, setMoveNotes] = useState('')
 
   return (
     <>
@@ -60,7 +66,7 @@ export function RefundBulkActionsBar({
                   className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 rounded-lg transition-colors"
                 >
                   <ArrowRightLeft className="h-4 w-4" />
-                  <span>Move</span>
+                  <span>{moveLabel}</span>
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
 
@@ -75,8 +81,13 @@ export function RefundBulkActionsBar({
                         <button
                           key={option.value}
                           onClick={() => {
-                            onMove(option.value)
                             setShowMoveMenu(false)
+                            if (moveRequiresNotes) {
+                              setPendingMove(option)
+                              setMoveNotes('')
+                            } else {
+                              onMove(option.value)
+                            }
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                         >
@@ -138,6 +149,57 @@ export function RefundBulkActionsBar({
           </div>
         </div>
       </div>
+
+      {/* Move-with-notes modal */}
+      {pendingMove && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => { setPendingMove(null); setMoveNotes('') }} />
+          <div className="relative bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-lg mx-4">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Move to {pendingMove.label}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{selectedCount} selected</p>
+              </div>
+              <button
+                onClick={() => { setPendingMove(null); setMoveNotes('') }}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+            <div className="px-6 py-5">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                Notes
+              </label>
+              <textarea
+                value={moveNotes}
+                onChange={(e) => setMoveNotes(e.target.value)}
+                placeholder="Add a note about this status change..."
+                rows={4}
+                className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
+              />
+            </div>
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => { setPendingMove(null); setMoveNotes('') }}
+                className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  onMove?.(pendingMove.value, moveNotes)
+                  setPendingMove(null)
+                  setMoveNotes('')
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+              >
+                Move to {pendingMove.label}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Note Modal */}
       {showNoteModal && (

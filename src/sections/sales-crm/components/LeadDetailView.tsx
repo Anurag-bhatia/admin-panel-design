@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock, Download, Pencil, Truck } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock, Download, Pencil, Truck, X } from 'lucide-react'
 import type { Lead, TimelineActivity, Document, User as UserType } from '@/../product/sections/sales-crm/types'
 import { IssuerHeader } from './AddQuotationModal'
 import { VehicleAnalysisModal } from './VehicleAnalysisModal'
@@ -27,12 +27,15 @@ interface LeadDetailViewProps {
   onAddQuotation?: () => void
   onModifyQuotation?: () => void
   onDownloadQuotation?: () => void
+  hideSalesActions?: boolean
 }
 
-export function LeadDetailView({ lead, timelineActivities, documents, users, onClose, onEdit, onAssign, onChangeStatus, onAddFollowUp, onUploadDocument, onAddQuotation, onModifyQuotation, onDownloadQuotation }: LeadDetailViewProps) {
+export function LeadDetailView({ lead, timelineActivities, documents, users, onClose, onEdit, onAssign, onChangeStatus, onAddFollowUp, onUploadDocument, onAddQuotation, onModifyQuotation, onDownloadQuotation, hideSalesActions = false }: LeadDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('details')
   const [showMoveMenu, setShowMoveMenu] = useState(false)
   const [showVehicleAnalysis, setShowVehicleAnalysis] = useState(false)
+  const [pendingStatus, setPendingStatus] = useState<{ value: Lead['status']; label: string } | null>(null)
+  const [statusNotes, setStatusNotes] = useState('')
 
   const leadTimeline = timelineActivities.filter(activity => activity.leadId === lead.id)
   const leadDocuments = documents.filter(doc => doc.leadId === lead.id)
@@ -44,20 +47,35 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
     { id: 'VA-001', fileName: `${lead.companyAlias || lead.companyName}-initial-fleet.csv`, analyzedAt: '2026-07-12T16:45:00', vehicleCount: 35, analyzedBy: 'Priya Nair' },
   ]
 
-  const statusOptions: { value: Lead['status']; label: string }[] = [
-    { value: 'assigned', label: 'Assigned' },
-    { value: 'follow-up', label: 'Follow-up' },
-    { value: 'quotations', label: 'Quotations' },
-    { value: 'projected', label: 'Projected' },
-    { value: 'invoiced', label: 'Ready to Invoice' },
-    { value: 'sales', label: 'Sales' },
-    { value: 'lost', label: 'Lost' },
-    { value: 'rejected', label: 'Rejected' },
-  ]
+  const statusOptions: { value: Lead['status']; label: string }[] = hideSalesActions
+    ? [
+        { value: 'invoiced', label: 'Ready to Invoice' },
+        { value: 'sales', label: 'Converted' },
+        { value: 'rejected', label: 'Rejected' },
+      ]
+    : [
+        { value: 'assigned', label: 'Assigned' },
+        { value: 'follow-up', label: 'Follow-up' },
+        { value: 'projected', label: 'Projected' },
+        { value: 'invoiced', label: 'Ready to Invoice' },
+        { value: 'lost', label: 'Lost' },
+      ]
 
-  const handleStatusChange = (newStatus: Lead['status']) => {
-    onChangeStatus?.(lead.id, newStatus)
+  const handleStatusPick = (option: { value: Lead['status']; label: string }) => {
     setShowMoveMenu(false)
+    if (option.value === 'assigned') {
+      onAssign?.()
+      return
+    }
+    setPendingStatus(option)
+    setStatusNotes('')
+  }
+
+  const handleStatusNotesSubmit = () => {
+    if (!pendingStatus) return
+    onChangeStatus?.(lead.id, pendingStatus.value)
+    setPendingStatus(null)
+    setStatusNotes('')
   }
 
   const formatDate = (dateString: string) => {
@@ -88,9 +106,11 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
     return icons[tab]
   }
 
-  const availableTabs: TabType[] = lead.status === 'quotations'
-    ? ['details', 'documents', 'quotations', 'pre-sales']
-    : ['details', 'documents', 'pre-sales']
+  const availableTabs: TabType[] = hideSalesActions
+    ? ['details', 'documents']
+    : lead.status === 'quotations'
+      ? ['details', 'documents', 'quotations', 'pre-sales']
+      : ['details', 'documents', 'pre-sales']
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 lg:p-8">
@@ -110,27 +130,31 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
             <p className="text-slate-500 dark:text-slate-400 mt-1">Lead ID: {lead.id}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={onAddQuotation}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
-            >
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Add Quotation</span>
-            </button>
-            <button
-              onClick={onAddFollowUp}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
-            >
-              <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">Update</span>
-            </button>
+            {!hideSalesActions && (
+              <>
+                <button
+                  onClick={onAddQuotation}
+                  className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span className="hidden sm:inline">Add Quotation</span>
+                </button>
+                <button
+                  onClick={onAddFollowUp}
+                  className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span className="hidden sm:inline">Update</span>
+                </button>
+              </>
+            )}
             <div className="relative">
               <button
                 onClick={() => setShowMoveMenu(!showMoveMenu)}
                 className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
               >
                 <ArrowRight className="w-4 h-4" />
-                <span className="hidden sm:inline">Move Ticket</span>
+                <span className="hidden sm:inline">Move Status</span>
                 <ChevronDown className="w-3 h-3" />
               </button>
               {showMoveMenu && (
@@ -141,7 +165,7 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                       {statusOptions.map(option => (
                         <button
                           key={option.value}
-                          onClick={() => handleStatusChange(option.value)}
+                          onClick={() => handleStatusPick(option)}
                           className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between ${
                             lead.status === option.value ? 'bg-slate-50 dark:bg-slate-700' : ''
                           }`}
@@ -486,6 +510,53 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
           onClose={() => setShowVehicleAnalysis(false)}
           onCreateQuotation={onAddQuotation}
         />
+      )}
+
+      {pendingStatus && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl max-w-lg w-full">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Move to {pendingStatus.label}</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{lead.companyAlias || lead.companyName}</p>
+              </div>
+              <button
+                onClick={() => setPendingStatus(null)}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+
+            <div className="px-6 py-5">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                Notes
+              </label>
+              <textarea
+                value={statusNotes}
+                onChange={e => setStatusNotes(e.target.value)}
+                placeholder="Add a note about this status change..."
+                rows={4}
+                className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => setPendingStatus(null)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleStatusNotesSubmit}
+                className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+              >
+                Move to {pendingStatus.label}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

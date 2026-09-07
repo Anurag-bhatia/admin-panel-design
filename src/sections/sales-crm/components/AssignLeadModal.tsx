@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { X, Search } from 'lucide-react'
+import { useState } from 'react'
+import { X } from 'lucide-react'
 import type { User as UserType } from '@/../product/sections/sales-crm/types'
 
 interface AssignLeadModalProps {
@@ -11,28 +11,14 @@ interface AssignLeadModalProps {
   onClose: () => void
 }
 
-export function AssignLeadModal({ leadId, leadName, currentAssignee, users, onAssign, onClose }: AssignLeadModalProps) {
-  const [selectedUser, setSelectedUser] = useState<string>(currentAssignee || '')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showDropdown, setShowDropdown] = useState(false)
+export function AssignLeadModal({ leadName, onAssign, onClose }: AssignLeadModalProps) {
+  const [personName, setPersonName] = useState('')
+  const [department, setDepartment] = useState('')
   const [notes, setNotes] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const filteredUsers = users.filter(user =>
-    user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.team.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-
-  const selectedUserObj = selectedUser
-    ? users.find(u => u.id === selectedUser)
-    : null
 
   const handleAssign = () => {
-    if (selectedUser) {
-      onAssign(selectedUser, notes)
-    }
+    if (!personName.trim()) return
+    onAssign(personName.trim(), notes)
   }
 
   return (
@@ -54,92 +40,32 @@ export function AssignLeadModal({ leadId, leadName, currentAssignee, users, onAs
 
         {/* Body */}
         <div className="px-6 py-5 space-y-5">
-          {/* Search with dropdown */}
+          {/* Person Name */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-              Owner
+              Person Name
             </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="Search by name, email, role, or team..."
-                value={searchQuery}
-                onChange={e => {
-                  setSearchQuery(e.target.value)
-                  setShowDropdown(true)
-                }}
-                onFocus={() => {
-                  if (searchQuery.trim()) setShowDropdown(true)
-                }}
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-              />
+            <input
+              type="text"
+              value={personName}
+              onChange={e => setPersonName(e.target.value)}
+              placeholder="Enter person name"
+              className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+          </div>
 
-              {/* Search results dropdown */}
-              {showDropdown && searchQuery.trim() && (
-                <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setShowDropdown(false)}
-                  />
-                  <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 max-h-48 overflow-y-auto z-20">
-                    {filteredUsers.length === 0 ? (
-                      <div className="px-3 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
-                        No users found
-                      </div>
-                    ) : (
-                      filteredUsers.map(user => (
-                        <button
-                          key={user.id}
-                          onClick={() => {
-                            setSelectedUser(user.id)
-                            setSearchQuery('')
-                            setShowDropdown(false)
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center flex-shrink-0 text-xs font-medium text-slate-600 dark:text-slate-300">
-                            {user.fullName.charAt(0)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                              {user.fullName}
-                            </div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                              {user.role} · {user.team}
-                            </div>
-                          </div>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Selected user chip */}
-            {selectedUserObj && (
-              <div className="mt-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-lg">
-                  <div className="w-5 h-5 rounded-full bg-cyan-600 text-white flex items-center justify-center text-[10px] font-medium">
-                    {selectedUserObj.fullName.charAt(0)}
-                  </div>
-                  <span className="text-sm font-medium text-cyan-900 dark:text-cyan-300">
-                    {selectedUserObj.fullName}
-                  </span>
-                  <button
-                    onClick={() => {
-                      setSelectedUser('')
-                      inputRef.current?.focus()
-                    }}
-                    className="p-0.5 hover:bg-cyan-100 dark:hover:bg-cyan-900/40 rounded transition-colors"
-                  >
-                    <X className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
-                  </button>
-                </div>
-              </div>
-            )}
+          {/* Department */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Department
+            </label>
+            <input
+              type="text"
+              value={department}
+              onChange={e => setDepartment(e.target.value)}
+              placeholder="Enter department"
+              className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
           </div>
 
           {/* Notes */}
@@ -167,7 +93,7 @@ export function AssignLeadModal({ leadId, leadName, currentAssignee, users, onAs
           </button>
           <button
             onClick={handleAssign}
-            disabled={!selectedUser}
+            disabled={!personName.trim()}
             className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg transition-colors"
           >
             Assign Lead

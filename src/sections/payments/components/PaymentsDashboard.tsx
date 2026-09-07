@@ -545,6 +545,7 @@ export function PaymentsDashboard({
             documents={[]}
             users={users}
             onClose={() => setSelectedLeadId(null)}
+            hideSalesActions
           />
         </div>
       </div>
@@ -920,9 +921,6 @@ export function PaymentsDashboard({
                   }
                 }}
                 onViewLead={(id) => setSelectedLeadId(id)}
-                onAssignLead={onAssignLead}
-                onSendPI={(lead) => setSendModal({ type: 'pi', lead })}
-                onSendInvoice={(lead) => setSendModal({ type: 'invoice', lead })}
               />
             </div>
           )}
@@ -981,16 +979,21 @@ export function PaymentsDashboard({
       {sidebarView === 'leads' && selectedLeadIds.size > 0 && (
         <RefundBulkActionsBar
           selectedCount={selectedLeadIds.size}
-          actionLabel="Mark as Converted"
+          moveLabel="Move Status"
+          moveRequiresNotes
           onClearSelection={() => setSelectedLeadIds(new Set())}
-          onMarkComplete={() => onBulkMarkLeadsConverted?.(Array.from(selectedLeadIds))}
-          onSendPI={() => {
-            const selected = leads.filter((l) => selectedLeadIds.has(l.id))
-            setBulkSendModal({ type: 'pi', leads: selected })
-          }}
-          onSendInvoice={() => {
-            const selected = leads.filter((l) => selectedLeadIds.has(l.id))
-            setBulkSendModal({ type: 'invoice', leads: selected })
+          moveOptions={[
+            { value: 'sales', label: 'Converted' },
+            { value: 'lost', label: 'Lost' },
+            { value: 'rejected', label: 'Rejected' },
+          ]}
+          onMove={(targetStage, notes) => {
+            const ids = Array.from(selectedLeadIds)
+            console.log('Bulk move leads:', ids, 'to:', targetStage, 'notes:', notes)
+            if (targetStage === 'sales') {
+              onBulkMarkLeadsConverted?.(ids)
+            }
+            setSelectedLeadIds(new Set())
           }}
         />
       )}
