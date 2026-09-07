@@ -984,7 +984,6 @@ export function PaymentsDashboard({
           onClearSelection={() => setSelectedLeadIds(new Set())}
           moveOptions={[
             { value: 'sales', label: 'Converted' },
-            { value: 'lost', label: 'Lost' },
             { value: 'rejected', label: 'Rejected' },
           ]}
           onMove={(targetStage, notes) => {
