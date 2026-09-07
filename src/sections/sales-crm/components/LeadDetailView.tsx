@@ -42,9 +42,9 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
   const assignedUser = users.find(u => u.id === lead.assignedTo)
 
   const pastAnalyses: { id: string; fileName: string; analyzedAt: string; vehicleCount: number; analyzedBy: string }[] = [
-    { id: 'VA-003', fileName: `${lead.companyAlias || lead.companyName}-fleet-aug.xlsx`, analyzedAt: '2026-08-18T14:22:00', vehicleCount: 42, analyzedBy: assignedUser?.fullName ?? 'Rahul Verma' },
-    { id: 'VA-002', fileName: `${lead.companyAlias || lead.companyName}-fleet-jul.xlsx`, analyzedAt: '2026-07-30T10:08:00', vehicleCount: 38, analyzedBy: assignedUser?.fullName ?? 'Rahul Verma' },
-    { id: 'VA-001', fileName: `${lead.companyAlias || lead.companyName}-initial-fleet.csv`, analyzedAt: '2026-07-12T16:45:00', vehicleCount: 35, analyzedBy: 'Priya Nair' },
+    { id: 'BI-003', fileName: `${lead.companyAlias || lead.companyName}-fleet-aug.xlsx`, analyzedAt: '2026-08-18T14:22:00', vehicleCount: 42, analyzedBy: assignedUser?.fullName ?? 'Rahul Verma' },
+    { id: 'BI-002', fileName: `${lead.companyAlias || lead.companyName}-fleet-jul.xlsx`, analyzedAt: '2026-07-30T10:08:00', vehicleCount: 38, analyzedBy: assignedUser?.fullName ?? 'Rahul Verma' },
+    { id: 'BI-001', fileName: `${lead.companyAlias || lead.companyName}-initial-fleet.csv`, analyzedAt: '2026-07-12T16:45:00', vehicleCount: 35, analyzedBy: 'Priya Nair' },
   ]
 
   const statusOptions: { value: Lead['status']; label: string }[] = hideSalesActions
@@ -270,6 +270,42 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                     <InfoField label="Assigned To" value={assignedUser ? assignedUser.fullName : 'Unassigned'} />
                     {assignedUser && <InfoField label="Role" value={assignedUser.role} />}
                   </div>
+                  {(() => {
+                    const previousAssignees: { id: string; name: string; role: string; timestamp: string }[] = []
+                    const seen = new Set<string>(assignedUser ? [assignedUser.id] : [])
+                    const assignmentActivities = leadTimeline
+                      .filter(a => a.type === 'assignment' && a.details?.assignedTo)
+                      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                    for (const activity of assignmentActivities) {
+                      const uid = activity.details!.assignedTo!
+                      if (seen.has(uid)) continue
+                      seen.add(uid)
+                      const user = users.find(u => u.id === uid)
+                      previousAssignees.push({
+                        id: uid,
+                        name: user?.fullName || activity.details?.assignedToName || uid,
+                        role: user?.role || '—',
+                        timestamp: activity.timestamp,
+                      })
+                    }
+                    if (previousAssignees.length === 0) return null
+                    return (
+                      <div className="mt-4">
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Previously Assigned</p>
+                        <div className="space-y-1.5">
+                          {previousAssignees.map(p => (
+                            <div key={`${p.id}-${p.timestamp}`} className="flex items-center justify-between text-sm px-3 py-2 rounded-md bg-slate-50 dark:bg-slate-800/60">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="font-medium text-slate-900 dark:text-slate-50 truncate">{p.name}</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400 truncate">· {p.role}</span>
+                              </div>
+                              <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">{formatDate(p.timestamp)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 {/* Metadata */}
@@ -467,6 +503,7 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                   <table className="w-full text-sm">
                     <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 dark:text-slate-400">
                       <tr>
+                        <th className="text-left px-4 py-3 font-medium">Batch_id</th>
                         <th className="text-left px-4 py-3 font-medium">File</th>
                         <th className="text-left px-4 py-3 font-medium">Analyzed On</th>
                         <th className="text-right px-4 py-3 font-medium">Vehicles</th>
@@ -477,6 +514,7 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {pastAnalyses.map(analysis => (
                         <tr key={analysis.id} className="text-slate-900 dark:text-slate-50">
+                          <td className="px-4 py-3 text-slate-600 dark:text-slate-300 font-mono text-xs">{analysis.id}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               <FileText className="w-4 h-4 text-slate-400 flex-shrink-0" />

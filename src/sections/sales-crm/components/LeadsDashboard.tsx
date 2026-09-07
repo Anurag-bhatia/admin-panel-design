@@ -58,6 +58,7 @@ export function LeadsDashboard({
     owner: '',
     serviceType: '',
     location: '',
+    outcome: '',
   })
 
   const selectedLead = selectedLeadId ? leads.find(l => l.id === selectedLeadId) : null
@@ -156,9 +157,19 @@ export function LeadsDashboard({
     if (filters.location) {
       filtered = filtered.filter(l => l.state.toLowerCase().includes(filters.location.toLowerCase()))
     }
+    if (filters.outcome) {
+      const latestOutcomeByLead = new Map<string, string>()
+      const sortedActivities = [...timelineActivities].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      for (const activity of sortedActivities) {
+        if (activity.type === 'follow_up' && activity.details?.outcome && !latestOutcomeByLead.has(activity.leadId)) {
+          latestOutcomeByLead.set(activity.leadId, activity.details.outcome)
+        }
+      }
+      filtered = filtered.filter(l => latestOutcomeByLead.get(l.id) === filters.outcome)
+    }
 
     return filtered
-  }, [leads, activeTab, searchQuery, filters])
+  }, [leads, activeTab, searchQuery, filters, timelineActivities])
 
   // Count leads per tab
   const tabCounts: Record<LifecycleTab, number> = useMemo(() => {
@@ -396,7 +407,7 @@ export function LeadsDashboard({
           {/* Filter Panel */}
           {showFilters && (
             <div className="mt-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Source</label>
                   <select
@@ -456,11 +467,24 @@ export function LeadsDashboard({
                     className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Outcome</label>
+                  <select
+                    value={filters.outcome}
+                    onChange={e => setFilters({ ...filters, outcome: e.target.value })}
+                    className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                  >
+                    <option value="">All Outcomes</option>
+                    <option value="Positive">Positive</option>
+                    <option value="Negative">Negative</option>
+                  </select>
+                </div>
               </div>
 
               <div className="mt-4 flex justify-end">
                 <button
-                  onClick={() => setFilters({ source: '', owner: '', serviceType: '', location: '' })}
+                  onClick={() => setFilters({ source: '', owner: '', serviceType: '', location: '', outcome: '' })}
                   className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                 >
                   Clear all filters

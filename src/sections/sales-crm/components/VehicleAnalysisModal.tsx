@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
-import { X, Upload, Download, AlertCircle, CheckCircle, Loader2, FilePlus2, ChevronDown } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { X, Upload, Download, AlertCircle, CheckCircle, Loader2, FilePlus2, Eye, EyeOff } from 'lucide-react'
 
 interface VehicleAnalysisModalProps {
   onClose: () => void
@@ -70,20 +70,8 @@ export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnal
   const [file, setFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
-  const [downloadMenuOpen, setDownloadMenuOpen] = useState(false)
+  const [showReport, setShowReport] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const downloadMenuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!downloadMenuOpen) return
-    const handleClick = (e: MouseEvent) => {
-      if (downloadMenuRef.current && !downloadMenuRef.current.contains(e.target as Node)) {
-        setDownloadMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [downloadMenuOpen])
 
   const parsedVehicleCount = Number.parseInt(vehicleCount, 10)
   const canAnalyze = !!file && parsedVehicleCount > 0
@@ -133,7 +121,6 @@ export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnal
   }
 
   const handleDownload = (format: 'xls' | 'pdf') => {
-    setDownloadMenuOpen(false)
     const ext = format === 'xls' ? 'xls' : 'pdf'
     const mime = format === 'xls' ? 'application/vnd.ms-excel' : 'application/pdf'
 
@@ -188,11 +175,9 @@ export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnal
     onClose()
   }
 
-  const maxWidthClass = stage === 'results' ? 'max-w-5xl' : 'max-w-lg'
-
   return (
     <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-[100] p-4">
-      <div className={`bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full ${maxWidthClass} max-h-[90vh] overflow-hidden flex flex-col`}>
+      <div className={`bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full ${stage === 'results' && showReport ? 'max-w-5xl' : 'max-w-2xl'} max-h-[90vh] overflow-hidden flex flex-col`}>
         {/* Header */}
         <div className="border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Vehicle Analysis</h2>
@@ -291,77 +276,112 @@ export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnal
           )}
 
           {stage === 'results' && (
-            <div className="space-y-8">
+            <div className="space-y-6">
               {/* Summary */}
-              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <section className="grid grid-cols-2 gap-3">
                 <SummaryTile label="Total Vehicles" value={SUMMARY.totalVehicles.toLocaleString('en-IN')} />
                 <SummaryTile label="Pending Challan Amount" value={formatINR(SUMMARY.pendingAmount)} />
                 <SummaryTile label="Pending Challans" value={SUMMARY.pendingChallans.toLocaleString('en-IN')} />
                 <SummaryTile label="Oldest Pending Since" value={SUMMARY.oldestPendingSince} />
               </section>
 
-              {/* Overall Challan Status */}
-              <section>
-                <SectionHeading title="Overall Challan Status" />
-                <ReportTable
-                  columns={['Challan Status', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
-                  rows={OVERALL_STATUS.map(r => [r.label, r.vehicles, r.challans, formatINR(r.amount)])}
-                  grandTotal={(() => {
-                    const t = sumRow(OVERALL_STATUS)
-                    return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
-                  })()}
-                />
-              </section>
-
-              {/* State Wise Challan */}
-              <section>
-                <SectionHeading title="State Wise Challan" />
-                <div className="space-y-4">
-                  <SubReport
-                    label="PENDING ONLINE"
-                    columns={['State', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
-                    rows={STATE_PENDING_ONLINE.map(r => [r.state, r.vehicles, r.challans, formatINR(r.amount)])}
-                    grandTotal={(() => {
-                      const t = sumRow(STATE_PENDING_ONLINE)
-                      return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
-                    })()}
-                  />
-                  <SubReport
-                    label="PENDING IN COURT"
-                    columns={['State', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
-                    rows={STATE_PENDING_COURT.map(r => [r.state, r.vehicles, r.challans, formatINR(r.amount)])}
-                    grandTotal={(() => {
-                      const t = sumRow(STATE_PENDING_COURT)
-                      return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
-                    })()}
-                  />
+              {/* Report ready */}
+              <section className="border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-900/10 rounded-lg p-5">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Output report is ready</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Download the full analysis in your preferred format.</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handleDownload('xls')}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download as XLS
+                  </button>
+                  <button
+                    onClick={() => handleDownload('pdf')}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download as PDF
+                  </button>
+                  <button
+                    onClick={() => setShowReport(s => !s)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    {showReport ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showReport ? 'Hide Report' : 'View Report'}
+                  </button>
                 </div>
               </section>
 
-              {/* Amount Range */}
-              <section>
-                <SectionHeading title="Amount Range" />
-                <div className="space-y-4">
-                  <SubReport
-                    label="PENDING ONLINE"
-                    columns={['Grouped Amount', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
-                    rows={AMOUNT_PENDING_ONLINE.map(r => [r.range, r.vehicles, r.challans, formatINR(r.amount)])}
-                    grandTotal={(() => {
-                      const t = sumRow(AMOUNT_PENDING_ONLINE)
-                      return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
-                    })()}
-                  />
-                  <SubReport
-                    label="PENDING IN COURT"
-                    columns={['Grouped Amount', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
-                    rows={AMOUNT_PENDING_COURT.map(r => [r.range, r.vehicles, r.challans, formatINR(r.amount)])}
-                    grandTotal={(() => {
-                      const t = sumRow(AMOUNT_PENDING_COURT)
-                      return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
-                    })()}
-                  />
-                </div>
-              </section>
+              {showReport && (
+                <>
+                  <section>
+                    <SectionHeading title="Overall Challan Status" />
+                    <ReportTable
+                      columns={['Challan Status', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
+                      rows={OVERALL_STATUS.map(r => [r.label, r.vehicles, r.challans, formatINR(r.amount)])}
+                      grandTotal={(() => {
+                        const t = sumRow(OVERALL_STATUS)
+                        return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
+                      })()}
+                    />
+                  </section>
+
+                  <section>
+                    <SectionHeading title="State Wise Challan" />
+                    <div className="space-y-4">
+                      <SubReport
+                        label="PENDING ONLINE"
+                        columns={['State', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
+                        rows={STATE_PENDING_ONLINE.map(r => [r.state, r.vehicles, r.challans, formatINR(r.amount)])}
+                        grandTotal={(() => {
+                          const t = sumRow(STATE_PENDING_ONLINE)
+                          return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
+                        })()}
+                      />
+                      <SubReport
+                        label="PENDING IN COURT"
+                        columns={['State', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
+                        rows={STATE_PENDING_COURT.map(r => [r.state, r.vehicles, r.challans, formatINR(r.amount)])}
+                        grandTotal={(() => {
+                          const t = sumRow(STATE_PENDING_COURT)
+                          return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
+                        })()}
+                      />
+                    </div>
+                  </section>
+
+                  <section>
+                    <SectionHeading title="Amount Range" />
+                    <div className="space-y-4">
+                      <SubReport
+                        label="PENDING ONLINE"
+                        columns={['Grouped Amount', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
+                        rows={AMOUNT_PENDING_ONLINE.map(r => [r.range, r.vehicles, r.challans, formatINR(r.amount)])}
+                        grandTotal={(() => {
+                          const t = sumRow(AMOUNT_PENDING_ONLINE)
+                          return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
+                        })()}
+                      />
+                      <SubReport
+                        label="PENDING IN COURT"
+                        columns={['Grouped Amount', 'Unique Vehicle Count', 'No of Challan', 'Challan Amount']}
+                        rows={AMOUNT_PENDING_COURT.map(r => [r.range, r.vehicles, r.challans, formatINR(r.amount)])}
+                        grandTotal={(() => {
+                          const t = sumRow(AMOUNT_PENDING_COURT)
+                          return ['Grand Total', t.vehicles, t.challans, formatINR(t.amount)]
+                        })()}
+                      />
+                    </div>
+                  </section>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -396,37 +416,6 @@ export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnal
               >
                 Run Analysis
               </button>
-            )}
-
-            {stage === 'results' && (
-              <div className="relative" ref={downloadMenuRef}>
-                <button
-                  onClick={() => setDownloadMenuOpen(o => !o)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-cyan-600 hover:bg-cyan-700 transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  Download Report
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {downloadMenuOpen && (
-                  <div className="absolute right-0 bottom-full mb-2 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden z-10">
-                    <button
-                      onClick={() => handleDownload('xls')}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download as XLS
-                    </button>
-                    <button
-                      onClick={() => handleDownload('pdf')}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left border-t border-slate-100 dark:border-slate-700"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download as PDF
-                    </button>
-                  </div>
-                )}
-              </div>
             )}
           </div>
         </div>

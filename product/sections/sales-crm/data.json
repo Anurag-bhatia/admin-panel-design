@@ -488,10 +488,38 @@
       "performedBy": "USR-004",
       "performedByName": "System Admin",
       "timestamp": "2024-01-16T09:45:00Z",
-      "description": "Lead assigned to Amit Patel",
+      "description": "Lead reassigned to Amit Patel",
       "details": {
         "assignedTo": "USR-003",
         "assignedToName": "Amit Patel",
+        "team": "Service"
+      }
+    },
+    {
+      "id": "ACT-003B",
+      "leadId": "LLD-1191901",
+      "type": "assignment",
+      "performedBy": "USR-004",
+      "performedByName": "System Admin",
+      "timestamp": "2024-01-15T16:20:00Z",
+      "description": "Lead reassigned to Rahul Verma",
+      "details": {
+        "assignedTo": "USR-002",
+        "assignedToName": "Rahul Verma",
+        "team": "Service"
+      }
+    },
+    {
+      "id": "ACT-003A",
+      "leadId": "LLD-1191901",
+      "type": "assignment",
+      "performedBy": "USR-004",
+      "performedByName": "System Admin",
+      "timestamp": "2024-01-15T11:10:00Z",
+      "description": "Lead assigned to Priya Sharma",
+      "details": {
+        "assignedTo": "USR-001",
+        "assignedToName": "Priya Sharma",
         "team": "Service"
       }
     },

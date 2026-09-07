@@ -9,6 +9,8 @@ import {
   Download,
   Send,
   Paperclip,
+  Upload,
+  FileText,
   X,
 } from 'lucide-react'
 import type { Lead } from '@/../product/sections/sales-crm/types'
@@ -64,6 +66,7 @@ export interface QuotationDraft {
   addonQuantities: Record<string, number>
   addonPerHitPrices: Record<string, number>
   overallDiscount: number
+  gstMode: 'inclusive' | 'exclusive'
   validTill: string
   terms: string
 }
@@ -153,6 +156,8 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     sent: false,
   })
   const attachmentInputRef = useRef<HTMLInputElement>(null)
+  const [caasOutputSheet, setCaasOutputSheet] = useState<File | null>(null)
+  const caasOutputInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState<QuotationDraft>({
     leadId: '',
@@ -163,6 +168,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
     addonQuantities: {},
     addonPerHitPrices: {},
     overallDiscount: 0,
+    gstMode: 'exclusive',
     validTill: defaultValidTill(),
     terms: DEFAULT_TERMS,
   })
@@ -646,6 +652,49 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                     )}
                   </div>
                 </div>
+                {activeAddonCategories.includes('caas') && (
+                  <div className="mb-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+                    <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+                      Upload Output Sheet
+                    </label>
+                    <input
+                      ref={caasOutputInputRef}
+                      type="file"
+                      accept=".csv,.xlsx,.xls,.pdf"
+                      className="hidden"
+                      onChange={e => setCaasOutputSheet(e.target.files?.[0] || null)}
+                    />
+                    {caasOutputSheet ? (
+                      <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText className="w-4 h-4 text-slate-400 shrink-0" />
+                          <span className="text-sm font-medium text-slate-900 dark:text-slate-50 truncate">{caasOutputSheet.name}</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">({(caasOutputSheet.size / 1024).toFixed(1)} KB)</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCaasOutputSheet(null)
+                            if (caasOutputInputRef.current) caasOutputInputRef.current.value = ''
+                          }}
+                          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded shrink-0"
+                        >
+                          <X className="w-4 h-4 text-slate-500" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => caasOutputInputRef.current?.click()}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-cyan-500 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/10 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors"
+                      >
+                        <Upload className="w-4 h-4" />
+                        Upload Output Sheet
+                      </button>
+                    )}
+                    <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">CSV, XLS, XLSX or PDF from the vehicle analysis.</p>
+                  </div>
+                )}
                 <div className="space-y-2">
                   {ADDONS.filter(a => activeAddonCategories.includes(a.category)).map(addon => {
                     const selected = formData.addonIds.includes(addon.id)
@@ -884,6 +933,41 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
                   })}
                 </div>
               </FormSection>
+
+            {/* GST Treatment */}
+            <FormSection title="GST Treatment">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {(['inclusive', 'exclusive'] as const).map(mode => {
+                  const selected = formData.gstMode === mode
+                  const label = mode === 'inclusive' ? 'Inclusive of GST' : 'Exclusive of GST'
+                  const helper = mode === 'inclusive'
+                    ? 'Prices already include 18% GST.'
+                    : 'GST @ 18% will be added on top.'
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, gstMode: mode })}
+                      className={`text-left px-3 py-3 rounded-lg border transition-colors ${
+                        selected
+                          ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
+                          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${selected ? 'border-cyan-600' : 'border-slate-300 dark:border-slate-600'}`}>
+                          {selected && <span className="w-2 h-2 rounded-full bg-cyan-600" />}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">{label}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{helper}</p>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </FormSection>
 
             {/* Terms & Validity */}
             <FormSection title="Terms & Validity">
