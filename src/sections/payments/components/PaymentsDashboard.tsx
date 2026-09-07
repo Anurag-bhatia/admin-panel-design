@@ -32,6 +32,7 @@ const LAWYER_FEE_TABS = [
 const LEADS_TABS = [
   { key: 'ready_to_invoice', label: 'Ready to Invoice' },
   { key: 'converted', label: 'Converted' },
+  { key: 'rejected', label: 'Rejected' },
 ]
 
 const PARTNER_TABS = [
@@ -193,6 +194,7 @@ export function PaymentsDashboard({
   const leadsStageCounts = useMemo(() => ({
     ready_to_invoice: leads.filter((l) => l.status === 'invoiced').length,
     converted: leads.filter((l) => l.status === 'sales').length,
+    rejected: leads.filter((l) => l.status === 'rejected').length,
   }), [leads])
 
   // Partner payout stage counts
@@ -205,7 +207,12 @@ export function PaymentsDashboard({
 
   // Filtered leads
   const filteredLeads = useMemo(() => {
-    const statusFilter = leadsStage === 'ready_to_invoice' ? 'invoiced' : 'sales'
+    const statusFilter: Lead['status'] =
+      leadsStage === 'ready_to_invoice'
+        ? 'invoiced'
+        : leadsStage === 'rejected'
+          ? 'rejected'
+          : 'sales'
     let filtered = leads.filter((l) => l.status === statusFilter)
 
     if (searchQuery.trim()) {
