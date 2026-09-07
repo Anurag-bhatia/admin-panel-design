@@ -102,4 +102,9 @@ export interface RewardsConfigDashboardProps {
    * Optional heading override for the module header. Ignored when `embedded`.
    */
   titleOverride?: string
+  /**
+   * When this number increments, the dashboard switches into add-configuration
+   * mode. Lets an embedding parent host the Add button on its own toolbar.
+   */
+  addTrigger?: number
 }

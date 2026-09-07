@@ -64,6 +64,8 @@ export function SalesConfigDashboard() {
   const [query, setQuery] = useState('')
   const [rowsState, setRowsState] = useState<SalesConfigRow[]>(INITIAL_ROWS)
   const [editingRow, setEditingRow] = useState<SalesConfigRow | null>(null)
+  const [addingCategory, setAddingCategory] = useState<SalesCategory | null>(null)
+  const [caasAddTrigger, setCaasAddTrigger] = useState(0)
 
   const categoryCounts = useMemo(
     () =>
@@ -103,49 +105,68 @@ export function SalesConfigDashboard() {
 
   const isCaas = activeCategory === 'caas'
 
+  const handleAddClick = () => {
+    if (isCaas) {
+      setCaasAddTrigger((n) => n + 1)
+    } else {
+      setAddingCategory(activeCategory)
+    }
+  }
+
+  const handleAddSubmit = (category: SalesCategory, name: string, amount: number) => {
+    const newRow: SalesConfigRow = {
+      id: `${category}-${Date.now()}`,
+      category,
+      service: name,
+      amount,
+      lastUpdatedBy: 'You',
+      lastUpdatedAt: new Date().toISOString(),
+    }
+    setRowsState((prev) => [...prev, newRow])
+    setAddingCategory(null)
+  }
+
   return (
     <div className="min-h-full bg-slate-50 dark:bg-slate-950">
       {/* Module header */}
       <div>
         <div className="max-w-[1440px] mx-auto px-6 py-5">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
-              Sales Reward Configurations
-            </h1>
-            {!isCaas && (
-              <button
-                type="button"
-                onClick={() => console.log('Add sales config')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm"
-              >
-                <Plus className="w-4 h-4" />
-                Add Configuration
-              </button>
-            )}
-          </div>
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+            Sales Reward Configurations
+          </h1>
         </div>
       </div>
 
-      {/* Category tabs */}
+      {/* Category tabs + Add button */}
       <div className="max-w-[1440px] mx-auto px-6 pt-6">
-        <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
-          {CATEGORY_TABS.map((tab) => {
-            const isActive = activeCategory === tab.key
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveCategory(tab.key)}
-                className={`px-4 py-1.5 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                {tab.label} ({categoryCounts[tab.key]})
-              </button>
-            )
-          })}
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
+            {CATEGORY_TABS.map((tab) => {
+              const isActive = activeCategory === tab.key
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setActiveCategory(tab.key)}
+                  className={`px-4 py-1.5 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
+                    isActive
+                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  }`}
+                >
+                  {tab.label} ({categoryCounts[tab.key]})
+                </button>
+              )
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={handleAddClick}
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Configuration
+          </button>
         </div>
       </div>
 
@@ -158,6 +179,7 @@ export function SalesConfigDashboard() {
           currentUser={rewardsData.currentUser as AllowlistedUser}
           embedded
           lockedProduct="challanPay"
+          addTrigger={caasAddTrigger}
           onAdd={(draft) => console.log('Add CAAS state config:', draft)}
           onUpdate={(id, draft) => console.log('Update CAAS state config:', id, draft)}
         />
@@ -276,6 +298,14 @@ export function SalesConfigDashboard() {
           onSave={handleSaveAmount}
         />
       )}
+
+      {addingCategory && (
+        <AddConfigModal
+          category={addingCategory}
+          onClose={() => setAddingCategory(null)}
+          onSave={handleAddSubmit}
+        />
+      )}
     </div>
   )
 }
@@ -392,6 +422,170 @@ function EditAmountModal({
             className="px-3.5 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm"
           >
             Save
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AddConfigModal({
+  category,
+  onClose,
+  onSave,
+}: {
+  category: SalesCategory
+  onClose: () => void
+  onSave: (category: SalesCategory, name: string, amount: number) => void
+}) {
+  const [name, setName] = useState('')
+  const [amount, setAmount] = useState('')
+  const [errors, setErrors] = useState<{ name?: string; amount?: string }>({})
+
+  const amountLabel = category === 'api' ? 'Per Hit Price' : 'Amount'
+  const categoryLabel =
+    CATEGORY_TABS.find((t) => t.key === category)?.label ?? category.toUpperCase()
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
+  const handleSubmit = () => {
+    const next: { name?: string; amount?: string } = {}
+    const trimmed = name.trim()
+    if (!trimmed) next.name = 'Please enter a service name'
+    const parsed = Number(amount)
+    if (amount === '' || isNaN(parsed) || parsed < 0) {
+      next.amount = 'Please enter a valid amount'
+    }
+    if (Object.keys(next).length > 0) {
+      setErrors(next)
+      return
+    }
+    onSave(category, trimmed, Math.round(parsed))
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-config-title"
+        className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <h2
+              id="add-config-title"
+              className="text-base font-semibold text-slate-900 dark:text-white"
+            >
+              Add Configuration
+            </h2>
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+              {categoryLabel}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="p-1 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="px-5 py-5 space-y-4">
+          <div>
+            <label
+              htmlFor="add-name-input"
+              className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5"
+            >
+              Name
+            </label>
+            <input
+              id="add-name-input"
+              type="text"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value)
+                if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }))
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleSubmit()
+                }
+              }}
+              autoFocus
+              placeholder="e.g. New Service"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            />
+            {errors.name && (
+              <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">
+                {errors.name}
+              </p>
+            )}
+          </div>
+          <div>
+            <label
+              htmlFor="add-amount-input"
+              className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5"
+            >
+              {amountLabel}
+            </label>
+            <div className="flex items-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 overflow-hidden focus-within:ring-2 focus-within:ring-cyan-500 focus-within:border-transparent">
+              <span className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                ₹
+              </span>
+              <input
+                id="add-amount-input"
+                type="number"
+                min={0}
+                step="1"
+                value={amount}
+                onChange={(e) => {
+                  setAmount(e.target.value)
+                  if (errors.amount) setErrors((prev) => ({ ...prev, amount: undefined }))
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleSubmit()
+                  }
+                }}
+                placeholder="0"
+                className="w-full px-3 py-2 text-sm bg-transparent text-slate-900 dark:text-white focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              />
+            </div>
+            {errors.amount && (
+              <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">
+                {errors.amount}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 rounded-b-2xl">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="px-3.5 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm"
+          >
+            Add
           </button>
         </div>
       </div>
