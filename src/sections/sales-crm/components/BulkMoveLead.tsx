@@ -23,7 +23,8 @@ export function BulkMoveLead({ mode, selectedCount, users, onMove, onClose }: Bu
     { value: 'projected', label: 'Projected' },
     { value: 'invoiced', label: 'Ready to Invoice' },
     { value: 'sales', label: 'Sales' },
-    { value: 'lost', label: 'Lost' }
+    { value: 'lost', label: 'Lost' },
+    { value: 'rejected', label: 'Rejected' }
   ]
 
   const ownerOptions = [

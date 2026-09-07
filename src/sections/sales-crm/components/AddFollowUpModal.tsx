@@ -43,7 +43,7 @@ export function AddFollowUpModal({ leadId, leadName, activityTypes, onSubmit, on
         {/* Header */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white">Add Follow-up Activity</h2>
+            <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-white">Update Activity</h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5">{leadName}</p>
           </div>
           <button
@@ -136,7 +136,7 @@ export function AddFollowUpModal({ leadId, leadName, activityTypes, onSubmit, on
               type="submit"
               className="px-3 sm:px-4 py-1.5 sm:py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors"
             >
-              Add Follow-up
+              Update
             </button>
           </div>
         </form>

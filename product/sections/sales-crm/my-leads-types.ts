@@ -21,7 +21,7 @@ export interface Lead {
   area: string
   addressLane: string
   pinCode: string
-  status: 'assigned' | 'new' | 'follow-up' | 'quotations' | 'projected' | 'invoiced' | 'sales' | 'lost'
+  status: 'assigned' | 'new' | 'follow-up' | 'quotations' | 'projected' | 'invoiced' | 'sales' | 'lost' | 'rejected'
   assignedTo: string
   assignedTeam: string
   createdDate: string

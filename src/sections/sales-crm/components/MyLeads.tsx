@@ -102,6 +102,7 @@ export function MyLeads({
       invoiced: 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300',
       sales: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
       lost: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
+      rejected: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
     }
     return `${baseClasses} ${variants[status]}`
   }
@@ -115,6 +116,7 @@ export function MyLeads({
     invoiced: 'Ready to Invoice',
     sales: 'Converted',
     lost: 'Lost',
+    rejected: 'Rejected',
   }
 
   const getUserName = (userId: string | null) => {

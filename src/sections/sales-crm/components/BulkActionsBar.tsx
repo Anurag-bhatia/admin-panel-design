@@ -23,6 +23,7 @@ const STATUS_OPTIONS: { key: Lead['status']; label: string }[] = [
   { key: 'invoiced', label: 'Ready to Invoice' },
   { key: 'sales', label: 'Converted' },
   { key: 'lost', label: 'Lost' },
+  { key: 'rejected', label: 'Rejected' },
 ]
 
 export function BulkActionsBar({

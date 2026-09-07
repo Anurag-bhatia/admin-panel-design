@@ -16,7 +16,7 @@ import { UploadDocumentModal } from './UploadDocumentModal'
 // Design tokens: cyan (primary), slate (neutral)
 // Aesthetic: Clean data-driven dashboard with strong data hierarchy and operational efficiency
 
-type LifecycleTab = 'all' | 'new' | 'assigned' | 'follow-up' | 'quotations' | 'projected' | 'invoiced' | 'sales' | 'lost'
+type LifecycleTab = 'all' | 'new' | 'assigned' | 'follow-up' | 'quotations' | 'projected' | 'invoiced' | 'sales' | 'lost' | 'rejected'
 
 export function LeadsDashboard({
   leads,
@@ -124,6 +124,7 @@ export function LeadsDashboard({
       invoiced: 'invoiced',
       sales: 'sales',
       lost: 'lost',
+      rejected: 'rejected',
     }
 
     const status = statusMap[activeTab]
@@ -170,6 +171,7 @@ export function LeadsDashboard({
       invoiced: leads.filter(l => l.status === 'invoiced').length,
       sales: leads.filter(l => l.status === 'sales').length,
       lost: leads.filter(l => l.status === 'lost').length,
+      rejected: leads.filter(l => l.status === 'rejected').length,
     }
   }, [leads])
 
@@ -183,6 +185,7 @@ export function LeadsDashboard({
     { key: 'invoiced', label: 'Ready to Invoice' },
     { key: 'sales', label: 'Converted' },
     { key: 'lost', label: 'Lost' },
+    { key: 'rejected', label: 'Rejected' },
   ]
 
   // If the Add Quotation builder is open, render it inline (keeps app sidebar visible)
