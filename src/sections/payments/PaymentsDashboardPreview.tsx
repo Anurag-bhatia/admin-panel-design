@@ -4,7 +4,7 @@ import lawyersData from '@/../product/sections/lawyers/data.json'
 import partnersData from '@/../product/sections/partners/data.json'
 import { PaymentsDashboard } from './components/PaymentsDashboard'
 import type { Refund, LawyerFee, PartnerPayout } from '@/../product/sections/payments/types'
-import type { Lead, User } from '@/../product/sections/sales-crm/types'
+import type { Lead, User, Document as LeadDocument, TimelineActivity } from '@/../product/sections/sales-crm/types'
 import type { Lawyer } from '@/../product/sections/lawyers/types'
 import type { Partner } from '@/../product/sections/partners/types'
 
@@ -16,6 +16,8 @@ export default function PaymentsDashboardPreview() {
         lawyerFees={data.lawyerFees as LawyerFee[]}
         leads={leadsData.leads as Lead[]}
         users={leadsData.users as User[]}
+        leadDocuments={leadsData.documents as LeadDocument[]}
+        leadTimelineActivities={leadsData.timelineActivities as TimelineActivity[]}
         partnerPayouts={data.partnerPayouts as PartnerPayout[]}
         lawyers={lawyersData.lawyers as Lawyer[]}
         partners={partnersData.partners as Partner[]}

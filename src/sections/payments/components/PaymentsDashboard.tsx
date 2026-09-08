@@ -94,6 +94,8 @@ export function PaymentsDashboard({
   lawyerFees,
   leads = [],
   users = [],
+  leadDocuments = [],
+  leadTimelineActivities = [],
   lawyers = [],
   partners = [],
   partnerPayouts = [],
@@ -541,8 +543,8 @@ export function PaymentsDashboard({
         <div className="flex-1 overflow-auto">
           <LeadDetailView
             lead={selectedLead}
-            timelineActivities={[]}
-            documents={[]}
+            timelineActivities={leadTimelineActivities}
+            documents={leadDocuments}
             users={users}
             onClose={() => setSelectedLeadId(null)}
             hideSalesActions

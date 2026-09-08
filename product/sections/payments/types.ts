@@ -80,6 +80,10 @@ export interface PaymentsProps {
   leads?: import('@/../product/sections/sales-crm/types').Lead[]
   /** Available users for lead assignment */
   users?: import('@/../product/sections/sales-crm/types').User[]
+  /** Documents attached to leads (surfaced in Accounts → Leads detail) */
+  leadDocuments?: import('@/../product/sections/sales-crm/types').Document[]
+  /** Timeline activities for leads (surfaced in Accounts → Leads detail) */
+  leadTimelineActivities?: import('@/../product/sections/sales-crm/types').TimelineActivity[]
   /** List of lawyers for profile navigation from Lawyer Payments */
   lawyers?: import('@/../product/sections/lawyers/types').Lawyer[]
   /** Called when user approves a refund */
