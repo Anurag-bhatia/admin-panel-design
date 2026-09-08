@@ -73,6 +73,7 @@ export interface QuotationDraft {
 
 interface AddQuotationModalProps {
   leads: Lead[]
+  initialLeadId?: string
   onSave: (data: QuotationDraft, isDraft: boolean) => void
   onClose: () => void
 }
@@ -133,7 +134,7 @@ const defaultValidTill = () => {
   return d.toISOString().split('T')[0]
 }
 
-export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalProps) {
+export function AddQuotationModal({ leads, initialLeadId, onSave, onClose }: AddQuotationModalProps) {
   const [customerSearch, setCustomerSearch] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [activeAddonCategories, setActiveAddonCategories] = useState<AddonCategory[]>(['caas'])
@@ -160,7 +161,7 @@ export function AddQuotationModal({ leads, onSave, onClose }: AddQuotationModalP
   const caasOutputInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState<QuotationDraft>({
-    leadId: '',
+    leadId: initialLeadId ?? '',
     type: 'subscription-addons',
     planId: null,
     addonIds: [],

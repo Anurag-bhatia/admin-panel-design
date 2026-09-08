@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   X,
   ArrowRight,
   UserPlus,
   ChevronDown,
+  Paperclip,
+  FileText,
 } from 'lucide-react'
 import type { Lead } from '@/../product/sections/sales-crm/types'
 
@@ -32,6 +34,9 @@ export function BulkActionsBar({
   const [showStatusDropdown, setShowStatusDropdown] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<{ key: Lead['status']; label: string } | null>(null)
   const [notes, setNotes] = useState('')
+  const [attachments, setAttachments] = useState<File[]>([])
+  const [notesError, setNotesError] = useState<string | null>(null)
+  const attachmentInputRef = useRef<HTMLInputElement>(null)
 
   const handleStatusPick = (status: { key: Lead['status']; label: string }) => {
     setShowStatusDropdown(false)
@@ -41,13 +46,31 @@ export function BulkActionsBar({
     }
     setPendingStatus(status)
     setNotes('')
+    setAttachments([])
+    setNotesError(null)
   }
 
   const handleNotesSubmit = () => {
     if (!pendingStatus) return
+    if (!notes.trim()) {
+      setNotesError('Notes are required')
+      return
+    }
     onMoveStatus?.(pendingStatus.key, notes)
     setPendingStatus(null)
     setNotes('')
+    setAttachments([])
+    setNotesError(null)
+  }
+
+  const handleAttachmentPick = (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    setAttachments(prev => [...prev, ...Array.from(files)])
+    if (attachmentInputRef.current) attachmentInputRef.current.value = ''
+  }
+
+  const removeAttachment = (idx: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== idx))
   }
 
   return (
@@ -137,17 +160,62 @@ export function BulkActionsBar({
             </div>
 
             {/* Body */}
-            <div className="px-6 py-5">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Notes
-              </label>
-              <textarea
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                placeholder="Add a note about this status change..."
-                rows={4}
-                className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
-              />
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                  Notes <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={e => {
+                    setNotes(e.target.value)
+                    if (notesError) setNotesError(null)
+                  }}
+                  placeholder="Add a note about this status change..."
+                  rows={4}
+                  className={`w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none ${notesError ? 'border-red-400 dark:border-red-500' : 'border-slate-200 dark:border-slate-700'}`}
+                />
+                {notesError && <p className="mt-1 text-xs text-red-500">{notesError}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Attachments</label>
+                <input
+                  ref={attachmentInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={e => handleAttachmentPick(e.target.files)}
+                />
+                <button
+                  type="button"
+                  onClick={() => attachmentInputRef.current?.click()}
+                  className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <Paperclip className="w-4 h-4" />
+                  Add attachment
+                </button>
+                {attachments.length > 0 && (
+                  <ul className="mt-2 space-y-1.5">
+                    {attachments.map((file, idx) => (
+                      <li key={`${file.name}-${idx}`} className="flex items-center justify-between gap-2 px-3 py-2 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText className="w-4 h-4 text-slate-400 shrink-0" />
+                          <span className="text-sm text-slate-900 dark:text-slate-100 truncate">{file.name}</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">({(file.size / 1024).toFixed(1)} KB)</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeAttachment(idx)}
+                          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                        >
+                          <X className="w-3.5 h-3.5 text-slate-500" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             {/* Footer */}

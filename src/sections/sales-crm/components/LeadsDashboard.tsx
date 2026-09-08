@@ -45,6 +45,7 @@ export function LeadsDashboard({
   const [showAddModal, setShowAddModal] = useState(false)
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false)
   const [showQuotationModal, setShowQuotationModal] = useState(false)
+  const [quotationInitialLeadId, setQuotationInitialLeadId] = useState<string | undefined>(undefined)
   const [showFilters, setShowFilters] = useState(false)
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
   const [assignLeadId, setAssignLeadId] = useState<string | null>(null)
@@ -205,11 +206,16 @@ export function LeadsDashboard({
     return (
       <AddQuotationModal
         leads={leads}
+        initialLeadId={quotationInitialLeadId}
         onSave={(data, isDraft) => {
           console.log('Save quotation', { data, isDraft })
           setShowQuotationModal(false)
+          setQuotationInitialLeadId(undefined)
         }}
-        onClose={() => setShowQuotationModal(false)}
+        onClose={() => {
+          setShowQuotationModal(false)
+          setQuotationInitialLeadId(undefined)
+        }}
       />
     )
   }
@@ -237,7 +243,10 @@ export function LeadsDashboard({
           onUploadDocument={() => {
             setUploadDocLeadId(selectedLead.id)
           }}
-          onAddQuotation={() => setShowQuotationModal(true)}
+          onAddQuotation={() => {
+            setQuotationInitialLeadId(selectedLead.id)
+            setShowQuotationModal(true)
+          }}
         />
 
         {/* Modals for detail view */}

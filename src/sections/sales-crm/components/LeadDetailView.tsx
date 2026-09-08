@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock, Download, Pencil, Truck, X } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock, Download, Pencil, Truck, X, Paperclip } from 'lucide-react'
 import type { Lead, TimelineActivity, Document, User as UserType } from '@/../product/sections/sales-crm/types'
 import { IssuerHeader } from './AddQuotationModal'
 import { VehicleAnalysisModal } from './VehicleAnalysisModal'
@@ -36,6 +36,9 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
   const [showVehicleAnalysis, setShowVehicleAnalysis] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<{ value: Lead['status']; label: string } | null>(null)
   const [statusNotes, setStatusNotes] = useState('')
+  const [statusNotesError, setStatusNotesError] = useState<string | null>(null)
+  const [statusAttachments, setStatusAttachments] = useState<File[]>([])
+  const statusAttachmentInputRef = useRef<HTMLInputElement>(null)
 
   const leadTimeline = timelineActivities.filter(activity => activity.leadId === lead.id)
   const leadDocuments = documents.filter(doc => doc.leadId === lead.id)
@@ -69,13 +72,31 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
     }
     setPendingStatus(option)
     setStatusNotes('')
+    setStatusAttachments([])
+    setStatusNotesError(null)
   }
 
   const handleStatusNotesSubmit = () => {
     if (!pendingStatus) return
+    if (!statusNotes.trim()) {
+      setStatusNotesError('Notes are required')
+      return
+    }
     onChangeStatus?.(lead.id, pendingStatus.value)
     setPendingStatus(null)
     setStatusNotes('')
+    setStatusAttachments([])
+    setStatusNotesError(null)
+  }
+
+  const handleStatusAttachmentPick = (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    setStatusAttachments(prev => [...prev, ...Array.from(files)])
+    if (statusAttachmentInputRef.current) statusAttachmentInputRef.current.value = ''
+  }
+
+  const removeStatusAttachment = (idx: number) => {
+    setStatusAttachments(prev => prev.filter((_, i) => i !== idx))
   }
 
   const formatDate = (dateString: string) => {
@@ -566,17 +587,64 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
               </button>
             </div>
 
-            <div className="px-6 py-5">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Notes
-              </label>
-              <textarea
-                value={statusNotes}
-                onChange={e => setStatusNotes(e.target.value)}
-                placeholder="Add a note about this status change..."
-                rows={4}
-                className="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
-              />
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                  Notes <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={statusNotes}
+                  onChange={e => {
+                    setStatusNotes(e.target.value)
+                    if (statusNotesError) setStatusNotesError(null)
+                  }}
+                  placeholder="Add a note about this status change..."
+                  rows={4}
+                  className={`w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none ${statusNotesError ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'}`}
+                />
+                {statusNotesError && <p className="mt-1 text-xs text-red-500">{statusNotesError}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                  Attachments
+                </label>
+                <input
+                  ref={statusAttachmentInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={e => handleStatusAttachmentPick(e.target.files)}
+                />
+                <button
+                  type="button"
+                  onClick={() => statusAttachmentInputRef.current?.click()}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <Paperclip className="w-3.5 h-3.5" />
+                  Add attachment
+                </button>
+                {statusAttachments.length > 0 && (
+                  <ul className="mt-2 space-y-1.5">
+                    {statusAttachments.map((file, idx) => (
+                      <li key={`${file.name}-${idx}`} className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span className="text-xs font-medium text-slate-900 dark:text-slate-50 truncate">{file.name}</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">({(file.size / 1024).toFixed(1)} KB)</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeStatusAttachment(idx)}
+                          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5 text-slate-500" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
