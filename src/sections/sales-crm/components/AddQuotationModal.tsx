@@ -1000,9 +1000,9 @@ export function AddQuotationModal({ leads, initialLeadId, onSave, onClose }: Add
         </div>
 
         {/* Preview (right) */}
-        <div className="flex-1 lg:w-1/2 xl:w-[45%] bg-slate-100 dark:bg-slate-950/60">
-          <div className="lg:sticky lg:top-0 p-4 sm:p-6 lg:p-8">
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
+        <div className="flex-1 lg:w-1/2 xl:w-[45%] bg-slate-100 dark:bg-slate-950/60 lg:self-stretch">
+          <div className="lg:sticky lg:top-0 p-4 sm:p-6 lg:p-8 lg:h-screen lg:flex lg:flex-col">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden flex flex-col lg:min-h-0 lg:flex-1">
               {/* Issuer header */}
               <IssuerHeader />
 
@@ -1043,6 +1043,8 @@ export function AddQuotationModal({ leads, initialLeadId, onSave, onClose }: Add
                 )}
               </div>
 
+              {/* Scrollable middle */}
+              <div className="flex-1 overflow-y-auto min-h-0">
               {/* Line items */}
               <div>
                 <div className="px-6 py-2 flex items-center justify-between text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
@@ -1102,16 +1104,19 @@ export function AddQuotationModal({ leads, initialLeadId, onSave, onClose }: Add
                   )}
                 </div>
 
-                <div className="px-6 py-4 bg-cyan-50 dark:bg-cyan-900/20 border-t border-cyan-100 dark:border-cyan-900/50 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-cyan-900 dark:text-cyan-100">Total Due</span>
-                  <span className="text-xl font-bold text-cyan-900 dark:text-cyan-100 tabular-nums">{formatCurrency(finalAmount)}</span>
-                </div>
               </div>
 
               {/* Terms */}
               <div className="px-6 py-5 border-t border-slate-100 dark:border-slate-800">
                 <p className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Terms & Conditions</p>
                 <pre className="whitespace-pre-wrap text-xs leading-relaxed text-slate-700 dark:text-slate-300 font-sans">{formData.terms || '—'}</pre>
+              </div>
+              </div>
+
+              {/* Sticky Total Due */}
+              <div className="px-6 py-4 bg-cyan-50 dark:bg-cyan-900/20 border-t border-cyan-100 dark:border-cyan-900/50 flex items-center justify-between shrink-0">
+                <span className="text-sm font-semibold text-cyan-900 dark:text-cyan-100">Total Due</span>
+                <span className="text-xl font-bold text-cyan-900 dark:text-cyan-100 tabular-nums">{formatCurrency(finalAmount)}</span>
               </div>
             </div>
           </div>

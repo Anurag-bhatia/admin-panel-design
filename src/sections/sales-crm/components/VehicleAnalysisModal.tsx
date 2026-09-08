@@ -71,6 +71,9 @@ export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnal
   const [isDragging, setIsDragging] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
   const [showReport, setShowReport] = useState(false)
+  const [pendingDownloadFormat, setPendingDownloadFormat] = useState<'xls' | 'pdf' | null>(null)
+  const [downloadReason, setDownloadReason] = useState('')
+  const [downloadReasonError, setDownloadReasonError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const parsedVehicleCount = Number.parseInt(vehicleCount, 10)
@@ -168,6 +171,29 @@ export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnal
     a.download = `vehicle-analysis-report.${ext}`
     a.click()
     window.URL.revokeObjectURL(url)
+  }
+
+  const requestDownload = (format: 'xls' | 'pdf') => {
+    setPendingDownloadFormat(format)
+    setDownloadReason('')
+    setDownloadReasonError('')
+  }
+
+  const cancelDownload = () => {
+    setPendingDownloadFormat(null)
+    setDownloadReason('')
+    setDownloadReasonError('')
+  }
+
+  const confirmDownload = () => {
+    if (!downloadReason.trim()) {
+      setDownloadReasonError('Reason is required')
+      return
+    }
+    if (pendingDownloadFormat) {
+      handleDownload(pendingDownloadFormat)
+    }
+    cancelDownload()
   }
 
   const handleCreateQuotation = () => {
@@ -296,14 +322,14 @@ export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnal
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button
-                    onClick={() => handleDownload('xls')}
+                    onClick={() => requestDownload('xls')}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 transition-colors"
                   >
                     <Download className="w-4 h-4" />
                     Download as XLS
                   </button>
                   <button
-                    onClick={() => handleDownload('pdf')}
+                    onClick={() => requestDownload('pdf')}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                   >
                     <Download className="w-4 h-4" />
@@ -420,6 +446,62 @@ export function VehicleAnalysisModal({ onClose, onCreateQuotation }: VehicleAnal
           </div>
         </div>
       </div>
+
+      {pendingDownloadFormat && (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-[110] p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md flex flex-col">
+            <div className="border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                Reason for Download
+              </h3>
+              <button
+                onClick={cancelDownload}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+              </button>
+            </div>
+            <div className="p-6 space-y-3">
+              <div>
+                <label htmlFor="download-reason" className="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-1.5">
+                  Reason <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="download-reason"
+                  value={downloadReason}
+                  onChange={e => {
+                    setDownloadReason(e.target.value)
+                    if (downloadReasonError && e.target.value.trim()) setDownloadReasonError('')
+                  }}
+                  rows={3}
+                  placeholder="e.g. Sharing with customer for review"
+                  className={`w-full px-3 py-2 rounded-lg border bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent ${
+                    downloadReasonError ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
+                  }`}
+                />
+                {downloadReasonError && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">{downloadReasonError}</p>
+                )}
+              </div>
+            </div>
+            <div className="border-t border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-end gap-2 bg-slate-50 dark:bg-slate-700/50">
+              <button
+                onClick={cancelDownload}
+                className="px-4 py-2 rounded-lg font-medium text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDownload}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-cyan-600 hover:bg-cyan-700 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
