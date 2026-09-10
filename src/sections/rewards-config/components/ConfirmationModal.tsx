@@ -20,16 +20,10 @@ export function ConfirmationModal({
   onCancel,
 }: ConfirmationModalProps) {
   const [status, setStatus] = useState<ConfigStatus>(draft.status)
-  const marginPct =
-    draft.operationsCostPct !== null ? 100 - draft.operationsCostPct : null
-  const maxCv =
-    marginPct !== null && draft.lawyeredCvPct !== null
-      ? marginPct - draft.lawyeredCvPct
-      : null
-  const maxNcv =
-    marginPct !== null && draft.lawyeredNcvPct !== null
-      ? marginPct - draft.lawyeredNcvPct
-      : null
+  const formatFee = (value: number | null | undefined) =>
+    value === null || value === undefined
+      ? '—'
+      : `₹${value.toLocaleString('en-IN')}`
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -71,23 +65,13 @@ export function ConfirmationModal({
           <SummaryRow label="Region" value={draft.region} muted />
           <div className="h-px bg-slate-200 dark:bg-slate-700/60 my-2" />
           <SummaryRow
-            label="Operations Cost %"
-            value={draft.operationsCostPct !== null ? `${draft.operationsCostPct}%` : '—'}
-          />
-          <SummaryRow
-            label="Margin %"
-            value={marginPct !== null ? `${marginPct}%` : '—'}
-            muted
-          />
-          <div className="h-px bg-slate-200 dark:bg-slate-700/60 my-2" />
-          <SummaryRow
-            label="Max CV Reward %"
-            value={maxCv !== null ? `${maxCv}%` : '—'}
+            label="Online Convenience Fee"
+            value={formatFee(draft.onlineConvenienceFee ?? null)}
             highlight
           />
           <SummaryRow
-            label="Max NCV Reward %"
-            value={maxNcv !== null ? `${maxNcv}%` : '—'}
+            label="Online Court Fee"
+            value={formatFee(draft.onlineCourtFee ?? null)}
             highlight
           />
         </div>

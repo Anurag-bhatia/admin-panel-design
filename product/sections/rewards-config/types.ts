@@ -67,6 +67,8 @@ export interface ConfigDraft {
   operationsCostPct: number | null
   lawyeredCvPct: number | null
   lawyeredNcvPct: number | null
+  onlineConvenienceFee?: number | null
+  onlineCourtFee?: number | null
   status: ConfigStatus
 }
 
@@ -75,6 +77,8 @@ export interface ValidationErrors {
   operationsCostPct?: string
   lawyeredCvPct?: string
   lawyeredNcvPct?: string
+  onlineConvenienceFee?: string
+  onlineCourtFee?: string
 }
 
 // =============================================================================

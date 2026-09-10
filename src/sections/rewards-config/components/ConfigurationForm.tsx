@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { AlertCircle, ChevronDown, Lock } from 'lucide-react'
 import type {
   ConfigDraft,
@@ -11,8 +11,6 @@ const PLATFORM_OPTIONS: { value: Product; label: string }[] = [
   { value: 'challanPay', label: 'ChallanPay' },
   { value: 'lots247', label: 'LOTS247' },
 ]
-import { InfoTooltip } from './InfoTooltip'
-import { MaxRewardPreview } from './MaxRewardPreview'
 
 interface ConfigurationFormProps {
   mode: 'add' | 'edit'
@@ -31,32 +29,18 @@ function validate(draft: ConfigDraft): ValidationErrors {
     errors.state = 'Please select a state.'
   }
 
-  const cost = draft.operationsCostPct
-  if (cost === null || Number.isNaN(cost)) {
-    errors.operationsCostPct = 'Operations Cost % is required.'
-  } else if (cost < 0 || cost > 100) {
-    errors.operationsCostPct = 'Enter a value between 0 and 100.'
+  const conv = draft.onlineConvenienceFee ?? null
+  if (conv === null || Number.isNaN(conv)) {
+    errors.onlineConvenienceFee = 'Online Convenience Fee is required.'
+  } else if (conv < 0) {
+    errors.onlineConvenienceFee = 'Value cannot be negative.'
   }
 
-  const margin =
-    cost !== null && !Number.isNaN(cost) ? 100 - cost : null
-
-  const cv = draft.lawyeredCvPct
-  if (cv === null || Number.isNaN(cv)) {
-    errors.lawyeredCvPct = 'Lawyered CV Margin % is required.'
-  } else if (cv < 0) {
-    errors.lawyeredCvPct = 'Value cannot be negative.'
-  } else if (margin !== null && cv > margin) {
-    errors.lawyeredCvPct = `Must be ≤ Margin % (${margin}%).`
-  }
-
-  const ncv = draft.lawyeredNcvPct
-  if (ncv === null || Number.isNaN(ncv)) {
-    errors.lawyeredNcvPct = 'Lawyered NCV Margin % is required.'
-  } else if (ncv < 0) {
-    errors.lawyeredNcvPct = 'Value cannot be negative.'
-  } else if (margin !== null && ncv > margin) {
-    errors.lawyeredNcvPct = `Must be ≤ Margin % (${margin}%).`
+  const court = draft.onlineCourtFee ?? null
+  if (court === null || Number.isNaN(court)) {
+    errors.onlineCourtFee = 'Online Court Fee is required.'
+  } else if (court < 0) {
+    errors.onlineCourtFee = 'Value cannot be negative.'
   }
 
   return errors
@@ -77,9 +61,11 @@ export function ConfigurationForm({
           product: initialConfig.product,
           state: initialConfig.state,
           region: initialConfig.region,
-          operationsCostPct: initialConfig.operationsCostPct,
-          lawyeredCvPct: initialConfig.lawyeredCvPct,
-          lawyeredNcvPct: initialConfig.lawyeredNcvPct,
+          operationsCostPct: null,
+          lawyeredCvPct: null,
+          lawyeredNcvPct: null,
+          onlineConvenienceFee: null,
+          onlineCourtFee: null,
           status: initialConfig.status,
         }
       : {
@@ -89,21 +75,14 @@ export function ConfigurationForm({
           operationsCostPct: null,
           lawyeredCvPct: null,
           lawyeredNcvPct: null,
+          onlineConvenienceFee: null,
+          onlineCourtFee: null,
           status: 'active',
         },
   )
   const [errors, setErrors] = useState<ValidationErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [challanType, setChallanType] = useState<'regular' | 'express'>('regular')
-  const [rewardTierMode, setRewardTierMode] = useState<'flat' | 'range'>('flat')
-  const [rangeLowPct, setRangeLowPct] = useState<number | null>(20)
-  const [rangeHighPct, setRangeHighPct] = useState<number | null>(30)
-
-  const marginPct = useMemo(() => {
-    if (draft.operationsCostPct === null || Number.isNaN(draft.operationsCostPct))
-      return null
-    return 100 - draft.operationsCostPct
-  }, [draft.operationsCostPct])
 
   const stateLocked = mode === 'edit'
   const availableStates =
@@ -114,9 +93,8 @@ export function ConfigurationForm({
   const handleSubmit = () => {
     setTouched({
       state: true,
-      operationsCostPct: true,
-      lawyeredCvPct: true,
-      lawyeredNcvPct: true,
+      onlineConvenienceFee: true,
+      onlineCourtFee: true,
     })
     const nextErrors = validate(draft)
     setErrors(nextErrors)
@@ -200,145 +178,54 @@ export function ConfigurationForm({
             </div>
           </SectionGroup>
 
-          {/* Cost & Margin */}
-          <SectionGroup
-            eyebrow="2 · Cost & Margin"
-            title="Operations Cost & Margin"
-          >
+          {/* Fees */}
+          <SectionGroup eyebrow="2 · Fees" title="Fees">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Field
-                label="Operations Cost %"
+                label="Online Convenience Fee"
                 required
-                error={showError('operationsCostPct') ? errors.operationsCostPct : undefined}
-              >
-                <PercentInput
-                  value={draft.operationsCostPct}
-                  placeholder="e.g., 30"
-                  onChange={(v) => {
-                    setDraft({ ...draft, operationsCostPct: v })
-                    if (touched.operationsCostPct)
-                      setErrors(validate({ ...draft, operationsCostPct: v }))
-                  }}
-                  onBlur={() => markTouched('operationsCostPct')}
-                  invalid={!!showError('operationsCostPct')}
-                />
-              </Field>
-
-              <Field label="Margin %" locked>
-                <div className="flex items-center h-11 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-base">
-                  <span className="text-slate-900 dark:text-white font-semibold tabular-nums">
-                    {marginPct !== null ? `${marginPct}%` : '—'}
-                  </span>
-                </div>
-              </Field>
-            </div>
-          </SectionGroup>
-
-          {/* Lawyered Margins */}
-          <SectionGroup
-            eyebrow="3 · Lawyered Margins"
-            title="Lawyered CV & NCV Margins"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Field
-                label={
-                  <span className="inline-flex items-center gap-1.5">
-                    Lawyered CV Margin %
-                    <InfoTooltip label="CV — Commercial Vehicle" />
-                  </span>
+                error={
+                  showError('onlineConvenienceFee')
+                    ? errors.onlineConvenienceFee
+                    : undefined
                 }
-                required
-                error={showError('lawyeredCvPct') ? errors.lawyeredCvPct : undefined}
               >
-                <PercentInput
-                  value={draft.lawyeredCvPct}
-                  placeholder="e.g., 10"
+                <RupeeInput
+                  value={draft.onlineConvenienceFee ?? null}
+                  placeholder="e.g., 250"
                   onChange={(v) => {
-                    setDraft({ ...draft, lawyeredCvPct: v })
-                    if (touched.lawyeredCvPct)
-                      setErrors(validate({ ...draft, lawyeredCvPct: v }))
+                    setDraft({ ...draft, onlineConvenienceFee: v })
+                    if (touched.onlineConvenienceFee)
+                      setErrors(
+                        validate({ ...draft, onlineConvenienceFee: v }),
+                      )
                   }}
-                  onBlur={() => markTouched('lawyeredCvPct')}
-                  invalid={!!showError('lawyeredCvPct')}
+                  onBlur={() => markTouched('onlineConvenienceFee')}
+                  invalid={!!showError('onlineConvenienceFee')}
                 />
-                <FieldHint>
-                  Must be ≤ Margin %
-                  {marginPct !== null ? ` (${marginPct}%).` : '.'}
-                </FieldHint>
               </Field>
 
               <Field
-                label={
-                  <span className="inline-flex items-center gap-1.5">
-                    Lawyered NCV Margin %
-                    <InfoTooltip label="NCV — Non-Commercial Vehicle" />
-                  </span>
-                }
+                label="Online Court Fee"
                 required
-                error={showError('lawyeredNcvPct') ? errors.lawyeredNcvPct : undefined}
+                error={
+                  showError('onlineCourtFee') ? errors.onlineCourtFee : undefined
+                }
               >
-                <PercentInput
-                  value={draft.lawyeredNcvPct}
-                  placeholder="e.g., 15"
+                <RupeeInput
+                  value={draft.onlineCourtFee ?? null}
+                  placeholder="e.g., 500"
                   onChange={(v) => {
-                    setDraft({ ...draft, lawyeredNcvPct: v })
-                    if (touched.lawyeredNcvPct)
-                      setErrors(validate({ ...draft, lawyeredNcvPct: v }))
+                    setDraft({ ...draft, onlineCourtFee: v })
+                    if (touched.onlineCourtFee)
+                      setErrors(validate({ ...draft, onlineCourtFee: v }))
                   }}
-                  onBlur={() => markTouched('lawyeredNcvPct')}
-                  invalid={!!showError('lawyeredNcvPct')}
+                  onBlur={() => markTouched('onlineCourtFee')}
+                  invalid={!!showError('onlineCourtFee')}
                 />
-                <FieldHint>
-                  Must be ≤ Margin %
-                  {marginPct !== null ? ` (${marginPct}%).` : '.'}
-                </FieldHint>
               </Field>
             </div>
           </SectionGroup>
-
-          {/* Reward Tier */}
-          <SectionGroup eyebrow="4 · Reward Tier" title="Reward Tier">
-            <div className="space-y-4">
-              <div className="flex items-center gap-6">
-                <RadioOption
-                  name="rewardTier"
-                  value="flat"
-                  label="Flat Reward"
-                  checked={rewardTierMode === 'flat'}
-                  onChange={() => setRewardTierMode('flat')}
-                />
-                <RadioOption
-                  name="rewardTier"
-                  value="range"
-                  label="Range"
-                  checked={rewardTierMode === 'range'}
-                  onChange={() => setRewardTierMode('range')}
-                />
-              </div>
-
-              {rewardTierMode === 'range' && (
-                <div className="space-y-3 pt-1">
-                  <RangeRow
-                    label="2000 – 5000"
-                    value={rangeLowPct}
-                    onChange={setRangeLowPct}
-                  />
-                  <RangeRow
-                    label="5000 and more"
-                    value={rangeHighPct}
-                    onChange={setRangeHighPct}
-                  />
-                </div>
-              )}
-            </div>
-          </SectionGroup>
-
-          {/* Preview */}
-          <MaxRewardPreview
-            marginPct={marginPct}
-            lawyeredCvPct={draft.lawyeredCvPct}
-            lawyeredNcvPct={draft.lawyeredNcvPct}
-          />
         </div>
 
         {/* Footer */}
@@ -485,7 +372,7 @@ function Select({
   )
 }
 
-function PercentInput({
+function RupeeInput({
   value,
   placeholder,
   onChange,
@@ -499,12 +386,21 @@ function PercentInput({
   invalid?: boolean
 }) {
   return (
-    <div className="relative">
+    <div
+      className={`flex items-center h-11 rounded-lg border bg-white dark:bg-slate-800 overflow-hidden focus-within:ring-2 focus-within:ring-cyan-500/20 transition-colors ${
+        invalid
+          ? 'border-rose-400 dark:border-rose-500 focus-within:border-rose-500'
+          : 'border-slate-200 dark:border-slate-700 focus-within:border-cyan-500'
+      }`}
+    >
+      <span className="px-3 h-full flex items-center text-sm text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+        ₹
+      </span>
       <input
         type="number"
         inputMode="decimal"
         min={0}
-        max={100}
+        step="1"
         value={value ?? ''}
         placeholder={placeholder}
         onChange={(e) => {
@@ -513,66 +409,8 @@ function PercentInput({
           else onChange(Number(raw))
         }}
         onBlur={onBlur}
-        className={`w-full h-11 pl-3.5 pr-9 text-base bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-colors tabular-nums ${
-          invalid
-            ? 'border-rose-400 dark:border-rose-500 focus:border-rose-500'
-            : 'border-slate-200 dark:border-slate-700 focus:border-cyan-500'
-        }`}
+        className="w-full h-full px-3 text-base bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
-      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
-        %
-      </span>
-    </div>
-  )
-}
-
-function RadioOption({
-  name,
-  value,
-  label,
-  checked,
-  onChange,
-}: {
-  name: string
-  value: string
-  label: string
-  checked: boolean
-  onChange: () => void
-}) {
-  return (
-    <label className="inline-flex items-center gap-3 cursor-pointer select-none">
-      <input
-        type="radio"
-        name={name}
-        value={value}
-        checked={checked}
-        onChange={onChange}
-        className="w-6 h-6 accent-cyan-600"
-      />
-      <span className="text-base font-medium text-slate-800 dark:text-slate-200">
-        {label}
-      </span>
-    </label>
-  )
-}
-
-function RangeRow({
-  label,
-  value,
-  onChange,
-}: {
-  label: string
-  value: number | null
-  onChange: (v: number | null) => void
-}) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-      <div className="flex items-center h-11 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-        <span className="text-sm font-medium text-slate-700 dark:text-slate-200 tabular-nums">
-          {label}
-        </span>
-      </div>
-      <PercentInput value={value} placeholder="e.g., 50" onChange={onChange} />
     </div>
   )
 }
