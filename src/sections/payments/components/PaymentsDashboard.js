@@ -13,8 +13,14 @@ import { LeadsTable } from '@/sections/sales-crm/components/LeadsTable';
 import { LeadDetailView } from '@/sections/sales-crm/components/LeadDetailView';
 import { LawyerProfile } from '@/sections/lawyers/components/LawyerProfile';
 import { PartnerDetail } from '@/sections/partners/components/PartnerDetail';
-const REFUND_TABS = [
-    { key: 'refund_raised', label: 'Refund Raised' },
+const CHALLAN_REFUND_TABS = [
+    { key: 'all', label: 'All' },
+    { key: 'refund_requested', label: 'Refund Requested' },
+    { key: 'hold', label: 'Hold' },
+    { key: 'completed', label: 'Completed' },
+];
+const CASE_REFUND_TABS = [
+    { key: 'refund_requested', label: 'Refund Requested' },
     { key: 'completed', label: 'Completed' },
     { key: 'hold', label: 'Hold' },
     { key: 'rejected', label: 'Rejected' },
@@ -28,6 +34,7 @@ const LAWYER_FEE_TABS = [
 const LEADS_TABS = [
     { key: 'ready_to_invoice', label: 'Ready to Invoice' },
     { key: 'converted', label: 'Converted' },
+    { key: 'rejected', label: 'Rejected' },
 ];
 const PARTNER_TABS = [
     { key: 'to_pay', label: 'To Pay' },
@@ -36,7 +43,7 @@ const PARTNER_TABS = [
     { key: 'rejected', label: 'Failed' },
 ];
 const REFUND_STATUS_OPTIONS = [
-    { value: 'Refund Raised', label: 'Refund Raised' },
+    { value: 'Refund Requested', label: 'Refund Requested' },
     { value: 'Completed', label: 'Completed' },
     { value: 'Hold', label: 'Hold' },
     { value: 'Rejected', label: 'Rejected' },
@@ -56,8 +63,10 @@ const PARTNER_STATUS_OPTIONS = [
     { value: 'Failed', label: 'Failed' },
 ];
 function isRefundInStage(refund, stage) {
-    if (stage === 'refund_raised')
-        return refund.refundStatus === 'Refund Raised';
+    if (stage === 'all')
+        return true;
+    if (stage === 'refund_requested')
+        return refund.refundStatus === 'Refund Requested';
     if (stage === 'completed')
         return refund.refundStatus === 'Completed';
     if (stage === 'hold')
@@ -88,12 +97,12 @@ function isPartnerPayoutInStage(payout, stage) {
         return payout.status === 'Failed';
     return true;
 }
-export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [], lawyers = [], partners = [], partnerPayouts = [], onApproveRefund, onProcessRefund, onBulkApproveRefunds, onBulkProcessRefunds, onExportRefunds, onViewLawyerProfile, onExportLawyerFees, onViewLead, onAssignLead, onBulkMarkLeadsConverted, onBulkMarkLawyerFeesPaid, onBulkMarkPartnerPayoutsPaid, onViewPartnerProfile, onExportPartnerPayouts, }) {
+export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [], leadDocuments = [], leadTimelineActivities = [], lawyers = [], partners = [], partnerPayouts = [], onApproveRefund, onProcessRefund, onBulkApproveRefunds, onBulkProcessRefunds, onExportRefunds, onViewLawyerProfile, onExportLawyerFees, onViewLead, onAssignLead, onBulkMarkLeadsConverted, onBulkMarkLawyerFeesPaid, onBulkMarkPartnerPayoutsPaid, onViewPartnerProfile, onExportPartnerPayouts, }) {
     // Sidebar state
     const [sidebarView, setSidebarView] = useState('challan-refunds');
     // Active stage tab
-    const [challanRefundStage, setChallanRefundStage] = useState('refund_raised');
-    const [caseRefundStage, setCaseRefundStage] = useState('refund_raised');
+    const [challanRefundStage, setChallanRefundStage] = useState('all');
+    const [caseRefundStage, setCaseRefundStage] = useState('refund_requested');
     const [feeStage, setFeeStage] = useState('to_pay');
     const [leadsStage, setLeadsStage] = useState('ready_to_invoice');
     const [partnerStage, setPartnerStage] = useState('to_pay');
@@ -131,14 +140,14 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
     const caseRefunds = useMemo(() => refunds.filter((r) => r.workType === 'case'), [refunds]);
     // Challan refund stage counts
     const challanRefundStageCounts = useMemo(() => ({
-        refund_raised: challanRefunds.filter((r) => r.refundStatus === 'Refund Raised').length,
-        completed: challanRefunds.filter((r) => r.refundStatus === 'Completed').length,
+        all: challanRefunds.length,
+        refund_requested: challanRefunds.filter((r) => r.refundStatus === 'Refund Requested').length,
         hold: challanRefunds.filter((r) => r.refundStatus === 'Hold').length,
-        rejected: challanRefunds.filter((r) => r.refundStatus === 'Rejected').length,
+        completed: challanRefunds.filter((r) => r.refundStatus === 'Completed').length,
     }), [challanRefunds]);
     // Case refund stage counts
     const caseRefundStageCounts = useMemo(() => ({
-        refund_raised: caseRefunds.filter((r) => r.refundStatus === 'Refund Raised').length,
+        refund_requested: caseRefunds.filter((r) => r.refundStatus === 'Refund Requested').length,
         completed: caseRefunds.filter((r) => r.refundStatus === 'Completed').length,
         hold: caseRefunds.filter((r) => r.refundStatus === 'Hold').length,
         rejected: caseRefunds.filter((r) => r.refundStatus === 'Rejected').length,
@@ -154,6 +163,7 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
     const leadsStageCounts = useMemo(() => ({
         ready_to_invoice: leads.filter((l) => l.status === 'invoiced').length,
         converted: leads.filter((l) => l.status === 'sales').length,
+        rejected: leads.filter((l) => l.status === 'rejected').length,
     }), [leads]);
     // Partner payout stage counts
     const partnerStageCounts = useMemo(() => ({
@@ -164,7 +174,11 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
     }), [partnerPayouts]);
     // Filtered leads
     const filteredLeads = useMemo(() => {
-        const statusFilter = leadsStage === 'ready_to_invoice' ? 'invoiced' : 'sales';
+        const statusFilter = leadsStage === 'ready_to_invoice'
+            ? 'invoiced'
+            : leadsStage === 'rejected'
+                ? 'rejected'
+                : 'sales';
         let filtered = leads.filter((l) => l.status === statusFilter);
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();
@@ -386,14 +400,15 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
         return (_jsxs("div", { className: "flex h-full bg-slate-100 dark:bg-slate-950", children: [_jsx(PaymentsSidebar, { view: sidebarView, onViewChange: (view) => {
                         handleSidebarChange(view);
                         setSelectedLeadId(null);
-                    } }), _jsx("div", { className: "flex-1 overflow-auto", children: _jsx(LeadDetailView, { lead: selectedLead, timelineActivities: [], documents: [], users: users, onClose: () => setSelectedLeadId(null) }) })] }));
+                    } }), _jsx("div", { className: "flex-1 overflow-auto", children: _jsx(LeadDetailView, { lead: selectedLead, timelineActivities: leadTimelineActivities, documents: leadDocuments, users: users, onClose: () => setSelectedLeadId(null), hideSalesActions: true }) })] }));
     }
     // Determine current stage tabs, counts, and active tab
     const isRefundView = sidebarView === 'challan-refunds' || sidebarView === 'case-refunds';
-    const currentTabs = isRefundView ? REFUND_TABS
-        : sidebarView === 'lawyer-fees' ? LAWYER_FEE_TABS
-            : sidebarView === 'leads' ? LEADS_TABS
-                : PARTNER_TABS;
+    const currentTabs = sidebarView === 'challan-refunds' ? CHALLAN_REFUND_TABS
+        : sidebarView === 'case-refunds' ? CASE_REFUND_TABS
+            : sidebarView === 'lawyer-fees' ? LAWYER_FEE_TABS
+                : sidebarView === 'leads' ? LEADS_TABS
+                    : PARTNER_TABS;
     const currentCounts = sidebarView === 'challan-refunds' ? challanRefundStageCounts
         : sidebarView === 'case-refunds' ? caseRefundStageCounts
             : sidebarView === 'lawyer-fees' ? feeStageCounts
@@ -427,7 +442,9 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
         : sidebarView === 'lawyer-fees' ? filteredFees.length
             : sidebarView === 'leads' ? filteredLeads.length
                 : filteredPartnerPayouts.length;
-    return (_jsxs("div", { className: "flex h-full bg-slate-100 dark:bg-slate-950", children: [_jsx(PaymentsSidebar, { view: sidebarView, onViewChange: handleSidebarChange }), _jsxs("div", { className: "flex-1 flex flex-col min-w-0", children: [_jsx(PaymentsStageTabs, { tabs: currentTabs, activeTab: currentActiveTab, counts: currentCounts, onTabChange: currentTabChange }), _jsx(PaymentsTableHeader, { searchPlaceholder: currentSearchPlaceholder, searchQuery: searchQuery, onSearchChange: setSearchQuery, onExport: currentExport, statusOptions: currentStatusOptions, ...(sidebarView === 'partners' ? { fromDateLabel: 'Requested Date', toDateLabel: 'Paid Date' } : {}) }), _jsx("div", { className: `flex-1 bg-white dark:bg-slate-900 ${sidebarView === 'leads' ? 'overflow-visible' : 'overflow-auto'}`, children: isRefundView ? (_jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 text-left", children: _jsx("input", { type: "checkbox", checked: allSelected, ref: (el) => {
+    return (_jsxs("div", { className: "flex h-full bg-slate-100 dark:bg-slate-950", children: [_jsx(PaymentsSidebar, { view: sidebarView, onViewChange: handleSidebarChange }), _jsxs("div", { className: "flex-1 flex flex-col min-w-0", children: [_jsx(PaymentsStageTabs, { tabs: currentTabs, activeTab: currentActiveTab, counts: currentCounts, onTabChange: currentTabChange }), _jsx(PaymentsTableHeader, { searchPlaceholder: currentSearchPlaceholder, searchQuery: searchQuery, onSearchChange: setSearchQuery, onExport: currentExport, statusOptions: currentStatusOptions, ...(sidebarView === 'partners' ? { fromDateLabel: 'Requested Date', toDateLabel: 'Paid Date' } : {}) }), _jsx("div", { className: `flex-1 bg-white dark:bg-slate-900 ${sidebarView === 'leads' ? 'overflow-visible' : 'overflow-auto'}`, children: sidebarView === 'challan-refunds' ? (_jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Incident ID" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Subscriber" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Status" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Govt Amount" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Convenience Fee" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Challan Refund" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Refund Txn ID" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Updated" })] }) }), _jsx("tbody", { children: filteredRefunds.length === 0 ? (_jsx("tr", { children: _jsx("td", { colSpan: 8, className: "px-4 py-16 text-center text-slate-500 dark:text-slate-400", children: _jsxs("div", { className: "flex flex-col items-center gap-2", children: [_jsx("div", { className: "w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center", children: _jsx("svg", { className: "w-6 h-6 text-slate-400", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 1.5, d: "M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" }) }) }), _jsx("p", { className: "font-medium", children: "No refunds found" }), _jsx("p", { className: "text-sm", children: searchQuery
+                                                            ? 'Try adjusting your search query'
+                                                            : 'No refunds in this stage yet' })] }) }) })) : (filteredRefunds.map((refund) => (_jsx(RefundRow, { refund: refund, variant: "challan", onClick: () => setSelectedRefundId(refund.id) }, refund.id)))) })] })) : sidebarView === 'case-refunds' ? (_jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 text-left", children: _jsx("input", { type: "checkbox", checked: allSelected, ref: (el) => {
                                                         if (el)
                                                             el.indeterminate = someSelected;
                                                     }, onChange: (e) => activeRefundHandleSelectAll(e.target.checked), className: "h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 dark:bg-slate-700" }) }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Refund ID" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Linked Incident" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Customer / Subscriber" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Amount" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Status" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Initiated By" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Refund Date" }), _jsx("th", { className: "px-4 py-3 text-left", children: _jsx("span", { className: "sr-only", children: "Actions" }) })] }) }), _jsx("tbody", { children: filteredRefunds.length === 0 ? (_jsx("tr", { children: _jsx("td", { colSpan: 9, className: "px-4 py-16 text-center text-slate-500 dark:text-slate-400", children: _jsxs("div", { className: "flex flex-col items-center gap-2", children: [_jsx("div", { className: "w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center", children: _jsx("svg", { className: "w-6 h-6 text-slate-400", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 1.5, d: "M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" }) }) }), _jsx("p", { className: "font-medium", children: "No refunds found" }), _jsx("p", { className: "text-sm", children: searchQuery
@@ -462,9 +479,9 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
                                     else {
                                         setSelectedLeadIds(new Set());
                                     }
-                                }, onViewLead: (id) => setSelectedLeadId(id), onAssignLead: onAssignLead, onSendPI: (lead) => setSendModal({ type: 'pi', lead }), onSendInvoice: (lead) => setSendModal({ type: 'invoice', lead }) }) })) }), _jsx(Pagination, { currentPage: 1, totalPages: 1, totalItems: currentTotalItems, itemsPerPage: 25 })] }), isRefundView && activeRefundSelectedIds.size > 0 && (_jsx(RefundBulkActionsBar, { selectedCount: activeRefundSelectedIds.size, onClearSelection: () => sidebarView === 'case-refunds' ? setSelectedCaseRefundIds(new Set()) : setSelectedIds(new Set()), moveOptions: REFUND_STATUS_OPTIONS, onMove: (targetStage) => {
+                                }, onViewLead: (id) => setSelectedLeadId(id) }) })) }), _jsx(Pagination, { currentPage: 1, totalPages: 1, totalItems: currentTotalItems, itemsPerPage: 25 })] }), sidebarView === 'case-refunds' && activeRefundSelectedIds.size > 0 && (_jsx(RefundBulkActionsBar, { selectedCount: activeRefundSelectedIds.size, onClearSelection: () => setSelectedCaseRefundIds(new Set()), moveOptions: REFUND_STATUS_OPTIONS, onMove: (targetStage) => {
                     console.log('Move refunds:', selectedArray, 'to', targetStage);
-                    sidebarView === 'case-refunds' ? setSelectedCaseRefundIds(new Set()) : setSelectedIds(new Set());
+                    setSelectedCaseRefundIds(new Set());
                 } })), sidebarView === 'lawyer-fees' && selectedFeeKeys.size > 0 && (_jsx(RefundBulkActionsBar, { selectedCount: selectedFeeKeys.size, actionLabel: "Mark as Paid", onClearSelection: () => setSelectedFeeKeys(new Set()), onMarkComplete: () => onBulkMarkLawyerFeesPaid?.(selectedFeeArray) })), sidebarView === 'partners' && selectedPartnerKeys.size > 0 && (_jsx(RefundBulkActionsBar, { selectedCount: selectedPartnerKeys.size, onClearSelection: () => setSelectedPartnerKeys(new Set()), moveOptions: [
                     { value: 'completed', label: 'Completed' },
                     { value: 'hold', label: 'Hold' },
@@ -474,12 +491,16 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
                     setSelectedPartnerKeys(new Set());
                 }, onAddNote: (note) => {
                     console.log(`Add note for ${selectedPartnerArray.length} payouts:`, note);
-                } })), sidebarView === 'leads' && selectedLeadIds.size > 0 && (_jsx(RefundBulkActionsBar, { selectedCount: selectedLeadIds.size, actionLabel: "Mark as Converted", onClearSelection: () => setSelectedLeadIds(new Set()), onMarkComplete: () => onBulkMarkLeadsConverted?.(Array.from(selectedLeadIds)), onSendPI: () => {
-                    const selected = leads.filter((l) => selectedLeadIds.has(l.id));
-                    setBulkSendModal({ type: 'pi', leads: selected });
-                }, onSendInvoice: () => {
-                    const selected = leads.filter((l) => selectedLeadIds.has(l.id));
-                    setBulkSendModal({ type: 'invoice', leads: selected });
+                } })), sidebarView === 'leads' && selectedLeadIds.size > 0 && (_jsx(RefundBulkActionsBar, { selectedCount: selectedLeadIds.size, moveLabel: "Move Status", moveRequiresNotes: true, onClearSelection: () => setSelectedLeadIds(new Set()), moveOptions: [
+                    { value: 'sales', label: 'Converted' },
+                    { value: 'rejected', label: 'Rejected' },
+                ], onMove: (targetStage, notes) => {
+                    const ids = Array.from(selectedLeadIds);
+                    console.log('Bulk move leads:', ids, 'to:', targetStage, 'notes:', notes);
+                    if (targetStage === 'sales') {
+                        onBulkMarkLeadsConverted?.(ids);
+                    }
+                    setSelectedLeadIds(new Set());
                 } })), sendModal && (_jsxs("div", { className: "fixed inset-0 z-50 flex items-center justify-center", children: [_jsx("div", { className: "absolute inset-0 bg-black/50", onClick: () => setSendModal(null) }), _jsxs("div", { className: "relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6", children: [_jsxs("h3", { className: "text-lg font-semibold text-slate-900 dark:text-white mb-2", children: ["Send ", sendModal.type === 'pi' ? 'Proforma Invoice' : 'Invoice'] }), _jsxs("p", { className: "text-sm text-slate-600 dark:text-slate-400 mb-6", children: ["Are you sure you want to send the ", sendModal.type === 'pi' ? 'Proforma Invoice' : 'Invoice', " to the client", ' ', _jsx("span", { className: "font-medium text-slate-900 dark:text-white", children: sendModal.lead.companyAlias }), "? It will be sent to", ' ', _jsx("span", { className: "font-medium text-cyan-600 dark:text-cyan-400", children: sendModal.lead.emailId }), "."] }), _jsxs("div", { className: "flex items-center justify-end gap-3", children: [_jsx("button", { onClick: () => setSendModal(null), className: "px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors", children: "Cancel" }), _jsx("button", { onClick: () => {
                                             setSendSuccess({ type: sendModal.type, message: `Sent to ${sendModal.lead.emailId}` });
                                             setSendModal(null);

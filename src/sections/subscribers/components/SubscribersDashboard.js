@@ -4,28 +4,40 @@ import { SubscriberList } from './SubscriberList';
 import { SubscriberDetail } from './SubscriberDetail';
 export function SubscribersDashboard({ subscribers, subscriptions, users, partners, subscriberSources, subscriberTypes, subscriberSubTypes, planTypes, priceCategories, documents = [], vehicles = [], drivers = [], followUps = [], utmSources = [], vehicleTypes = [], userTypes = [], onViewIncident }) {
     const [selectedSubscriberId, setSelectedSubscriberId] = useState(null);
+    const [selectedSubscriptionId, setSelectedSubscriptionId] = useState(null);
     const selectedSubscriber = selectedSubscriberId ? subscribers.find(s => s.id === selectedSubscriberId) : null;
-    const selectedSubscription = selectedSubscriber ? subscriptions.find(sub => sub.subscriberId === selectedSubscriber.id) : null;
+    const subscriberSubscriptions = selectedSubscriber
+        ? subscriptions.filter(sub => sub.subscriberId === selectedSubscriber.id)
+        : [];
+    const selectedSubscription = selectedSubscriber
+        ? (selectedSubscriptionId
+            ? subscriptions.find(sub => sub.id === selectedSubscriptionId)
+            : subscriberSubscriptions[0])
+        : null;
     const assignedUser = selectedSubscriber ? users.find(u => u.id === selectedSubscriber.assignedOwner) : null;
     const subscriberDocuments = selectedSubscriber ? documents.filter((doc) => doc.subscriberId === selectedSubscriber.id) : [];
     const subscriberVehicles = selectedSubscriber ? vehicles.filter((veh) => veh.subscriberId === selectedSubscriber.id) : [];
     const subscriberDrivers = selectedSubscriber ? drivers.filter((drv) => drv.subscriberId === selectedSubscriber.id) : [];
     const subscriberFollowUps = selectedSubscriber ? followUps.filter((fup) => fup.subscriberId === selectedSubscriber.id) : [];
-    // Sample incidents data
-    const incidents = selectedSubscriber ? [
-        {
-            id: 'IRN-124501',
-            vehicleNumber: 'MH02AB1234',
-            status: 'Resolved',
-            date: '2024-01-20T10:30:00Z'
-        },
-        {
-            id: 'IRN-124502',
-            vehicleNumber: 'MH02CD5678',
-            status: 'In Progress',
-            date: '2024-01-25T14:15:00Z'
-        }
-    ] : [];
+    // Sample incidents data — attach a subscription per incident (rotate through subscriber's plans)
+    const incidents = selectedSubscriber
+        ? (() => {
+            const baseIncidents = [
+                { id: 'IRN-124501', vehicleNumber: 'MH02AB1234', status: 'Resolved', date: '2024-01-20T10:30:00Z' },
+                { id: 'IRN-124502', vehicleNumber: 'MH02CD5678', status: 'In Progress', date: '2024-01-25T14:15:00Z' },
+                { id: 'IRN-124503', vehicleNumber: 'MH02AB1234', status: 'Screening', date: '2024-02-08T09:20:00Z' },
+                { id: 'IRN-124504', vehicleNumber: 'MH04EF9012', status: 'Resolved', date: '2024-02-14T16:45:00Z' },
+            ];
+            return baseIncidents.map((inc, i) => {
+                const sub = subscriberSubscriptions[i % Math.max(1, subscriberSubscriptions.length)];
+                return {
+                    ...inc,
+                    subscriptionId: sub?.id ?? null,
+                    subscriptionName: sub?.subscriptionName ?? null,
+                };
+            });
+        })()
+        : [];
     // Sample challans data
     const challans = selectedSubscriber ? [
         { id: 'MH11279200417102541', vehicleNumber: 'MH02AB1234', violation: 'Overspeeding on National Highway Beyond Permissible Limit', amount: 2000, status: 'pending', challanType: 'online', date: '2024-02-10T08:30:00Z', location: 'Mumbai-Pune Expressway, Lonavala' },
@@ -63,21 +75,36 @@ export function SubscribersDashboard({ subscribers, subscriptions, users, partne
         },
     ] : [];
     // Sample reports data
-    const reports = selectedSubscriber ? [
-        { id: 'RPT-001', subscriberId: selectedSubscriber.id, reportType: 'MIS', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-03-01T06:00:00Z', fileSize: 245760, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
-        { id: 'RPT-002', subscriberId: selectedSubscriber.id, reportType: 'MIS-Challan', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-03-01T06:05:00Z', fileSize: 184320, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
-        { id: 'RPT-003', subscriberId: selectedSubscriber.id, reportType: 'MIS', format: 'CSV', status: 'generating', category: 'monthly', generatedAt: '2026-03-06T06:00:00Z', fileSize: null, period: 'March 2026', periodStart: '2026-03-01', periodEnd: '2026-03-31' },
-        { id: 'RPT-004', subscriberId: selectedSubscriber.id, reportType: 'MIS-Challan', format: 'CSV', status: 'failed', category: 'monthly', generatedAt: '2026-02-01T06:00:00Z', fileSize: null, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
-        { id: 'RPT-005', subscriberId: selectedSubscriber.id, reportType: 'MIS', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-02-01T06:00:00Z', fileSize: 312400, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
-        { id: 'RPT-006', subscriberId: selectedSubscriber.id, reportType: 'ICR', format: 'PDF', status: 'ready', category: 'incident', generatedAt: '2026-02-15T10:30:00Z', fileSize: 524288, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
-        { id: 'RPT-007', subscriberId: selectedSubscriber.id, reportType: 'ISR', format: 'PDF', status: 'ready', category: 'incident', generatedAt: '2026-02-15T10:35:00Z', fileSize: 412672, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
-        { id: 'RPT-008', subscriberId: selectedSubscriber.id, reportType: 'ICR', format: 'PDF', status: 'generating', category: 'incident', generatedAt: '2026-03-05T14:20:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
-        { id: 'RPT-009', subscriberId: selectedSubscriber.id, reportType: 'ISR', format: 'PDF', status: 'failed', category: 'incident', generatedAt: '2026-03-04T09:00:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
-    ] : [];
+    const reports = selectedSubscriber ? (() => {
+        const pick = (i) => {
+            const sub = subscriberSubscriptions[i % Math.max(1, subscriberSubscriptions.length)];
+            return { subscriptionId: sub?.id, subscriptionName: sub?.subscriptionName };
+        };
+        return [
+            { id: 'RPT-001', subscriberId: selectedSubscriber.id, ...pick(0), reportType: 'MIS', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-03-01T06:00:00Z', fileSize: 245760, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
+            { id: 'RPT-002', subscriberId: selectedSubscriber.id, ...pick(1), reportType: 'MIS-Challan', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-03-01T06:05:00Z', fileSize: 184320, period: 'February 2026', periodStart: '2026-02-01', periodEnd: '2026-02-28' },
+            { id: 'RPT-003', subscriberId: selectedSubscriber.id, ...pick(2), reportType: 'MIS', format: 'CSV', status: 'generating', category: 'monthly', generatedAt: '2026-03-06T06:00:00Z', fileSize: null, period: 'March 2026', periodStart: '2026-03-01', periodEnd: '2026-03-31' },
+            { id: 'RPT-004', subscriberId: selectedSubscriber.id, ...pick(0), reportType: 'MIS-Challan', format: 'CSV', status: 'failed', category: 'monthly', generatedAt: '2026-02-01T06:00:00Z', fileSize: null, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
+            { id: 'RPT-005', subscriberId: selectedSubscriber.id, ...pick(1), reportType: 'MIS', format: 'CSV', status: 'ready', category: 'monthly', generatedAt: '2026-02-01T06:00:00Z', fileSize: 312400, period: 'January 2026', periodStart: '2026-01-01', periodEnd: '2026-01-31' },
+            { id: 'RPT-006', subscriberId: selectedSubscriber.id, ...pick(0), reportType: 'ICR', format: 'PDF', status: 'ready', category: 'incident', generatedAt: '2026-02-15T10:30:00Z', fileSize: 524288, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
+            { id: 'RPT-007', subscriberId: selectedSubscriber.id, ...pick(0), reportType: 'ISR', format: 'PDF', status: 'ready', category: 'incident', generatedAt: '2026-02-15T10:35:00Z', fileSize: 412672, incidentId: 'IRN-124501', incidentVehicle: 'MH02AB1234', incidentStatus: 'Resolved' },
+            { id: 'RPT-008', subscriberId: selectedSubscriber.id, ...pick(1), reportType: 'ICR', format: 'PDF', status: 'generating', category: 'incident', generatedAt: '2026-03-05T14:20:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
+            { id: 'RPT-009', subscriberId: selectedSubscriber.id, ...pick(1), reportType: 'ISR', format: 'PDF', status: 'failed', category: 'incident', generatedAt: '2026-03-04T09:00:00Z', fileSize: null, incidentId: 'IRN-124502', incidentVehicle: 'MH02CD5678', incidentStatus: 'In Progress' },
+        ];
+    })() : [];
     // If a subscriber is selected, show detail view
     if (selectedSubscriber) {
-        return (_jsx(SubscriberDetail, { subscriber: selectedSubscriber, subscription: selectedSubscription || null, assignedUser: assignedUser || null, incidents: incidents, challans: challans, documents: subscriberDocuments, vehicles: subscriberVehicles, teamMembers: teamMembers, apiCatalogue: apiCatalogue, reports: reports, onDownloadReport: (id) => console.log('Download report:', id), onRetryReport: (id) => console.log('Retry report:', id), onSaveApiCatalogue: (id, config) => console.log('Save API config:', id, config), onBack: () => setSelectedSubscriberId(null), onEdit: (id) => console.log('Edit subscriber:', id), onUploadDocument: (subscriberId, file) => console.log('Upload document:', subscriberId, file.name), onDeleteDocument: (subscriberId, docId) => console.log('Delete document:', subscriberId, docId), onViewIncident: onViewIncident, onViewChallan: (challanId) => console.log('View challan:', challanId), users: users, partners: partners, subscriberSources: subscriberSources, subscriberTypes: subscriberTypes, subscriberSubTypes: subscriberSubTypes }));
+        return (_jsx(SubscriberDetail, { subscriber: selectedSubscriber, subscription: selectedSubscription || null, subscriptions: subscriberSubscriptions, assignedUser: assignedUser || null, incidents: incidents, challans: challans, documents: subscriberDocuments, vehicles: subscriberVehicles, teamMembers: teamMembers, apiCatalogue: apiCatalogue, reports: reports, onDownloadReport: (id) => console.log('Download report:', id), onRetryReport: (id) => console.log('Retry report:', id), onSaveApiCatalogue: (id, config) => console.log('Save API config:', id, config), onBack: () => {
+                setSelectedSubscriberId(null);
+                setSelectedSubscriptionId(null);
+            }, onEdit: (id) => console.log('Edit subscriber:', id), onUploadDocument: (subscriberId, file) => console.log('Upload document:', subscriberId, file.name), onDeleteDocument: (subscriberId, docId) => console.log('Delete document:', subscriberId, docId), onViewIncident: onViewIncident, onViewChallan: (challanId) => console.log('View challan:', challanId), users: users, partners: partners, subscriberSources: subscriberSources, subscriberTypes: subscriberTypes, subscriberSubTypes: subscriberSubTypes }));
     }
     // Otherwise show list view
-    return (_jsx(SubscriberList, { subscribers: subscribers, subscriptions: subscriptions, users: users, partners: partners, subscriberSources: subscriberSources, subscriberTypes: subscriberTypes, subscriberSubTypes: subscriberSubTypes, planTypes: planTypes, priceCategories: priceCategories, utmSources: utmSources, vehicleTypes: vehicleTypes, userTypes: userTypes, onViewDetails: (id) => setSelectedSubscriberId(id), onEdit: (id) => console.log('Edit subscriber:', id), onAddSubscriber: () => console.log('Add subscriber'), onBulkUpload: () => console.log('Bulk upload'), onSearch: (query) => console.log('Search:', query), onFilter: (filters) => console.log('Filter:', filters) }));
+    return (_jsx(SubscriberList, { subscribers: subscribers, subscriptions: subscriptions, users: users, partners: partners, subscriberSources: subscriberSources, subscriberTypes: subscriberTypes, subscriberSubTypes: subscriberSubTypes, planTypes: planTypes, priceCategories: priceCategories, utmSources: utmSources, vehicleTypes: vehicleTypes, userTypes: userTypes, onViewDetails: (id) => {
+            setSelectedSubscriptionId(null);
+            setSelectedSubscriberId(id);
+        }, onViewSubscription: (subscriberId, subscriptionId) => {
+            setSelectedSubscriptionId(subscriptionId);
+            setSelectedSubscriberId(subscriberId);
+        }, onEdit: (id) => console.log('Edit subscriber:', id), onAddSubscriber: () => console.log('Add subscriber'), onBulkUpload: () => console.log('Bulk upload'), onSearch: (query) => console.log('Search:', query), onFilter: (filters) => console.log('Filter:', filters) }));
 }

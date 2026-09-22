@@ -19,8 +19,8 @@ export interface RefundDetailViewProps {
 }
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  'Refund Raised': {
-    label: 'Refund Raised',
+  'Refund Requested': {
+    label: 'Refund Requested',
     className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
   },
   Completed: {
@@ -77,7 +77,7 @@ export function RefundDetailView({
   ]
 
   const moveStages = [
-    { key: 'Refund Raised', label: 'Refund Raised' },
+    { key: 'Refund Requested', label: 'Refund Requested' },
     { key: 'Completed', label: 'Completed' },
     { key: 'Hold', label: 'Hold' },
     { key: 'Rejected', label: 'Rejected' },

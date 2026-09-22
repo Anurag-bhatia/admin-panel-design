@@ -8,6 +8,7 @@ import { AddCaseModal } from './components/AddCaseModal';
 import { AssignAgentModal } from './components/AssignAgentModal';
 import { AssignLawyerModal } from './components/AssignLawyerModal';
 import { MoveQueueModal } from './components/MoveQueueModal';
+import { MoveQueueDetailsModal } from './components/MoveQueueDetailsModal';
 import { BulkUpdateModal } from './components/BulkUpdateModal';
 import { ScreenResultsView } from './components/ScreenResultsView';
 export default function IncidentListPreview() {
@@ -17,6 +18,7 @@ export default function IncidentListPreview() {
     // Modal state
     const [activeModal, setActiveModal] = useState(null);
     const [selectedIncidentIds, setSelectedIncidentIds] = useState([]);
+    const [settledPreviewType, setSettledPreviewType] = useState('challan');
     // Results state (for demo)
     const [screeningResults, setScreeningResults] = useState([]);
     // Get incident details for detail view
@@ -81,6 +83,11 @@ export default function IncidentListPreview() {
         }
     };
     const handleMoveQueue = (incidentIds, queue) => {
+        if (queue === 'inProgress') {
+            setSelectedIncidentIds(incidentIds);
+            setActiveModal('assignAgentForMove');
+            return;
+        }
         if (queue) {
             console.log('Moving incidents:', incidentIds, 'to queue:', queue);
             setActiveModal(null);
@@ -109,19 +116,27 @@ export default function IncidentListPreview() {
     }
     // Render detail view
     if (viewMode === 'detail' && selectedIncident && subscriber) {
-        return (_jsx(IncidentDetailView, { incident: selectedIncident, subscriber: subscriber, assignedAgent: assignedAgent, assignedLawyer: assignedLawyer, followUps: followUps, timelineActivities: timelineActivities, documents: documents, users: data.users, lawyers: data.lawyers, onBack: handleBack, onAddFollowUp: (incidentId, followUp) => {
-                console.log('Add follow-up:', incidentId, followUp);
-            }, onUploadDocument: (incidentId, file, type) => {
-                console.log('Upload document:', incidentId, file.name, type);
-            }, onViewDocument: (documentId) => console.log('View document:', documentId), onDeleteDocument: (documentId) => console.log('Delete document:', documentId), onAssignAgent: (incidentId, agentId) => {
-                console.log('Assign agent:', agentId, 'to incident:', incidentId);
-            }, onAssignLawyer: (incidentId, lawyerId) => {
-                console.log('Assign lawyer:', lawyerId, 'to incident:', incidentId);
-            }, onMoveQueue: (incidentId, queue) => {
-                console.log('Move incident:', incidentId, 'to queue:', queue);
-            }, onScreen: (incidentId) => handleScreen([incidentId]), onUpdate: (incidentId, updates) => {
-                console.log('Update incident:', incidentId, updates);
-            } }));
+        return (_jsxs(_Fragment, { children: [_jsx(IncidentDetailView, { incident: selectedIncident, subscriber: subscriber, assignedAgent: assignedAgent, assignedLawyer: assignedLawyer, followUps: followUps, timelineActivities: timelineActivities, documents: documents, users: data.users, lawyers: data.lawyers, onBack: handleBack, onAddFollowUp: (incidentId, followUp) => {
+                        console.log('Add follow-up:', incidentId, followUp);
+                    }, onUploadDocument: (incidentId, file, type) => {
+                        console.log('Upload document:', incidentId, file.name, type);
+                    }, onViewDocument: (documentId) => console.log('View document:', documentId), onDeleteDocument: (documentId) => console.log('Delete document:', documentId), onAssignAgent: (incidentId, agentId) => {
+                        console.log('Assign agent:', agentId, 'to incident:', incidentId);
+                    }, onAssignLawyer: (incidentId, lawyerId) => {
+                        console.log('Assign lawyer:', lawyerId, 'to incident:', incidentId);
+                    }, onMoveQueue: (incidentId, queue) => {
+                        if (queue === 'inProgress') {
+                            setSelectedIncidentIds([incidentId]);
+                            setActiveModal('assignAgentForMove');
+                            return;
+                        }
+                        console.log('Move incident:', incidentId, 'to queue:', queue);
+                    }, onScreen: (incidentId) => handleScreen([incidentId]), onUpdate: (incidentId, updates) => {
+                        console.log('Update incident:', incidentId, updates);
+                    } }), activeModal === 'assignAgentForMove' && (_jsx(AssignAgentModal, { selectedCount: selectedIncidentIds.length, users: data.users, onAssign: (agentId, notes) => {
+                        console.log('Move to In Progress + assign agent:', agentId, 'incidents:', selectedIncidentIds, 'notes:', notes);
+                        setActiveModal(null);
+                    }, onClose: () => setActiveModal(null) }))] }));
     }
     // Render list view with modals
     return (_jsxs(_Fragment, { children: [_jsx("div", { className: "h-[calc(100vh-64px)]", children: _jsx(IncidentList, { incidents: data.incidents, challanQueueCounts: data.challanQueueCounts, caseQueueCounts: data.caseQueueCounts, pagination: data.pagination, users: data.users, lawyers: data.lawyers, sources: data.sources, offenceTypes: data.offenceTypes, onViewIncident: handleViewIncident, onAddChallan: handleAddChallan, onAddCase: handleAddCase, onScreen: handleScreen, onAssignAgent: (ids, agentId) => handleAssignAgent(ids, agentId), onAssignLawyer: (ids, lawyerId) => handleAssignLawyer(ids, lawyerId), onMoveQueue: (ids, queue) => handleMoveQueue(ids, queue), onBulkUpdate: (ids, file) => handleBulkUpdate(ids, file), onExport: (ids) => console.log('Export incidents:', ids), onSearch: (query) => console.log('Search:', query), onFilter: (filters) => console.log('Filter:', filters), onQueueChange: (queue) => console.log('Queue changed:', queue), onPageChange: (page) => console.log('Page changed:', page) }) }), activeModal === 'addChallan' && (_jsx(AddChallanModal, { subscribers: data.subscribers, sources: data.sources, onSubmit: (challan) => {
@@ -130,5 +145,11 @@ export default function IncidentListPreview() {
                 }, onCancel: () => setActiveModal(null) })), activeModal === 'addCase' && (_jsx(AddCaseModal, { subscribers: data.subscribers, sources: data.sources, onSubmit: (caseData) => {
                     console.log('Add case:', caseData);
                     setActiveModal(null);
-                }, onCancel: () => setActiveModal(null) })), activeModal === 'assignAgent' && (_jsx(AssignAgentModal, { selectedCount: selectedIncidentIds.length, users: data.users, onAssign: (agentId, notes) => handleAssignAgent(selectedIncidentIds, agentId, notes), onClose: () => setActiveModal(null) })), activeModal === 'assignLawyer' && (_jsx(AssignLawyerModal, { selectedCount: selectedIncidentIds.length, lawyers: data.lawyers, onAssign: (lawyerId, notes) => handleAssignLawyer(selectedIncidentIds, lawyerId, notes), onClose: () => setActiveModal(null) })), activeModal === 'moveQueue' && (_jsx(MoveQueueModal, { selectedCount: selectedIncidentIds.length, onMove: (queue) => handleMoveQueue(selectedIncidentIds, queue), onClose: () => setActiveModal(null) })), activeModal === 'bulkUpdate' && (_jsx(BulkUpdateModal, { selectedCount: selectedIncidentIds.length, onUpload: (file) => handleBulkUpdate(selectedIncidentIds, file), onClose: () => setActiveModal(null) }))] }));
+                }, onCancel: () => setActiveModal(null) })), activeModal === 'assignAgent' && (_jsx(AssignAgentModal, { selectedCount: selectedIncidentIds.length, users: data.users, onAssign: (agentId, notes) => handleAssignAgent(selectedIncidentIds, agentId, notes), onClose: () => setActiveModal(null) })), activeModal === 'assignAgentForMove' && (_jsx(AssignAgentModal, { selectedCount: selectedIncidentIds.length, users: data.users, onAssign: (agentId, notes) => {
+                    console.log('Move to In Progress + assign agent:', agentId, 'incidents:', selectedIncidentIds, 'notes:', notes);
+                    setActiveModal(null);
+                }, onClose: () => setActiveModal(null) })), activeModal === 'assignLawyer' && (_jsx(AssignLawyerModal, { selectedCount: selectedIncidentIds.length, lawyers: data.lawyers, onAssign: (lawyerId, notes) => handleAssignLawyer(selectedIncidentIds, lawyerId, notes), onClose: () => setActiveModal(null) })), activeModal === 'moveQueue' && (_jsx(MoveQueueModal, { selectedCount: selectedIncidentIds.length, onMove: (queue) => handleMoveQueue(selectedIncidentIds, queue), onClose: () => setActiveModal(null) })), activeModal === 'bulkUpdate' && (_jsx(BulkUpdateModal, { selectedCount: selectedIncidentIds.length, onUpload: (file) => handleBulkUpdate(selectedIncidentIds, file), onClose: () => setActiveModal(null) })), settledPreviewType && (_jsx(MoveQueueDetailsModal, { incidentId: (data.incidents.find((i) => i.workType === settledPreviewType) ?? data.incidents[0]).incidentId, stage: "settled", onSubmit: (payload) => {
+                    console.log('Move to Settled payload:', payload);
+                    setSettledPreviewType(null);
+                }, onCancel: () => setSettledPreviewType(null) }))] }));
 }

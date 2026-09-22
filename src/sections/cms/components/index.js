@@ -1,6 +1,17 @@
 export { CMSDashboard } from './CMSDashboard';
 export { BlogList } from './BlogList';
 export { EventNewsList } from './EventNewsList';
+export { BannerList } from './BannerList';
+export { CouponList } from './CouponList';
+export { AddCouponPage } from './AddCouponPage';
+export { ProgrammeList } from './ProgrammeList';
+export { AddProgrammePage } from './AddProgrammePage';
+export { WalletSection } from './WalletSection';
+export { WalletDashboard } from './WalletDashboard';
+export { CustomerCreditView } from './CustomerCreditView';
+export { WalletAuditLog } from './WalletAuditLog';
+export { AdvancedRulesBuilder } from './AdvancedRulesBuilder';
 export { AddBlogPage } from './AddBlogPage';
 export { AddEventNewsPage } from './AddEventNewsPage';
+export { AddBannerPage } from './AddBannerPage';
 export { RichTextEditor } from './RichTextEditor';

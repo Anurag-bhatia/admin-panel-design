@@ -1,9 +1,12 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 const TYPE_LABELS = {
-    refund: 'Refund Dispute',
-    service: 'Service Dispute',
-    payment: 'Payment Dispute',
+    refund: 'Refund',
+    '48hr_refund': '48 hr Refund',
+    tat_breach: 'TAT Breach',
+    payment_issue: 'Payment Issue',
     legal_escalation: 'Legal Escalation',
+    information_missing: 'Information Missing',
+    incorrect_data: 'Incorrect Data',
 };
 const RAISED_BY_LABELS = {
     customer: 'Customer',
@@ -11,25 +14,37 @@ const RAISED_BY_LABELS = {
     internal: 'Internal',
 };
 const STATUS_LABELS = {
-    open: {
-        label: 'Open',
+    new_incident: {
+        label: 'New Incident',
         className: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
     },
     in_progress: {
         label: 'In Progress',
         className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
     },
-    refund_raised: {
-        label: 'Refund Raised',
+    assigned: {
+        label: 'Assigned',
+        className: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+    },
+    transfer_to_department: {
+        label: 'Transfer to Department',
+        className: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400',
+    },
+    reroute: {
+        label: 'Reroute',
         className: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+    },
+    settled: {
+        label: 'Settled',
+        className: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
     },
     not_settled: {
         label: 'Not Settled',
         className: 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
     },
-    settled: {
-        label: 'Settled',
-        className: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+    hold: {
+        label: 'Hold',
+        className: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
     },
 };
 function formatCurrency(amount) {
@@ -51,5 +66,5 @@ function formatDateTime(dateString) {
 }
 export function SummaryTab({ dispute }) {
     const statusConfig = STATUS_LABELS[dispute.status] || { label: dispute.status, className: '' };
-    return (_jsx("div", { className: "p-6", children: _jsxs("div", { className: "max-w-4xl mx-auto space-y-6", children: [_jsxs("div", { children: [_jsx("h2", { className: "text-lg font-semibold text-slate-900 dark:text-white mb-4", children: "Dispute Overview" }), _jsx("div", { className: "bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6", children: _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [_jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Dispute ID" }), _jsx("p", { className: "text-sm font-mono font-semibold text-slate-900 dark:text-white", children: dispute.disputeId })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Status" }), _jsx("span", { className: `inline-flex items-center px-2.5 py-1 rounded text-xs font-medium ${statusConfig.className}`, children: statusConfig.label })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Dispute Type" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: TYPE_LABELS[dispute.disputeType] || dispute.disputeType })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Raised By" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: RAISED_BY_LABELS[dispute.raisedBy] || dispute.raisedBy })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Source" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: dispute.source })] }), dispute.disputedAmount !== null && (_jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Disputed Amount" }), _jsx("p", { className: "text-sm font-semibold text-slate-900 dark:text-white", children: formatCurrency(dispute.disputedAmount) })] })), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Created On" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: formatDateTime(dispute.createdOn) })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Last Updated" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: formatDateTime(dispute.lastUpdated) })] })] }) })] }), _jsxs("div", { children: [_jsx("h2", { className: "text-lg font-semibold text-slate-900 dark:text-white mb-4", children: "Reason" }), _jsx("div", { className: "bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6", children: _jsx("p", { className: "text-sm text-slate-700 dark:text-slate-300 leading-relaxed", children: dispute.reason || dispute.description }) })] })] }) }));
+    return (_jsx("div", { className: "p-6", children: _jsxs("div", { className: "max-w-4xl mx-auto space-y-6", children: [_jsxs("div", { children: [_jsx("h2", { className: "text-lg font-semibold text-slate-900 dark:text-white mb-4", children: "Dispute Overview" }), _jsx("div", { className: "bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6", children: _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [_jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Dispute ID" }), _jsx("p", { className: "text-sm font-mono font-semibold text-slate-900 dark:text-white", children: dispute.disputeId.replace(/-/g, '') })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Status" }), _jsx("span", { className: `inline-flex items-center px-2.5 py-1 rounded text-xs font-medium ${statusConfig.className}`, children: statusConfig.label })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Dispute Type" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: TYPE_LABELS[dispute.disputeType] || dispute.disputeType })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Raised By" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: RAISED_BY_LABELS[dispute.raisedBy] || dispute.raisedBy })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Source" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: dispute.source })] }), dispute.disputedAmount !== null && (_jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Disputed Amount" }), _jsx("p", { className: "text-sm font-semibold text-slate-900 dark:text-white", children: formatCurrency(dispute.disputedAmount) })] })), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Created On" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: formatDateTime(dispute.createdOn) })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1", children: "Last Updated" }), _jsx("p", { className: "text-sm text-slate-900 dark:text-white", children: formatDateTime(dispute.lastUpdated) })] })] }) })] }), _jsxs("div", { children: [_jsx("h2", { className: "text-lg font-semibold text-slate-900 dark:text-white mb-4", children: "Reason" }), _jsx("div", { className: "bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6", children: _jsx("p", { className: "text-sm text-slate-700 dark:text-slate-300 leading-relaxed", children: dispute.reason || dispute.description }) })] })] }) }));
 }

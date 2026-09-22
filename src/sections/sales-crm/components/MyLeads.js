@@ -1,6 +1,6 @@
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState, useMemo } from 'react';
-import { Calendar, Clock, MoreVertical, Eye, Phone, MapPin, Truck, Building2 } from 'lucide-react';
+import { Calendar, MoreVertical, Eye, Phone, MapPin, Truck, Building2 } from 'lucide-react';
 import { LeadDetailView } from './LeadDetailView';
 import { EditLeadModal } from './EditLeadModal';
 import { AddFollowUpModal } from './AddFollowUpModal';
@@ -70,6 +70,7 @@ export function MyLeads({ currentUser, leads, todaysMeetings, todaysPriorities, 
             invoiced: 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300',
             sales: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
             lost: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
+            rejected: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
         };
         return `${baseClasses} ${variants[status]}`;
     };
@@ -82,6 +83,7 @@ export function MyLeads({ currentUser, leads, todaysMeetings, todaysPriorities, 
         invoiced: 'Ready to Invoice',
         sales: 'Converted',
         lost: 'Lost',
+        rejected: 'Rejected',
     };
     const getUserName = (userId) => {
         if (!userId)
@@ -107,7 +109,7 @@ export function MyLeads({ currentUser, leads, todaysMeetings, todaysPriorities, 
                         setUploadDocLeadId(null);
                     }, onClose: () => setUploadDocLeadId(null) }))] }));
     }
-    return (_jsx("div", { className: "min-h-screen bg-slate-50 dark:bg-slate-950", children: _jsxs("div", { className: "max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8", children: [_jsxs("div", { className: "mb-6", children: [_jsxs("div", { className: "flex items-center gap-3 mb-2", children: [_jsx(Calendar, { className: "w-5 h-5 text-cyan-600 dark:text-cyan-400" }), _jsx("h1", { className: "text-2xl font-semibold text-slate-900 dark:text-slate-100", children: "My Leads" })] }), _jsx("p", { className: "text-sm text-slate-600 dark:text-slate-400", children: today })] }), todaysMeetings.length > 0 && (_jsxs("div", { className: "mb-6 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4", children: [_jsxs("div", { className: "flex items-center gap-2 mb-3", children: [_jsx(Clock, { className: "w-4 h-4 text-cyan-600 dark:text-cyan-400" }), _jsx("h2", { className: "text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider", children: "Today's Meetings" })] }), _jsx("div", { className: "space-y-2", children: todaysMeetings.map(meeting => (_jsx("div", { className: "flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer", onClick: () => setSelectedLeadId(meeting.leadId), children: _jsxs("div", { className: "flex items-center gap-3", children: [_jsxs("div", { className: "flex flex-col items-center justify-center w-16 h-16 rounded-lg bg-cyan-100 dark:bg-cyan-900/30", children: [_jsx("span", { className: "text-sm font-semibold text-cyan-600 dark:text-cyan-400", children: meeting.timeSlot.split(':')[0] }), _jsx("span", { className: "text-xs text-cyan-600 dark:text-cyan-400", children: meeting.timeSlot.split(' ')[1] })] }), _jsxs("div", { children: [_jsx("p", { className: "font-medium text-slate-900 dark:text-white", children: meeting.leadName }), _jsxs("p", { className: "text-sm text-slate-600 dark:text-slate-400", children: [meeting.meetingType, " \u2022 ", meeting.duration] })] })] }) }, meeting.id))) })] })), _jsx("div", { className: "mb-6", children: _jsx("div", { className: "border-b border-slate-200 dark:border-slate-800 overflow-x-auto", children: _jsx("nav", { className: "flex gap-4 sm:gap-6 min-w-max px-1", "aria-label": "Lead tabs", children: [
+    return (_jsx("div", { className: "min-h-screen bg-slate-50 dark:bg-slate-950", children: _jsxs("div", { className: "max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8", children: [_jsxs("div", { className: "mb-6", children: [_jsxs("div", { className: "flex items-center gap-3 mb-2", children: [_jsx(Calendar, { className: "w-5 h-5 text-cyan-600 dark:text-cyan-400" }), _jsx("h1", { className: "text-2xl font-semibold text-slate-900 dark:text-slate-100", children: "My Leads" })] }), _jsx("p", { className: "text-sm text-slate-600 dark:text-slate-400", children: today })] }), _jsx("div", { className: "mb-6", children: _jsx("div", { className: "border-b border-slate-200 dark:border-slate-800 overflow-x-auto", children: _jsx("nav", { className: "flex gap-4 sm:gap-6 min-w-max px-1", "aria-label": "Lead tabs", children: [
                                 { key: 'assigned', label: 'Assigned Leads' },
                                 { key: 'follow-up', label: 'Follow-up' },
                                 { key: 'quotations', label: 'Quotation' },

@@ -32,9 +32,11 @@ export interface Refund {
   customerSubscriber: string
   originalPaymentId: string
   refundAmount: number
-  refundStatus: 'Refund Raised' | 'Completed' | 'Hold' | 'Rejected'
+  convenienceFee?: number
+  refundStatus: 'Refund Requested' | 'Completed' | 'Hold' | 'Rejected'
   initiatedBy: string | null
   refundDate: string | null
+  refundTxnId?: string | null
   createdOn: string
   lastUpdated: string
   reason: string

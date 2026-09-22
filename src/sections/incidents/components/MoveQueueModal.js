@@ -28,9 +28,14 @@ const QUEUE_OPTIONS = [
         description: 'Challans temporarily paused',
     },
     {
-        value: 'refund',
-        label: 'Refund',
+        value: 'refundRequested',
+        label: 'Refund Requested',
         description: 'Challans pending refund processing',
+    },
+    {
+        value: 'refundCompleted',
+        label: 'Refund Completed',
+        description: 'Challans with refund completed',
     },
 ];
 export function MoveQueueModal({ selectedCount, currentQueue, onMove, onClose, }) {

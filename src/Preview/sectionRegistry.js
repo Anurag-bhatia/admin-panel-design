@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, UserPlus, Users, UserCircle, Scale, Handshake, CreditCard, MessageSquare, HeadphonesIcon, BarChart3, UsersRound, Settings, FileText, CheckCircle2, FileInput, Gift, } from 'lucide-react';
+import { AlertCircle, UserPlus, Users, UserCircle, Scale, Handshake, CreditCard, MessageSquare, HeadphonesIcon, BarChart3, UsersRound, Settings, FileText, CheckCircle2, FileInput, Gift, BookOpen, } from 'lucide-react';
 // Lazy-loaded section preview components
 const IncidentListPreview = React.lazy(() => import('../sections/incidents/IncidentListPreview'));
 const LeadsDashboard = React.lazy(() => import('../sections/sales-crm/LeadsDashboard'));
@@ -17,6 +17,7 @@ const CMSDashboardPreview = React.lazy(() => import('../sections/cms/CMSDashboar
 const SettledChallansPreview = React.lazy(() => import('../sections/settled-challans/SettledChallansPreview'));
 const ProposalListPreview = React.lazy(() => import('../sections/proposals/ProposalListPreview'));
 const RewardsConfigPreview = React.lazy(() => import('../sections/rewards-config/RewardsConfigPreview'));
+const KnowledgeBasePreview = React.lazy(() => import('../sections/knowledge-base/KnowledgeBasePreview'));
 // Section metadata mapping
 export const SECTION_DATA = {
     incidents: {
@@ -30,8 +31,8 @@ export const SECTION_DATA = {
         icon: UserPlus,
     },
     subscribers: {
-        label: 'Subscribers',
-        description: 'Active client account management and relationship tracking for B2B fleet operators and companies.',
+        label: 'Users',
+        description: 'Manage customers (individual users) and subscribers (B2B fleet operators and companies) under one Users section.',
         icon: Users,
     },
     customers: {
@@ -95,9 +96,14 @@ export const SECTION_DATA = {
         icon: FileInput,
     },
     'rewards-config': {
-        label: 'Rewards Config',
+        label: 'Config',
         description: 'State-level reward configuration for Operations Cost, Margin, and Lawyered CV/NCV margins. Email-allow-listed access with versioned change history.',
         icon: Gift,
+    },
+    'knowledge-base': {
+        label: 'Knowledge Base',
+        description: 'Admin backend for legal guides, templates, FAQs, checklists, regulations, judgements, and circulars that end users see in the app.',
+        icon: BookOpen,
     },
 };
 // Component mapping for implemented sections
@@ -118,6 +124,7 @@ export const SECTION_COMPONENTS = {
     'settled-challans': SettledChallansPreview,
     proposals: ProposalListPreview,
     'rewards-config': RewardsConfigPreview,
+    'knowledge-base': KnowledgeBasePreview,
 };
 // Ordered list of section IDs for consistent navigation
 export const SECTION_IDS = [
@@ -137,6 +144,7 @@ export const SECTION_IDS = [
     'settled-challans',
     'proposals',
     'rewards-config',
+    'knowledge-base',
 ];
 // Sections hidden from sidebar navigation (kept in registry for data access)
 export const HIDDEN_SECTIONS = new Set(['customers']);

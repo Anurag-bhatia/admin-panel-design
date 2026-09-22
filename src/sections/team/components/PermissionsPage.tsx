@@ -17,6 +17,7 @@ import {
   Shield,
   UserCog,
   Users,
+  Wallet,
 } from 'lucide-react'
 import type { Employee, Permissions } from '@/../product/sections/team/types'
 
@@ -41,6 +42,7 @@ const moduleIcons: Record<string, typeof Shield> = {
   Teams: Users,
   Employees: UserCog,
   Finance: CreditCard,
+  'ChallanPay-Wallet': Wallet,
   Settings: Settings,
 }
 

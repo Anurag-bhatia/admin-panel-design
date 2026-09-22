@@ -1,69 +1,58 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { AlertCircle, ChevronDown, Lock } from 'lucide-react';
-import { InfoTooltip } from './InfoTooltip';
-import { StatusToggle } from './StatusToggle';
-import { MaxRewardPreview } from './MaxRewardPreview';
+const PLATFORM_OPTIONS = [
+    { value: 'challanPay', label: 'ChallanPay' },
+    { value: 'lots247', label: 'LOTS247' },
+];
 function validate(draft) {
     const errors = {};
     if (!draft.state) {
         errors.state = 'Please select a state.';
     }
-    const cost = draft.operationsCostPct;
-    if (cost === null || Number.isNaN(cost)) {
-        errors.operationsCostPct = 'Operations Cost % is required.';
+    const conv = draft.onlineConvenienceFee ?? null;
+    if (conv === null || Number.isNaN(conv)) {
+        errors.onlineConvenienceFee = 'Online Convenience Fee is required.';
     }
-    else if (cost < 0 || cost > 100) {
-        errors.operationsCostPct = 'Enter a value between 0 and 100.';
+    else if (conv < 0) {
+        errors.onlineConvenienceFee = 'Value cannot be negative.';
     }
-    const margin = cost !== null && !Number.isNaN(cost) ? 100 - cost : null;
-    const cv = draft.lawyeredCvPct;
-    if (cv === null || Number.isNaN(cv)) {
-        errors.lawyeredCvPct = 'Lawyered CV Margin % is required.';
+    const court = draft.onlineCourtFee ?? null;
+    if (court === null || Number.isNaN(court)) {
+        errors.onlineCourtFee = 'Online Court Fee is required.';
     }
-    else if (cv < 0) {
-        errors.lawyeredCvPct = 'Value cannot be negative.';
-    }
-    else if (margin !== null && cv > margin) {
-        errors.lawyeredCvPct = `Must be ≤ Margin % (${margin}%).`;
-    }
-    const ncv = draft.lawyeredNcvPct;
-    if (ncv === null || Number.isNaN(ncv)) {
-        errors.lawyeredNcvPct = 'Lawyered NCV Margin % is required.';
-    }
-    else if (ncv < 0) {
-        errors.lawyeredNcvPct = 'Value cannot be negative.';
-    }
-    else if (margin !== null && ncv > margin) {
-        errors.lawyeredNcvPct = `Must be ≤ Margin % (${margin}%).`;
+    else if (court < 0) {
+        errors.onlineCourtFee = 'Value cannot be negative.';
     }
     return errors;
 }
-export function ConfigurationForm({ mode, states, existingStates, initialConfig, onCancel, onSubmit, }) {
+export function ConfigurationForm({ mode, states, existingStates, initialConfig, defaultProduct, onCancel, onSubmit, }) {
     const [draft, setDraft] = useState(() => initialConfig
         ? {
+            product: initialConfig.product,
             state: initialConfig.state,
             region: initialConfig.region,
-            operationsCostPct: initialConfig.operationsCostPct,
-            lawyeredCvPct: initialConfig.lawyeredCvPct,
-            lawyeredNcvPct: initialConfig.lawyeredNcvPct,
+            operationsCostPct: null,
+            lawyeredCvPct: null,
+            lawyeredNcvPct: null,
+            onlineConvenienceFee: null,
+            onlineCourtFee: null,
             status: initialConfig.status,
         }
         : {
+            product: defaultProduct ?? 'challanPay',
             state: null,
             region: 'All Regions',
             operationsCostPct: null,
             lawyeredCvPct: null,
             lawyeredNcvPct: null,
+            onlineConvenienceFee: null,
+            onlineCourtFee: null,
             status: 'active',
         });
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
-    const marginPct = useMemo(() => {
-        if (draft.operationsCostPct === null || Number.isNaN(draft.operationsCostPct))
-            return null;
-        return 100 - draft.operationsCostPct;
-    }, [draft.operationsCostPct]);
+    const [challanType, setChallanType] = useState('regular');
     const stateLocked = mode === 'edit';
     const availableStates = mode === 'edit'
         ? states
@@ -71,9 +60,8 @@ export function ConfigurationForm({ mode, states, existingStates, initialConfig,
     const handleSubmit = () => {
         setTouched({
             state: true,
-            operationsCostPct: true,
-            lawyeredCvPct: true,
-            lawyeredNcvPct: true,
+            onlineConvenienceFee: true,
+            onlineCourtFee: true,
         });
         const nextErrors = validate(draft);
         setErrors(nextErrors);
@@ -86,26 +74,28 @@ export function ConfigurationForm({ mode, states, existingStates, initialConfig,
         setErrors(validate(draft));
     };
     const showError = (field) => touched[field] && errors[field];
-    return (_jsx("div", { className: "max-w-5xl mx-auto", children: _jsxs("div", { className: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden", children: [_jsx("div", { className: "px-6 py-5 border-b border-slate-200 dark:border-slate-800", children: _jsx("div", { className: "flex items-center justify-between", children: _jsx("div", { children: _jsx("h2", { className: "text-lg font-semibold text-slate-900 dark:text-white", children: mode === 'add'
-                                    ? 'Add Reward Configuration'
-                                    : `Update Configuration — ${initialConfig?.state}` }) }) }) }), _jsxs("div", { className: "px-8 py-8 space-y-10", children: [_jsx(SectionGroup, { eyebrow: "1 \u00B7 Scope", title: "State & Region", children: _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [_jsx(Field, { label: "Select State", required: true, locked: stateLocked, error: showError('state') ? errors.state : undefined, children: stateLocked ? (_jsx(LockedInput, { value: draft.state ?? '' })) : (_jsx(Select, { value: draft.state ?? '', placeholder: "Select a state\u2026", onChange: (v) => {
+    return (_jsx("div", { className: "max-w-5xl mx-auto", children: _jsxs("div", { className: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden", children: [_jsxs("div", { className: "px-8 py-8 space-y-10", children: [_jsx(SectionGroup, { eyebrow: "1 \u00B7 Scope", title: "Platform and State", children: _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [_jsx(Field, { label: "Platform", required: true, children: _jsx(Select, { value: draft.product ?? 'challanPay', placeholder: "Select a platform\u2026", onChange: (v) => setDraft({ ...draft, product: v }), options: PLATFORM_OPTIONS.map((p) => ({
+                                                value: p.value,
+                                                label: p.label,
+                                            })) }) }), _jsx(Field, { label: "Challan Type", required: true, children: _jsx(Select, { value: challanType, placeholder: "Select a type\u2026", onChange: (v) => setChallanType(v), options: [
+                                                { value: 'regular', label: 'Regular' },
+                                                { value: 'express', label: 'Express' },
+                                            ] }) }), _jsx(Field, { label: "Select State", required: true, locked: stateLocked, error: showError('state') ? errors.state : undefined, children: stateLocked ? (_jsx(LockedInput, { value: draft.state ?? '' })) : (_jsx(Select, { value: draft.state ?? '', placeholder: "Select a state\u2026", onChange: (v) => {
                                                 const next = { ...draft, state: v || null };
                                                 setDraft(next);
                                                 setTouched((prev) => ({ ...prev, state: true }));
                                                 setErrors(validate(next));
-                                            }, options: availableStates.map((s) => ({ value: s, label: s })), invalid: !!showError('state') })) }), _jsx(Field, { label: "Select Region", locked: true, children: _jsx(LockedInput, { value: draft.region }) })] }) }), _jsx(SectionGroup, { eyebrow: "2 \u00B7 Cost & Margin", title: "Operations Cost & Margin", children: _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [_jsx(Field, { label: "Operations Cost %", required: true, error: showError('operationsCostPct') ? errors.operationsCostPct : undefined, children: _jsx(PercentInput, { value: draft.operationsCostPct, placeholder: "e.g., 30", onChange: (v) => {
-                                                setDraft({ ...draft, operationsCostPct: v });
-                                                if (touched.operationsCostPct)
-                                                    setErrors(validate({ ...draft, operationsCostPct: v }));
-                                            }, onBlur: () => markTouched('operationsCostPct'), invalid: !!showError('operationsCostPct') }) }), _jsx(Field, { label: "Margin %", locked: true, children: _jsx("div", { className: "flex items-center h-11 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-base", children: _jsx("span", { className: "text-slate-900 dark:text-white font-semibold tabular-nums", children: marginPct !== null ? `${marginPct}%` : '—' }) }) })] }) }), _jsx(SectionGroup, { eyebrow: "3 \u00B7 Lawyered Margins", title: "Lawyered CV & NCV Margins", children: _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [_jsxs(Field, { label: _jsxs("span", { className: "inline-flex items-center gap-1.5", children: ["Lawyered CV Margin %", _jsx(InfoTooltip, { label: "CV \u2014 Commercial Vehicle" })] }), required: true, error: showError('lawyeredCvPct') ? errors.lawyeredCvPct : undefined, children: [_jsx(PercentInput, { value: draft.lawyeredCvPct, placeholder: "e.g., 10", onChange: (v) => {
-                                                    setDraft({ ...draft, lawyeredCvPct: v });
-                                                    if (touched.lawyeredCvPct)
-                                                        setErrors(validate({ ...draft, lawyeredCvPct: v }));
-                                                }, onBlur: () => markTouched('lawyeredCvPct'), invalid: !!showError('lawyeredCvPct') }), _jsxs(FieldHint, { children: ["Must be \u2264 Margin %", marginPct !== null ? ` (${marginPct}%).` : '.'] })] }), _jsxs(Field, { label: _jsxs("span", { className: "inline-flex items-center gap-1.5", children: ["Lawyered NCV Margin %", _jsx(InfoTooltip, { label: "NCV \u2014 Non-Commercial Vehicle" })] }), required: true, error: showError('lawyeredNcvPct') ? errors.lawyeredNcvPct : undefined, children: [_jsx(PercentInput, { value: draft.lawyeredNcvPct, placeholder: "e.g., 15", onChange: (v) => {
-                                                    setDraft({ ...draft, lawyeredNcvPct: v });
-                                                    if (touched.lawyeredNcvPct)
-                                                        setErrors(validate({ ...draft, lawyeredNcvPct: v }));
-                                                }, onBlur: () => markTouched('lawyeredNcvPct'), invalid: !!showError('lawyeredNcvPct') }), _jsxs(FieldHint, { children: ["Must be \u2264 Margin %", marginPct !== null ? ` (${marginPct}%).` : '.'] })] })] }) }), _jsx(SectionGroup, { eyebrow: "4 \u00B7 Status", title: "Configuration Status", children: _jsx(StatusToggle, { value: draft.status, onChange: (next) => setDraft({ ...draft, status: next }) }) }), _jsx(MaxRewardPreview, { marginPct: marginPct, lawyeredCvPct: draft.lawyeredCvPct, lawyeredNcvPct: draft.lawyeredNcvPct })] }), _jsx("div", { className: "px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-end", children: _jsxs("div", { className: "flex items-center gap-2", children: [_jsx("button", { type: "button", onClick: onCancel, className: "px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors", children: "Cancel" }), _jsx("button", { type: "button", onClick: handleSubmit, className: "px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm", children: mode === 'add' ? 'Add Configuration' : 'Update Configuration' })] }) })] }) }));
+                                            }, options: availableStates.map((s) => ({ value: s, label: s })), invalid: !!showError('state') })) }), _jsx(Field, { label: "Select Region", locked: true, children: _jsx(LockedInput, { value: draft.region }) })] }) }), _jsx(SectionGroup, { eyebrow: "2 \u00B7 Fees", title: "Fees", children: _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [_jsx(Field, { label: "Online Convenience Fee", required: true, error: showError('onlineConvenienceFee')
+                                            ? errors.onlineConvenienceFee
+                                            : undefined, children: _jsx(RupeeInput, { value: draft.onlineConvenienceFee ?? null, placeholder: "e.g., 250", onChange: (v) => {
+                                                setDraft({ ...draft, onlineConvenienceFee: v });
+                                                if (touched.onlineConvenienceFee)
+                                                    setErrors(validate({ ...draft, onlineConvenienceFee: v }));
+                                            }, onBlur: () => markTouched('onlineConvenienceFee'), invalid: !!showError('onlineConvenienceFee') }) }), _jsx(Field, { label: "Online Court Fee", required: true, error: showError('onlineCourtFee') ? errors.onlineCourtFee : undefined, children: _jsx(RupeeInput, { value: draft.onlineCourtFee ?? null, placeholder: "e.g., 500", onChange: (v) => {
+                                                setDraft({ ...draft, onlineCourtFee: v });
+                                                if (touched.onlineCourtFee)
+                                                    setErrors(validate({ ...draft, onlineCourtFee: v }));
+                                            }, onBlur: () => markTouched('onlineCourtFee'), invalid: !!showError('onlineCourtFee') }) })] }) })] }), _jsx("div", { className: "px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-end", children: _jsxs("div", { className: "flex items-center gap-2", children: [_jsx("button", { type: "button", onClick: onCancel, className: "px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors", children: "Cancel" }), _jsx("button", { type: "button", onClick: handleSubmit, className: "px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm", children: mode === 'add' ? 'Add Configuration' : 'Update Configuration' })] }) })] }) }));
 }
 // ---------- Sub-components ----------
 function SectionGroup({ title, description, children, }) {
@@ -125,14 +115,14 @@ function Select({ value, onChange, placeholder, options, invalid, }) {
                     ? 'border-rose-400 dark:border-rose-500 focus:border-rose-500'
                     : 'border-slate-200 dark:border-slate-700 focus:border-cyan-500'} ${!value ? 'text-slate-400 dark:text-slate-500' : ''}`, children: [_jsx("option", { value: "", disabled: true, children: placeholder }), options.map((o) => (_jsx("option", { value: o.value, className: "text-slate-900 dark:text-white", children: o.label }, o.value)))] }), _jsx(ChevronDown, { className: "absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" })] }));
 }
-function PercentInput({ value, placeholder, onChange, onBlur, invalid, }) {
-    return (_jsxs("div", { className: "relative", children: [_jsx("input", { type: "number", inputMode: "decimal", min: 0, max: 100, value: value ?? '', placeholder: placeholder, onChange: (e) => {
+function RupeeInput({ value, placeholder, onChange, onBlur, invalid, }) {
+    return (_jsxs("div", { className: `flex items-center h-11 rounded-lg border bg-white dark:bg-slate-800 overflow-hidden focus-within:ring-2 focus-within:ring-cyan-500/20 transition-colors ${invalid
+            ? 'border-rose-400 dark:border-rose-500 focus-within:border-rose-500'
+            : 'border-slate-200 dark:border-slate-700 focus-within:border-cyan-500'}`, children: [_jsx("span", { className: "px-3 h-full flex items-center text-sm text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60", children: "\u20B9" }), _jsx("input", { type: "number", inputMode: "decimal", min: 0, step: "1", value: value ?? '', placeholder: placeholder, onChange: (e) => {
                     const raw = e.target.value;
                     if (raw === '')
                         onChange(null);
                     else
                         onChange(Number(raw));
-                }, onBlur: onBlur, className: `w-full h-11 pl-3.5 pr-9 text-base bg-white dark:bg-slate-800 border rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-colors tabular-nums ${invalid
-                    ? 'border-rose-400 dark:border-rose-500 focus:border-rose-500'
-                    : 'border-slate-200 dark:border-slate-700 focus:border-cyan-500'}` }), _jsx("span", { className: "absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none", children: "%" })] }));
+                }, onBlur: onBlur, className: "w-full h-full px-3 text-base bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" })] }));
 }

@@ -15,8 +15,15 @@ import { LeadDetailView } from '@/sections/sales-crm/components/LeadDetailView'
 import { LawyerProfile } from '@/sections/lawyers/components/LawyerProfile'
 import { PartnerDetail } from '@/sections/partners/components/PartnerDetail'
 
-const REFUND_TABS = [
-  { key: 'refund_raised', label: 'Refund Raised' },
+const CHALLAN_REFUND_TABS = [
+  { key: 'all', label: 'All' },
+  { key: 'refund_requested', label: 'Refund Requested' },
+  { key: 'hold', label: 'Hold' },
+  { key: 'completed', label: 'Completed' },
+]
+
+const CASE_REFUND_TABS = [
+  { key: 'refund_requested', label: 'Refund Requested' },
   { key: 'completed', label: 'Completed' },
   { key: 'hold', label: 'Hold' },
   { key: 'rejected', label: 'Rejected' },
@@ -43,7 +50,7 @@ const PARTNER_TABS = [
 ]
 
 const REFUND_STATUS_OPTIONS = [
-  { value: 'Refund Raised', label: 'Refund Raised' },
+  { value: 'Refund Requested', label: 'Refund Requested' },
   { value: 'Completed', label: 'Completed' },
   { value: 'Hold', label: 'Hold' },
   { value: 'Rejected', label: 'Rejected' },
@@ -66,7 +73,8 @@ const PARTNER_STATUS_OPTIONS = [
 ]
 
 function isRefundInStage(refund: Refund, stage: string): boolean {
-  if (stage === 'refund_raised') return refund.refundStatus === 'Refund Raised'
+  if (stage === 'all') return true
+  if (stage === 'refund_requested') return refund.refundStatus === 'Refund Requested'
   if (stage === 'completed') return refund.refundStatus === 'Completed'
   if (stage === 'hold') return refund.refundStatus === 'Hold'
   if (stage === 'rejected') return refund.refundStatus === 'Rejected'
@@ -118,8 +126,8 @@ export function PaymentsDashboard({
   const [sidebarView, setSidebarView] = useState<'challan-refunds' | 'case-refunds' | 'lawyer-fees' | 'leads' | 'partners'>('challan-refunds')
 
   // Active stage tab
-  const [challanRefundStage, setChallanRefundStage] = useState('refund_raised')
-  const [caseRefundStage, setCaseRefundStage] = useState('refund_raised')
+  const [challanRefundStage, setChallanRefundStage] = useState('all')
+  const [caseRefundStage, setCaseRefundStage] = useState('refund_requested')
   const [feeStage, setFeeStage] = useState('to_pay')
   const [leadsStage, setLeadsStage] = useState('ready_to_invoice')
   const [partnerStage, setPartnerStage] = useState('to_pay')
@@ -170,15 +178,15 @@ export function PaymentsDashboard({
 
   // Challan refund stage counts
   const challanRefundStageCounts = useMemo(() => ({
-    refund_raised: challanRefunds.filter((r) => r.refundStatus === 'Refund Raised').length,
-    completed: challanRefunds.filter((r) => r.refundStatus === 'Completed').length,
+    all: challanRefunds.length,
+    refund_requested: challanRefunds.filter((r) => r.refundStatus === 'Refund Requested').length,
     hold: challanRefunds.filter((r) => r.refundStatus === 'Hold').length,
-    rejected: challanRefunds.filter((r) => r.refundStatus === 'Rejected').length,
+    completed: challanRefunds.filter((r) => r.refundStatus === 'Completed').length,
   }), [challanRefunds])
 
   // Case refund stage counts
   const caseRefundStageCounts = useMemo(() => ({
-    refund_raised: caseRefunds.filter((r) => r.refundStatus === 'Refund Raised').length,
+    refund_requested: caseRefunds.filter((r) => r.refundStatus === 'Refund Requested').length,
     completed: caseRefunds.filter((r) => r.refundStatus === 'Completed').length,
     hold: caseRefunds.filter((r) => r.refundStatus === 'Hold').length,
     rejected: caseRefunds.filter((r) => r.refundStatus === 'Rejected').length,
@@ -557,7 +565,8 @@ export function PaymentsDashboard({
   // Determine current stage tabs, counts, and active tab
   const isRefundView = sidebarView === 'challan-refunds' || sidebarView === 'case-refunds'
 
-  const currentTabs = isRefundView ? REFUND_TABS
+  const currentTabs = sidebarView === 'challan-refunds' ? CHALLAN_REFUND_TABS
+    : sidebarView === 'case-refunds' ? CASE_REFUND_TABS
     : sidebarView === 'lawyer-fees' ? LAWYER_FEE_TABS
     : sidebarView === 'leads' ? LEADS_TABS
     : PARTNER_TABS
@@ -632,7 +641,81 @@ export function PaymentsDashboard({
 
         {/* Table */}
         <div className={`flex-1 bg-white dark:bg-slate-900 ${sidebarView === 'leads' ? 'overflow-visible' : 'overflow-auto'}`}>
-          {isRefundView ? (
+          {sidebarView === 'challan-refunds' ? (
+            <table className="w-full">
+              <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Incident ID
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Subscriber
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Govt Amount
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Convenience Fee
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Challan Refund
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Refund Txn ID
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Updated
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredRefunds.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={8}
+                      className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                          <svg
+                            className="w-6 h-6 text-slate-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.5}
+                              d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-medium">No refunds found</p>
+                        <p className="text-sm">
+                          {searchQuery
+                            ? 'Try adjusting your search query'
+                            : 'No refunds in this stage yet'}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredRefunds.map((refund) => (
+                    <RefundRow
+                      key={refund.id}
+                      refund={refund}
+                      variant="challan"
+                      onClick={() => setSelectedRefundId(refund.id)}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
+          ) : sidebarView === 'case-refunds' ? (
             <table className="w-full">
               <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                 <tr>
@@ -938,14 +1021,14 @@ export function PaymentsDashboard({
       </div>
 
       {/* Bulk Actions Bar */}
-      {isRefundView && activeRefundSelectedIds.size > 0 && (
+      {sidebarView === 'case-refunds' && activeRefundSelectedIds.size > 0 && (
         <RefundBulkActionsBar
           selectedCount={activeRefundSelectedIds.size}
-          onClearSelection={() => sidebarView === 'case-refunds' ? setSelectedCaseRefundIds(new Set()) : setSelectedIds(new Set())}
+          onClearSelection={() => setSelectedCaseRefundIds(new Set())}
           moveOptions={REFUND_STATUS_OPTIONS}
           onMove={(targetStage) => {
             console.log('Move refunds:', selectedArray, 'to', targetStage)
-            sidebarView === 'case-refunds' ? setSelectedCaseRefundIds(new Set()) : setSelectedIds(new Set())
+            setSelectedCaseRefundIds(new Set())
           }}
         />
       )}

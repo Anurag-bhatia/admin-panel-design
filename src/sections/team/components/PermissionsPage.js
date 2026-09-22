@@ -1,6 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
-import { ArrowLeft, ChevronDown, Save, User, AlertTriangle, BarChart3, Briefcase, CreditCard, Headphones, LayoutGrid, MessageSquareWarning, Scale, Settings, UserCog, Users, } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Save, User, AlertTriangle, BarChart3, Briefcase, CreditCard, Headphones, LayoutGrid, MessageSquareWarning, Scale, Settings, UserCog, Users, Wallet, } from 'lucide-react';
 const moduleIcons = {
     Incidents: AlertTriangle,
     Leads: Briefcase,
@@ -14,6 +14,7 @@ const moduleIcons = {
     Teams: Users,
     Employees: UserCog,
     Finance: CreditCard,
+    'ChallanPay-Wallet': Wallet,
     Settings: Settings,
 };
 function Toggle({ enabled, onChange, disabled, size = 'md', }) {

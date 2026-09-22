@@ -4,8 +4,8 @@ import { ArrowLeft, ArrowRightLeft, ChevronDown, } from 'lucide-react';
 import { RefundActivityTab } from './RefundActivityTab';
 import { RefundNotesTab } from './RefundNotesTab';
 const STATUS_LABELS = {
-    'Refund Raised': {
-        label: 'Refund Raised',
+    'Refund Requested': {
+        label: 'Refund Requested',
         className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
     },
     Completed: {
@@ -51,7 +51,7 @@ export function RefundDetailView({ refund, onBack, onAddNote, onAddFollowUp, onM
         { key: 'notes', label: `Notes (${refund.notes.length})` },
     ];
     const moveStages = [
-        { key: 'Refund Raised', label: 'Refund Raised' },
+        { key: 'Refund Requested', label: 'Refund Requested' },
         { key: 'Completed', label: 'Completed' },
         { key: 'Hold', label: 'Hold' },
         { key: 'Rejected', label: 'Rejected' },

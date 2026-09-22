@@ -2,7 +2,7 @@ import { jsxs as _jsxs, jsx as _jsx, Fragment as _Fragment } from "react/jsx-run
 import { useState } from 'react';
 import { Plus, UserPlus, ArrowUpRight, AlertTriangle, CheckCircle, XCircle, Clock, FileText, MessageSquare, X, } from 'lucide-react';
 const STAGE_OPTIONS = [
-    'Refund Raised',
+    'Refund Requested',
     'Under Review',
     'Approved',
     'Hold',

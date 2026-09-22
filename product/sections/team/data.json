@@ -495,7 +495,7 @@
   ],
   "departments": ["Operations", "Finance", "Customer Success", "Legal"],
   "designations": ["Operations Manager", "Senior Operations Executive", "Operations Executive", "Finance Manager", "Finance Executive", "Support Manager", "Support Executive", "Legal Coordinator"],
-  "modules": ["Incidents", "Leads", "Subscribers", "Lawyers", "Partners", "Payments", "Disputes", "Support", "Reports", "Teams", "Employees", "Finance", "Settings"],
+  "modules": ["Incidents", "Leads", "Subscribers", "Lawyers", "Partners", "Payments", "Disputes", "Support", "Reports", "Teams", "Employees", "Finance", "ChallanPay-Wallet", "Settings"],
   "flows": {
     "Incidents": ["view", "screen", "assign", "reassign", "approve"],
     "Lawyers": ["view", "add", "edit", "deactivate", "manage_performance"],
@@ -507,6 +507,7 @@
     "Teams": ["view", "add", "edit", "manage_members"],
     "Employees": ["view", "add", "edit", "manage_permissions", "deactivate"],
     "Reports": ["view", "export"],
+    "ChallanPay-Wallet": ["create_programme", "edit_draft_programme", "activate_or_schedule", "pause_resume_issuing", "pause_resume_redemption", "archive_programme", "clone_programme", "view_customer_credit", "view_reports", "view_audit_log", "export_data"],
     "Settings": ["view", "modify_configurations"]
   }
 }

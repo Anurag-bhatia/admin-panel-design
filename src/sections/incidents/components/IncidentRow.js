@@ -1,6 +1,7 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useState } from 'react';
 import { MoreHorizontal, Search, UserPlus, Scale, ArrowRight, Edit, X, Receipt, } from 'lucide-react';
+import { MoveQueueDetailsModal } from './MoveQueueDetailsModal';
 const TYPE_LABELS = {
     payAndClose: 'PPT',
     contest: 'Bulk',
@@ -39,12 +40,21 @@ const QUEUE_OPTIONS = [
     { key: 'settled', label: 'Settled' },
     { key: 'notSettled', label: 'Not Settled' },
     { key: 'hold', label: 'Hold' },
-    { key: 'refund', label: 'Refund' },
+    { key: 'refundRequested', label: 'Refund Requested' },
+    { key: 'refundCompleted', label: 'Refund Completed' },
 ];
 const STEP_META = {
     screening: {
         label: 'Screening',
         className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+    },
+    screenDone: {
+        label: 'Screen Done',
+        className: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+    },
+    failed: {
+        label: 'Failed',
+        className: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
     },
     agentAssigned: {
         label: 'Agent Assigned',
@@ -83,7 +93,6 @@ export function IncidentRow({ incident, isSelected, users, lawyers, workType = '
     const [showSettlementModal, setShowSettlementModal] = useState(false);
     const [settlementFees, setSettlementFees] = useState({
         totalAmountReceived: 0,
-        challanAmount: 0,
         convenienceFee: 0,
         gst: 0,
         gatewayCharges: 0,
@@ -123,7 +132,7 @@ export function IncidentRow({ incident, isSelected, users, lawyers, workType = '
         setShowSettlementModal(false);
         setPendingQueue(null);
         setIsAddingExpense(false);
-        setSettlementFees({ totalAmountReceived: 0, challanAmount: 0, convenienceFee: 0, gst: 0, gatewayCharges: 0, discount: 0, lawyerCharge: 0, governmentCharge: 0, miscellaneousCharge: 0 });
+        setSettlementFees({ totalAmountReceived: 0, convenienceFee: 0, gst: 0, gatewayCharges: 0, discount: 0, lawyerCharge: 0, governmentCharge: 0, miscellaneousCharge: 0 });
     };
     const assignedAgent = users.find((u) => u.id === incident.assignedAgentId);
     const assignedLawyer = lawyers.find((l) => l.id === incident.assignedLawyerId);
@@ -133,23 +142,39 @@ export function IncidentRow({ incident, isSelected, users, lawyers, workType = '
                                         return (_jsxs("p", { className: "text-xs font-medium text-cyan-600 dark:text-cyan-400", children: ["Overdue by ", Math.abs(daysLeft), " ", Math.abs(daysLeft) === 1 ? 'day' : 'days'] }));
                                     }
                                     return (_jsxs("p", { className: "text-xs text-cyan-600 dark:text-cyan-400", children: [daysLeft, " ", daysLeft === 1 ? 'day' : 'days', " left"] }));
-                                })()] }) }), _jsx("td", { className: "px-4 py-3", children: _jsxs("div", { children: [_jsx("p", { className: "text-sm font-medium text-slate-900 dark:text-white", children: incident.subscriberName }), _jsx("p", { className: "text-xs text-slate-500 dark:text-slate-400", children: incident.subscriberId }), _jsx("p", { className: "mt-1 font-mono text-xs text-slate-700 dark:text-slate-300", children: incident.vehicle })] }) }), _jsx("td", { className: "px-4 py-3", children: _jsxs("div", { className: "flex flex-wrap items-center gap-1", children: [_jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${isCases
-                                        ? incident.type === 'onSpot'
+                                })()] }) }), _jsx("td", { className: "px-4 py-3", children: _jsxs("div", { children: [_jsx("p", { className: "text-sm font-medium text-slate-900 dark:text-white", children: incident.subscriberName }), _jsx("p", { className: "text-xs text-slate-500 dark:text-slate-400", children: incident.subscriberId }), _jsx("span", { className: "mt-1 inline-flex items-center px-2 py-0.5 rounded font-mono text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300", children: incident.vehicle })] }) }), !isCases && (_jsxs("td", { className: "px-4 py-3", children: [_jsx("p", { className: "font-mono text-sm font-medium text-slate-900 dark:text-white", children: incident.challanNumber }), _jsxs("p", { className: "mt-2 text-xs font-medium text-slate-900 dark:text-white", children: ["\u20B9", incident.amount.toLocaleString('en-IN')] })] })), _jsx("td", { className: "px-4 py-3", children: _jsx("div", { className: "flex flex-wrap items-center gap-1", children: isCases ? (_jsxs(_Fragment, { children: [_jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${incident.type === 'onSpot'
                                             ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-                                            : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                                        : incident.type === 'contest'
-                                            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                                            : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'}`, children: TYPE_LABELS[incident.type] }), isCases
-                                    ? incident.caseCategory && (_jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400", children: CASE_CATEGORY_LABELS[incident.caseCategory] || incident.caseCategory }))
-                                    : (incident.challanType === 'court' || incident.challanType === 'online') && (_jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${incident.challanType === 'court'
-                                            ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400'
-                                            : 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'}`, children: CHALLAN_TYPE_LABELS[incident.challanType] }))] }) }), _jsxs("td", { className: "px-4 py-3", children: [_jsx("p", { className: "text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap", children: formatDate(incident.lastUpdatedAt) }), _jsx("p", { className: "text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap", children: formatTime(incident.lastUpdatedAt) })] }), _jsx("td", { className: "px-4 py-3", children: incident.step ? (_jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STEP_META[incident.step].className}`, children: STEP_META[incident.step].label })) : (_jsx("span", { className: "text-sm text-slate-400 dark:text-slate-500", children: "\u2014" })) }), !isCases && (_jsx("td", { className: "px-4 py-3", children: assignedAgent ? (_jsxs("div", { className: "flex items-center gap-2 min-w-0", children: [_jsx("div", { className: "h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300 flex-shrink-0", children: assignedAgent.name.charAt(0) }), _jsx("span", { className: "text-sm text-slate-700 dark:text-slate-300 truncate", children: assignedAgent.name.split(' ')[0] })] })) : (_jsx("span", { className: "text-sm text-slate-400 dark:text-slate-500", children: "\u2014" })) })), _jsx("td", { className: "px-4 py-3", children: assignedLawyer ? (_jsx("span", { className: "text-sm text-slate-700 dark:text-slate-300 truncate block", children: assignedLawyer.name.replace('Adv. ', '') })) : (_jsx("span", { className: "text-sm text-slate-400 dark:text-slate-500", children: "\u2014" })) }), _jsx("td", { className: "px-4 py-3", onClick: (e) => e.stopPropagation(), children: _jsxs("div", { className: "relative", children: [_jsx("button", { onClick: () => setShowMenu(!showMenu), className: "p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors", children: _jsx(MoreHorizontal, { className: "h-4 w-4 text-slate-500" }) }), showMenu && (_jsxs(_Fragment, { children: [_jsx("div", { className: "fixed inset-0 z-10", onClick: () => {
+                                            : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'}`, children: TYPE_LABELS[incident.type] }), incident.caseCategory && (_jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400", children: CASE_CATEGORY_LABELS[incident.caseCategory] || incident.caseCategory }))] })) : ((incident.challanType === 'court' || incident.challanType === 'online') && (_jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${incident.challanType === 'court'
+                                    ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400'
+                                    : 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'}`, children: CHALLAN_TYPE_LABELS[incident.challanType] }))) }) }), _jsxs("td", { className: "px-4 py-3", children: [_jsx("p", { className: "text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap", children: formatDate(incident.createdAt) }), _jsx("p", { className: "text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap", children: formatTime(incident.createdAt) })] }), _jsxs("td", { className: "px-4 py-3", children: [_jsx("p", { className: "text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap", children: formatDate(incident.lastUpdatedAt) }), _jsx("p", { className: "text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap", children: formatTime(incident.lastUpdatedAt) })] }), _jsx("td", { className: "px-4 py-3", children: (() => {
+                            if (incident.queue === 'newIncidents') {
+                                return (_jsx("span", { className: "text-sm text-slate-400 dark:text-slate-500", children: "\u2014" }));
+                            }
+                            if (isCases &&
+                                (incident.queue === 'settled' ||
+                                    incident.queue === 'notSettled' ||
+                                    incident.queue === 'refundRequested' ||
+                                    incident.queue === 'refundCompleted')) {
+                                return (_jsxs("span", { className: "text-sm font-semibold text-slate-900 dark:text-white", children: ["\u20B9", incident.amount.toLocaleString('en-IN')] }));
+                            }
+                            const rawStatuses = incident.statuses && incident.statuses.length > 0
+                                ? incident.statuses
+                                : incident.step
+                                    ? [incident.step]
+                                    : [];
+                            const filtered = rawStatuses.filter((s) => s === 'screening' || s === 'screenDone' || s === 'failed');
+                            const statuses = filtered.length > 0 ? filtered : ['screening'];
+                            if (statuses.length === 0) {
+                                return (_jsx("span", { className: "text-sm text-slate-400 dark:text-slate-500", children: "\u2014" }));
+                            }
+                            return (_jsx("div", { className: "flex flex-wrap items-center gap-1", children: statuses.map((s) => (_jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STEP_META[s].className}`, children: STEP_META[s].label }, s))) }));
+                        })() }), !isCases && (_jsx("td", { className: "px-4 py-3", children: incident.queue === 'newIncidents' ? (_jsx("span", { className: "text-sm text-slate-400 dark:text-slate-500", children: "\u2014" })) : assignedAgent ? (_jsxs("div", { className: "flex items-center gap-2 min-w-0", children: [_jsx("div", { className: "h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-300 flex-shrink-0", children: assignedAgent.name.charAt(0) }), _jsx("span", { className: "text-sm text-slate-700 dark:text-slate-300 truncate", children: assignedAgent.name.split(' ')[0] })] })) : (_jsx("span", { className: "text-sm text-slate-400 dark:text-slate-500", children: "\u2014" })) })), isCases && (_jsx("td", { className: "px-4 py-3", children: incident.queue === 'newIncidents' ? (_jsx("span", { className: "text-sm text-slate-400 dark:text-slate-500", children: "\u2014" })) : assignedLawyer ? (_jsx("span", { className: "text-sm text-slate-700 dark:text-slate-300 truncate block", children: assignedLawyer.name.replace('Adv. ', '') })) : (_jsx("span", { className: "text-sm text-slate-400 dark:text-slate-500", children: "\u2014" })) })), _jsx("td", { className: "px-4 py-3", onClick: (e) => e.stopPropagation(), children: _jsxs("div", { className: "relative", children: [_jsx("button", { onClick: () => setShowMenu(!showMenu), className: "p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors", children: _jsx(MoreHorizontal, { className: "h-4 w-4 text-slate-500" }) }), showMenu && (_jsxs(_Fragment, { children: [_jsx("div", { className: "fixed inset-0 z-10", onClick: () => {
                                                 setShowMenu(false);
                                                 setShowAgentDropdown(false);
                                                 setShowLawyerDropdown(false);
                                                 setShowQueueDropdown(false);
                                             } }), _jsx("div", { className: "absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20", children: incident.queue === 'notSettled' ? (_jsxs("button", { onClick: () => {
-                                                    handleMoveToQueue('refund');
+                                                    handleMoveToQueue('refundRequested');
                                                 }, className: "w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700", children: [_jsx(ArrowRight, { className: "h-4 w-4" }), "Send to Refund"] })) : (_jsxs(_Fragment, { children: [!isCases && (_jsxs(_Fragment, { children: [_jsxs("button", { onClick: () => {
                                                                     if (incident.queue === 'newIncidents') {
                                                                         onScreen?.();
@@ -172,7 +197,15 @@ export function IncidentRow({ incident, isSelected, users, lawyers, workType = '
                                                                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`, children: [_jsxs("span", { className: "flex items-center gap-2", children: [_jsx(ArrowRight, { className: "h-4 w-4" }), "Move Queue"] }), _jsx(ArrowRight, { className: "h-3 w-3" })] }), showQueueDropdown && (isCases || incident.queue !== 'newIncidents') && (_jsx("div", { className: "absolute left-full top-0 ml-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1", children: QUEUE_OPTIONS.filter((q) => q.key !== incident.queue).map((queue) => (_jsx("button", { onClick: () => handleMoveToQueue(queue.key), className: "w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700", children: queue.label }, queue.key))) }))] }), _jsx("div", { className: "border-t border-slate-100 dark:border-slate-700 my-1" }), _jsxs("button", { onClick: handleAddExpense, className: "w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700", children: [_jsx(Receipt, { className: "h-4 w-4" }), "Add Expense"] }), _jsxs("button", { onClick: () => {
                                                             onUpdate?.();
                                                             setShowMenu(false);
-                                                        }, className: "w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700", children: [_jsx(Edit, { className: "h-4 w-4" }), "Update"] })] })) })] }))] }) })] }), showSettlementModal && (_jsx("tr", { children: _jsx("td", { colSpan: isCases ? 10 : 11, className: "p-0", children: _jsxs("div", { className: "fixed inset-0 z-50 flex items-center justify-center", children: [_jsx("div", { className: "absolute inset-0 bg-black/50", onClick: () => setShowSettlementModal(false) }), _jsxs("div", { className: "relative bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6", children: [_jsx("button", { onClick: () => setShowSettlementModal(false), className: "absolute top-4 right-4 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors", children: _jsx(X, { className: "h-5 w-5 text-slate-500" }) }), _jsx("h2", { className: "text-lg font-semibold text-slate-900 dark:text-white mb-2", children: isAddingExpense ? 'Add Expense' : pendingQueue === 'settled' ? 'Settlement Details' : 'Not Settled Details' }), _jsx("p", { className: "text-sm text-slate-500 dark:text-slate-400 mb-6", children: isAddingExpense
+                                                        }, className: "w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700", children: [_jsx(Edit, { className: "h-4 w-4" }), "Update"] })] })) })] }))] }) })] }), showSettlementModal && !isAddingExpense && pendingQueue === 'settled' && (_jsx("tr", { children: _jsx("td", { colSpan: isCases ? 9 : 10, className: "p-0", children: _jsx(MoveQueueDetailsModal, { incidentId: incident.incidentId, stage: "settled", onSubmit: (payload) => {
+                            console.log('Settled payload:', payload);
+                            onMoveQueue?.('settled');
+                            setShowSettlementModal(false);
+                            setPendingQueue(null);
+                        }, onCancel: () => {
+                            setShowSettlementModal(false);
+                            setPendingQueue(null);
+                        } }) }) })), showSettlementModal && (isAddingExpense || pendingQueue !== 'settled') && (_jsx("tr", { children: _jsx("td", { colSpan: isCases ? 9 : 10, className: "p-0", children: _jsxs("div", { className: "fixed inset-0 z-50 flex items-center justify-center", children: [_jsx("div", { className: "absolute inset-0 bg-black/50", onClick: () => setShowSettlementModal(false) }), _jsxs("div", { className: "relative bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6", children: [_jsx("button", { onClick: () => setShowSettlementModal(false), className: "absolute top-4 right-4 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors", children: _jsx(X, { className: "h-5 w-5 text-slate-500" }) }), _jsx("h2", { className: "text-lg font-semibold text-slate-900 dark:text-white mb-2", children: isAddingExpense ? 'Add Expense' : pendingQueue === 'settled' ? 'Settlement Details' : 'Not Settled Details' }), _jsx("p", { className: "text-sm text-slate-500 dark:text-slate-400 mb-6", children: isAddingExpense
                                             ? `Enter the expense details for this ${isCases ? 'case' : 'challan'}.`
                                             : `Enter the fee details before marking as ${pendingQueue === 'settled' ? 'settled' : 'not settled'}.` }), _jsx("div", { className: "space-y-4", children: isCases ? (_jsxs(_Fragment, { children: [_jsxs("div", { children: [_jsxs("label", { className: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1", children: ["Lawyer Charge ", _jsx("span", { className: "text-red-500", children: "*" })] }), _jsxs("div", { className: "relative", children: [_jsx("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-500", children: "\u20B9" }), _jsx("input", { type: "number", value: settlementFees.lawyerCharge || '', onChange: (e) => setSettlementFees({
                                                                         ...settlementFees,
@@ -186,9 +219,6 @@ export function IncidentRow({ incident, isSelected, users, lawyers, workType = '
                                                                     }), placeholder: "0.00", className: "w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white" })] })] })] })) : (_jsxs(_Fragment, { children: [_jsxs("div", { children: [_jsxs("label", { className: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1", children: ["Total Amount Received ", _jsx("span", { className: "text-red-500", children: "*" })] }), _jsxs("div", { className: "relative", children: [_jsx("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-500", children: "\u20B9" }), _jsx("input", { type: "number", value: settlementFees.totalAmountReceived || '', onChange: (e) => setSettlementFees({
                                                                         ...settlementFees,
                                                                         totalAmountReceived: parseFloat(e.target.value) || 0,
-                                                                    }), placeholder: "0.00", className: "w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white" })] })] }), _jsxs("div", { children: [_jsxs("label", { className: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1", children: ["Challan Amount ", _jsx("span", { className: "text-red-500", children: "*" })] }), _jsxs("div", { className: "relative", children: [_jsx("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-500", children: "\u20B9" }), _jsx("input", { type: "number", value: settlementFees.challanAmount || '', onChange: (e) => setSettlementFees({
-                                                                        ...settlementFees,
-                                                                        challanAmount: parseFloat(e.target.value) || 0,
                                                                     }), placeholder: "0.00", className: "w-full pl-8 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white" })] })] }), _jsxs("div", { className: "grid grid-cols-2 gap-3", children: [_jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1", children: "Convenience Fee" }), _jsxs("div", { className: "relative", children: [_jsx("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-500", children: "\u20B9" }), _jsx("input", { type: "number", value: settlementFees.convenienceFee || '', onChange: (e) => setSettlementFees({
                                                                                 ...settlementFees,
                                                                                 convenienceFee: parseFloat(e.target.value) || 0,

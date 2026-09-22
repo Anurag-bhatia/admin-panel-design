@@ -4,17 +4,18 @@ import type { Refund } from '@/../product/sections/payments/types'
 
 interface RefundRowProps {
   refund: Refund
-  isSelected: boolean
-  onSelect: (selected: boolean) => void
+  isSelected?: boolean
+  onSelect?: (selected: boolean) => void
   onApprove?: () => void
   onProcess?: () => void
   onMove?: (targetStage: string) => void
   onClick?: () => void
+  variant?: 'default' | 'challan'
 }
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  'Refund Raised': {
-    label: 'Refund Raised',
+  'Refund Requested': {
+    label: 'Refund Requested',
     className: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
   },
   Completed: {
@@ -51,7 +52,7 @@ function formatCurrency(amount: number): string {
 }
 
 const MOVE_OPTIONS = [
-  { value: 'Refund Raised', label: 'Refund Raised' },
+  { value: 'Refund Requested', label: 'Refund Requested' },
   { value: 'Completed', label: 'Completed' },
   { value: 'Hold', label: 'Hold' },
   { value: 'Rejected', label: 'Rejected' },
@@ -59,18 +60,92 @@ const MOVE_OPTIONS = [
 
 export function RefundRow({
   refund,
-  isSelected,
+  isSelected = false,
   onSelect,
-  onApprove,
-  onProcess,
   onMove,
   onClick,
+  variant = 'default',
 }: RefundRowProps) {
   const [showMenu, setShowMenu] = useState(false)
 
   const statusConfig = STATUS_LABELS[refund.refundStatus] || {
     label: refund.refundStatus,
     className: '',
+  }
+
+  if (variant === 'challan') {
+    return (
+      <tr
+        className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+        onClick={onClick}
+      >
+        {/* Incident ID */}
+        <td className="px-4 py-3">
+          <span className="font-mono text-sm text-slate-700 dark:text-slate-300">
+            {refund.linkedIncident}
+          </span>
+        </td>
+
+        {/* Subscriber */}
+        <td className="px-4 py-3">
+          <span className="text-sm text-slate-900 dark:text-white">
+            {refund.customerSubscriber}
+          </span>
+        </td>
+
+        {/* Status */}
+        <td className="px-4 py-3">
+          <span
+            className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${statusConfig.className}`}
+          >
+            {statusConfig.label}
+          </span>
+        </td>
+
+        {/* Govt Amount */}
+        <td className="px-4 py-3">
+          <span className="text-sm text-slate-700 dark:text-slate-300">
+            {formatCurrency(refund.refundAmount)}
+          </span>
+        </td>
+
+        {/* Convenience Fee */}
+        <td className="px-4 py-3">
+          {refund.convenienceFee != null ? (
+            <span className="text-sm text-slate-700 dark:text-slate-300">
+              {formatCurrency(refund.convenienceFee)}
+            </span>
+          ) : (
+            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          )}
+        </td>
+
+        {/* Challan Refund */}
+        <td className="px-4 py-3">
+          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+            Not Applicable
+          </span>
+        </td>
+
+        {/* Refund Txn ID */}
+        <td className="px-4 py-3">
+          {refund.refundTxnId ? (
+            <span className="font-mono text-xs text-slate-600 dark:text-slate-400">
+              {refund.refundTxnId}
+            </span>
+          ) : (
+            <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
+          )}
+        </td>
+
+        {/* Updated */}
+        <td className="px-4 py-3">
+          <span className="text-sm text-slate-700 dark:text-slate-300">
+            {formatDate(refund.lastUpdated)}
+          </span>
+        </td>
+      </tr>
+    )
   }
 
   return (
@@ -85,7 +160,7 @@ export function RefundRow({
         <input
           type="checkbox"
           checked={isSelected}
-          onChange={(e) => onSelect(e.target.checked)}
+          onChange={(e) => onSelect?.(e.target.checked)}
           className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 dark:bg-slate-800"
         />
       </td>

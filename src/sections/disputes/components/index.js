@@ -14,3 +14,4 @@ export { DisputeActivityTab } from './DisputeActivityTab';
 export { BulkUpdateModal } from './BulkUpdateModal';
 export { CreateDisputeModal } from './CreateDisputeModal';
 export { AssignReviewerModal } from './AssignReviewerModal';
+export { SettleDisputeModal } from './SettleDisputeModal';

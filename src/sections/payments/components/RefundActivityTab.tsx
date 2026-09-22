@@ -23,7 +23,7 @@ interface RefundActivityTabProps {
 type SubTab = 'followUp' | 'timeline'
 
 const STAGE_OPTIONS = [
-  'Refund Raised',
+  'Refund Requested',
   'Under Review',
   'Approved',
   'Hold',

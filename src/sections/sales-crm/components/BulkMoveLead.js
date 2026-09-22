@@ -6,14 +6,14 @@ export function BulkMoveLead({ mode, selectedCount, users, onMove, onClose }) {
     const [selectedValue, setSelectedValue] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const statusOptions = [
-        { value: 'new', label: 'New' },
         { value: 'assigned', label: 'Assigned' },
         { value: 'follow-up', label: 'Follow-up' },
         { value: 'quotations', label: 'Quotations' },
         { value: 'projected', label: 'Projected' },
         { value: 'invoiced', label: 'Ready to Invoice' },
         { value: 'sales', label: 'Sales' },
-        { value: 'lost', label: 'Lost' }
+        { value: 'lost', label: 'Lost' },
+        { value: 'rejected', label: 'Rejected' }
     ];
     const ownerOptions = [
         { value: 'unassigned', label: 'Unassigned' },
