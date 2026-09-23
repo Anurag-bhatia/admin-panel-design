@@ -454,6 +454,9 @@ export function ProposalList({
           <AddQuotationModal
             leads={leads}
             initialLeadId={leads[0].id}
+            hideQuotationType
+            hideSubscriptionPlan
+            hideDiscount
             onSave={(_data, isDraft) => {
               if (!isDraft) {
                 onBulkUpdateStatus?.(addQuotationForIds, 'quotations')

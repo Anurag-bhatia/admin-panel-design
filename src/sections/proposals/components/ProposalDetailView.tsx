@@ -12,6 +12,9 @@ import {
   FileText,
   LinkIcon,
   Plus,
+  Pencil,
+  Download,
+  Receipt,
 } from 'lucide-react'
 import type {
   Proposal,
@@ -30,7 +33,7 @@ import { SendQuoteModal } from './SendQuoteModal'
 import { RejectModal } from './RejectModal'
 import { ConvertToIncidentModal } from './ConvertToIncidentModal'
 import { AssignModal } from './AssignModal'
-import { AddQuotationModal } from '../../sales-crm/components/AddQuotationModal'
+import { AddQuotationModal, IssuerHeader } from '../../sales-crm/components/AddQuotationModal'
 import type { Lead } from '@/../product/sections/sales-crm/types'
 
 function proposalToLead(p: Proposal): Lead {
@@ -63,7 +66,7 @@ function proposalToLead(p: Proposal): Lead {
   }
 }
 
-type TabKey = 'details' | 'items' | 'notes' | 'incidents'
+type TabKey = 'details' | 'items' | 'quotations' | 'notes' | 'incidents'
 
 // =============================================================================
 // Props
@@ -261,6 +264,7 @@ export function ProposalDetailView({
   const tabs: { key: TabKey; label: string; icon: typeof FileText; show: boolean }[] = [
     { key: 'details', label: 'Details', icon: FileText, show: true },
     { key: 'items', label: 'Quantity', icon: FileText, show: true },
+    { key: 'quotations', label: 'Quotations', icon: Receipt, show: proposal.status === 'quotations' },
     { key: 'notes', label: 'Notes', icon: MessageSquare, show: true },
     { key: 'incidents', label: 'Incidents', icon: LinkIcon, show: proposal.status === 'converted' },
   ]
@@ -417,6 +421,105 @@ export function ProposalDetailView({
             ))}
           </tbody>
         </table>
+      </div>
+    )
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Render: Quotations Tab
+  // ───────────────────────────────────────────────────────────────────────────
+  const renderQuotationsTab = () => {
+    const quotationNumber = proposal.displayId.replace(/^REQ-/i, '')
+    const subtotal = proposal.amount > 0 ? proposal.amount : 17000
+    const discount = 0
+    const gst = Math.round((subtotal - discount) * 0.18)
+    const total = subtotal - discount + gst
+
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Quotation Preview</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              QTN-{quotationNumber} · Issued {formatDate(proposal.updatedAt)}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAddQuotation(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+              Modify Quotation
+            </button>
+            <button
+              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Download PDF
+            </button>
+          </div>
+        </div>
+
+        <div className="border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-950 overflow-hidden">
+          <IssuerHeader />
+          <div className="p-6 sm:p-8">
+            <div className="flex items-start justify-between mb-6 pb-6 border-b border-slate-200 dark:border-slate-800 flex-wrap gap-4">
+              <div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Quotation for</p>
+                <p className="text-lg font-semibold text-slate-900 dark:text-slate-50 mt-1">
+                  {proposal.customer.company || proposal.customer.name}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  {proposal.customer.name} · {proposal.customer.email}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-slate-500 dark:text-slate-400">From</p>
+                <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 mt-1">LOTS247</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Valid till {formatDate(proposal.updatedAt)}
+                </p>
+              </div>
+            </div>
+
+            <table className="w-full text-sm mb-6">
+              <thead>
+                <tr className="text-left text-xs text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                  <th className="py-2 font-medium">Item</th>
+                  <th className="py-2 font-medium text-right">Qty</th>
+                  <th className="py-2 font-medium text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="text-slate-900 dark:text-slate-50">
+                <tr className="border-b border-slate-100 dark:border-slate-800">
+                  <td className="py-3">{proposal.type} Service</td>
+                  <td className="py-3 text-right">{proposal.quantity}</td>
+                  <td className="py-3 text-right">{formatINR(subtotal)}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="ml-auto max-w-xs space-y-2 text-sm">
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>Subtotal</span>
+                <span>{formatINR(subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>Discount (0%)</span>
+                <span>-{formatINR(discount)}</span>
+              </div>
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>GST (18%)</span>
+                <span>{formatINR(gst)}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-800 font-semibold text-slate-900 dark:text-slate-50">
+                <span>Total</span>
+                <span>{formatINR(total)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
@@ -665,6 +768,7 @@ export function ProposalDetailView({
           <div className="flex-1 overflow-auto bg-white dark:bg-slate-900">
             {activeTab === 'details' && renderDetailsTab()}
             {activeTab === 'items' && renderItemsTab()}
+            {activeTab === 'quotations' && renderQuotationsTab()}
             {activeTab === 'notes' && renderNotesTab()}
             {activeTab === 'incidents' && renderIncidentsTab()}
           </div>
@@ -742,6 +846,9 @@ export function ProposalDetailView({
           <AddQuotationModal
             leads={[lead]}
             initialLeadId={lead.id}
+            hideQuotationType
+            hideSubscriptionPlan
+            hideDiscount
             onSave={() => setShowAddQuotation(false)}
             onClose={() => setShowAddQuotation(false)}
           />

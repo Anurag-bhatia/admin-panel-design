@@ -209,7 +209,7 @@ export function ProposalList({ proposals, teamMembers, dashboardStats, onAssign,
                     .map(proposalToLead);
                 if (leads.length === 0)
                     return null;
-                return (_jsx(AddQuotationModal, { leads: leads, initialLeadId: leads[0].id, onSave: (_data, isDraft) => {
+                return (_jsx(AddQuotationModal, { leads: leads, initialLeadId: leads[0].id, hideQuotationType: true, hideSubscriptionPlan: true, hideDiscount: true, onSave: (_data, isDraft) => {
                         if (!isDraft) {
                             onBulkUpdateStatus?.(addQuotationForIds, 'quotations');
                         }

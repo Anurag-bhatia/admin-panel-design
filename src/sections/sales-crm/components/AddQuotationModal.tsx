@@ -76,6 +76,9 @@ interface AddQuotationModalProps {
   initialLeadId?: string
   onSave: (data: QuotationDraft, isDraft: boolean) => void
   onClose: () => void
+  hideQuotationType?: boolean
+  hideSubscriptionPlan?: boolean
+  hideDiscount?: boolean
 }
 
 const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
@@ -134,7 +137,7 @@ const defaultValidTill = () => {
   return d.toISOString().split('T')[0]
 }
 
-export function AddQuotationModal({ leads, initialLeadId, onSave, onClose }: AddQuotationModalProps) {
+export function AddQuotationModal({ leads, initialLeadId, onSave, onClose, hideQuotationType = false, hideSubscriptionPlan = false, hideDiscount = false }: AddQuotationModalProps) {
   const [customerSearch, setCustomerSearch] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [activeAddonCategories, setActiveAddonCategories] = useState<AddonCategory[]>(['caas'])
@@ -520,37 +523,39 @@ export function AddQuotationModal({ leads, initialLeadId, onSave, onClose }: Add
             </FormSection>
 
             {/* Quotation Type */}
-            <FormSection title="Quotation Type">
-              <div className="grid grid-cols-3 gap-2">
-                {typeCards.map(card => {
-                  const selected = formData.type === card.id
-                  return (
-                    <button
-                      key={card.id}
-                      type="button"
-                      onClick={() =>
-                        setFormData({
-                          ...formData,
-                          type: card.id,
-                          planId: card.id === 'pay-per-service' ? null : formData.planId,
-                        })
-                      }
-                      className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-lg border text-xs font-medium transition-colors ${
-                        selected
-                          ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500'
-                          : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
-                      }`}
-                    >
-                      {card.icon}
-                      <span className="text-center leading-tight">{card.title}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </FormSection>
+            {!hideQuotationType && (
+              <FormSection title="Quotation Type">
+                <div className="grid grid-cols-3 gap-2">
+                  {typeCards.map(card => {
+                    const selected = formData.type === card.id
+                    return (
+                      <button
+                        key={card.id}
+                        type="button"
+                        onClick={() =>
+                          setFormData({
+                            ...formData,
+                            type: card.id,
+                            planId: card.id === 'pay-per-service' ? null : formData.planId,
+                          })
+                        }
+                        className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-lg border text-xs font-medium transition-colors ${
+                          selected
+                            ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500'
+                            : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                        }`}
+                      >
+                        {card.icon}
+                        <span className="text-center leading-tight">{card.title}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </FormSection>
+            )}
 
             {/* Plans / Services */}
-            {formData.type === 'subscription-addons' && (
+            {formData.type === 'subscription-addons' && !hideSubscriptionPlan && (
               <FormSection title="Subscription Plan" error={errors.planId}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {SUBSCRIPTION_PLANS.map(plan => {
@@ -583,20 +588,22 @@ export function AddQuotationModal({ leads, initialLeadId, onSave, onClose }: Add
               </FormSection>
             )}
 
-            <FormSection title="Discount">
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={formData.overallDiscount || ''}
-                  onChange={e => setFormData({ ...formData, overallDiscount: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })}
-                  placeholder="0"
-                  className={inputClass(false)}
-                />
-                <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Percentage (%)</span>
-              </div>
-            </FormSection>
+            {!hideDiscount && (
+              <FormSection title="Discount">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={formData.overallDiscount || ''}
+                    onChange={e => setFormData({ ...formData, overallDiscount: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })}
+                    placeholder="0"
+                    className={inputClass(false)}
+                  />
+                  <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Percentage (%)</span>
+                </div>
+              </FormSection>
+            )}
 
             <FormSection title={formData.type === 'pay-per-service' ? 'Services' : 'Add-ons'} error={errors.addonIds}>
                 <div className="mb-4 pb-4 border-b border-slate-200 dark:border-slate-800">
