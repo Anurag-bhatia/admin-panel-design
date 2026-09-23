@@ -2,14 +2,10 @@ import { useState } from 'react'
 import {
   MoreHorizontal,
   Eye,
-  HandMetal,
   UserPlus,
   Send,
-  RefreshCw,
-  Undo2,
   XCircle,
   RotateCcw,
-  ArrowUpCircle,
   ExternalLink,
 } from 'lucide-react'
 import type { Proposal, ProposalStatus, ServiceStatus } from '@/../product/sections/proposals/types'
@@ -20,14 +16,9 @@ interface ProposalRowProps {
   activeTab: ProposalStatus
   onSelect?: (selected: boolean) => void
   onView?: () => void
-  onPickUp?: () => void
   onAssign?: () => void
   onSendQuote?: () => void
-  onReassign?: () => void
   onReject?: () => void
-  onReviseQuote?: () => void
-  onWithdraw?: () => void
-  onUpdateServiceStatus?: () => void
   onViewIncident?: () => void
   onReopen?: () => void
 }
@@ -82,14 +73,9 @@ export function ProposalRow({
   activeTab,
   onSelect,
   onView,
-  onPickUp,
   onAssign,
   onSendQuote,
-  onReassign,
   onReject,
-  onReviseQuote,
-  onWithdraw,
-  onUpdateServiceStatus,
   onViewIncident,
   onReopen,
 }: ProposalRowProps) {
@@ -99,28 +85,23 @@ export function ProposalRow({
     switch (activeTab) {
       case 'sent':
         return [
-          { label: 'Pick Up', icon: HandMetal, action: onPickUp },
           { label: 'Assign', icon: UserPlus, action: onAssign },
           { label: 'View', icon: Eye, action: onView },
           { label: 'Reject', icon: XCircle, action: onReject, danger: true },
         ]
       case 'under_review':
         return [
-          { label: 'Send Quote', icon: Send, action: onSendQuote },
-          { label: 'Reassign', icon: RefreshCw, action: onReassign },
+          { label: 'Create Quotation', icon: Send, action: onSendQuote },
           { label: 'View', icon: Eye, action: onView },
           { label: 'Reject', icon: XCircle, action: onReject, danger: true },
         ]
       case 'received':
         return [
           { label: 'View', icon: Eye, action: onView },
-          { label: 'Revise Quote', icon: RefreshCw, action: onReviseQuote },
-          { label: 'Withdraw', icon: Undo2, action: onWithdraw },
         ]
       case 'converted':
         return [
           { label: 'View', icon: Eye, action: onView },
-          { label: 'Update Status', icon: ArrowUpCircle, action: onUpdateServiceStatus },
           { label: 'View Incident', icon: ExternalLink, action: onViewIncident },
         ]
       case 'rejected':

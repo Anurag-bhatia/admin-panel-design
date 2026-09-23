@@ -1,7 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState, useMemo } from 'react';
 import { FileText } from 'lucide-react';
-import { DashboardCards } from './DashboardCards';
 import { ProposalSidebar } from './ProposalSidebar';
 import { ProposalQueueTabs } from './ProposalQueueTabs';
 import { ProposalTableHeader } from './ProposalTableHeader';
@@ -12,8 +11,38 @@ import { SendQuoteModal } from './SendQuoteModal';
 import { RejectModal } from './RejectModal';
 import { ConvertToIncidentModal } from './ConvertToIncidentModal';
 import { AssignModal } from './AssignModal';
+import { AddQuotationModal } from '../../sales-crm/components/AddQuotationModal';
+function proposalToLead(p) {
+    const phone = p.customer.phone ?? '';
+    const email = p.customer.email ?? '';
+    return {
+        id: p.id,
+        source: 'proposal',
+        type: 'B2B',
+        subType: p.type,
+        lotsFor: '',
+        numberOfTrucks: p.quantity,
+        phoneNumber: phone,
+        country: 'India',
+        state: '',
+        city: '',
+        companyAlias: p.customer.company,
+        companyName: p.customer.company,
+        emailId: email,
+        contactPerson: p.customer.name,
+        gstNumber: '',
+        area: '',
+        addressLane: '',
+        pinCode: '',
+        status: 'quotations',
+        assignedTo: p.assignedTo?.id ?? null,
+        assignedTeam: null,
+        createdDate: p.createdAt,
+        lastActivityDate: p.updatedAt,
+    };
+}
 const PAGE_SIZE = 10;
-export function ProposalList({ proposals, teamMembers, dashboardStats, onPickUp, onAssign, onReassign, onSendQuote, onReviseQuote, onWithdraw, onReject, onReopen, onConvertToIncident, onUpdateServiceStatus, onView, onViewIncident, onBulkAssign, onBulkUpdateStatus, }) {
+export function ProposalList({ proposals, teamMembers, dashboardStats, onAssign, onReassign, onSendQuote, onReviseQuote, onWithdraw, onReject, onReopen, onConvertToIncident, onUpdateServiceStatus, onView, onViewIncident, onBulkAssign, onBulkUpdateStatus, }) {
     // Tab & filter state
     const [activeTab, setActiveTab] = useState('sent');
     const [searchQuery, setSearchQuery] = useState('');
@@ -26,10 +55,12 @@ export function ProposalList({ proposals, teamMembers, dashboardStats, onPickUp,
     // Modal state
     const [activeModal, setActiveModal] = useState(null);
     const [modalProposalId, setModalProposalId] = useState(null);
+    const [addQuotationForIds, setAddQuotationForIds] = useState(null);
     // Tab counts
     const tabCounts = useMemo(() => ({
         sent: proposals.filter((p) => p.status === 'sent').length,
         under_review: proposals.filter((p) => p.status === 'under_review').length,
+        quotations: proposals.filter((p) => p.status === 'quotations').length,
         received: proposals.filter((p) => p.status === 'received').length,
         converted: proposals.filter((p) => p.status === 'converted').length,
         rejected: proposals.filter((p) => p.status === 'rejected').length,
@@ -128,7 +159,7 @@ export function ProposalList({ proposals, teamMembers, dashboardStats, onPickUp,
     const showLinkedIncidentCol = activeTab === 'converted';
     const colCount = 7 + (showAssignedCol ? 1 : 0) + (showServiceStatusCol ? 1 : 0) + (showLinkedIncidentCol ? 1 : 0);
     const allOnPageSelected = paginatedProposals.length > 0 && paginatedProposals.every((p) => selectedIds.has(p.id));
-    return (_jsxs("div", { className: "flex flex-col h-[calc(100vh-64px)] bg-slate-100 dark:bg-slate-950", children: [_jsx("div", { className: "bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700", children: _jsx(DashboardCards, { stats: dashboardStats }) }), _jsxs("div", { className: "flex flex-1 overflow-hidden", children: [_jsx(ProposalSidebar, { view: view, typeFilter: typeFilter, onViewChange: setView, onTypeFilterChange: (t) => {
+    return (_jsxs("div", { className: "flex flex-col h-[calc(100vh-64px)] bg-slate-100 dark:bg-slate-950", children: [_jsxs("div", { className: "flex flex-1 overflow-hidden", children: [_jsx(ProposalSidebar, { view: view, typeFilter: typeFilter, onViewChange: setView, onTypeFilterChange: (t) => {
                             setTypeFilter(t);
                             setCurrentPage(1);
                         } }), _jsxs("div", { className: "flex-1 flex flex-col overflow-hidden", children: [_jsx(ProposalQueueTabs, { activeTab: activeTab, counts: tabCounts, onTabChange: handleTabChange }), _jsx(ProposalTableHeader, { searchQuery: searchQuery, teamMembers: teamMembers, onSearchChange: (q) => {
@@ -139,12 +170,16 @@ export function ProposalList({ proposals, teamMembers, dashboardStats, onPickUp,
                                     setCurrentPage(1);
                                 }, onExport: () => console.log('Export proposals') }), _jsx("div", { className: "flex-1 overflow-auto bg-white dark:bg-slate-900", children: _jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 z-10", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 w-10", children: _jsx("input", { type: "checkbox", checked: allOnPageSelected, onChange: (e) => handleSelectAll(e.target.checked), className: "w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 cursor-pointer" }) }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Request ID" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Customer" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Type" }), _jsx("th", { className: "px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Qty" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Amount" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Created" }), showAssignedCol && (_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Assigned To" })), showServiceStatusCol && (_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Service Status" })), showLinkedIncidentCol && (_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Incident" })), _jsx("th", { className: "px-4 py-3 w-10" })] }) }), _jsx("tbody", { children: paginatedProposals.length === 0 ? (_jsx("tr", { children: _jsx("td", { colSpan: colCount, className: "px-4 py-16 text-center", children: _jsxs("div", { className: "flex flex-col items-center gap-2", children: [_jsx("div", { className: "w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center", children: _jsx(FileText, { className: "w-6 h-6 text-slate-400" }) }), _jsx("p", { className: "font-medium text-slate-700 dark:text-slate-300", children: "No proposals found" }), _jsx("p", { className: "text-sm text-slate-500 dark:text-slate-400", children: searchQuery
                                                                     ? 'Try adjusting your search or filters'
-                                                                    : 'No proposals in this queue' })] }) }) })) : (paginatedProposals.map((proposal) => (_jsx(ProposalRow, { proposal: proposal, isSelected: selectedIds.has(proposal.id), activeTab: activeTab, onSelect: (checked) => handleSelectOne(proposal.id, checked), onView: () => onView?.(proposal.id), onPickUp: () => onPickUp?.(proposal.id), onAssign: () => openModal('assign', proposal.id), onSendQuote: () => openModal('sendQuote', proposal.id), onReassign: () => openModal('reassign', proposal.id), onReject: () => openModal('reject', proposal.id), onReviseQuote: () => openModal('reviseQuote', proposal.id), onWithdraw: () => onWithdraw?.(proposal.id), onUpdateServiceStatus: () => onUpdateServiceStatus?.(proposal.id, 'in_progress'), onViewIncident: () => proposal.linkedIncidentId
+                                                                    : 'No proposals in this queue' })] }) }) })) : (paginatedProposals.map((proposal) => (_jsx(ProposalRow, { proposal: proposal, isSelected: selectedIds.has(proposal.id), activeTab: activeTab, onSelect: (checked) => handleSelectOne(proposal.id, checked), onView: () => onView?.(proposal.id), onAssign: () => openModal('assign', proposal.id), onSendQuote: () => openModal('sendQuote', proposal.id), onReject: () => openModal('reject', proposal.id), onViewIncident: () => proposal.linkedIncidentId
                                                     ? onViewIncident?.(proposal.linkedIncidentId)
                                                     : undefined, onReopen: () => onReopen?.(proposal.id) }, proposal.id)))) })] }) }), _jsx(Pagination, { currentPage: currentPage, totalPages: totalPages, totalItems: filteredProposals.length, pageSize: PAGE_SIZE, onPageChange: setCurrentPage })] })] }), _jsx(BulkActionsBar, { selectedCount: selectedIds.size, activeTab: activeTab, teamMembers: teamMembers, onClear: () => setSelectedIds(new Set()), onBulkAssign: (tmId) => {
                     onBulkAssign?.(Array.from(selectedIds), tmId);
                     setSelectedIds(new Set());
                 }, onBulkUpdateStatus: (status) => {
+                    if (status === 'quotations') {
+                        setAddQuotationForIds(Array.from(selectedIds));
+                        return;
+                    }
                     onBulkUpdateStatus?.(Array.from(selectedIds), status);
                     setSelectedIds(new Set());
                 } }), activeModal === 'sendQuote' && modalProposal && (_jsx(SendQuoteModal, { proposal: modalProposal, onSubmit: (amount, breakdown, note) => {
@@ -167,5 +202,19 @@ export function ProposalList({ proposals, teamMembers, dashboardStats, onPickUp,
                         onAssign?.(modalProposal.id, tmId);
                     }
                     closeModal();
-                }, onCancel: closeModal }))] }));
+                }, onCancel: closeModal })), addQuotationForIds && addQuotationForIds.length > 0 && (() => {
+                const leads = addQuotationForIds
+                    .map((id) => proposals.find((p) => p.id === id))
+                    .filter((p) => Boolean(p))
+                    .map(proposalToLead);
+                if (leads.length === 0)
+                    return null;
+                return (_jsx(AddQuotationModal, { leads: leads, initialLeadId: leads[0].id, onSave: (_data, isDraft) => {
+                        if (!isDraft) {
+                            onBulkUpdateStatus?.(addQuotationForIds, 'quotations');
+                        }
+                        setAddQuotationForIds(null);
+                        setSelectedIds(new Set());
+                    }, onClose: () => setAddQuotationForIds(null) }));
+            })()] }));
 }

@@ -11,6 +11,7 @@ import {
   MessageSquare,
   FileText,
   LinkIcon,
+  Plus,
 } from 'lucide-react'
 import type {
   Proposal,
@@ -29,6 +30,38 @@ import { SendQuoteModal } from './SendQuoteModal'
 import { RejectModal } from './RejectModal'
 import { ConvertToIncidentModal } from './ConvertToIncidentModal'
 import { AssignModal } from './AssignModal'
+import { AddQuotationModal } from '../../sales-crm/components/AddQuotationModal'
+import type { Lead } from '@/../product/sections/sales-crm/types'
+
+function proposalToLead(p: Proposal): Lead {
+  const phone = (p.customer as any).phone ?? ''
+  const email = (p.customer as any).email ?? ''
+  return {
+    id: p.id,
+    source: 'proposal',
+    type: 'B2B',
+    subType: p.type,
+    lotsFor: '',
+    numberOfTrucks: p.quantity,
+    phoneNumber: phone,
+    country: 'India',
+    state: '',
+    city: '',
+    companyAlias: p.customer.company,
+    companyName: p.customer.company,
+    emailId: email,
+    contactPerson: p.customer.name,
+    gstNumber: '',
+    area: '',
+    addressLane: '',
+    pinCode: '',
+    status: 'quotations',
+    assignedTo: p.assignedTo?.id ?? null,
+    assignedTeam: null,
+    createdDate: p.createdAt,
+    lastActivityDate: p.updatedAt,
+  }
+}
 
 type TabKey = 'details' | 'items' | 'notes' | 'incidents'
 
@@ -99,6 +132,7 @@ function timeAgo(dateString: string): string {
 const STATUS_STYLES: Record<ProposalStatus, { label: string; className: string }> = {
   sent: { label: 'Inbox', className: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300' },
   under_review: { label: 'In Review', className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' },
+  quotations: { label: 'Quotations', className: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300' },
   received: { label: 'Quote Sent', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' },
   converted: { label: 'Converted', className: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300' },
   rejected: { label: 'Rejected', className: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300' },
@@ -121,6 +155,49 @@ const ITEM_STATUS_STYLES: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
   in_progress: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   completed: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+}
+
+const STATE_CODES = ['UP32', 'MH12', 'DL01', 'KA05', 'RJ14', 'GJ01', 'TN22', 'HR26']
+const CHALLAN_TYPES: Array<'Court' | 'Online'> = ['Court', 'Online']
+const FIRST_NAMES = ['Ramesh', 'Sunil', 'Mohan', 'Vijay', 'Arjun', 'Bharat', 'Kamlesh', 'Ajay', 'Rakesh', 'Suresh']
+const LAST_NAMES = ['Yadav', 'Tiwari', 'Kumar', 'Singh', 'Patel', 'Sharma', 'Verma', 'Gupta']
+
+function generateFallbackItems(proposal: Proposal): ProposalItem[] {
+  const count = Math.max(1, proposal.quantity)
+  const seed = proposal.id
+  const items: ProposalItem[] = []
+  for (let i = 0; i < count; i++) {
+    const state = STATE_CODES[i % STATE_CODES.length]
+    const suffix = String(1001 + i).padStart(4, '0')
+    if (proposal.type === 'Challan') {
+      const perItemAmount = Math.round(proposal.amount / count) || 5000
+      items.push({
+        id: `${seed}-item-${i + 1}`,
+        challanId: `CH-${state}-${suffix}`,
+        challanType: CHALLAN_TYPES[i % CHALLAN_TYPES.length],
+        vehicleNumber: `${state} AB ${suffix}`,
+        amount: perItemAmount,
+        status: 'pending',
+      } as ChallanItem)
+    } else if (proposal.type === 'DL') {
+      const firstName = FIRST_NAMES[i % FIRST_NAMES.length]
+      const lastName = LAST_NAMES[i % LAST_NAMES.length]
+      items.push({
+        id: `${seed}-item-${i + 1}`,
+        licenceNumber: `${state}202600${String(10000 + i).padStart(5, '0')}`,
+        driverName: `${firstName} ${lastName}`,
+        status: 'pending',
+      } as DLItem)
+    } else {
+      items.push({
+        id: `${seed}-item-${i + 1}`,
+        rcNumber: `${state} TC ${suffix}`,
+        vehicleNumber: `${state} AA ${suffix}`,
+        status: 'pending',
+      } as RCItem)
+    }
+  }
+  return items
 }
 
 // =============================================================================
@@ -149,6 +226,7 @@ export function ProposalDetailView({
 }: ProposalDetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('details')
   const [activeModal, setActiveModal] = useState<string | null>(null)
+  const [showAddQuotation, setShowAddQuotation] = useState(false)
   const [newMessage, setNewMessage] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -182,7 +260,7 @@ export function ProposalDetailView({
 
   const tabs: { key: TabKey; label: string; icon: typeof FileText; show: boolean }[] = [
     { key: 'details', label: 'Details', icon: FileText, show: true },
-    { key: 'items', label: 'Items', icon: FileText, show: true },
+    { key: 'items', label: 'Quantity', icon: FileText, show: true },
     { key: 'notes', label: 'Notes', icon: MessageSquare, show: true },
     { key: 'incidents', label: 'Incidents', icon: LinkIcon, show: proposal.status === 'converted' },
   ]
@@ -270,18 +348,12 @@ export function ProposalDetailView({
   // Render: Items Tab
   // ───────────────────────────────────────────────────────────────────────────
   const renderItemsTab = () => {
-    if (items.length === 0) {
-      return (
-        <div className="p-12 text-center">
-          <FileText className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">No items available</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Item details haven't been added to this proposal yet.</p>
-        </div>
-      )
-    }
+    const displayItems: ProposalItem[] = items.length > 0
+      ? items
+      : generateFallbackItems(proposal)
 
-    const isChallan = 'challanId' in items[0]
-    const isDL = 'licenceNumber' in items[0]
+    const isChallan = 'challanId' in displayItems[0]
+    const isDL = 'licenceNumber' in displayItems[0]
 
     return (
       <div className="overflow-auto">
@@ -291,7 +363,8 @@ export function ProposalDetailView({
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">#</th>
               {isChallan && (
                 <>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Challan ID</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Challan Number</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Challan Type</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Vehicle</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Amount</th>
                 </>
@@ -312,12 +385,13 @@ export function ProposalDetailView({
             </tr>
           </thead>
           <tbody>
-            {items.map((item, idx) => (
+            {displayItems.map((item, idx) => (
               <tr key={item.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
                 <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{idx + 1}</td>
                 {isChallan && (
                   <>
                     <td className="px-4 py-3 text-sm font-mono text-slate-900 dark:text-slate-100">{(item as ChallanItem).challanId}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{(item as ChallanItem).challanType ?? '—'}</td>
                     <td className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{(item as ChallanItem).vehicleNumber}</td>
                     <td className="px-4 py-3 text-sm font-medium tabular-nums text-slate-900 dark:text-slate-100">{formatINR((item as ChallanItem).amount)}</td>
                   </>
@@ -532,6 +606,15 @@ export function ProposalDetailView({
             </div>
           </div>
 
+          {proposal.status === 'quotations' && (
+            <button
+              onClick={() => setShowAddQuotation(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Add Quotation
+            </button>
+          )}
         </div>
       </div>
 
@@ -652,6 +735,18 @@ export function ProposalDetailView({
           onCancel={() => setActiveModal(null)}
         />
       )}
+
+      {showAddQuotation && (() => {
+        const lead = proposalToLead(proposal)
+        return (
+          <AddQuotationModal
+            leads={[lead]}
+            initialLeadId={lead.id}
+            onSave={() => setShowAddQuotation(false)}
+            onClose={() => setShowAddQuotation(false)}
+          />
+        )
+      })()}
     </div>
   )
 }

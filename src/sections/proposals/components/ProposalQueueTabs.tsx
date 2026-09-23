@@ -8,6 +8,7 @@ interface TabConfig {
 const TABS: TabConfig[] = [
   { key: 'sent', label: 'Inbox' },
   { key: 'under_review', label: 'In Review' },
+  { key: 'quotations', label: 'Quotations' },
   { key: 'received', label: 'Quote Sent' },
   { key: 'converted', label: 'Converted' },
   { key: 'rejected', label: 'Rejected' },

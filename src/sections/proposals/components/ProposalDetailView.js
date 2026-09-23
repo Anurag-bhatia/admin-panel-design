@@ -1,10 +1,40 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Phone, Mail, Building2, Send, ExternalLink, Clock, User, MessageSquare, FileText, LinkIcon, } from 'lucide-react';
+import { ArrowLeft, Phone, Mail, Building2, Send, ExternalLink, Clock, User, MessageSquare, FileText, LinkIcon, Plus, } from 'lucide-react';
 import { SendQuoteModal } from './SendQuoteModal';
 import { RejectModal } from './RejectModal';
 import { ConvertToIncidentModal } from './ConvertToIncidentModal';
 import { AssignModal } from './AssignModal';
+import { AddQuotationModal } from '../../sales-crm/components/AddQuotationModal';
+function proposalToLead(p) {
+    const phone = p.customer.phone ?? '';
+    const email = p.customer.email ?? '';
+    return {
+        id: p.id,
+        source: 'proposal',
+        type: 'B2B',
+        subType: p.type,
+        lotsFor: '',
+        numberOfTrucks: p.quantity,
+        phoneNumber: phone,
+        country: 'India',
+        state: '',
+        city: '',
+        companyAlias: p.customer.company,
+        companyName: p.customer.company,
+        emailId: email,
+        contactPerson: p.customer.name,
+        gstNumber: '',
+        area: '',
+        addressLane: '',
+        pinCode: '',
+        status: 'quotations',
+        assignedTo: p.assignedTo?.id ?? null,
+        assignedTeam: null,
+        createdDate: p.createdAt,
+        lastActivityDate: p.updatedAt,
+    };
+}
 // =============================================================================
 // Helpers
 // =============================================================================
@@ -44,6 +74,7 @@ function timeAgo(dateString) {
 const STATUS_STYLES = {
     sent: { label: 'Inbox', className: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300' },
     under_review: { label: 'In Review', className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' },
+    quotations: { label: 'Quotations', className: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300' },
     received: { label: 'Quote Sent', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' },
     converted: { label: 'Converted', className: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300' },
     rejected: { label: 'Rejected', className: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300' },
@@ -64,12 +95,56 @@ const ITEM_STATUS_STYLES = {
     in_progress: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
     completed: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
 };
+const STATE_CODES = ['UP32', 'MH12', 'DL01', 'KA05', 'RJ14', 'GJ01', 'TN22', 'HR26'];
+const CHALLAN_TYPES = ['Court', 'Online'];
+const FIRST_NAMES = ['Ramesh', 'Sunil', 'Mohan', 'Vijay', 'Arjun', 'Bharat', 'Kamlesh', 'Ajay', 'Rakesh', 'Suresh'];
+const LAST_NAMES = ['Yadav', 'Tiwari', 'Kumar', 'Singh', 'Patel', 'Sharma', 'Verma', 'Gupta'];
+function generateFallbackItems(proposal) {
+    const count = Math.max(1, proposal.quantity);
+    const seed = proposal.id;
+    const items = [];
+    for (let i = 0; i < count; i++) {
+        const state = STATE_CODES[i % STATE_CODES.length];
+        const suffix = String(1001 + i).padStart(4, '0');
+        if (proposal.type === 'Challan') {
+            const perItemAmount = Math.round(proposal.amount / count) || 5000;
+            items.push({
+                id: `${seed}-item-${i + 1}`,
+                challanId: `CH-${state}-${suffix}`,
+                challanType: CHALLAN_TYPES[i % CHALLAN_TYPES.length],
+                vehicleNumber: `${state} AB ${suffix}`,
+                amount: perItemAmount,
+                status: 'pending',
+            });
+        }
+        else if (proposal.type === 'DL') {
+            const firstName = FIRST_NAMES[i % FIRST_NAMES.length];
+            const lastName = LAST_NAMES[i % LAST_NAMES.length];
+            items.push({
+                id: `${seed}-item-${i + 1}`,
+                licenceNumber: `${state}202600${String(10000 + i).padStart(5, '0')}`,
+                driverName: `${firstName} ${lastName}`,
+                status: 'pending',
+            });
+        }
+        else {
+            items.push({
+                id: `${seed}-item-${i + 1}`,
+                rcNumber: `${state} TC ${suffix}`,
+                vehicleNumber: `${state} AA ${suffix}`,
+                status: 'pending',
+            });
+        }
+    }
+    return items;
+}
 // =============================================================================
 // Component
 // =============================================================================
 export function ProposalDetailView({ proposal, items, activities, comments, teamMembers, onBack, onPickUp, onAssign, onReassign, onSendQuote, onReviseQuote, onWithdraw, onReject, onReopen, onConvertToIncident, onUpdateServiceStatus, onViewIncident, onSendComment, }) {
     const [activeTab, setActiveTab] = useState('details');
     const [activeModal, setActiveModal] = useState(null);
+    const [showAddQuotation, setShowAddQuotation] = useState(false);
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef(null);
     const proposalComments = comments
@@ -97,7 +172,7 @@ export function ProposalDetailView({ proposal, items, activities, comments, team
     };
     const tabs = [
         { key: 'details', label: 'Details', icon: FileText, show: true },
-        { key: 'items', label: 'Items', icon: FileText, show: true },
+        { key: 'items', label: 'Quantity', icon: FileText, show: true },
         { key: 'notes', label: 'Notes', icon: MessageSquare, show: true },
         { key: 'incidents', label: 'Incidents', icon: LinkIcon, show: proposal.status === 'converted' },
     ];
@@ -109,12 +184,12 @@ export function ProposalDetailView({ proposal, items, activities, comments, team
     // Render: Items Tab
     // ───────────────────────────────────────────────────────────────────────────
     const renderItemsTab = () => {
-        if (items.length === 0) {
-            return (_jsxs("div", { className: "p-12 text-center", children: [_jsx(FileText, { className: "h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" }), _jsx("p", { className: "text-sm font-medium text-slate-700 dark:text-slate-300", children: "No items available" }), _jsx("p", { className: "text-xs text-slate-500 dark:text-slate-400 mt-1", children: "Item details haven't been added to this proposal yet." })] }));
-        }
-        const isChallan = 'challanId' in items[0];
-        const isDL = 'licenceNumber' in items[0];
-        return (_jsx("div", { className: "overflow-auto", children: _jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "#" }), isChallan && (_jsxs(_Fragment, { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Challan ID" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Vehicle" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Amount" })] })), isDL && (_jsxs(_Fragment, { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Licence No." }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Driver Name" })] })), !isChallan && !isDL && (_jsxs(_Fragment, { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "RC Number" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Vehicle" })] })), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Status" })] }) }), _jsx("tbody", { children: items.map((item, idx) => (_jsxs("tr", { className: "border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50", children: [_jsx("td", { className: "px-4 py-3 text-sm text-slate-500 dark:text-slate-400", children: idx + 1 }), isChallan && (_jsxs(_Fragment, { children: [_jsx("td", { className: "px-4 py-3 text-sm font-mono text-slate-900 dark:text-slate-100", children: item.challanId }), _jsx("td", { className: "px-4 py-3 text-sm text-slate-700 dark:text-slate-300", children: item.vehicleNumber }), _jsx("td", { className: "px-4 py-3 text-sm font-medium tabular-nums text-slate-900 dark:text-slate-100", children: formatINR(item.amount) })] })), isDL && (_jsxs(_Fragment, { children: [_jsx("td", { className: "px-4 py-3 text-sm font-mono text-slate-900 dark:text-slate-100", children: item.licenceNumber }), _jsx("td", { className: "px-4 py-3 text-sm text-slate-700 dark:text-slate-300", children: item.driverName })] })), !isChallan && !isDL && (_jsxs(_Fragment, { children: [_jsx("td", { className: "px-4 py-3 text-sm font-mono text-slate-900 dark:text-slate-100", children: item.rcNumber }), _jsx("td", { className: "px-4 py-3 text-sm text-slate-700 dark:text-slate-300", children: item.vehicleNumber })] })), _jsx("td", { className: "px-4 py-3", children: _jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold capitalize ${ITEM_STATUS_STYLES[item.status] ?? ''}`, children: item.status.replace('_', ' ') }) })] }, item.id))) })] }) }));
+        const displayItems = items.length > 0
+            ? items
+            : generateFallbackItems(proposal);
+        const isChallan = 'challanId' in displayItems[0];
+        const isDL = 'licenceNumber' in displayItems[0];
+        return (_jsx("div", { className: "overflow-auto", children: _jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "#" }), isChallan && (_jsxs(_Fragment, { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Challan Number" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Challan Type" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Vehicle" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Amount" })] })), isDL && (_jsxs(_Fragment, { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Licence No." }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Driver Name" })] })), !isChallan && !isDL && (_jsxs(_Fragment, { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "RC Number" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Vehicle" })] })), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Status" })] }) }), _jsx("tbody", { children: displayItems.map((item, idx) => (_jsxs("tr", { className: "border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50", children: [_jsx("td", { className: "px-4 py-3 text-sm text-slate-500 dark:text-slate-400", children: idx + 1 }), isChallan && (_jsxs(_Fragment, { children: [_jsx("td", { className: "px-4 py-3 text-sm font-mono text-slate-900 dark:text-slate-100", children: item.challanId }), _jsx("td", { className: "px-4 py-3 text-sm text-slate-700 dark:text-slate-300", children: item.challanType ?? '—' }), _jsx("td", { className: "px-4 py-3 text-sm text-slate-700 dark:text-slate-300", children: item.vehicleNumber }), _jsx("td", { className: "px-4 py-3 text-sm font-medium tabular-nums text-slate-900 dark:text-slate-100", children: formatINR(item.amount) })] })), isDL && (_jsxs(_Fragment, { children: [_jsx("td", { className: "px-4 py-3 text-sm font-mono text-slate-900 dark:text-slate-100", children: item.licenceNumber }), _jsx("td", { className: "px-4 py-3 text-sm text-slate-700 dark:text-slate-300", children: item.driverName })] })), !isChallan && !isDL && (_jsxs(_Fragment, { children: [_jsx("td", { className: "px-4 py-3 text-sm font-mono text-slate-900 dark:text-slate-100", children: item.rcNumber }), _jsx("td", { className: "px-4 py-3 text-sm text-slate-700 dark:text-slate-300", children: item.vehicleNumber })] })), _jsx("td", { className: "px-4 py-3", children: _jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold capitalize ${ITEM_STATUS_STYLES[item.status] ?? ''}`, children: item.status.replace('_', ' ') }) })] }, item.id))) })] }) }));
     };
     // ───────────────────────────────────────────────────────────────────────────
     // Render: Notes Tab (Chat)
@@ -138,7 +213,7 @@ export function ProposalDetailView({ proposal, items, activities, comments, team
     // ───────────────────────────────────────────────────────────────────────────
     // Main Render
     // ───────────────────────────────────────────────────────────────────────────
-    return (_jsxs("div", { className: "flex flex-col h-[calc(100vh-64px)] bg-slate-100 dark:bg-slate-950", children: [_jsx("div", { className: "bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-4", children: _jsx("div", { className: "flex items-start justify-between gap-4", children: _jsxs("div", { className: "flex items-start gap-4", children: [_jsx("button", { onClick: onBack, className: "mt-1 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors", children: _jsx(ArrowLeft, { className: "h-5 w-5" }) }), _jsx("div", { children: _jsxs("div", { className: "flex items-center gap-3 mb-1", children: [_jsx("h1", { className: "font-mono text-lg font-bold text-slate-900 dark:text-slate-100", children: proposal.displayId }), _jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${STATUS_STYLES[proposal.status].className}`, children: STATUS_STYLES[proposal.status].label }), _jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${TYPE_BADGE_STYLES[proposal.type]}`, children: proposal.type })] }) })] }) }) }), _jsxs("div", { className: "flex flex-1 overflow-hidden", children: [_jsxs("div", { className: "flex-1 flex flex-col overflow-hidden", children: [_jsx("div", { className: "border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900", children: _jsx("div", { className: "flex items-center gap-1 px-4 overflow-x-auto scrollbar-hide", children: tabs
+    return (_jsxs("div", { className: "flex flex-col h-[calc(100vh-64px)] bg-slate-100 dark:bg-slate-950", children: [_jsx("div", { className: "bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-4", children: _jsxs("div", { className: "flex items-start justify-between gap-4", children: [_jsxs("div", { className: "flex items-start gap-4", children: [_jsx("button", { onClick: onBack, className: "mt-1 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors", children: _jsx(ArrowLeft, { className: "h-5 w-5" }) }), _jsx("div", { children: _jsxs("div", { className: "flex items-center gap-3 mb-1", children: [_jsx("h1", { className: "font-mono text-lg font-bold text-slate-900 dark:text-slate-100", children: proposal.displayId }), _jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${STATUS_STYLES[proposal.status].className}`, children: STATUS_STYLES[proposal.status].label }), _jsx("span", { className: `inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${TYPE_BADGE_STYLES[proposal.type]}`, children: proposal.type })] }) })] }), proposal.status === 'quotations' && (_jsxs("button", { onClick: () => setShowAddQuotation(true), className: "inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors", children: [_jsx(Plus, { className: "h-4 w-4" }), "Add Quotation"] }))] }) }), _jsxs("div", { className: "flex flex-1 overflow-hidden", children: [_jsxs("div", { className: "flex-1 flex flex-col overflow-hidden", children: [_jsx("div", { className: "border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900", children: _jsx("div", { className: "flex items-center gap-1 px-4 overflow-x-auto scrollbar-hide", children: tabs
                                         .filter((t) => t.show)
                                         .map((tab) => {
                                         const isActive = activeTab === tab.key;
@@ -166,7 +241,10 @@ export function ProposalDetailView({ proposal, items, activities, comments, team
                         onAssign?.(proposal.id, tmId);
                     }
                     setActiveModal(null);
-                }, onCancel: () => setActiveModal(null) }))] }));
+                }, onCancel: () => setActiveModal(null) })), showAddQuotation && (() => {
+                const lead = proposalToLead(proposal);
+                return (_jsx(AddQuotationModal, { leads: [lead], initialLeadId: lead.id, onSave: () => setShowAddQuotation(false), onClose: () => setShowAddQuotation(false) }));
+            })()] }));
 }
 // =============================================================================
 // Sub-components

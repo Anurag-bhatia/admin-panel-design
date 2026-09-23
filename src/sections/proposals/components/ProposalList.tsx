@@ -5,7 +5,6 @@ import type {
   ProposalStatus,
   ProposalType,
 } from '@/../product/sections/proposals/types'
-import { DashboardCards } from './DashboardCards'
 import { ProposalSidebar } from './ProposalSidebar'
 import { ProposalQueueTabs } from './ProposalQueueTabs'
 import { ProposalTableHeader, type ProposalFilters } from './ProposalTableHeader'
@@ -16,6 +15,39 @@ import { SendQuoteModal } from './SendQuoteModal'
 import { RejectModal } from './RejectModal'
 import { ConvertToIncidentModal } from './ConvertToIncidentModal'
 import { AssignModal } from './AssignModal'
+import { AddQuotationModal } from '../../sales-crm/components/AddQuotationModal'
+import type { Lead } from '@/../product/sections/sales-crm/types'
+import type { Proposal } from '@/../product/sections/proposals/types'
+
+function proposalToLead(p: Proposal): Lead {
+  const phone = (p.customer as any).phone ?? ''
+  const email = (p.customer as any).email ?? ''
+  return {
+    id: p.id,
+    source: 'proposal',
+    type: 'B2B',
+    subType: p.type,
+    lotsFor: '',
+    numberOfTrucks: p.quantity,
+    phoneNumber: phone,
+    country: 'India',
+    state: '',
+    city: '',
+    companyAlias: p.customer.company,
+    companyName: p.customer.company,
+    emailId: email,
+    contactPerson: p.customer.name,
+    gstNumber: '',
+    area: '',
+    addressLane: '',
+    pinCode: '',
+    status: 'quotations',
+    assignedTo: p.assignedTo?.id ?? null,
+    assignedTeam: null,
+    createdDate: p.createdAt,
+    lastActivityDate: p.updatedAt,
+  }
+}
 
 type ModalType = 'sendQuote' | 'reviseQuote' | 'reject' | 'convert' | 'assign' | 'reassign' | null
 
@@ -25,7 +57,6 @@ export function ProposalList({
   proposals,
   teamMembers,
   dashboardStats,
-  onPickUp,
   onAssign,
   onReassign,
   onSendQuote,
@@ -54,12 +85,14 @@ export function ProposalList({
   // Modal state
   const [activeModal, setActiveModal] = useState<ModalType>(null)
   const [modalProposalId, setModalProposalId] = useState<string | null>(null)
+  const [addQuotationForIds, setAddQuotationForIds] = useState<string[] | null>(null)
 
   // Tab counts
   const tabCounts = useMemo(
     () => ({
       sent: proposals.filter((p) => p.status === 'sent').length,
       under_review: proposals.filter((p) => p.status === 'under_review').length,
+      quotations: proposals.filter((p) => p.status === 'quotations').length,
       received: proposals.filter((p) => p.status === 'received').length,
       converted: proposals.filter((p) => p.status === 'converted').length,
       rejected: proposals.filter((p) => p.status === 'rejected').length,
@@ -185,11 +218,6 @@ export function ProposalList({
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] bg-slate-100 dark:bg-slate-950">
-      {/* Dashboard Cards */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
-        <DashboardCards stats={dashboardStats} />
-      </div>
-
       {/* Main content area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
@@ -305,14 +333,9 @@ export function ProposalList({
                       activeTab={activeTab}
                       onSelect={(checked) => handleSelectOne(proposal.id, checked)}
                       onView={() => onView?.(proposal.id)}
-                      onPickUp={() => onPickUp?.(proposal.id)}
                       onAssign={() => openModal('assign', proposal.id)}
                       onSendQuote={() => openModal('sendQuote', proposal.id)}
-                      onReassign={() => openModal('reassign', proposal.id)}
                       onReject={() => openModal('reject', proposal.id)}
-                      onReviseQuote={() => openModal('reviseQuote', proposal.id)}
-                      onWithdraw={() => onWithdraw?.(proposal.id)}
-                      onUpdateServiceStatus={() => onUpdateServiceStatus?.(proposal.id, 'in_progress')}
                       onViewIncident={() =>
                         proposal.linkedIncidentId
                           ? onViewIncident?.(proposal.linkedIncidentId)
@@ -348,6 +371,10 @@ export function ProposalList({
           setSelectedIds(new Set())
         }}
         onBulkUpdateStatus={(status) => {
+          if (status === 'quotations') {
+            setAddQuotationForIds(Array.from(selectedIds))
+            return
+          }
           onBulkUpdateStatus?.(Array.from(selectedIds), status)
           setSelectedIds(new Set())
         }}
@@ -416,6 +443,28 @@ export function ProposalList({
           onCancel={closeModal}
         />
       )}
+
+      {addQuotationForIds && addQuotationForIds.length > 0 && (() => {
+        const leads = addQuotationForIds
+          .map((id) => proposals.find((p) => p.id === id))
+          .filter((p): p is Proposal => Boolean(p))
+          .map(proposalToLead)
+        if (leads.length === 0) return null
+        return (
+          <AddQuotationModal
+            leads={leads}
+            initialLeadId={leads[0].id}
+            onSave={(_data, isDraft) => {
+              if (!isDraft) {
+                onBulkUpdateStatus?.(addQuotationForIds, 'quotations')
+              }
+              setAddQuotationForIds(null)
+              setSelectedIds(new Set())
+            }}
+            onClose={() => setAddQuotationForIds(null)}
+          />
+        )
+      })()}
     </div>
   )
 }

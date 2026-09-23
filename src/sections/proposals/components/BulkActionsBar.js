@@ -14,7 +14,10 @@ export function BulkActionsBar({ selectedCount, activeTab, teamMembers, onClear,
                     { key: 'rejected', label: 'Reject' },
                 ];
             case 'under_review':
-                return [{ key: 'rejected', label: 'Reject' }];
+                return [
+                    { key: 'quotations', label: 'Create Quotation' },
+                    { key: 'rejected', label: 'Reject' },
+                ];
             case 'rejected':
                 return [{ key: 'sent', label: 'Reopen to Inbox' }];
             default:

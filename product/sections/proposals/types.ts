@@ -4,7 +4,7 @@
 
 export type ProposalType = 'Challan' | 'DL' | 'RC'
 
-export type ProposalStatus = 'sent' | 'under_review' | 'received' | 'converted' | 'rejected'
+export type ProposalStatus = 'sent' | 'under_review' | 'quotations' | 'received' | 'converted' | 'rejected'
 
 export type ServiceStatus = 'pending' | 'in_progress' | 'completed' | 'not_applicable'
 
@@ -46,9 +46,12 @@ export interface Proposal {
   assignedTo: Assignee | null
 }
 
+export type ChallanType = 'Court' | 'Online'
+
 export interface ChallanItem {
   id: string
   challanId: string
+  challanType?: ChallanType
   vehicleNumber: string
   amount: number
   status: 'pending' | 'in_progress' | 'completed'
