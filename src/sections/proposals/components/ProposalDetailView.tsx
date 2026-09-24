@@ -264,7 +264,7 @@ export function ProposalDetailView({
   const tabs: { key: TabKey; label: string; icon: typeof FileText; show: boolean }[] = [
     { key: 'details', label: 'Details', icon: FileText, show: true },
     { key: 'items', label: 'Quantity', icon: FileText, show: true },
-    { key: 'quotations', label: 'Quotations', icon: Receipt, show: proposal.status === 'quotations' },
+    { key: 'quotations', label: 'Quotations', icon: Receipt, show: ['quotations', 'received', 'converted', 'rejected'].includes(proposal.status) },
     { key: 'notes', label: 'Notes', icon: MessageSquare, show: true },
     { key: 'incidents', label: 'Incidents', icon: LinkIcon, show: proposal.status === 'converted' },
   ]

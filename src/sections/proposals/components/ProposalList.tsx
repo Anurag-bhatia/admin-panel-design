@@ -334,7 +334,7 @@ export function ProposalList({
                       onSelect={(checked) => handleSelectOne(proposal.id, checked)}
                       onView={() => onView?.(proposal.id)}
                       onAssign={() => openModal('assign', proposal.id)}
-                      onSendQuote={() => openModal('sendQuote', proposal.id)}
+                      onSendQuote={() => setAddQuotationForIds([proposal.id])}
                       onReject={() => openModal('reject', proposal.id)}
                       onViewIncident={() =>
                         proposal.linkedIncidentId
