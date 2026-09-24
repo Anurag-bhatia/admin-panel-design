@@ -291,37 +291,20 @@ export function AddCouponPage({
             open={openSections.A}
             onToggle={() => toggleSection('A')}
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Code" required error={errors.code}>
-                <input
-                  type="text"
-                  disabled={isLocked}
-                  value={form.code}
-                  onChange={(e) => update('code', e.target.value.toUpperCase())}
-                  placeholder="WELCOME100"
-                  className={inputCls(isLocked)}
-                  maxLength={32}
-                />
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  3–32 characters, letters and numbers only. Auto-uppercased.
-                </p>
-              </Field>
-              <Field label="Type" required>
-                <div className="grid grid-cols-2 gap-2">
-                  {(['flat', 'percentage'] as CouponType[]).map((t) => (
-                    <button
-                      type="button"
-                      key={t}
-                      disabled={isLocked}
-                      onClick={() => update('type', t)}
-                      className={selectableCls(form.type === t)}
-                    >
-                      {t === 'flat' ? 'Flat amount (₹)' : 'Percentage (%)'}
-                    </button>
-                  ))}
-                </div>
-              </Field>
-            </div>
+            <Field label="Code" required error={errors.code}>
+              <input
+                type="text"
+                disabled={isLocked}
+                value={form.code}
+                onChange={(e) => update('code', e.target.value.toUpperCase())}
+                placeholder="WELCOME100"
+                className={inputCls(isLocked)}
+                maxLength={32}
+              />
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                3–32 characters, letters and numbers only. Auto-uppercased.
+              </p>
+            </Field>
             <Field label="Description">
               <textarea
                 disabled={isLocked}
@@ -340,6 +323,21 @@ export function AddCouponPage({
             open={openSections.B}
             onToggle={() => toggleSection('B')}
           >
+            <Field label="Type" required>
+              <div className="grid grid-cols-2 gap-2 max-w-md">
+                {(['flat', 'percentage'] as CouponType[]).map((t) => (
+                  <button
+                    type="button"
+                    key={t}
+                    disabled={isLocked}
+                    onClick={() => update('type', t)}
+                    className={selectableCls(form.type === t)}
+                  >
+                    {t === 'flat' ? 'Flat amount (₹)' : 'Percentage (%)'}
+                  </button>
+                ))}
+              </div>
+            </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field
                 label={form.type === 'flat' ? 'Discount amount (₹)' : 'Discount percentage'}
@@ -620,11 +618,13 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl">
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+        className={`w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+          open ? 'rounded-t-xl' : 'rounded-xl'
+        }`}
       >
         <div className="flex items-center gap-3 text-left">
           <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-900/40 rounded">
@@ -644,7 +644,7 @@ function Section({
         )}
       </button>
       {open && (
-        <div className="border-t border-slate-100 dark:border-slate-700 px-4 py-4 space-y-3">
+        <div className="border-t border-slate-100 dark:border-slate-700 px-4 py-4 space-y-3 rounded-b-xl">
           {children}
         </div>
       )}
