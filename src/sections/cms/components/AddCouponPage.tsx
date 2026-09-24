@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   ArrowLeft,
   ChevronDown,
@@ -6,7 +6,6 @@ import {
   Info,
   AlertCircle,
   Lock,
-  Sparkles,
   Check,
 } from 'lucide-react'
 import type {
@@ -136,7 +135,6 @@ export function AddCouponPage({
     F: false,
   })
   const [errors, setErrors] = useState<Partial<Record<keyof FormState | 'form', string>>>({})
-  const [sampleCart, setSampleCart] = useState<number>(1000)
 
   const update = <K extends keyof FormState>(key: K, val: FormState[K]) => {
     setForm((f) => ({ ...f, [key]: val }))
@@ -145,19 +143,6 @@ export function AddCouponPage({
 
   const toggleSection = (key: keyof typeof openSections) =>
     setOpenSections((s) => ({ ...s, [key]: !s[key] }))
-
-  const previewDiscount = useMemo(() => {
-    const v = Number(form.value)
-    if (!v || sampleCart <= 0) return { discount: 0, final: sampleCart }
-    if (form.type === 'flat') {
-      const d = Math.min(v, sampleCart)
-      return { discount: d, final: sampleCart - d }
-    }
-    let d = Math.round((sampleCart * v) / 100)
-    const cap = Number(form.maxDiscountCap)
-    if (cap && d > cap) d = cap
-    return { discount: d, final: sampleCart - d }
-  }, [form.type, form.value, form.maxDiscountCap, sampleCart])
 
   const validate = (): boolean => {
     const next: typeof errors = {}
@@ -291,8 +276,8 @@ export function AddCouponPage({
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-8 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
+      <div className="max-w-5xl mx-auto px-8 py-6">
+        <div className="space-y-3">
           {errors.form && (
             <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/40 text-sm text-red-700 dark:text-red-300">
               <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -306,20 +291,37 @@ export function AddCouponPage({
             open={openSections.A}
             onToggle={() => toggleSection('A')}
           >
-            <Field label="Code" required error={errors.code}>
-              <input
-                type="text"
-                disabled={isLocked}
-                value={form.code}
-                onChange={(e) => update('code', e.target.value.toUpperCase())}
-                placeholder="WELCOME100"
-                className={inputCls(isLocked)}
-                maxLength={32}
-              />
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                3–32 characters, letters and numbers only. Auto-uppercased.
-              </p>
-            </Field>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Code" required error={errors.code}>
+                <input
+                  type="text"
+                  disabled={isLocked}
+                  value={form.code}
+                  onChange={(e) => update('code', e.target.value.toUpperCase())}
+                  placeholder="WELCOME100"
+                  className={inputCls(isLocked)}
+                  maxLength={32}
+                />
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  3–32 characters, letters and numbers only. Auto-uppercased.
+                </p>
+              </Field>
+              <Field label="Type" required>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['flat', 'percentage'] as CouponType[]).map((t) => (
+                    <button
+                      type="button"
+                      key={t}
+                      disabled={isLocked}
+                      onClick={() => update('type', t)}
+                      className={selectableCls(form.type === t)}
+                    >
+                      {t === 'flat' ? 'Flat amount (₹)' : 'Percentage (%)'}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+            </div>
             <Field label="Description">
               <textarea
                 disabled={isLocked}
@@ -330,21 +332,6 @@ export function AddCouponPage({
                 className={inputCls(isLocked)}
               />
             </Field>
-            <Field label="Type" required>
-              <div className="grid grid-cols-2 gap-2">
-                {(['flat', 'percentage'] as CouponType[]).map((t) => (
-                  <button
-                    type="button"
-                    key={t}
-                    disabled={isLocked}
-                    onClick={() => update('type', t)}
-                    className={selectableCls(form.type === t)}
-                  >
-                    {t === 'flat' ? 'Flat amount (₹)' : 'Percentage (%)'}
-                  </button>
-                ))}
-              </div>
-            </Field>
           </Section>
 
           <Section
@@ -353,47 +340,49 @@ export function AddCouponPage({
             open={openSections.B}
             onToggle={() => toggleSection('B')}
           >
-            <Field
-              label={form.type === 'flat' ? 'Discount amount (₹)' : 'Discount percentage'}
-              required
-              error={errors.value}
-            >
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                  {form.type === 'flat' ? '₹' : '%'}
-                </span>
-                <input
-                  type="number"
-                  disabled={isLocked}
-                  value={form.value}
-                  onChange={(e) => update('value', e.target.value)}
-                  placeholder={form.type === 'flat' ? '100' : '10'}
-                  className={`${inputCls(isLocked)} pl-8`}
-                  min={1}
-                  max={form.type === 'percentage' ? 100 : undefined}
-                />
-              </div>
-            </Field>
-            {form.type === 'percentage' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field
-                label="Maximum discount cap (₹)"
-                error={errors.maxDiscountCap}
+                label={form.type === 'flat' ? 'Discount amount (₹)' : 'Discount percentage'}
+                required
+                error={errors.value}
               >
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                    ₹
+                    {form.type === 'flat' ? '₹' : '%'}
                   </span>
                   <input
                     type="number"
                     disabled={isLocked}
-                    value={form.maxDiscountCap}
-                    onChange={(e) => update('maxDiscountCap', e.target.value)}
-                    placeholder="Optional. e.g. 500"
+                    value={form.value}
+                    onChange={(e) => update('value', e.target.value)}
+                    placeholder={form.type === 'flat' ? '100' : '10'}
                     className={`${inputCls(isLocked)} pl-8`}
+                    min={1}
+                    max={form.type === 'percentage' ? 100 : undefined}
                   />
                 </div>
               </Field>
-            )}
+              {form.type === 'percentage' && (
+                <Field
+                  label="Maximum discount cap (₹)"
+                  error={errors.maxDiscountCap}
+                >
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      disabled={isLocked}
+                      value={form.maxDiscountCap}
+                      onChange={(e) => update('maxDiscountCap', e.target.value)}
+                      placeholder="Optional. e.g. 500"
+                      className={`${inputCls(isLocked)} pl-8`}
+                    />
+                  </div>
+                </Field>
+              )}
+            </div>
           </Section>
 
           <Section
@@ -430,103 +419,89 @@ export function AddCouponPage({
             open={openSections.D}
             onToggle={() => toggleSection('D')}
           >
-            <Field label="Minimum order value (₹)">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                  ₹
-                </span>
-                <input
-                  type="number"
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Minimum order value (₹)">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    disabled={isLocked}
+                    value={form.minOrderValue}
+                    onChange={(e) => update('minOrderValue', e.target.value)}
+                    placeholder="0"
+                    className={`${inputCls(isLocked)} pl-8`}
+                  />
+                </div>
+              </Field>
+
+              <Field label="Applicable on partner">
+                <div className="grid grid-cols-2 gap-2">
+                  {(['no', 'yes'] as const).map((v) => (
+                    <button
+                      type="button"
+                      key={v}
+                      disabled={isLocked}
+                      onClick={() => update('applicableOnPartner', v)}
+                      className={`${selectableCls(form.applicableOnPartner === v)} capitalize`}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Platform" required error={errors.platforms}>
+                <MultiSelectDropdown
+                  placeholder="Select platforms"
                   disabled={isLocked}
-                  value={form.minOrderValue}
-                  onChange={(e) => update('minOrderValue', e.target.value)}
-                  placeholder="0"
-                  className={`${inputCls(isLocked)} pl-8`}
+                  options={(Object.keys(PLATFORM_LABELS) as CouponPlatform[]).map((p) => ({
+                    value: p,
+                    label: PLATFORM_LABELS[p],
+                  }))}
+                  value={form.platforms}
+                  onChange={(next) => update('platforms', next as CouponPlatform[])}
                 />
-              </div>
-            </Field>
+              </Field>
 
-            <Field label="Platform" required error={errors.platforms}>
-              <div className="flex flex-wrap gap-2">
-                {(Object.keys(PLATFORM_LABELS) as CouponPlatform[]).map((p) => (
-                  <CheckboxPill
-                    key={p}
-                    label={PLATFORM_LABELS[p]}
-                    checked={form.platforms.includes(p)}
-                    disabled={isLocked}
-                    onChange={(checked) =>
-                      update(
-                        'platforms',
-                        checked
-                          ? [...form.platforms, p]
-                          : form.platforms.filter((x) => x !== p)
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </Field>
+              <Field label="Product" required>
+                <SingleSelectDropdown
+                  disabled={isLocked}
+                  options={(['all', 'challan', 'subscription'] as CouponProduct[]).map((p) => ({
+                    value: p,
+                    label: p.charAt(0).toUpperCase() + p.slice(1),
+                  }))}
+                  value={form.product}
+                  onChange={(next) => update('product', next as CouponProduct)}
+                />
+              </Field>
+            </div>
 
-            <Field label="Product" required>
-              <div className="grid grid-cols-3 gap-2">
-                {(['all', 'challan', 'subscription'] as CouponProduct[]).map((p) => (
-                  <button
-                    type="button"
-                    key={p}
-                    disabled={isLocked}
-                    onClick={() => update('product', p)}
-                    className={`${selectableCls(form.product === p)} capitalize`}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-            </Field>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Applicable Challan Type" required error={errors.challanTypes}>
+                <MultiSelectDropdown
+                  placeholder="Select challan types"
+                  disabled={isLocked}
+                  options={(Object.keys(CHALLAN_TYPE_LABELS) as CouponChallanType[]).map((t) => ({
+                    value: t,
+                    label: CHALLAN_TYPE_LABELS[t],
+                  }))}
+                  value={form.challanTypes}
+                  onChange={(next) => update('challanTypes', next as CouponChallanType[])}
+                />
+              </Field>
 
-            <Field label="Applicable Challan Type" required error={errors.challanTypes}>
-              <div className="flex flex-wrap gap-2">
-                {(Object.keys(CHALLAN_TYPE_LABELS) as CouponChallanType[]).map((t) => (
-                  <CheckboxPill
-                    key={t}
-                    label={CHALLAN_TYPE_LABELS[t]}
-                    checked={form.challanTypes.includes(t)}
-                    disabled={isLocked}
-                    onChange={(checked) =>
-                      update(
-                        'challanTypes',
-                        checked
-                          ? [...form.challanTypes, t]
-                          : form.challanTypes.filter((x) => x !== t)
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </Field>
-
-            <Field label="Location State">
-              <StateMultiSelect
-                value={form.states}
-                disabled={isLocked}
-                onChange={(states) => update('states', states)}
-              />
-            </Field>
-
-            <Field label="Applicable on partner">
-              <div className="grid grid-cols-2 gap-2 max-w-xs">
-                {(['no', 'yes'] as const).map((v) => (
-                  <button
-                    type="button"
-                    key={v}
-                    disabled={isLocked}
-                    onClick={() => update('applicableOnPartner', v)}
-                    className={`${selectableCls(form.applicableOnPartner === v)} capitalize`}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-            </Field>
+              <Field label="Location State">
+                <StateMultiSelect
+                  value={form.states}
+                  disabled={isLocked}
+                  onChange={(states) => update('states', states)}
+                />
+              </Field>
+            </div>
 
             {form.applicableOnPartner === 'yes' && (
               <Field label="Partner ID" required error={errors.partnerIds}>
@@ -608,74 +583,21 @@ export function AddCouponPage({
               readOnly={isLocked}
             />
           </Section>
-        </div>
 
-        <div className="lg:col-span-1">
-          <div className="sticky top-24 space-y-4">
-            <div className="bg-gradient-to-br from-cyan-50 to-white dark:from-cyan-900/20 dark:to-slate-900 border border-cyan-200 dark:border-cyan-900/40 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                  Live Preview
-                </h3>
-              </div>
-              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                Sample cart value
-              </label>
-              <div className="relative mb-4">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                  ₹
-                </span>
-                <input
-                  type="number"
-                  value={sampleCart}
-                  onChange={(e) => setSampleCart(Number(e.target.value) || 0)}
-                  className="w-full pl-8 pr-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
-              </div>
-              <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-slate-100 dark:border-slate-700 space-y-2">
-                <PreviewRow label="Cart" value={`₹${sampleCart}`} />
-                <PreviewRow
-                  label={form.code ? `Coupon ${form.code}` : 'Coupon'}
-                  value={`− ₹${previewDiscount.discount}`}
-                  emphasize
-                />
-                <div className="border-t border-slate-100 dark:border-slate-700 pt-2 mt-2">
-                  <PreviewRow
-                    label="Final"
-                    value={`₹${previewDiscount.final}`}
-                    bold
-                  />
-                </div>
-                {previewDiscount.discount > 0 && (
-                  <p className="text-xs text-green-600 dark:text-green-400 font-medium">
-                    You save ₹{previewDiscount.discount}
+          {isLocked && (
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 rounded-xl p-4 text-xs text-amber-800 dark:text-amber-300">
+              <div className="flex items-start gap-2">
+                <Lock className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold mb-0.5">Editing is locked</p>
+                  <p>
+                    The validity period has started. Only Pause, Resume and Archive actions
+                    are available.
                   </p>
-                )}
-              </div>
-              {form.type === 'percentage' && form.maxDiscountCap && (
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-3 flex items-start gap-1">
-                  <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                  Cap of ₹{form.maxDiscountCap} applies once percentage exceeds it.
-                </p>
-              )}
-            </div>
-
-            {isLocked && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 rounded-xl p-4 text-xs text-amber-800 dark:text-amber-300">
-                <div className="flex items-start gap-2">
-                  <Lock className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-semibold mb-0.5">Editing is locked</p>
-                    <p>
-                      The validity period has started. Only Pause, Resume and Archive actions
-                      are available.
-                    </p>
-                  </div>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -702,10 +624,10 @@ function Section({
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
       >
         <div className="flex items-center gap-3 text-left">
-          <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-900/40 rounded">
+          <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-900/40 rounded">
             {id}
           </span>
           <div>
@@ -722,7 +644,7 @@ function Section({
         )}
       </button>
       {open && (
-        <div className="border-t border-slate-100 dark:border-slate-700 p-5 space-y-4">
+        <div className="border-t border-slate-100 dark:border-slate-700 px-4 py-4 space-y-3">
           {children}
         </div>
       )}
@@ -743,7 +665,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       {children}
@@ -756,31 +678,157 @@ function Field({
   )
 }
 
-function CheckboxPill({
-  label,
-  checked,
-  disabled,
+type DropdownOption = { value: string; label: string }
+
+function MultiSelectDropdown({
+  options,
+  value,
   onChange,
+  disabled,
+  placeholder = 'Select…',
 }: {
-  label: string
-  checked: boolean
+  options: DropdownOption[]
+  value: string[]
+  onChange: (v: string[]) => void
   disabled?: boolean
-  onChange: (checked: boolean) => void
+  placeholder?: string
 }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  const selectedLabels = options
+    .filter((o) => value.includes(o.value))
+    .map((o) => o.label)
+  const summary =
+    value.length === 0
+      ? placeholder
+      : value.length === options.length
+        ? 'All'
+        : selectedLabels.join(', ')
+
+  const toggle = (v: string) =>
+    onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])
+
   return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
-      className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border-2 transition-colors ${
-        checked
-          ? 'border-cyan-600 bg-cyan-50 text-cyan-700 dark:border-cyan-500 dark:bg-cyan-900/30 dark:text-cyan-200'
-          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
-      } disabled:opacity-60 disabled:cursor-not-allowed`}
-    >
-      {checked && <Check className="w-4 h-4 text-cyan-600 dark:text-cyan-300" strokeWidth={3} />}
-      {label}
-    </button>
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((o) => !o)}
+        className={`${inputCls(!!disabled)} flex items-center justify-between text-left`}
+      >
+        <span
+          className={`truncate ${value.length === 0 ? 'text-slate-400' : ''}`}
+        >
+          {summary}
+        </span>
+        <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
+      </button>
+      {open && (
+        <div className="absolute z-20 mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg py-1 max-h-56 overflow-y-auto">
+          {options.map((o) => {
+            const selected = value.includes(o.value)
+            return (
+              <button
+                type="button"
+                key={o.value}
+                onClick={() => toggle(o.value)}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+              >
+                <span
+                  className={`inline-flex items-center justify-center w-4 h-4 rounded border ${
+                    selected
+                      ? 'bg-cyan-600 border-cyan-600'
+                      : 'border-slate-300 dark:border-slate-600'
+                  }`}
+                >
+                  {selected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                </span>
+                {o.label}
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SingleSelectDropdown({
+  options,
+  value,
+  onChange,
+  disabled,
+  placeholder = 'Select…',
+}: {
+  options: DropdownOption[]
+  value: string
+  onChange: (v: string) => void
+  disabled?: boolean
+  placeholder?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  const current = options.find((o) => o.value === value)
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((o) => !o)}
+        className={`${inputCls(!!disabled)} flex items-center justify-between text-left`}
+      >
+        <span className={`truncate ${!current ? 'text-slate-400' : ''}`}>
+          {current ? current.label : placeholder}
+        </span>
+        <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
+      </button>
+      {open && (
+        <div className="absolute z-20 mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg py-1 max-h-56 overflow-y-auto">
+          {options.map((o) => {
+            const selected = o.value === value
+            return (
+              <button
+                type="button"
+                key={o.value}
+                onClick={() => {
+                  onChange(o.value)
+                  setOpen(false)
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2 text-sm text-left hover:bg-slate-50 dark:hover:bg-slate-800 ${
+                  selected
+                    ? 'text-cyan-700 dark:text-cyan-300 font-medium'
+                    : 'text-slate-700 dark:text-slate-200'
+                }`}
+              >
+                {o.label}
+                {selected && <Check className="w-4 h-4 text-cyan-600" strokeWidth={3} />}
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -927,33 +975,6 @@ function StateMultiSelect({
           )}
         </div>
       )}
-    </div>
-  )
-}
-
-function PreviewRow({
-  label,
-  value,
-  emphasize,
-  bold,
-}: {
-  label: string
-  value: string
-  emphasize?: boolean
-  bold?: boolean
-}) {
-  return (
-    <div className="flex items-center justify-between text-sm">
-      <span
-        className={`text-slate-600 dark:text-slate-300 ${bold ? 'font-semibold' : ''}`}
-      >
-        {label}
-      </span>
-      <span
-        className={`${bold ? 'font-bold text-slate-900 dark:text-white' : emphasize ? 'text-green-600 dark:text-green-400 font-medium' : 'text-slate-700 dark:text-slate-200'}`}
-      >
-        {value}
-      </span>
     </div>
   )
 }
