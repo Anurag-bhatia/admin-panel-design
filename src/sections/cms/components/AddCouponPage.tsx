@@ -28,6 +28,7 @@ interface AddCouponPageProps {
 interface FormState {
   code: string
   description: string
+  note: string
   type: CouponType
   value: string
   maxDiscountCap: string
@@ -94,6 +95,7 @@ function initialFromCoupon(coupon?: Coupon): FormState {
   return {
     code: coupon?.code ?? '',
     description: coupon?.description ?? '',
+    note: coupon?.note ?? '',
     type: coupon?.type ?? 'flat',
     value: coupon?.value != null ? String(coupon.value) : '',
     maxDiscountCap:
@@ -199,6 +201,7 @@ export function AddCouponPage({
       ...(isEdit ? { id: initialCoupon!.id } : {}),
       code: form.code.trim().toUpperCase(),
       description: form.description.trim() || undefined,
+      note: form.note.trim() || undefined,
       type: form.type,
       value: Number(form.value),
       maxDiscountCap:
@@ -311,6 +314,16 @@ export function AddCouponPage({
                 value={form.description}
                 onChange={(e) => update('description', e.target.value)}
                 placeholder="Optional. Internal-only — not shown to users."
+                rows={2}
+                className={inputCls(isLocked)}
+              />
+            </Field>
+            <Field label="Coupon Note">
+              <textarea
+                disabled={isLocked}
+                value={form.note}
+                onChange={(e) => update('note', e.target.value)}
+                placeholder="Optional. Shown to users on the coupon."
                 rows={2}
                 className={inputCls(isLocked)}
               />

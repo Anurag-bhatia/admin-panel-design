@@ -78,6 +78,73 @@ const samplePendingInvoices = [
   },
 ]
 
+const sampleTeam = [
+  {
+    id: 't1',
+    name: 'Rohan Verma',
+    role: 'Associate Lawyer',
+    email: 'rohan.verma@firm.in',
+    mobile: '+91 98110 45623',
+    assignedIncidents: 24,
+    activeIncidents: 7,
+    resolvedIncidents: 17,
+    joinedDate: '2023-03-15',
+    status: 'Active' as const,
+    incidentIds: [
+      'IRN-2024-0018', 'IRN-2024-0024', 'IRN-2024-0037', 'IRN-2024-0051',
+      'IRN-2024-0062', 'IRN-2024-0078', 'IRN-2024-0089', 'IRN-2024-0104',
+    ],
+  },
+  {
+    id: 't2',
+    name: 'Priya Sharma',
+    role: 'Paralegal',
+    email: 'priya.sharma@firm.in',
+    mobile: '+91 98211 78345',
+    assignedIncidents: 18,
+    activeIncidents: 4,
+    resolvedIncidents: 14,
+    joinedDate: '2023-07-01',
+    status: 'Active' as const,
+    incidentIds: [
+      'IRN-2024-0021', 'IRN-2024-0033', 'IRN-2024-0045', 'IRN-2024-0067',
+      'IRN-2024-0081', 'IRN-2024-0092',
+    ],
+  },
+  {
+    id: 't3',
+    name: 'Arjun Mehta',
+    role: 'Junior Lawyer',
+    email: 'arjun.mehta@firm.in',
+    mobile: '+91 99900 12467',
+    assignedIncidents: 31,
+    activeIncidents: 9,
+    resolvedIncidents: 22,
+    joinedDate: '2022-11-20',
+    status: 'Active' as const,
+    incidentIds: [
+      'IRN-2024-0012', 'IRN-2024-0029', 'IRN-2024-0041', 'IRN-2024-0053',
+      'IRN-2024-0069', 'IRN-2024-0074', 'IRN-2024-0087', 'IRN-2024-0095',
+      'IRN-2024-0111',
+    ],
+  },
+  {
+    id: 't4',
+    name: 'Neha Kapoor',
+    role: 'Legal Assistant',
+    email: 'neha.kapoor@firm.in',
+    mobile: '+91 97112 88790',
+    assignedIncidents: 12,
+    activeIncidents: 0,
+    resolvedIncidents: 12,
+    joinedDate: '2024-01-10',
+    status: 'Inactive' as const,
+    incidentIds: [
+      'IRN-2023-0198', 'IRN-2023-0212', 'IRN-2023-0234', 'IRN-2023-0256',
+    ],
+  },
+]
+
 const sampleTransactions = [
   {
     id: '1',
@@ -168,6 +235,7 @@ export function Lawyers({ lawyers: initialLawyers }: LawyersProps) {
         incidents={sampleIncidents}
         pendingInvoices={samplePendingInvoices}
         transactions={sampleTransactions}
+        team={sampleTeam}
         onBack={handleBack}
         onEdit={() => setCurrentView('edit')}
         onDeactivate={() => {
@@ -180,6 +248,7 @@ export function Lawyers({ lawyers: initialLawyers }: LawyersProps) {
         }}
         onViewIncident={(id) => console.log('View incident:', id)}
         onViewTransaction={(id) => console.log('View transaction:', id)}
+        onViewTeamMember={(id) => console.log('View team member:', id)}
       />
     )
   }
