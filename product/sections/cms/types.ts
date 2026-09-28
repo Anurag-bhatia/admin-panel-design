@@ -71,9 +71,6 @@ export interface Coupon {
   platforms: CouponPlatform[]
   product: CouponProduct
   challanTypes: CouponChallanType[]
-  states: string[]
-  applicableOnPartner: boolean
-  partnerIds: string[]
   totalUsageLimit?: number
   perUserUsageLimit?: number
   stackable: boolean
@@ -94,6 +91,7 @@ export type RuleCategory =
   | 'customerIdentity'
   | 'vehicle'
   | 'challan'
+  | 'partner'
   | 'cartAndAmount'
   | 'timeWindow'
   | 'couponWalletCombo'

@@ -278,12 +278,13 @@
       "startAt": "2026-09-01T00:00:00Z",
       "endAt": "2026-12-31T23:59:00Z",
       "minOrderValue": 500,
-      "platforms": ["challanpay"],
+      "platforms": [
+        "challanpay"
+      ],
       "product": "challan",
-      "challanTypes": ["online"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online"
+      ],
       "totalUsageLimit": 500,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -303,12 +304,15 @@
       "startAt": "2026-09-10T00:00:00Z",
       "endAt": "2026-10-31T23:59:00Z",
       "minOrderValue": 1000,
-      "platforms": ["challanpay", "lots247"],
+      "platforms": [
+        "challanpay",
+        "lots247"
+      ],
       "product": "all",
-      "challanTypes": ["online", "regularCourt"],
-      "states": ["Delhi", "Haryana", "Uttar Pradesh"],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online",
+        "regularCourt"
+      ],
       "totalUsageLimit": 2000,
       "perUserUsageLimit": 2,
       "stackable": true,
@@ -327,12 +331,13 @@
       "startAt": "2026-09-05T00:00:00Z",
       "endAt": "2026-11-30T23:59:00Z",
       "minOrderValue": 800,
-      "platforms": ["challanpay"],
+      "platforms": [
+        "challanpay"
+      ],
       "product": "challan",
-      "challanTypes": ["regularCourt"],
-      "states": ["Delhi"],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "regularCourt"
+      ],
       "totalUsageLimit": 300,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -351,12 +356,13 @@
       "startAt": "2026-09-15T00:00:00Z",
       "endAt": "2026-12-15T23:59:00Z",
       "minOrderValue": 1500,
-      "platforms": ["challanpay"],
+      "platforms": [
+        "challanpay"
+      ],
       "product": "challan",
-      "challanTypes": ["xpressCourt"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "xpressCourt"
+      ],
       "totalUsageLimit": 400,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -376,12 +382,13 @@
       "startAt": "2026-09-01T00:00:00Z",
       "endAt": "2026-10-15T23:59:00Z",
       "minOrderValue": 0,
-      "platforms": ["lots247"],
+      "platforms": [
+        "lots247"
+      ],
       "product": "subscription",
-      "challanTypes": ["online"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online"
+      ],
       "totalUsageLimit": 1000,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -401,12 +408,16 @@
       "startAt": "2026-10-15T00:00:00Z",
       "endAt": "2026-11-15T23:59:00Z",
       "minOrderValue": 600,
-      "platforms": ["challanpay", "lots247"],
+      "platforms": [
+        "challanpay",
+        "lots247"
+      ],
       "product": "all",
-      "challanTypes": ["online", "regularCourt", "xpressCourt"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online",
+        "regularCourt",
+        "xpressCourt"
+      ],
       "totalUsageLimit": 3000,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -425,12 +436,14 @@
       "startAt": "2026-11-01T00:00:00Z",
       "endAt": "2027-01-31T23:59:00Z",
       "minOrderValue": 300,
-      "platforms": ["lots247"],
+      "platforms": [
+        "lots247"
+      ],
       "product": "challan",
-      "challanTypes": ["online", "regularCourt"],
-      "states": [],
-      "applicableOnPartner": true,
-      "partnerIds": ["partner-fleetco", "partner-transko"],
+      "challanTypes": [
+        "online",
+        "regularCourt"
+      ],
       "totalUsageLimit": 5000,
       "perUserUsageLimit": 20,
       "stackable": true,
@@ -449,12 +462,13 @@
       "startAt": "2026-08-15T00:00:00Z",
       "endAt": "2026-10-30T23:59:00Z",
       "minOrderValue": 1000,
-      "platforms": ["challanpay"],
+      "platforms": [
+        "challanpay"
+      ],
       "product": "challan",
-      "challanTypes": ["online"],
-      "states": ["Maharashtra"],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online"
+      ],
       "totalUsageLimit": 500,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -473,12 +487,13 @@
       "startAt": "2026-08-01T00:00:00Z",
       "endAt": "2026-11-30T23:59:00Z",
       "minOrderValue": 400,
-      "platforms": ["challanpay"],
+      "platforms": [
+        "challanpay"
+      ],
       "product": "challan",
-      "challanTypes": ["online"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online"
+      ],
       "totalUsageLimit": 2000,
       "perUserUsageLimit": 2,
       "stackable": false,
@@ -497,12 +512,15 @@
       "startAt": "2026-08-20T00:00:00Z",
       "endAt": "2026-10-20T23:59:00Z",
       "minOrderValue": 1200,
-      "platforms": ["challanpay", "lots247"],
+      "platforms": [
+        "challanpay",
+        "lots247"
+      ],
       "product": "all",
-      "challanTypes": ["online", "regularCourt"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online",
+        "regularCourt"
+      ],
       "totalUsageLimit": 800,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -521,12 +539,13 @@
       "startAt": "2026-07-01T00:00:00Z",
       "endAt": "2026-08-31T23:59:00Z",
       "minOrderValue": 300,
-      "platforms": ["challanpay"],
+      "platforms": [
+        "challanpay"
+      ],
       "product": "challan",
-      "challanTypes": ["online"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online"
+      ],
       "totalUsageLimit": 1000,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -546,12 +565,16 @@
       "startAt": "2026-08-10T00:00:00Z",
       "endAt": "2026-08-20T23:59:00Z",
       "minOrderValue": 500,
-      "platforms": ["challanpay", "lots247"],
+      "platforms": [
+        "challanpay",
+        "lots247"
+      ],
       "product": "all",
-      "challanTypes": ["online", "regularCourt", "xpressCourt"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online",
+        "regularCourt",
+        "xpressCourt"
+      ],
       "totalUsageLimit": 2500,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -570,12 +593,13 @@
       "startAt": "2026-06-01T00:00:00Z",
       "endAt": "2026-09-15T23:59:00Z",
       "minOrderValue": 400,
-      "platforms": ["lots247"],
+      "platforms": [
+        "lots247"
+      ],
       "product": "challan",
-      "challanTypes": ["online"],
-      "states": [],
-      "applicableOnPartner": true,
-      "partnerIds": ["partner-fleetco"],
+      "challanTypes": [
+        "online"
+      ],
       "totalUsageLimit": 1500,
       "perUserUsageLimit": 5,
       "stackable": false,
@@ -594,12 +618,13 @@
       "startAt": "2026-09-25T00:00:00Z",
       "endAt": "2026-10-25T23:59:00Z",
       "minOrderValue": 2000,
-      "platforms": ["challanpay"],
+      "platforms": [
+        "challanpay"
+      ],
       "product": "challan",
-      "challanTypes": ["online"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online"
+      ],
       "totalUsageLimit": 10,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -619,12 +644,15 @@
       "startAt": "2026-05-01T00:00:00Z",
       "endAt": "2026-07-31T23:59:00Z",
       "minOrderValue": 800,
-      "platforms": ["challanpay", "lots247"],
+      "platforms": [
+        "challanpay",
+        "lots247"
+      ],
       "product": "all",
-      "challanTypes": ["online", "regularCourt"],
-      "states": [],
-      "applicableOnPartner": false,
-      "partnerIds": [],
+      "challanTypes": [
+        "online",
+        "regularCourt"
+      ],
       "totalUsageLimit": 3000,
       "perUserUsageLimit": 1,
       "stackable": false,
@@ -653,7 +681,10 @@
       "perCartCapType": "percent",
       "perCartCapValue": 20,
       "partialUse": true,
-      "chargeComponents": ["convenience", "lawyerFee"],
+      "chargeComponents": [
+        "convenience",
+        "lawyerFee"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 500000,
       "alertLevelPercent": 80,
@@ -692,7 +723,9 @@
       "perCartCapType": "percent",
       "perCartCapValue": 15,
       "partialUse": true,
-      "chargeComponents": ["convenience"],
+      "chargeComponents": [
+        "convenience"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 300000,
       "alertLevelPercent": 75,
@@ -729,7 +762,10 @@
       "perCartCapType": "fixed",
       "perCartCapValue": 250,
       "partialUse": true,
-      "chargeComponents": ["convenience", "lawyerFee"],
+      "chargeComponents": [
+        "convenience",
+        "lawyerFee"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 250000,
       "alertLevelPercent": 80,
@@ -767,7 +803,11 @@
       "perCartCapType": "percent",
       "perCartCapValue": 30,
       "partialUse": true,
-      "chargeComponents": ["convenience", "lawyerFee", "subscription"],
+      "chargeComponents": [
+        "convenience",
+        "lawyerFee",
+        "subscription"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 5000000,
       "alertLevelPercent": 90,
@@ -805,7 +845,9 @@
       "perCartCapType": "fixed",
       "perCartCapValue": 200,
       "partialUse": true,
-      "chargeComponents": ["convenience"],
+      "chargeComponents": [
+        "convenience"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 10000,
       "alertLevelPercent": 100,
@@ -844,7 +886,9 @@
       "perCartCapType": "percent",
       "perCartCapValue": 10,
       "partialUse": true,
-      "chargeComponents": ["convenience"],
+      "chargeComponents": [
+        "convenience"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 200000,
       "alertLevelPercent": 80,
@@ -880,7 +924,9 @@
       "perCartCapType": "percent",
       "perCartCapValue": 20,
       "partialUse": true,
-      "chargeComponents": ["convenience"],
+      "chargeComponents": [
+        "convenience"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 150000,
       "alertLevelPercent": 90,
@@ -917,7 +963,9 @@
       "perCartCapType": "fixed",
       "perCartCapValue": 100,
       "partialUse": true,
-      "chargeComponents": ["convenience"],
+      "chargeComponents": [
+        "convenience"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 50000,
       "alertLevelPercent": 80,
@@ -954,7 +1002,10 @@
       "perCartCapType": "percent",
       "perCartCapValue": 20,
       "partialUse": true,
-      "chargeComponents": ["convenience", "lawyerFee"],
+      "chargeComponents": [
+        "convenience",
+        "lawyerFee"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 400000,
       "alertLevelPercent": 80,
@@ -992,7 +1043,10 @@
       "perCartCapType": "percent",
       "perCartCapValue": 25,
       "partialUse": true,
-      "chargeComponents": ["convenience", "lawyerFee"],
+      "chargeComponents": [
+        "convenience",
+        "lawyerFee"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 750000,
       "alertLevelPercent": 90,
@@ -1031,7 +1085,9 @@
       "perCartCapType": "percent",
       "perCartCapValue": 15,
       "partialUse": true,
-      "chargeComponents": ["convenience"],
+      "chargeComponents": [
+        "convenience"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 175000,
       "alertLevelPercent": 80,
@@ -1069,7 +1125,10 @@
       "perCartCapType": "percent",
       "perCartCapValue": 25,
       "partialUse": true,
-      "chargeComponents": ["convenience", "lawyerFee"],
+      "chargeComponents": [
+        "convenience",
+        "lawyerFee"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 960000,
       "alertLevelPercent": 90,
@@ -1105,7 +1164,10 @@
       "perCartCapType": "percent",
       "perCartCapValue": 20,
       "partialUse": true,
-      "chargeComponents": ["convenience", "lawyerFee"],
+      "chargeComponents": [
+        "convenience",
+        "lawyerFee"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 600000,
       "alertLevelPercent": 80,
@@ -1143,7 +1205,11 @@
       "perCartCapType": "percent",
       "perCartCapValue": 30,
       "partialUse": true,
-      "chargeComponents": ["convenience", "lawyerFee", "subscription"],
+      "chargeComponents": [
+        "convenience",
+        "lawyerFee",
+        "subscription"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 18000,
       "alertLevelPercent": 100,
@@ -1182,7 +1248,9 @@
       "perCartCapType": "percent",
       "perCartCapValue": 15,
       "partialUse": true,
-      "chargeComponents": ["convenience"],
+      "chargeComponents": [
+        "convenience"
+      ],
       "lotUseOrder": "earliestExpiryFirst",
       "budgetCoins": 180000,
       "alertLevelPercent": 80,
@@ -1296,7 +1364,10 @@
   "customerCredits": [
     {
       "mobileNumber": "9876543210",
-      "vehicleNumbers": ["DL01AB1234", "DL01CD5678"],
+      "vehicleNumbers": [
+        "DL01AB1234",
+        "DL01CD5678"
+      ],
       "customerName": "Ravi Kumar",
       "totalAvailable": 620,
       "totalReserved": 100,
@@ -1401,7 +1472,9 @@
     },
     {
       "mobileNumber": "9123456780",
-      "vehicleNumbers": ["MH14AB4321"],
+      "vehicleNumbers": [
+        "MH14AB4321"
+      ],
       "customerName": "Sneha Patil",
       "totalAvailable": 850,
       "totalReserved": 0,

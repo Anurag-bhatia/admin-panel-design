@@ -38,39 +38,11 @@ interface FormState {
   platforms: CouponPlatform[]
   product: CouponProduct
   challanTypes: CouponChallanType[]
-  states: string[]
-  applicableOnPartner: 'yes' | 'no'
-  partnerIds: string[]
   totalUsageLimit: string
   perUserUsageLimit: string
   stackable: boolean
   advancedRules: AdvancedRules
 }
-
-const INDIAN_STATES = [
-  'Andhra Pradesh',
-  'Assam',
-  'Bihar',
-  'Chhattisgarh',
-  'Delhi',
-  'Goa',
-  'Gujarat',
-  'Haryana',
-  'Himachal Pradesh',
-  'Jharkhand',
-  'Karnataka',
-  'Kerala',
-  'Madhya Pradesh',
-  'Maharashtra',
-  'Odisha',
-  'Punjab',
-  'Rajasthan',
-  'Tamil Nadu',
-  'Telangana',
-  'Uttar Pradesh',
-  'Uttarakhand',
-  'West Bengal',
-]
 
 const CHALLAN_TYPE_LABELS: Record<CouponChallanType, string> = {
   online: 'Online',
@@ -106,9 +78,6 @@ function initialFromCoupon(coupon?: Coupon): FormState {
     platforms: coupon?.platforms ?? [],
     product: coupon?.product ?? 'all',
     challanTypes: coupon?.challanTypes ?? [],
-    states: coupon?.states ?? [],
-    applicableOnPartner: coupon?.applicableOnPartner ? 'yes' : 'no',
-    partnerIds: coupon?.partnerIds ?? [],
     totalUsageLimit:
       coupon?.totalUsageLimit != null ? String(coupon.totalUsageLimit) : '',
     perUserUsageLimit:
@@ -182,9 +151,6 @@ export function AddCouponPage({
     if (form.challanTypes.length === 0)
       next.challanTypes = 'Select at least one challan type.'
 
-    if (form.applicableOnPartner === 'yes' && form.partnerIds.length === 0)
-      next.partnerIds = 'Select at least one partner.'
-
     setErrors(next)
     if (Object.keys(next).length > 0) return false
     return true
@@ -214,9 +180,6 @@ export function AddCouponPage({
       platforms: form.platforms,
       product: form.product,
       challanTypes: form.challanTypes,
-      states: form.states,
-      applicableOnPartner: form.applicableOnPartner === 'yes',
-      partnerIds: form.applicableOnPartner === 'yes' ? form.partnerIds : [],
       totalUsageLimit: form.totalUsageLimit ? Number(form.totalUsageLimit) : undefined,
       perUserUsageLimit: form.perUserUsageLimit
         ? Number(form.perUserUsageLimit)
@@ -447,20 +410,16 @@ export function AddCouponPage({
                 </div>
               </Field>
 
-              <Field label="Applicable on partner">
-                <div className="grid grid-cols-2 gap-2">
-                  {(['no', 'yes'] as const).map((v) => (
-                    <button
-                      type="button"
-                      key={v}
-                      disabled={isLocked}
-                      onClick={() => update('applicableOnPartner', v)}
-                      className={`${selectableCls(form.applicableOnPartner === v)} capitalize`}
-                    >
-                      {v}
-                    </button>
-                  ))}
-                </div>
+              <Field label="Product" required>
+                <SingleSelectDropdown
+                  disabled={isLocked}
+                  options={(['all', 'challan', 'subscription'] as CouponProduct[]).map((p) => ({
+                    value: p,
+                    label: p.charAt(0).toUpperCase() + p.slice(1),
+                  }))}
+                  value={form.product}
+                  onChange={(next) => update('product', next as CouponProduct)}
+                />
               </Field>
             </div>
 
@@ -478,20 +437,6 @@ export function AddCouponPage({
                 />
               </Field>
 
-              <Field label="Product" required>
-                <SingleSelectDropdown
-                  disabled={isLocked}
-                  options={(['all', 'challan', 'subscription'] as CouponProduct[]).map((p) => ({
-                    value: p,
-                    label: p.charAt(0).toUpperCase() + p.slice(1),
-                  }))}
-                  value={form.product}
-                  onChange={(next) => update('product', next as CouponProduct)}
-                />
-              </Field>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Applicable Challan Type" required error={errors.challanTypes}>
                 <MultiSelectDropdown
                   placeholder="Select challan types"
@@ -504,25 +449,7 @@ export function AddCouponPage({
                   onChange={(next) => update('challanTypes', next as CouponChallanType[])}
                 />
               </Field>
-
-              <Field label="Location State">
-                <StateMultiSelect
-                  value={form.states}
-                  disabled={isLocked}
-                  onChange={(states) => update('states', states)}
-                />
-              </Field>
             </div>
-
-            {form.applicableOnPartner === 'yes' && (
-              <Field label="Partner ID" required error={errors.partnerIds}>
-                <PartnerIdInput
-                  value={form.partnerIds}
-                  disabled={isLocked}
-                  onChange={(ids) => update('partnerIds', ids)}
-                />
-              </Field>
-            )}
           </Section>
 
           <Section
@@ -592,6 +519,7 @@ export function AddCouponPage({
               value={form.advancedRules}
               onChange={(next) => update('advancedRules', next)}
               readOnly={isLocked}
+              platforms={form.platforms}
             />
           </Section>
 
@@ -839,153 +767,6 @@ function SingleSelectDropdown({
               </button>
             )
           })}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function PartnerIdInput({
-  value,
-  disabled,
-  onChange,
-}: {
-  value: string[]
-  disabled?: boolean
-  onChange: (v: string[]) => void
-}) {
-  const [draft, setDraft] = useState('')
-
-  const commit = () => {
-    const clean = draft.trim()
-    if (!clean) return
-    if (value.includes(clean)) {
-      setDraft('')
-      return
-    }
-    onChange([...value, clean])
-    setDraft('')
-  }
-
-  return (
-    <div>
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          disabled={disabled}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ',') {
-              e.preventDefault()
-              commit()
-            }
-          }}
-          placeholder="Enter partner ID and press Enter"
-          className={inputCls(!!disabled)}
-        />
-        <button
-          type="button"
-          disabled={disabled || !draft.trim()}
-          onClick={commit}
-          className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
-        >
-          Add
-        </button>
-      </div>
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {value.map((id) => (
-            <span
-              key={id}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-900/50"
-            >
-              {id}
-              {!disabled && (
-                <button
-                  type="button"
-                  onClick={() => onChange(value.filter((v) => v !== id))}
-                  className="hover:text-cyan-900 dark:hover:text-cyan-100"
-                >
-                  ×
-                </button>
-              )}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function StateMultiSelect({
-  value,
-  disabled,
-  onChange,
-}: {
-  value: string[]
-  disabled?: boolean
-  onChange: (v: string[]) => void
-}) {
-  const [query, setQuery] = useState('')
-  const filtered = INDIAN_STATES.filter((s) =>
-    s.toLowerCase().includes(query.toLowerCase())
-  )
-  return (
-    <div>
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-2">
-          {value.map((s) => (
-            <span
-              key={s}
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-full bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300"
-            >
-              {s}
-              {!disabled && (
-                <button
-                  type="button"
-                  onClick={() => onChange(value.filter((v) => v !== s))}
-                  className="hover:text-cyan-900 dark:hover:text-cyan-100"
-                >
-                  ×
-                </button>
-              )}
-            </span>
-          ))}
-        </div>
-      )}
-      <input
-        type="text"
-        disabled={disabled}
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search states…"
-        className={inputCls(!!disabled)}
-      />
-      {query && (
-        <div className="mt-1 max-h-40 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-          {filtered.length === 0 ? (
-            <p className="px-3 py-2 text-xs text-slate-400">No matches</p>
-          ) : (
-            filtered.map((s) => {
-              const selected = value.includes(s)
-              return (
-                <button
-                  type="button"
-                  key={s}
-                  disabled={disabled}
-                  onClick={() => {
-                    onChange(selected ? value.filter((v) => v !== s) : [...value, s])
-                    setQuery('')
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-1.5 text-sm text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
-                >
-                  {s}
-                  {selected && <span className="text-xs text-cyan-600">Selected</span>}
-                </button>
-              )
-            })
-          )}
         </div>
       )}
     </div>

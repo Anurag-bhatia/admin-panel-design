@@ -109,7 +109,6 @@ export function CouponList({
   const [typeFilter, setTypeFilter] = useState<CouponType | 'all'>('all')
   const [platformFilter, setPlatformFilter] = useState<CouponPlatform | 'all'>('all')
   const [challanTypeFilter, setChallanTypeFilter] = useState<CouponChallanType | 'all'>('all')
-  const [stateFilter, setStateFilter] = useState<string>('all')
   const [sortKey, setSortKey] = useState<SortKey>('created')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
@@ -131,12 +130,6 @@ export function CouponList({
 
   const now = new Date()
 
-  const allStates = useMemo(() => {
-    const set = new Set<string>()
-    coupons.forEach((c) => c.states.forEach((s) => set.add(s)))
-    return Array.from(set).sort()
-  }, [coupons])
-
   const filtered = useMemo(() => {
     return coupons
       .map((c) => ({ ...c, effectiveStatus: getEffectiveStatus(c, now) }))
@@ -147,10 +140,6 @@ export function CouponList({
         if (platformFilter !== 'all' && !c.platforms.includes(platformFilter)) return false
         if (challanTypeFilter !== 'all' && !c.challanTypes.includes(challanTypeFilter))
           return false
-        if (stateFilter !== 'all') {
-          if (c.states.length === 0) return false
-          if (!c.states.includes(stateFilter)) return false
-        }
         return true
       })
       .sort((a, b) => {
@@ -160,7 +149,7 @@ export function CouponList({
           return dir * (new Date(a.endAt).getTime() - new Date(b.endAt).getTime())
         return dir * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
       })
-  }, [coupons, searchQuery, statusFilter, typeFilter, platformFilter, challanTypeFilter, stateFilter, sortKey, sortDir, now])
+  }, [coupons, searchQuery, statusFilter, typeFilter, platformFilter, challanTypeFilter, sortKey, sortDir, now])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
   const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage)
@@ -169,15 +158,13 @@ export function CouponList({
     (statusFilter !== 'all' ? 1 : 0) +
     (typeFilter !== 'all' ? 1 : 0) +
     (platformFilter !== 'all' ? 1 : 0) +
-    (challanTypeFilter !== 'all' ? 1 : 0) +
-    (stateFilter !== 'all' ? 1 : 0)
+    (challanTypeFilter !== 'all' ? 1 : 0)
 
   const clearFilters = () => {
     setStatusFilter('all')
     setTypeFilter('all')
     setPlatformFilter('all')
     setChallanTypeFilter('all')
-    setStateFilter('all')
     setCurrentPage(1)
   }
 
@@ -241,7 +228,7 @@ export function CouponList({
 
       {filtersOpen && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <FilterSelect
               label="Status"
               value={statusFilter}
@@ -298,18 +285,6 @@ export function CouponList({
                 { value: 'xpressCourt', label: 'XPress Court' },
               ]}
             />
-            <FilterSelect
-              label="State"
-              value={stateFilter}
-              onChange={(v) => {
-                setStateFilter(v)
-                setCurrentPage(1)
-              }}
-              options={[
-                { value: 'all', label: 'All states' },
-                ...allStates.map((s) => ({ value: s, label: s })),
-              ]}
-            />
           </div>
           {activeFilterCount > 0 && (
             <div className="flex items-center justify-end mt-3">
@@ -341,9 +316,6 @@ export function CouponList({
                 </th>
                 <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
                   Platform
-                </th>
-                <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
-                  Location
                 </th>
                 <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
                   Status
@@ -414,18 +386,6 @@ export function CouponList({
                           </span>
                         ))}
                       </div>
-                    </td>
-                    <td className="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-300">
-                      {coupon.states.length === 0 ? (
-                        <span className="text-slate-400">All states</span>
-                      ) : coupon.states.length <= 2 ? (
-                        coupon.states.join(', ')
-                      ) : (
-                        <span>
-                          {coupon.states.slice(0, 2).join(', ')}{' '}
-                          <span className="text-slate-400">+{coupon.states.length - 2}</span>
-                        </span>
-                      )}
                     </td>
                     <td className="px-4 py-3.5">
                       <span
@@ -537,7 +497,7 @@ export function CouponList({
               })}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-slate-400">
+                  <td colSpan={9} className="px-4 py-12 text-center text-sm text-slate-400">
                     No coupons match the current filters.
                   </td>
                 </tr>

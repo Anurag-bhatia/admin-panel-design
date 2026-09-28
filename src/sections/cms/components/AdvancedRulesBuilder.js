@@ -1,5 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Plus, Trash2, GitBranch, Ban } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Plus, Trash2, GitBranch, Ban, ChevronDown, Check } from 'lucide-react';
 const INDIAN_STATES = [
     'Andhra Pradesh',
     'Delhi',
@@ -36,6 +37,15 @@ const ISSUING_AUTHORITIES = [
     'Bengaluru Traffic Police',
     'Kolkata Traffic Police',
     'Hyderabad Traffic Police',
+];
+const RSP_PARTNERS = [
+    { value: 'partner-fleetco', label: 'FleetCo Logistics' },
+    { value: 'partner-transko', label: 'Transko Movers' },
+    { value: 'partner-rideeasy', label: 'RideEasy Cabs' },
+    { value: 'partner-swiftfleet', label: 'SwiftFleet Rentals' },
+    { value: 'partner-metrobus', label: 'MetroBus Operators' },
+    { value: 'partner-nationalcarriers', label: 'National Carriers' },
+    { value: 'partner-cityhaul', label: 'CityHaul Freight' },
 ];
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const CATEGORIES = {
@@ -195,6 +205,26 @@ const CATEGORIES = {
                 ],
                 valueType: 'select',
                 options: ISSUING_AUTHORITIES,
+            },
+        ],
+    },
+    partner: {
+        label: 'Partner',
+        attributes: [
+            {
+                value: 'partnerId',
+                label: 'Partner ID',
+                operators: [{ value: 'inList', label: 'in list' }],
+                valueType: 'multiSelect',
+                multiSelectOptions: RSP_PARTNERS,
+                placeholder: 'Select partners',
+            },
+            {
+                value: 'mobileNumber',
+                label: 'Mobile number',
+                operators: [{ value: 'inList', label: 'in list' }],
+                valueType: 'multiText',
+                placeholder: 'Enter number and press Enter',
             },
         ],
     },
@@ -359,7 +389,13 @@ function ruleToSentence(rule) {
         valueText = rule.value === 'true' ? 'Yes' : 'No';
     }
     else if (Array.isArray(rule.value)) {
-        valueText = rule.value.join(', ');
+        if (attr.valueType === 'multiSelect' && attr.multiSelectOptions) {
+            const labelFor = (v) => attr.multiSelectOptions.find((o) => o.value === v)?.label ?? v;
+            valueText = rule.value.map(labelFor).join(', ');
+        }
+        else {
+            valueText = rule.value.join(', ');
+        }
     }
     else {
         valueText = String(rule.value ?? '');
@@ -402,7 +438,8 @@ function detectContradictions(group) {
     });
     return warnings;
 }
-export function AdvancedRulesBuilder({ value, onChange, readOnly = false, }) {
+export function AdvancedRulesBuilder({ value, onChange, readOnly = false, platforms = [], }) {
+    const isChallanPay = platforms.includes('challanpay');
     const updateGroup = (groupId, mut) => {
         onChange({
             groups: value.groups.map((g) => (g.id === groupId ? mut(g) : g)),
@@ -428,21 +465,27 @@ export function AdvancedRulesBuilder({ value, onChange, readOnly = false, }) {
                 const warnings = detectContradictions(group);
                 return (_jsxs("div", { children: [gIdx > 0 && (_jsxs("div", { className: "flex items-center gap-3 my-3", children: [_jsx("div", { className: "flex-1 h-px bg-slate-200 dark:bg-slate-700" }), _jsx("span", { className: "text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wider", children: "OR" }), _jsx("div", { className: "flex-1 h-px bg-slate-200 dark:bg-slate-700" })] })), _jsxs("div", { className: `rounded-xl border p-4 ${group.isExclusion
                                 ? 'border-red-200 bg-red-50/50 dark:border-red-900/40 dark:bg-red-900/10'
-                                : 'border-slate-200 bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/30'}`, children: [_jsxs("div", { className: "flex items-center justify-between mb-3", children: [_jsxs("div", { className: "flex items-center gap-2", children: [_jsxs("span", { className: "text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: ["Group ", gIdx + 1] }), group.isExclusion && (_jsxs("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300", children: [_jsx(Ban, { className: "w-3 h-3" }), " Exclusion"] }))] }), !readOnly && (_jsxs("div", { className: "flex items-center gap-2", children: [_jsxs("label", { className: "inline-flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300", children: [_jsx("input", { type: "checkbox", checked: group.isExclusion, onChange: (e) => updateGroup(group.id, (g) => ({ ...g, isExclusion: e.target.checked })), className: "rounded border-slate-300 text-cyan-600 focus:ring-cyan-500" }), "Mark as exclusion"] }), _jsx("button", { type: "button", onClick: () => removeGroup(group.id), className: "p-1 rounded text-slate-400 hover:text-red-600 dark:hover:text-red-400", children: _jsx(Trash2, { className: "w-3.5 h-3.5" }) })] }))] }), _jsx("div", { className: "space-y-2", children: group.rules.map((rule, rIdx) => (_jsxs("div", { children: [rIdx > 0 && (_jsx("div", { className: "flex items-center gap-2 my-1.5 pl-1", children: _jsx("span", { className: "text-[10px] font-semibold text-slate-400 tracking-wider", children: "AND" }) })), _jsx(RuleRow, { rule: rule, readOnly: readOnly, onChange: (patch) => updateRule(group.id, rule.id, patch), onRemove: group.rules.length > 1
+                                : 'border-slate-200 bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/30'}`, children: [_jsxs("div", { className: "flex items-center justify-between mb-3", children: [_jsxs("div", { className: "flex items-center gap-2", children: [_jsxs("span", { className: "text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: ["Group ", gIdx + 1] }), group.isExclusion && (_jsxs("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300", children: [_jsx(Ban, { className: "w-3 h-3" }), " Exclusion"] }))] }), !readOnly && (_jsxs("div", { className: "flex items-center gap-2", children: [_jsxs("label", { className: "inline-flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300", children: [_jsx("input", { type: "checkbox", checked: group.isExclusion, onChange: (e) => updateGroup(group.id, (g) => ({ ...g, isExclusion: e.target.checked })), className: "rounded border-slate-300 text-cyan-600 focus:ring-cyan-500" }), "Mark as exclusion"] }), _jsx("button", { type: "button", onClick: () => removeGroup(group.id), className: "p-1 rounded text-slate-400 hover:text-red-600 dark:hover:text-red-400", children: _jsx(Trash2, { className: "w-3.5 h-3.5" }) })] }))] }), _jsx("div", { className: "space-y-2", children: group.rules.map((rule, rIdx) => (_jsxs("div", { children: [rIdx > 0 && (_jsx("div", { className: "flex items-center gap-2 my-1.5 pl-1", children: _jsx("span", { className: "text-[10px] font-semibold text-slate-400 tracking-wider", children: "AND" }) })), _jsx(RuleRow, { rule: rule, readOnly: readOnly, isChallanPay: isChallanPay, onChange: (patch) => updateRule(group.id, rule.id, patch), onRemove: group.rules.length > 1
                                                     ? () => removeRule(group.id, rule.id)
                                                     : undefined })] }, rule.id))) }), !readOnly && (_jsxs("button", { type: "button", onClick: () => addRule(group.id), className: "inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 text-xs font-medium text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 rounded-lg transition-colors", children: [_jsx(Plus, { className: "w-3.5 h-3.5" }), "Add rule (AND)"] })), _jsxs("div", { className: "mt-3 pt-3 border-t border-slate-200 dark:border-slate-700", children: [_jsx("p", { className: "text-xs text-slate-600 dark:text-slate-300 italic", children: groupToSentence(group) }), warnings.length > 0 && (_jsx("div", { className: "mt-2 space-y-1", children: warnings.map((w, i) => (_jsxs("p", { className: "text-xs text-red-600 dark:text-red-400 font-medium", children: ["\u26A0 ", w] }, i))) }))] })] })] }, group.id));
             }), !readOnly && (_jsxs("button", { type: "button", onClick: addGroup, className: "inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors", children: [_jsx(Plus, { className: "w-4 h-4" }), "Add group (OR)"] }))] }));
 }
-function RuleRow({ rule, readOnly, onChange, onRemove, }) {
+function RuleRow({ rule, readOnly, isChallanPay, onChange, onRemove, }) {
     const category = CATEGORIES[rule.category];
     const attr = getAttrConfig(rule.category, rule.attribute) ?? category.attributes[0];
+    const availableCategories = Object.keys(CATEGORIES).filter((k) => k !== 'partner' || isChallanPay || rule.category === 'partner');
+    const initialValueFor = (vt) => vt === 'boolean'
+        ? 'true'
+        : vt === 'multi' || vt === 'multiSelect' || vt === 'multiText'
+            ? []
+            : '';
     const handleCategoryChange = (nextCategory) => {
         const first = CATEGORIES[nextCategory].attributes[0];
         onChange({
             category: nextCategory,
             attribute: first.value,
             operator: first.operators[0].value,
-            value: first.valueType === 'boolean' ? 'true' : first.valueType === 'multi' ? [] : '',
+            value: initialValueFor(first.valueType),
         });
     };
     const handleAttributeChange = (nextAttribute) => {
@@ -450,10 +493,10 @@ function RuleRow({ rule, readOnly, onChange, onRemove, }) {
         onChange({
             attribute: nextAttribute,
             operator: nextAttr.operators[0].value,
-            value: nextAttr.valueType === 'boolean' ? 'true' : nextAttr.valueType === 'multi' ? [] : '',
+            value: initialValueFor(nextAttr.valueType),
         });
     };
-    return (_jsxs("div", { className: "grid grid-cols-1 md:grid-cols-12 gap-2 items-start bg-white dark:bg-slate-900 rounded-lg p-2 border border-slate-100 dark:border-slate-700/60", children: [_jsx("div", { className: "md:col-span-3", children: _jsx("select", { disabled: readOnly, value: rule.category, onChange: (e) => handleCategoryChange(e.target.value), className: "w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60", children: Object.keys(CATEGORIES).map((k) => (_jsx("option", { value: k, children: CATEGORIES[k].label }, k))) }) }), _jsx("div", { className: "md:col-span-3", children: _jsx("select", { disabled: readOnly, value: rule.attribute, onChange: (e) => handleAttributeChange(e.target.value), className: "w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60", children: category.attributes.map((a) => (_jsx("option", { value: a.value, children: a.label }, a.value))) }) }), _jsx("div", { className: "md:col-span-2", children: _jsx("select", { disabled: readOnly, value: rule.operator, onChange: (e) => onChange({ operator: e.target.value }), className: "w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60", children: attr.operators.map((o) => (_jsx("option", { value: o.value, children: o.label }, o.value))) }) }), _jsx("div", { className: "md:col-span-3", children: _jsx(ValueInput, { attr: attr, value: rule.value, readOnly: readOnly, onChange: (v) => onChange({ value: v }) }) }), _jsx("div", { className: "md:col-span-1 flex justify-end", children: onRemove && !readOnly && (_jsx("button", { type: "button", onClick: onRemove, className: "p-1.5 rounded text-slate-400 hover:text-red-600 dark:hover:text-red-400", children: _jsx(Trash2, { className: "w-3.5 h-3.5" }) })) })] }));
+    return (_jsxs("div", { className: "grid grid-cols-1 md:grid-cols-12 gap-2 items-start bg-white dark:bg-slate-900 rounded-lg p-2 border border-slate-100 dark:border-slate-700/60", children: [_jsx("div", { className: "md:col-span-3", children: _jsx("select", { disabled: readOnly, value: rule.category, onChange: (e) => handleCategoryChange(e.target.value), className: "w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60", children: availableCategories.map((k) => (_jsx("option", { value: k, children: CATEGORIES[k].label }, k))) }) }), _jsx("div", { className: "md:col-span-3", children: _jsx("select", { disabled: readOnly, value: rule.attribute, onChange: (e) => handleAttributeChange(e.target.value), className: "w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60", children: category.attributes.map((a) => (_jsx("option", { value: a.value, children: a.label }, a.value))) }) }), _jsx("div", { className: "md:col-span-2", children: _jsx("select", { disabled: readOnly, value: rule.operator, onChange: (e) => onChange({ operator: e.target.value }), className: "w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60", children: attr.operators.map((o) => (_jsx("option", { value: o.value, children: o.label }, o.value))) }) }), _jsx("div", { className: "md:col-span-3", children: _jsx(ValueInput, { attr: attr, value: rule.value, readOnly: readOnly, onChange: (v) => onChange({ value: v }) }) }), _jsx("div", { className: "md:col-span-1 flex justify-end", children: onRemove && !readOnly && (_jsx("button", { type: "button", onClick: onRemove, className: "p-1.5 rounded text-slate-400 hover:text-red-600 dark:hover:text-red-400", children: _jsx(Trash2, { className: "w-3.5 h-3.5" }) })) })] }));
 }
 function ValueInput({ attr, value, readOnly, onChange, }) {
     const inputClass = 'w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60';
@@ -472,6 +515,14 @@ function ValueInput({ attr, value, readOnly, onChange, }) {
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-cyan-400'}`, children: opt }, opt));
             }) }));
     }
+    if (attr.valueType === 'multiSelect') {
+        const arr = Array.isArray(value) ? value.map(String) : [];
+        return (_jsx(MultiSelectValue, { options: attr.multiSelectOptions ?? [], value: arr, onChange: onChange, placeholder: attr.placeholder ?? 'Select…', disabled: readOnly }));
+    }
+    if (attr.valueType === 'multiText') {
+        const arr = Array.isArray(value) ? value.map(String) : [];
+        return (_jsx(MultiTextValue, { value: arr, onChange: onChange, placeholder: attr.placeholder ?? 'Add value', disabled: readOnly }));
+    }
     if (attr.valueType === 'date') {
         return (_jsx("input", { type: "date", disabled: readOnly, value: String(value ?? ''), onChange: (e) => onChange(e.target.value), className: inputClass }));
     }
@@ -479,4 +530,56 @@ function ValueInput({ attr, value, readOnly, onChange, }) {
         return (_jsxs("div", { className: "relative", children: [attr.unit && (_jsx("span", { className: "absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400", children: attr.unit })), _jsx("input", { type: "number", disabled: readOnly, value: String(value ?? ''), onChange: (e) => onChange(e.target.value === '' ? '' : Number(e.target.value)), placeholder: attr.placeholder, className: `${inputClass} ${attr.unit ? 'pl-6' : ''}` })] }));
     }
     return (_jsx("input", { type: "text", disabled: readOnly, value: String(value ?? ''), onChange: (e) => onChange(e.target.value), placeholder: attr.placeholder, className: inputClass }));
+}
+function MultiTextValue({ value, onChange, placeholder, disabled, }) {
+    const [draft, setDraft] = useState('');
+    const commit = () => {
+        const clean = draft.trim();
+        if (!clean || value.includes(clean)) {
+            setDraft('');
+            return;
+        }
+        onChange([...value, clean]);
+        setDraft('');
+    };
+    const remove = (v) => onChange(value.filter((x) => x !== v));
+    return (_jsxs("div", { children: [_jsx("input", { type: "text", disabled: disabled, value: draft, onChange: (e) => setDraft(e.target.value), onKeyDown: (e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        commit();
+                    }
+                    else if (e.key === 'Backspace' && !draft && value.length > 0) {
+                        e.preventDefault();
+                        remove(value[value.length - 1]);
+                    }
+                }, onBlur: commit, placeholder: placeholder, className: "w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60" }), value.length > 0 && (_jsx("div", { className: "flex flex-wrap gap-1 mt-1.5", children: value.map((v) => (_jsxs("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-900/50", children: [v, !disabled && (_jsx("button", { type: "button", onClick: () => remove(v), className: "hover:text-cyan-900 dark:hover:text-cyan-100", children: "\u00D7" }))] }, v))) }))] }));
+}
+function MultiSelectValue({ options, value, onChange, placeholder, disabled, }) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef(null);
+    useEffect(() => {
+        if (!open)
+            return;
+        const handler = (e) => {
+            if (ref.current && !ref.current.contains(e.target))
+                setOpen(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [open]);
+    const toggle = (v) => onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v]);
+    const selectedLabels = options
+        .filter((o) => value.includes(o.value))
+        .map((o) => o.label);
+    const summary = value.length === 0
+        ? placeholder
+        : value.length === options.length
+            ? 'All'
+            : selectedLabels.join(', ');
+    return (_jsxs("div", { ref: ref, className: "relative", children: [_jsxs("button", { type: "button", disabled: disabled, onClick: () => setOpen((o) => !o), className: "w-full flex items-center justify-between gap-1 px-2 py-1.5 text-xs text-left bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60", children: [_jsx("span", { className: `truncate ${value.length === 0 ? 'text-slate-400' : ''}`, children: summary }), _jsx(ChevronDown, { className: "w-3.5 h-3.5 text-slate-400 flex-shrink-0" })] }), open && (_jsx("div", { className: "absolute z-30 mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg py-1 max-h-56 overflow-y-auto", children: options.length === 0 ? (_jsx("p", { className: "px-3 py-2 text-xs text-slate-400", children: "No options" })) : (options.map((o) => {
+                    const selected = value.includes(o.value);
+                    return (_jsxs("button", { type: "button", onClick: () => toggle(o.value), className: "w-full flex items-center gap-2 px-3 py-1.5 text-xs text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800", children: [_jsx("span", { className: `inline-flex items-center justify-center w-3.5 h-3.5 rounded border ${selected
+                                    ? 'bg-cyan-600 border-cyan-600'
+                                    : 'border-slate-300 dark:border-slate-600'}`, children: selected && _jsx(Check, { className: "w-2.5 h-2.5 text-white", strokeWidth: 3 }) }), o.label] }, o.value));
+                })) }))] }));
 }

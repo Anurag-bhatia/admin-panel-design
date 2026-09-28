@@ -1,6 +1,8 @@
-import { Plus, Trash2, GitBranch, Ban } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Plus, Trash2, GitBranch, Ban, ChevronDown, Check } from 'lucide-react'
 import type {
   AdvancedRules,
+  CouponPlatform,
   Rule,
   RuleCategory,
   RuleGroup,
@@ -10,14 +12,29 @@ interface AdvancedRulesBuilderProps {
   value: AdvancedRules
   onChange: (next: AdvancedRules) => void
   readOnly?: boolean
+  platforms?: CouponPlatform[]
+}
+
+interface AttributeOption {
+  value: string
+  label: string
 }
 
 interface AttributeConfig {
   value: string
   label: string
   operators: { value: string; label: string }[]
-  valueType: 'text' | 'number' | 'date' | 'boolean' | 'select' | 'multi'
+  valueType:
+    | 'text'
+    | 'number'
+    | 'date'
+    | 'boolean'
+    | 'select'
+    | 'multi'
+    | 'multiSelect'
+    | 'multiText'
   options?: string[]
+  multiSelectOptions?: AttributeOption[]
   placeholder?: string
   unit?: string
 }
@@ -66,6 +83,16 @@ const ISSUING_AUTHORITIES = [
   'Bengaluru Traffic Police',
   'Kolkata Traffic Police',
   'Hyderabad Traffic Police',
+]
+
+const RSP_PARTNERS: AttributeOption[] = [
+  { value: 'partner-fleetco', label: 'FleetCo Logistics' },
+  { value: 'partner-transko', label: 'Transko Movers' },
+  { value: 'partner-rideeasy', label: 'RideEasy Cabs' },
+  { value: 'partner-swiftfleet', label: 'SwiftFleet Rentals' },
+  { value: 'partner-metrobus', label: 'MetroBus Operators' },
+  { value: 'partner-nationalcarriers', label: 'National Carriers' },
+  { value: 'partner-cityhaul', label: 'CityHaul Freight' },
 ]
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -227,6 +254,26 @@ const CATEGORIES: Record<RuleCategory, CategoryConfig> = {
         ],
         valueType: 'select',
         options: ISSUING_AUTHORITIES,
+      },
+    ],
+  },
+  partner: {
+    label: 'Partner',
+    attributes: [
+      {
+        value: 'partnerId',
+        label: 'Partner ID',
+        operators: [{ value: 'inList', label: 'in list' }],
+        valueType: 'multiSelect',
+        multiSelectOptions: RSP_PARTNERS,
+        placeholder: 'Select partners',
+      },
+      {
+        value: 'mobileNumber',
+        label: 'Mobile number',
+        operators: [{ value: 'inList', label: 'in list' }],
+        valueType: 'multiText',
+        placeholder: 'Enter number and press Enter',
       },
     ],
   },
@@ -395,7 +442,13 @@ function ruleToSentence(rule: Rule): string {
   if (attr.valueType === 'boolean') {
     valueText = rule.value === 'true' ? 'Yes' : 'No'
   } else if (Array.isArray(rule.value)) {
-    valueText = rule.value.join(', ')
+    if (attr.valueType === 'multiSelect' && attr.multiSelectOptions) {
+      const labelFor = (v: string) =>
+        attr.multiSelectOptions!.find((o) => o.value === v)?.label ?? v
+      valueText = rule.value.map(labelFor).join(', ')
+    } else {
+      valueText = rule.value.join(', ')
+    }
   } else {
     valueText = String(rule.value ?? '')
     if (attr.unit === '₹' && valueText) valueText = `₹${valueText}`
@@ -444,7 +497,9 @@ export function AdvancedRulesBuilder({
   value,
   onChange,
   readOnly = false,
+  platforms = [],
 }: AdvancedRulesBuilderProps) {
+  const isChallanPay = platforms.includes('challanpay')
   const updateGroup = (groupId: string, mut: (g: RuleGroup) => RuleGroup) => {
     onChange({
       groups: value.groups.map((g) => (g.id === groupId ? mut(g) : g)),
@@ -567,6 +622,7 @@ export function AdvancedRulesBuilder({
                     <RuleRow
                       rule={rule}
                       readOnly={readOnly}
+                      isChallanPay={isChallanPay}
                       onChange={(patch) => updateRule(group.id, rule.id, patch)}
                       onRemove={
                         group.rules.length > 1
@@ -625,16 +681,28 @@ export function AdvancedRulesBuilder({
 function RuleRow({
   rule,
   readOnly,
+  isChallanPay,
   onChange,
   onRemove,
 }: {
   rule: Rule
   readOnly: boolean
+  isChallanPay: boolean
   onChange: (patch: Partial<Rule>) => void
   onRemove?: () => void
 }) {
   const category = CATEGORIES[rule.category]
   const attr = getAttrConfig(rule.category, rule.attribute) ?? category.attributes[0]
+  const availableCategories = (Object.keys(CATEGORIES) as RuleCategory[]).filter(
+    (k) => k !== 'partner' || isChallanPay || rule.category === 'partner'
+  )
+
+  const initialValueFor = (vt: AttributeConfig['valueType']): Rule['value'] =>
+    vt === 'boolean'
+      ? 'true'
+      : vt === 'multi' || vt === 'multiSelect' || vt === 'multiText'
+        ? []
+        : ''
 
   const handleCategoryChange = (nextCategory: RuleCategory) => {
     const first = CATEGORIES[nextCategory].attributes[0]
@@ -642,7 +710,7 @@ function RuleRow({
       category: nextCategory,
       attribute: first.value,
       operator: first.operators[0].value,
-      value: first.valueType === 'boolean' ? 'true' : first.valueType === 'multi' ? [] : '',
+      value: initialValueFor(first.valueType),
     })
   }
 
@@ -651,7 +719,7 @@ function RuleRow({
     onChange({
       attribute: nextAttribute,
       operator: nextAttr.operators[0].value,
-      value: nextAttr.valueType === 'boolean' ? 'true' : nextAttr.valueType === 'multi' ? [] : '',
+      value: initialValueFor(nextAttr.valueType),
     })
   }
 
@@ -664,7 +732,7 @@ function RuleRow({
           onChange={(e) => handleCategoryChange(e.target.value as RuleCategory)}
           className="w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60"
         >
-          {(Object.keys(CATEGORIES) as RuleCategory[]).map((k) => (
+          {availableCategories.map((k) => (
             <option key={k} value={k}>
               {CATEGORIES[k].label}
             </option>
@@ -796,6 +864,31 @@ function ValueInput({
     )
   }
 
+  if (attr.valueType === 'multiSelect') {
+    const arr = Array.isArray(value) ? value.map(String) : []
+    return (
+      <MultiSelectValue
+        options={attr.multiSelectOptions ?? []}
+        value={arr}
+        onChange={onChange}
+        placeholder={attr.placeholder ?? 'Select…'}
+        disabled={readOnly}
+      />
+    )
+  }
+
+  if (attr.valueType === 'multiText') {
+    const arr = Array.isArray(value) ? value.map(String) : []
+    return (
+      <MultiTextValue
+        value={arr}
+        onChange={onChange}
+        placeholder={attr.placeholder ?? 'Add value'}
+        disabled={readOnly}
+      />
+    )
+  }
+
   if (attr.valueType === 'date') {
     return (
       <input
@@ -837,5 +930,160 @@ function ValueInput({
       placeholder={attr.placeholder}
       className={inputClass}
     />
+  )
+}
+
+function MultiTextValue({
+  value,
+  onChange,
+  placeholder,
+  disabled,
+}: {
+  value: string[]
+  onChange: (v: string[]) => void
+  placeholder: string
+  disabled: boolean
+}) {
+  const [draft, setDraft] = useState('')
+
+  const commit = () => {
+    const clean = draft.trim()
+    if (!clean || value.includes(clean)) {
+      setDraft('')
+      return
+    }
+    onChange([...value, clean])
+    setDraft('')
+  }
+
+  const remove = (v: string) => onChange(value.filter((x) => x !== v))
+
+  return (
+    <div>
+      <input
+        type="text"
+        disabled={disabled}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault()
+            commit()
+          } else if (e.key === 'Backspace' && !draft && value.length > 0) {
+            e.preventDefault()
+            remove(value[value.length - 1])
+          }
+        }}
+        onBlur={commit}
+        placeholder={placeholder}
+        className="w-full px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60"
+      />
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {value.map((v) => (
+            <span
+              key={v}
+              className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-900/50"
+            >
+              {v}
+              {!disabled && (
+                <button
+                  type="button"
+                  onClick={() => remove(v)}
+                  className="hover:text-cyan-900 dark:hover:text-cyan-100"
+                >
+                  ×
+                </button>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function MultiSelectValue({
+  options,
+  value,
+  onChange,
+  placeholder,
+  disabled,
+}: {
+  options: AttributeOption[]
+  value: string[]
+  onChange: (v: string[]) => void
+  placeholder: string
+  disabled: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  const toggle = (v: string) =>
+    onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])
+
+  const selectedLabels = options
+    .filter((o) => value.includes(o.value))
+    .map((o) => o.label)
+  const summary =
+    value.length === 0
+      ? placeholder
+      : value.length === options.length
+        ? 'All'
+        : selectedLabels.join(', ')
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between gap-1 px-2 py-1.5 text-xs text-left bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-60"
+      >
+        <span className={`truncate ${value.length === 0 ? 'text-slate-400' : ''}`}>
+          {summary}
+        </span>
+        <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+      </button>
+      {open && (
+        <div className="absolute z-30 mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg py-1 max-h-56 overflow-y-auto">
+          {options.length === 0 ? (
+            <p className="px-3 py-2 text-xs text-slate-400">No options</p>
+          ) : (
+            options.map((o) => {
+              const selected = value.includes(o.value)
+              return (
+                <button
+                  type="button"
+                  key={o.value}
+                  onClick={() => toggle(o.value)}
+                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                >
+                  <span
+                    className={`inline-flex items-center justify-center w-3.5 h-3.5 rounded border ${
+                      selected
+                        ? 'bg-cyan-600 border-cyan-600'
+                        : 'border-slate-300 dark:border-slate-600'
+                    }`}
+                  >
+                    {selected && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
+                  </span>
+                  {o.label}
+                </button>
+              )
+            })
+          )}
+        </div>
+      )}
+    </div>
   )
 }
