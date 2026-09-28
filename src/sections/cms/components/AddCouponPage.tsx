@@ -55,6 +55,16 @@ const PLATFORM_LABELS: Record<CouponPlatform, string> = {
   lots247: 'LOTS247',
 }
 
+function productsForPlatforms(platforms: CouponPlatform[]): CouponProduct[] {
+  if (platforms.length === 0) return []
+  const hasChallanPay = platforms.includes('challanpay')
+  const hasLots = platforms.includes('lots247')
+  if (hasChallanPay && hasLots) return ['all', 'challan', 'subscription']
+  if (hasChallanPay) return ['challan']
+  if (hasLots) return ['subscription']
+  return []
+}
+
 function toDatetimeLocal(iso?: string): string {
   if (!iso) return ''
   const d = new Date(iso)
@@ -114,6 +124,15 @@ export function AddCouponPage({
 
   const toggleSection = (key: keyof typeof openSections) =>
     setOpenSections((s) => ({ ...s, [key]: !s[key] }))
+
+  const availableProducts = productsForPlatforms(form.platforms)
+
+  useEffect(() => {
+    if (availableProducts.length === 0) return
+    if (!availableProducts.includes(form.product)) {
+      setForm((f) => ({ ...f, product: availableProducts[0] }))
+    }
+  }, [availableProducts, form.product])
 
   const validate = (): boolean => {
     const next: typeof errors = {}
@@ -410,20 +429,6 @@ export function AddCouponPage({
                 </div>
               </Field>
 
-              <Field label="Product" required>
-                <SingleSelectDropdown
-                  disabled={isLocked}
-                  options={(['all', 'challan', 'subscription'] as CouponProduct[]).map((p) => ({
-                    value: p,
-                    label: p.charAt(0).toUpperCase() + p.slice(1),
-                  }))}
-                  value={form.product}
-                  onChange={(next) => update('product', next as CouponProduct)}
-                />
-              </Field>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Platform" required error={errors.platforms}>
                 <MultiSelectDropdown
                   placeholder="Select platforms"
@@ -434,6 +439,23 @@ export function AddCouponPage({
                   }))}
                   value={form.platforms}
                   onChange={(next) => update('platforms', next as CouponPlatform[])}
+                />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Product" required>
+                <SingleSelectDropdown
+                  disabled={isLocked || form.platforms.length === 0}
+                  placeholder={
+                    form.platforms.length === 0 ? 'Select a platform first' : 'Select…'
+                  }
+                  options={availableProducts.map((p) => ({
+                    value: p,
+                    label: p.charAt(0).toUpperCase() + p.slice(1),
+                  }))}
+                  value={form.product}
+                  onChange={(next) => update('product', next as CouponProduct)}
                 />
               </Field>
 

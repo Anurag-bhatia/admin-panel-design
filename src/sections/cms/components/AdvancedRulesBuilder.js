@@ -39,14 +39,17 @@ const ISSUING_AUTHORITIES = [
     'Hyderabad Traffic Police',
 ];
 const RSP_PARTNERS = [
-    { value: 'partner-fleetco', label: 'FleetCo Logistics' },
-    { value: 'partner-transko', label: 'Transko Movers' },
-    { value: 'partner-rideeasy', label: 'RideEasy Cabs' },
-    { value: 'partner-swiftfleet', label: 'SwiftFleet Rentals' },
-    { value: 'partner-metrobus', label: 'MetroBus Operators' },
-    { value: 'partner-nationalcarriers', label: 'National Carriers' },
-    { value: 'partner-cityhaul', label: 'CityHaul Freight' },
-];
+    'PAT100234',
+    'PAT100518',
+    'PAT100742',
+    'PAT101096',
+    'PAT101347',
+    'PAT101589',
+    'PAT101823',
+    'PAT102045',
+    'PAT102268',
+    'PAT102491',
+].map((id) => ({ value: id, label: id }));
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const CATEGORIES = {
     customerHistory: {
