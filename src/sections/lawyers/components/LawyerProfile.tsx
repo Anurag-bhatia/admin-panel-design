@@ -106,7 +106,13 @@ export function LawyerProfile({
   onViewTeamMember,
   onRaiseInvoice,
 }: LawyerProfileProps) {
-  const [activeTab, setActiveTab] = useState<TabType>(initialTab)
+  const isBusiness = lawyer.company !== null
+  const availableTabs: TabType[] = isBusiness
+    ? ['details', 'documents', 'incidents', 'invoicing', 'transactions', 'team']
+    : ['details', 'documents', 'incidents', 'invoicing', 'transactions']
+  const [activeTab, setActiveTab] = useState<TabType>(
+    availableTabs.includes(initialTab) ? initialTab : 'details'
+  )
   const isActive = lawyer.activityState === 'Active'
   const fullName = `${lawyer.firstName} ${lawyer.lastName}`
 
@@ -240,7 +246,7 @@ export function LawyerProfile({
             {/* Tabs */}
             <div className="mb-6 overflow-x-auto">
               <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit min-w-full">
-                {(['details', 'documents', 'incidents', 'invoicing', 'transactions', 'team'] as TabType[]).map((tab) => (
+                {availableTabs.map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}

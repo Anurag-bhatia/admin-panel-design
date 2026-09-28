@@ -40,7 +40,7 @@ export default function ShellPreview() {
       icon: Users,
     },
     {
-      label: 'Lawyers',
+      label: 'Experts',
       href: '/lawyers',
       icon: Scale,
     },

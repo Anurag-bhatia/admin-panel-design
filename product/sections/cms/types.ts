@@ -61,7 +61,6 @@ export interface Coupon {
   id: string
   code: string
   description?: string
-  note?: string
   type: CouponType
   value: number
   maxDiscountCap?: number

@@ -168,7 +168,7 @@ const sampleTransactions = [
         status: 'Paid',
     },
 ];
-export function Lawyers({ lawyers: initialLawyers }) {
+export function Lawyers({ lawyers: initialLawyers, heading = 'Experts', }) {
     const [lawyers, setLawyers] = useState(initialLawyers);
     const [currentView, setCurrentView] = useState('list');
     const [selectedLawyer, setSelectedLawyer] = useState(null);
@@ -222,5 +222,5 @@ export function Lawyers({ lawyers: initialLawyers }) {
     if (currentView === 'add' || (currentView === 'edit' && selectedLawyer)) {
         return (_jsx(LawyerForm, { lawyer: selectedLawyer, onBack: handleBack, onSave: handleSave, isEdit: currentView === 'edit' }));
     }
-    return (_jsx(LawyerTable, { lawyers: lawyers, onView: handleView, onEdit: handleEdit, onAdd: handleAdd, onDeactivate: handleDeactivate, onReactivate: handleReactivate }));
+    return (_jsx(LawyerTable, { lawyers: lawyers, onView: handleView, onEdit: handleEdit, onAdd: handleAdd, onDeactivate: handleDeactivate, onReactivate: handleReactivate, heading: heading }));
 }

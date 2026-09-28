@@ -95,8 +95,8 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     icon: UserCircle,
   },
   lawyers: {
-    label: 'Lawyers',
-    description: 'Legal professional network management with performance tracking and commission calculation.',
+    label: 'Experts',
+    description: 'Lawyers and RTO agents network management with performance tracking and commission calculation.',
     icon: Scale,
   },
   partners: {

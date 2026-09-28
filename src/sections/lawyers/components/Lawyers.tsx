@@ -175,7 +175,14 @@ const sampleTransactions = [
   },
 ]
 
-export function Lawyers({ lawyers: initialLawyers }: LawyersProps) {
+interface LawyersComponentProps extends LawyersProps {
+  heading?: string
+}
+
+export function Lawyers({
+  lawyers: initialLawyers,
+  heading = 'Experts',
+}: LawyersComponentProps) {
   const [lawyers, setLawyers] = useState<Lawyer[]>(initialLawyers)
   const [currentView, setCurrentView] = useState<View>('list')
   const [selectedLawyer, setSelectedLawyer] = useState<Lawyer | null>(null)
@@ -272,6 +279,7 @@ export function Lawyers({ lawyers: initialLawyers }: LawyersProps) {
       onAdd={handleAdd}
       onDeactivate={handleDeactivate}
       onReactivate={handleReactivate}
+      heading={heading}
     />
   )
 }

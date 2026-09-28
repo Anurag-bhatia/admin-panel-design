@@ -2,6 +2,15 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { Search, Plus, Filter, MoreHorizontal, Eye, Pencil, UserX, UserCheck, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Lawyer } from '@/../product/sections/lawyers/types'
 
+function businessInitials(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean)
+  if (words.length === 0) return ''
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+  return (words[0][0] + words[1][0]).toUpperCase()
+}
+
+type ExpertType = 'lawyers' | 'rtoAgents'
+
 interface LawyerTableProps {
   lawyers: Lawyer[]
   onView: (id: string) => void
@@ -9,6 +18,12 @@ interface LawyerTableProps {
   onAdd: () => void
   onDeactivate: (id: string) => void
   onReactivate: (id: string) => void
+  heading?: string
+}
+
+const EXPERT_LABELS: Record<ExpertType, { plural: string; singular: string }> = {
+  lawyers: { plural: 'Lawyers', singular: 'Lawyer' },
+  rtoAgents: { plural: 'RTO Agents', singular: 'RTO Agent' },
 }
 
 export function LawyerTable({
@@ -18,8 +33,10 @@ export function LawyerTable({
   onAdd,
   onDeactivate,
   onReactivate,
+  heading = 'Experts',
 }: LawyerTableProps) {
-  const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active')
+  const isBusiness = heading === 'Business'
+  const [activeTab, setActiveTab] = useState<ExpertType>('lawyers')
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState({
@@ -31,23 +48,24 @@ export function LawyerTable({
   const pageSize = 10
   const menuRef = useRef<HTMLDivElement>(null)
 
-  const activeLawyers = lawyers.filter((l) => l.activityState === 'Active')
-  const inactiveLawyers = lawyers.filter((l) => l.activityState === 'Inactive')
-
-  const currentLawyers = activeTab === 'active' ? activeLawyers : inactiveLawyers
+  const currentLawyers = lawyers
+  const singular = isBusiness ? 'Business' : EXPERT_LABELS[activeTab].singular
 
   // Get unique states and categories for filter dropdowns
   const uniqueStates = Array.from(new Set(lawyers.map((l) => l.currentAddress.state))).sort()
   const uniqueCategories = Array.from(new Set(lawyers.map((l) => l.category))).sort()
 
   // Apply search filter
+  const q = searchQuery.toLowerCase()
   let filteredLawyers = searchQuery
     ? currentLawyers.filter(
         (l) =>
-          `${l.firstName} ${l.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          l.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          l.lawyerId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          l.category.toLowerCase().includes(searchQuery.toLowerCase())
+          `${l.firstName} ${l.lastName}`.toLowerCase().includes(q) ||
+          l.email.toLowerCase().includes(q) ||
+          l.lawyerId.toLowerCase().includes(q) ||
+          l.category.toLowerCase().includes(q) ||
+          (l.company?.name.toLowerCase().includes(q) ?? false) ||
+          (l.company?.email.toLowerCase().includes(q) ?? false)
       )
     : currentLawyers
 
@@ -87,40 +105,37 @@ export function LawyerTable({
     <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Lawyers</h1>
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{heading}</h1>
       </div>
 
       {/* Tabs and Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
-          <button
-            onClick={() => setActiveTab('active')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === 'active'
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            Active ({activeLawyers.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('inactive')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === 'inactive'
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            Inactive ({inactiveLawyers.length})
-          </button>
-        </div>
+        {isBusiness ? (
+          <div />
+        ) : (
+          <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
+            {(Object.keys(EXPERT_LABELS) as ExpertType[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  activeTab === tab
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {EXPERT_LABELS[tab].plural}
+              </button>
+            ))}
+          </div>
+        )}
 
         <button
           onClick={onAdd}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add Lawyer
+          Add {singular}
         </button>
       </div>
 
@@ -213,7 +228,7 @@ export function LawyerTable({
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-700">
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                  Lawyer
+                  {singular}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide hidden md:table-cell">
                   Contact
@@ -238,8 +253,8 @@ export function LawyerTable({
                   <td colSpan={6} className="px-4 py-12 text-center">
                     <p className="text-slate-500 dark:text-slate-400">
                       {searchQuery
-                        ? 'No lawyers found matching your search'
-                        : `No ${activeTab} lawyers`}
+                        ? `No ${EXPERT_LABELS[activeTab].plural.toLowerCase()} found matching your search`
+                        : `No ${EXPERT_LABELS[activeTab].plural.toLowerCase()} in ${heading}`}
                     </p>
                   </td>
                 </tr>
@@ -254,17 +269,21 @@ export function LawyerTable({
                     }}
                     className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
                   >
-                    {/* Lawyer Info */}
+                    {/* Lawyer / Business Info */}
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center flex-shrink-0">
                           <span className="text-sm font-semibold text-cyan-700 dark:text-cyan-400">
-                            {lawyer.firstName[0]}{lawyer.lastName[0]}
+                            {lawyer.company
+                              ? businessInitials(lawyer.company.name)
+                              : `${lawyer.firstName[0]}${lawyer.lastName[0]}`}
                           </span>
                         </div>
                         <div className="min-w-0">
                           <p className="font-medium text-slate-900 dark:text-white truncate">
-                            {lawyer.firstName} {lawyer.lastName}
+                            {lawyer.company
+                              ? lawyer.company.name
+                              : `${lawyer.firstName} ${lawyer.lastName}`}
                           </p>
                           <p className="text-sm text-slate-500 dark:text-slate-400 font-mono">
                             {lawyer.lawyerId}
@@ -277,10 +296,10 @@ export function LawyerTable({
                     <td className="px-4 py-4 hidden md:table-cell">
                       <div className="min-w-0">
                         <p className="text-sm text-slate-900 dark:text-white truncate max-w-[200px]">
-                          {lawyer.email}
+                          {lawyer.company ? lawyer.company.email : lawyer.email}
                         </p>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                          {lawyer.mobile}
+                          {lawyer.company ? lawyer.company.phone : lawyer.mobile}
                         </p>
                       </div>
                     </td>
