@@ -657,17 +657,14 @@
     ],
     "mstr-006": [
       { "id": "mv-027", "value": "Criminal Law", "status": "active", "sortOrder": 1 },
-      { "id": "mv-028", "value": "Motor Vehicle Act", "status": "active", "sortOrder": 2 },
-      { "id": "mv-029", "value": "Corporate Litigation", "status": "active", "sortOrder": 3 },
-      { "id": "mv-030", "value": "Consumer Protection Law", "status": "active", "sortOrder": 4 },
-      { "id": "mv-031", "value": "Intellectual Property", "status": "active", "sortOrder": 5 },
-      { "id": "mv-032", "value": "Employment and Labour Laws", "status": "active", "sortOrder": 6 },
-      { "id": "mv-033", "value": "Startup and Corporate Compliance", "status": "active", "sortOrder": 7 },
-      { "id": "mv-034", "value": "Taxation", "status": "active", "sortOrder": 8 },
-      { "id": "mv-035", "value": "ADR", "status": "active", "sortOrder": 9 },
-      { "id": "mv-036", "value": "Family Law", "status": "inactive", "sortOrder": 10 },
-      { "id": "mv-037", "value": "Insolvency and Bankruptcy Law", "status": "active", "sortOrder": 11 },
-      { "id": "mv-038", "value": "Other", "status": "active", "sortOrder": 12 }
+      { "id": "mv-030", "value": "Consumer Protection Law", "status": "active", "sortOrder": 2 },
+      { "id": "mv-031", "value": "Intellectual Property", "status": "active", "sortOrder": 3 },
+      { "id": "mv-032", "value": "Employment and Labour Laws", "status": "active", "sortOrder": 4 },
+      { "id": "mv-034", "value": "Taxation", "status": "active", "sortOrder": 5 },
+      { "id": "mv-035", "value": "ADR", "status": "active", "sortOrder": 6 },
+      { "id": "mv-036", "value": "Family Law", "status": "inactive", "sortOrder": 7 },
+      { "id": "mv-037", "value": "Insolvency and Bankruptcy Law", "status": "active", "sortOrder": 8 },
+      { "id": "mv-038", "value": "Other", "status": "active", "sortOrder": 9 }
     ],
     "mstr-009": [
       { "id": "mv-039", "value": "Truck", "status": "active", "sortOrder": 1 },

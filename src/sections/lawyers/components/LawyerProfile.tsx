@@ -23,7 +23,6 @@ import {
   Eye,
   Upload,
   Users,
-  X,
 } from 'lucide-react'
 import type { Lawyer } from '@/../product/sections/lawyers/types'
 
@@ -71,6 +70,7 @@ interface TeamMember {
   joinedDate: string
   status: 'Active' | 'Inactive'
   incidentIds?: string[]
+  isOwner?: boolean
 }
 
 interface LawyerProfileProps {
@@ -87,6 +87,7 @@ interface LawyerProfileProps {
   onViewIncident?: (incidentId: string) => void
   onViewTransaction?: (transactionId: string) => void
   onViewTeamMember?: (memberId: string) => void
+  onViewTeamMemberProfile?: (member: TeamMember) => void
   onRaiseInvoice?: () => void
 }
 
@@ -104,17 +105,35 @@ export function LawyerProfile({
   onViewIncident,
   onViewTransaction,
   onViewTeamMember,
+  onViewTeamMemberProfile,
   onRaiseInvoice,
 }: LawyerProfileProps) {
   const isBusiness = lawyer.company !== null
   const availableTabs: TabType[] = isBusiness
-    ? ['details', 'documents', 'incidents', 'invoicing', 'transactions', 'team']
+    ? ['details', 'invoicing', 'transactions', 'team']
     : ['details', 'documents', 'incidents', 'invoicing', 'transactions']
   const [activeTab, setActiveTab] = useState<TabType>(
     availableTabs.includes(initialTab) ? initialTab : 'details'
   )
   const isActive = lawyer.activityState === 'Active'
   const fullName = `${lawyer.firstName} ${lawyer.lastName}`
+
+  const businessInitials = (name: string): string => {
+    const words = name.trim().split(/\s+/).filter(Boolean)
+    if (words.length === 0) return ''
+    if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+    return (words[0][0] + words[1][0]).toUpperCase()
+  }
+
+  const headerTitle = isBusiness ? 'Business Profile' : 'Lawyer Profile'
+  const displayName = isBusiness && lawyer.company ? lawyer.company.name : fullName
+  const displayInitials =
+    isBusiness && lawyer.company
+      ? businessInitials(lawyer.company.name)
+      : `${lawyer.firstName[0]}${lawyer.lastName[0]}`
+  const displayEmail = isBusiness && lawyer.company ? lawyer.company.email : lawyer.email
+  const displayPhone = isBusiness && lawyer.company ? lawyer.company.phone : lawyer.mobile
+  const displayId = isBusiness ? lawyer.lawyerId.replace(/^LAW-/, 'BIZ-') : lawyer.lawyerId
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
@@ -141,7 +160,6 @@ export function LawyerProfile({
   }
 
   const [showDocumentUpload, setShowDocumentUpload] = useState(false)
-  const [viewingTeamMember, setViewingTeamMember] = useState<TeamMember | null>(null)
 
   const totalPendingAmount = pendingInvoices.reduce((sum, inv) => sum + inv.commissionAmount, 0)
 
@@ -157,7 +175,7 @@ export function LawyerProfile({
             <ArrowLeft className="w-5 h-5 text-slate-600 dark:text-slate-400" />
           </button>
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Lawyer Profile</h1>
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{headerTitle}</h1>
           </div>
           <div className="flex items-center gap-2">
             {isActive ? (
@@ -192,12 +210,12 @@ export function LawyerProfile({
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="w-14 h-14 rounded-full bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center flex-shrink-0">
               <span className="text-lg font-semibold text-cyan-700 dark:text-cyan-400">
-                {lawyer.firstName[0]}{lawyer.lastName[0]}
+                {displayInitials}
               </span>
             </div>
             <div className="flex-1">
               <div className="flex flex-wrap items-start gap-3 mb-3">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{fullName}</h2>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{displayName}</h2>
                 <span
                   className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
                     isActive
@@ -208,34 +226,38 @@ export function LawyerProfile({
                   {lawyer.activityState}
                 </span>
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-mono mb-4">
-                {lawyer.lawyerId}
+              <p className={`text-sm text-slate-500 dark:text-slate-400 font-mono ${isBusiness ? '' : 'mb-4'}`}>
+                {displayId}
               </p>
-              <div className="flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                  <Mail className="w-4 h-4" />
-                  {lawyer.email}
+              {!isBusiness && (
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <Mail className="w-4 h-4" />
+                    {displayEmail}
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <Phone className="w-4 h-4" />
+                    {displayPhone}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                  <Phone className="w-4 h-4" />
-                  {lawyer.mobile}
+              )}
+            </div>
+            {!isBusiness && (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">KYC:</span>
+                  <span
+                    className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
+                      lawyer.kycStatus === 'Verified'
+                        ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
+                        : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                    }`}
+                  >
+                    {lawyer.kycStatus}
+                  </span>
                 </div>
               </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 dark:text-slate-400">KYC:</span>
-                <span
-                  className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
-                    lawyer.kycStatus === 'Verified'
-                      ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
-                      : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                  }`}
-                >
-                  {lawyer.kycStatus}
-                </span>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -257,7 +279,9 @@ export function LawyerProfile({
                     }`}
                   >
                     {getTabIcon(tab)}
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    {tab === 'details' && isBusiness
+                      ? 'Business Details'
+                      : tab.charAt(0).toUpperCase() + tab.slice(1)}
                   </button>
                 ))}
               </div>
@@ -268,56 +292,60 @@ export function LawyerProfile({
           {/* Details Tab */}
           {activeTab === 'details' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Basic Information */}
-              <Section title="Basic Information" icon={<Briefcase className="w-4 h-4" />}>
-                <InfoRow label="Category" value={lawyer.category} />
-                <InfoRow label="Sub-Category" value={lawyer.subCategory} />
-                <InfoRow label="Gender" value={lawyer.gender} />
-                <InfoRow label="Date of Birth" value={formatDate(lawyer.dateOfBirth)} />
-                <InfoRow label="Source" value={lawyer.source} />
-              </Section>
+              {!isBusiness && (
+                <>
+                  {/* Basic Information */}
+                  <Section title="Basic Information" icon={<Briefcase className="w-4 h-4" />}>
+                    <InfoRow label="Category" value={lawyer.category} />
+                    <InfoRow label="Sub-Category" value={lawyer.subCategory} />
+                    <InfoRow label="Gender" value={lawyer.gender} />
+                    <InfoRow label="Date of Birth" value={formatDate(lawyer.dateOfBirth)} />
+                    <InfoRow label="Source" value={lawyer.source} />
+                  </Section>
 
-              {/* Bank Details */}
-              <Section title="Bank Details" icon={<CreditCard className="w-4 h-4" />}>
-                <InfoRow label="Account Holder" value={lawyer.bankDetails.accountHolderName} />
-                <InfoRow label="Account Number" value={lawyer.bankDetails.accountNumber} />
-                <InfoRow label="Bank Name" value={lawyer.bankDetails.bankName} />
-                <InfoRow label="IFSC Code" value={lawyer.bankDetails.ifscCode} />
-              </Section>
+                  {/* Bank Details */}
+                  <Section title="Bank Details" icon={<CreditCard className="w-4 h-4" />}>
+                    <InfoRow label="Account Holder" value={lawyer.bankDetails.accountHolderName} />
+                    <InfoRow label="Account Number" value={lawyer.bankDetails.accountNumber} />
+                    <InfoRow label="Bank Name" value={lawyer.bankDetails.bankName} />
+                    <InfoRow label="IFSC Code" value={lawyer.bankDetails.ifscCode} />
+                  </Section>
 
-              {/* Qualifications */}
-              <Section title="Qualifications" icon={<GraduationCap className="w-4 h-4" />}>
-                {lawyer.qualifications.map((qual, index) => (
-                  <div
-                    key={index}
-                    className="py-3 border-b border-slate-100 dark:border-slate-700 last:border-0"
-                  >
-                    <p className="font-medium text-slate-900 dark:text-white">{qual.degree}</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">{qual.university}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-500">
-                      {qual.yearOfCompletion}
-                      {qual.percentage && ` • ${qual.percentage}%`}
-                    </p>
-                  </div>
-                ))}
-              </Section>
+                  {/* Qualifications */}
+                  <Section title="Qualifications" icon={<GraduationCap className="w-4 h-4" />}>
+                    {lawyer.qualifications.map((qual, index) => (
+                      <div
+                        key={index}
+                        className="py-3 border-b border-slate-100 dark:border-slate-700 last:border-0"
+                      >
+                        <p className="font-medium text-slate-900 dark:text-white">{qual.degree}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">{qual.university}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-500">
+                          {qual.yearOfCompletion}
+                          {qual.percentage && ` • ${qual.percentage}%`}
+                        </p>
+                      </div>
+                    ))}
+                  </Section>
 
-              {/* Experience */}
-              <Section title="Experience" icon={<Calendar className="w-4 h-4" />}>
-                {lawyer.experience.map((exp, index) => (
-                  <div
-                    key={index}
-                    className="py-3 border-b border-slate-100 dark:border-slate-700 last:border-0"
-                  >
-                    <p className="font-medium text-slate-900 dark:text-white">{exp.role}</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">{exp.company}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-500">
-                      {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
-                    </p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{exp.functionalArea}</p>
-                  </div>
-                ))}
-              </Section>
+                  {/* Experience */}
+                  <Section title="Experience" icon={<Calendar className="w-4 h-4" />}>
+                    {lawyer.experience.map((exp, index) => (
+                      <div
+                        key={index}
+                        className="py-3 border-b border-slate-100 dark:border-slate-700 last:border-0"
+                      >
+                        <p className="font-medium text-slate-900 dark:text-white">{exp.role}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">{exp.company}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-500">
+                          {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                        </p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{exp.functionalArea}</p>
+                      </div>
+                    ))}
+                  </Section>
+                </>
+              )}
 
               {/* Company Details */}
               {lawyer.company && (
@@ -326,14 +354,8 @@ export function LawyerProfile({
                     <InfoRow label="Company Name" value={lawyer.company.name} />
                     <InfoRow label="Email" value={lawyer.company.email} />
                     <InfoRow label="Phone" value={lawyer.company.phone} />
-                    <InfoRow label="Website" value={lawyer.company.website} />
                     <InfoRow label="GST Number" value={lawyer.company.gstNumber} />
                     <InfoRow label="PAN Number" value={lawyer.company.panNumber} />
-                    <InfoRow label="Main Office" value={lawyer.company.mainOffice} />
-                    <InfoRow
-                      label="Branch Offices"
-                      value={lawyer.company.branchOffices.join(', ') || 'None'}
-                    />
                   </div>
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-700 mt-3">
                     <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Address</p>
@@ -342,21 +364,23 @@ export function LawyerProfile({
                 </Section>
               )}
 
-              {/* Current Address */}
-              <Section title="Current Address" icon={<MapPin className="w-4 h-4" />}>
-                <div className="py-3">
-                  <p className="text-sm text-slate-900 dark:text-white">
-                    {lawyer.currentAddress.addressLine}
-                  </p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {lawyer.currentAddress.area}, {lawyer.currentAddress.city}
-                  </p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {lawyer.currentAddress.state}, {lawyer.currentAddress.country} -{' '}
-                    {lawyer.currentAddress.pinCode}
-                  </p>
-                </div>
-              </Section>
+              {!isBusiness && (
+                /* Current Address */
+                <Section title="Current Address" icon={<MapPin className="w-4 h-4" />}>
+                  <div className="py-3">
+                    <p className="text-sm text-slate-900 dark:text-white">
+                      {lawyer.currentAddress.addressLine}
+                    </p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {lawyer.currentAddress.area}, {lawyer.currentAddress.city}
+                    </p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {lawyer.currentAddress.state}, {lawyer.currentAddress.country} -{' '}
+                      {lawyer.currentAddress.pinCode}
+                    </p>
+                  </div>
+                </Section>
+              )}
             </div>
           )}
 
@@ -634,35 +658,52 @@ export function LawyerProfile({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {team.map((member) => (
-                        <tr key={member.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3">
-                            <span className="font-medium text-slate-900 dark:text-slate-50">{member.name}</span>
-                          </td>
-                          <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{member.assignedIncidents}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(member.joinedDate)}</td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
-                              member.status === 'Active'
-                                ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                                : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
-                            }`}>
-                              {member.status}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <button
-                              onClick={() => {
-                                setViewingTeamMember(member)
-                                onViewTeamMember?.(member.id)
-                              }}
-                              className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
-                            >
-                              View Incidents
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {team.map((member) => {
+                        const openProfile = () => {
+                          onViewTeamMember?.(member.id)
+                          onViewTeamMemberProfile?.(member)
+                        }
+                        return (
+                          <tr
+                            key={member.id}
+                            onClick={openProfile}
+                            className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer"
+                          >
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-slate-900 dark:text-slate-50">{member.name}</span>
+                                {member.isOwner && (
+                                  <span className="inline-flex px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400">
+                                    Owner
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{member.assignedIncidents}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(member.joinedDate)}</td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
+                                member.status === 'Active'
+                                  ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                              }`}>
+                                {member.status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  openProfile()
+                                }}
+                                className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
+                              >
+                                View Profile
+                              </button>
+                            </td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -700,58 +741,6 @@ export function LawyerProfile({
         </div>
       </div>
 
-      {viewingTeamMember && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-950/70 p-4"
-          onClick={() => setViewingTeamMember(null)}
-        >
-          <div
-            className="w-full max-w-md bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-slate-800"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800">
-              <div>
-                <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-                  {viewingTeamMember.name}
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Assigned Incidents ({viewingTeamMember.incidentIds?.length ?? viewingTeamMember.assignedIncidents})
-                </p>
-              </div>
-              <button
-                onClick={() => setViewingTeamMember(null)}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="px-5 py-4 max-h-96 overflow-y-auto">
-              {viewingTeamMember.incidentIds && viewingTeamMember.incidentIds.length > 0 ? (
-                <ul className="space-y-2">
-                  {viewingTeamMember.incidentIds.map((incidentId) => (
-                    <li
-                      key={incidentId}
-                      className="flex items-center justify-between px-3 py-2 rounded-md bg-slate-50 dark:bg-slate-800"
-                    >
-                      <span className="font-mono text-sm text-slate-900 dark:text-slate-50">{incidentId}</span>
-                      <button
-                        onClick={() => onViewIncident?.(incidentId)}
-                        className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
-                      >
-                        Open
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-6">
-                  No incident IDs available
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

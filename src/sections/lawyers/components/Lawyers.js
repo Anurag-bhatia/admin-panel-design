@@ -172,6 +172,7 @@ export function Lawyers({ lawyers: initialLawyers, heading = 'Experts', }) {
     const [lawyers, setLawyers] = useState(initialLawyers);
     const [currentView, setCurrentView] = useState('list');
     const [selectedLawyer, setSelectedLawyer] = useState(null);
+    const [profileStack, setProfileStack] = useState([]);
     const handleView = (id) => {
         const lawyer = lawyers.find((l) => l.id === id);
         if (lawyer) {
@@ -197,8 +198,37 @@ export function Lawyers({ lawyers: initialLawyers, heading = 'Experts', }) {
         setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, activityState: 'Active' } : l)));
     };
     const handleBack = () => {
+        if (profileStack.length > 0) {
+            const previous = profileStack[profileStack.length - 1];
+            setProfileStack((s) => s.slice(0, -1));
+            setSelectedLawyer(previous);
+            return;
+        }
         setCurrentView('list');
         setSelectedLawyer(null);
+    };
+    const handleViewTeamMemberProfile = (member) => {
+        if (!selectedLawyer)
+            return;
+        const [firstName, ...rest] = member.name.split(' ');
+        const lastName = rest.join(' ') || '';
+        const synthetic = {
+            ...selectedLawyer,
+            id: `${selectedLawyer.id}-tm-${member.id}`,
+            lawyerId: `TM-${member.id.toUpperCase()}`,
+            firstName,
+            lastName,
+            email: member.email,
+            mobile: member.mobile,
+            category: member.role,
+            subCategory: selectedLawyer.category,
+            activityState: member.status,
+            company: null,
+            createdAt: member.joinedDate,
+            lastUpdatedAt: selectedLawyer.lastUpdatedAt,
+        };
+        setProfileStack((s) => [...s, selectedLawyer]);
+        setSelectedLawyer(synthetic);
     };
     const handleSave = (lawyer) => {
         if (currentView === 'add') {
@@ -217,10 +247,10 @@ export function Lawyers({ lawyers: initialLawyers, heading = 'Experts', }) {
             }, onReactivate: () => {
                 handleReactivate(selectedLawyer.id);
                 setSelectedLawyer({ ...selectedLawyer, activityState: 'Active' });
-            }, onViewIncident: (id) => console.log('View incident:', id), onViewTransaction: (id) => console.log('View transaction:', id), onViewTeamMember: (id) => console.log('View team member:', id) }));
+            }, onViewIncident: (id) => console.log('View incident:', id), onViewTransaction: (id) => console.log('View transaction:', id), onViewTeamMember: (id) => console.log('View team member:', id), onViewTeamMemberProfile: handleViewTeamMemberProfile }, selectedLawyer.id));
     }
     if (currentView === 'add' || (currentView === 'edit' && selectedLawyer)) {
-        return (_jsx(LawyerForm, { lawyer: selectedLawyer, onBack: handleBack, onSave: handleSave, isEdit: currentView === 'edit' }));
+        return (_jsx(LawyerForm, { lawyer: selectedLawyer, onBack: handleBack, onSave: handleSave, isEdit: currentView === 'edit', isBusiness: heading === 'Business' }));
     }
     return (_jsx(LawyerTable, { lawyers: lawyers, onView: handleView, onEdit: handleEdit, onAdd: handleAdd, onDeactivate: handleDeactivate, onReactivate: handleReactivate, heading: heading }));
 }

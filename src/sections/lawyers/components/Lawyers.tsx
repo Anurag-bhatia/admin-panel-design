@@ -90,6 +90,7 @@ const sampleTeam = [
     resolvedIncidents: 17,
     joinedDate: '2023-03-15',
     status: 'Active' as const,
+    isOwner: true,
     incidentIds: [
       'IRN-2024-0018', 'IRN-2024-0024', 'IRN-2024-0037', 'IRN-2024-0051',
       'IRN-2024-0062', 'IRN-2024-0078', 'IRN-2024-0089', 'IRN-2024-0104',
@@ -186,6 +187,7 @@ export function Lawyers({
   const [lawyers, setLawyers] = useState<Lawyer[]>(initialLawyers)
   const [currentView, setCurrentView] = useState<View>('list')
   const [selectedLawyer, setSelectedLawyer] = useState<Lawyer | null>(null)
+  const [profileStack, setProfileStack] = useState<Lawyer[]>([])
 
   const handleView = (id: string) => {
     const lawyer = lawyers.find((l) => l.id === id)
@@ -221,8 +223,45 @@ export function Lawyers({
   }
 
   const handleBack = () => {
+    if (profileStack.length > 0) {
+      const previous = profileStack[profileStack.length - 1]
+      setProfileStack((s) => s.slice(0, -1))
+      setSelectedLawyer(previous)
+      return
+    }
     setCurrentView('list')
     setSelectedLawyer(null)
+  }
+
+  const handleViewTeamMemberProfile = (member: {
+    id: string
+    name: string
+    role: string
+    email: string
+    mobile: string
+    status: 'Active' | 'Inactive'
+    joinedDate: string
+  }) => {
+    if (!selectedLawyer) return
+    const [firstName, ...rest] = member.name.split(' ')
+    const lastName = rest.join(' ') || ''
+    const synthetic: Lawyer = {
+      ...selectedLawyer,
+      id: `${selectedLawyer.id}-tm-${member.id}`,
+      lawyerId: `TM-${member.id.toUpperCase()}`,
+      firstName,
+      lastName,
+      email: member.email,
+      mobile: member.mobile,
+      category: member.role,
+      subCategory: selectedLawyer.category,
+      activityState: member.status,
+      company: null,
+      createdAt: member.joinedDate,
+      lastUpdatedAt: selectedLawyer.lastUpdatedAt,
+    }
+    setProfileStack((s) => [...s, selectedLawyer])
+    setSelectedLawyer(synthetic)
   }
 
   const handleSave = (lawyer: Lawyer) => {
@@ -238,6 +277,7 @@ export function Lawyers({
   if (currentView === 'profile' && selectedLawyer) {
     return (
       <LawyerProfile
+        key={selectedLawyer.id}
         lawyer={selectedLawyer}
         incidents={sampleIncidents}
         pendingInvoices={samplePendingInvoices}
@@ -256,6 +296,7 @@ export function Lawyers({
         onViewIncident={(id) => console.log('View incident:', id)}
         onViewTransaction={(id) => console.log('View transaction:', id)}
         onViewTeamMember={(id) => console.log('View team member:', id)}
+        onViewTeamMemberProfile={handleViewTeamMemberProfile}
       />
     )
   }
@@ -267,6 +308,7 @@ export function Lawyers({
         onBack={handleBack}
         onSave={handleSave}
         isEdit={currentView === 'edit'}
+        isBusiness={heading === 'Business'}
       />
     )
   }

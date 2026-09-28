@@ -73,6 +73,8 @@ export interface Coupon {
   totalUsageLimit?: number
   perUserUsageLimit?: number
   stackable: boolean
+  autoApplyOldest?: boolean
+  exitIntentEligible?: boolean
   status: CouponStatus
   usageCount: number
   advancedRules?: AdvancedRules

@@ -9,6 +9,11 @@ function businessInitials(name: string): string {
   return (words[0][0] + words[1][0]).toUpperCase()
 }
 
+function businessTeamCount(lawyerId: string): number {
+  const seed = Array.from(lawyerId).reduce((a, c) => a + c.charCodeAt(0), 0)
+  return 3 + (seed % 6)
+}
+
 type ExpertType = 'lawyers' | 'rtoAgents'
 
 interface LawyerTableProps {
@@ -41,7 +46,7 @@ export function LawyerTable({
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState({
     state: '',
-    category: '',
+    status: '',
   })
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -51,9 +56,8 @@ export function LawyerTable({
   const currentLawyers = lawyers
   const singular = isBusiness ? 'Business' : EXPERT_LABELS[activeTab].singular
 
-  // Get unique states and categories for filter dropdowns
+  // Get unique states for filter dropdown
   const uniqueStates = Array.from(new Set(lawyers.map((l) => l.currentAddress.state))).sort()
-  const uniqueCategories = Array.from(new Set(lawyers.map((l) => l.category))).sort()
 
   // Apply search filter
   const q = searchQuery.toLowerCase()
@@ -69,14 +73,13 @@ export function LawyerTable({
       )
     : currentLawyers
 
-  // Apply state and category filters
   if (filters.state) {
     filteredLawyers = filteredLawyers.filter((l) =>
       l.currentAddress.state.toLowerCase().includes(filters.state.toLowerCase())
     )
   }
-  if (filters.category) {
-    filteredLawyers = filteredLawyers.filter((l) => l.category === filters.category)
+  if (filters.status) {
+    filteredLawyers = filteredLawyers.filter((l) => l.activityState === filters.status)
   }
 
   const totalPages = Math.max(1, Math.ceil(filteredLawyers.length / pageSize))
@@ -89,7 +92,7 @@ export function LawyerTable({
   // Reset to page 1 when filters/tab change
   useEffect(() => {
     setCurrentPage(1)
-  }, [activeTab, searchQuery, filters.state, filters.category])
+  }, [activeTab, searchQuery, filters.state, filters.status])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -103,41 +106,53 @@ export function LawyerTable({
 
   return (
     <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{heading}</h1>
-      </div>
-
-      {/* Tabs and Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        {isBusiness ? (
-          <div />
-        ) : (
-          <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
-            {(Object.keys(EXPERT_LABELS) as ExpertType[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  activeTab === tab
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {EXPERT_LABELS[tab].plural}
-              </button>
-            ))}
+      {isBusiness ? (
+        /* Header + Add on one row */
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{heading}</h1>
+          <button
+            onClick={onAdd}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add {singular}
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{heading}</h1>
           </div>
-        )}
 
-        <button
-          onClick={onAdd}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add {singular}
-        </button>
-      </div>
+          {/* Tabs and Actions */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="flex gap-1 p-1 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg w-fit">
+              {(Object.keys(EXPERT_LABELS) as ExpertType[]).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                    activeTab === tab
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {EXPERT_LABELS[tab].plural}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={onAdd}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add {singular}
+            </button>
+          </div>
+        </>
+      )}
 
       {/* Search and Filters */}
       <div className="mb-6">
@@ -192,26 +207,23 @@ export function LawyerTable({
 
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Category
+                  Status
                 </label>
                 <select
-                  value={filters.category}
-                  onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                  value={filters.status}
+                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                   className="w-full pl-3 pr-9 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
                 >
-                  <option value="">All Categories</option>
-                  {uniqueCategories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
+                  <option value="">All Statuses</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
                 </select>
               </div>
             </div>
 
             <div className="mt-4 flex justify-end">
               <button
-                onClick={() => setFilters({ state: '', category: '' })}
+                onClick={() => setFilters({ state: '', status: '' })}
                 className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
               >
                 Clear all filters
@@ -233,14 +245,22 @@ export function LawyerTable({
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide hidden md:table-cell">
                   Contact
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide hidden lg:table-cell">
-                  Category
-                </th>
+                {isBusiness ? (
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                    Team
+                  </th>
+                ) : (
+                  <>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                      State
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                      KYC
+                    </th>
+                  </>
+                )}
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                  State
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                  KYC
+                  Status
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                   Actions
@@ -250,7 +270,7 @@ export function LawyerTable({
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {paginatedLawyers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center">
+                  <td colSpan={isBusiness ? 5 : 6} className="px-4 py-12 text-center">
                     <p className="text-slate-500 dark:text-slate-400">
                       {searchQuery
                         ? `No ${EXPERT_LABELS[activeTab].plural.toLowerCase()} found matching your search`
@@ -288,6 +308,11 @@ export function LawyerTable({
                           <p className="text-sm text-slate-500 dark:text-slate-400 font-mono">
                             {lawyer.lawyerId}
                           </p>
+                          {!lawyer.company && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[220px] mt-0.5">
+                              {lawyer.category}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -304,31 +329,47 @@ export function LawyerTable({
                       </div>
                     </td>
 
-                    {/* Category */}
-                    <td className="px-4 py-4 hidden lg:table-cell">
-                      <p className="text-sm text-slate-900 dark:text-white">{lawyer.category}</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-[160px]">
-                        {lawyer.subCategory}
-                      </p>
-                    </td>
+                    {isBusiness ? (
+                      /* Team */
+                      <td className="px-4 py-4">
+                        <span className="text-sm text-slate-900 dark:text-white">
+                          {businessTeamCount(lawyer.lawyerId)} members
+                        </span>
+                      </td>
+                    ) : (
+                      <>
+                        {/* State */}
+                        <td className="px-4 py-4">
+                          <span className="text-sm text-slate-900 dark:text-white">
+                            {lawyer.currentAddress.state}
+                          </span>
+                        </td>
 
-                    {/* State */}
-                    <td className="px-4 py-4">
-                      <span className="text-sm text-slate-900 dark:text-white">
-                        {lawyer.currentAddress.state}
-                      </span>
-                    </td>
+                        {/* KYC Status */}
+                        <td className="px-4 py-4">
+                          <span
+                            className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
+                              lawyer.kycStatus === 'Verified'
+                                ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
+                                : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                            }`}
+                          >
+                            {lawyer.kycStatus}
+                          </span>
+                        </td>
+                      </>
+                    )}
 
-                    {/* KYC Status */}
+                    {/* Status */}
                     <td className="px-4 py-4">
                       <span
                         className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
-                          lawyer.kycStatus === 'Verified'
-                            ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
-                            : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                          lawyer.activityState === 'Active'
+                            ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                         }`}
                       >
-                        {lawyer.kycStatus}
+                        {lawyer.activityState}
                       </span>
                     </td>
 

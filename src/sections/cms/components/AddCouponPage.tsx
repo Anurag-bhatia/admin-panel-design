@@ -40,6 +40,8 @@ interface FormState {
   totalUsageLimit: string
   perUserUsageLimit: string
   stackable: boolean
+  autoApplyOldest: boolean
+  exitIntentEligible: boolean
   advancedRules: AdvancedRules
 }
 
@@ -91,6 +93,8 @@ function initialFromCoupon(coupon?: Coupon): FormState {
     perUserUsageLimit:
       coupon?.perUserUsageLimit != null ? String(coupon.perUserUsageLimit) : '1',
     stackable: coupon?.stackable ?? false,
+    autoApplyOldest: coupon?.autoApplyOldest ?? false,
+    exitIntentEligible: coupon?.exitIntentEligible ?? false,
     advancedRules: coupon?.advancedRules ?? { groups: [] },
   }
 }
@@ -201,6 +205,8 @@ export function AddCouponPage({
         ? Number(form.perUserUsageLimit)
         : undefined,
       stackable: form.stackable,
+      autoApplyOldest: form.autoApplyOldest,
+      exitIntentEligible: form.exitIntentEligible,
       advancedRules: form.advancedRules.groups.length > 0 ? form.advancedRules : undefined,
       status: mode === 'publish' && !startsInFuture ? 'active' : 'draft',
     }
@@ -515,6 +521,20 @@ export function AddCouponPage({
                 />
               </button>
             </div>
+            <div className="pt-1 space-y-2">
+              <CheckboxRow
+                checked={form.autoApplyOldest}
+                disabled={isLocked}
+                onChange={(v) => update('autoApplyOldest', v)}
+                label="Auto-apply the oldest eligible coupon at checkout"
+              />
+              <CheckboxRow
+                checked={form.exitIntentEligible}
+                disabled={isLocked}
+                onChange={(v) => update('exitIntentEligible', v)}
+                label="Eligible for an exit-intent prompt"
+              />
+            </div>
           </Section>
 
           <Section
@@ -625,6 +645,35 @@ function Field({
         </p>
       )}
     </div>
+  )
+}
+
+function CheckboxRow({
+  checked,
+  disabled,
+  onChange,
+  label,
+}: {
+  checked: boolean
+  disabled?: boolean
+  onChange: (v: boolean) => void
+  label: string
+}) {
+  return (
+    <label
+      className={`flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 ${
+        disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+        className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500"
+      />
+      {label}
+    </label>
   )
 }
 

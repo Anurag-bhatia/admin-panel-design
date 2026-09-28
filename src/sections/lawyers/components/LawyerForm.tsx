@@ -7,9 +7,10 @@ interface LawyerFormProps {
   onBack: () => void
   onSave: (lawyer: Lawyer) => void
   isEdit: boolean
+  isBusiness?: boolean
 }
 
-const STEPS = [
+const LAWYER_STEPS = [
   'Basic Info',
   'Address',
   'Qualifications',
@@ -18,14 +19,13 @@ const STEPS = [
   'Company',
 ]
 
+const BUSINESS_STEPS = ['Company Details']
+
 const CATEGORIES = [
   'Criminal Law',
-  'Motor Vehicle Act',
-  'Corporate Litigation',
   'Consumer Protection Law',
   'Intellectual Property',
   'Employment and Labour Laws',
-  'Startup and Corporate Compliance',
   'Taxation',
   'ADR',
   'Family Law',
@@ -58,10 +58,11 @@ const emptyExperience: Experience = {
   functionalArea: '',
 }
 
-export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) {
+export function LawyerForm({ lawyer, onBack, onSave, isEdit, isBusiness = false }: LawyerFormProps) {
+  const STEPS = isBusiness ? BUSINESS_STEPS : LAWYER_STEPS
   const [currentStep, setCurrentStep] = useState(0)
   const [sameAsCurrentAddress, setSameAsCurrentAddress] = useState(false)
-  const [hasCompany, setHasCompany] = useState(!!lawyer?.company)
+  const [hasCompany, setHasCompany] = useState(isBusiness || !!lawyer?.company)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -160,11 +161,18 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
           <ArrowLeft className="w-5 h-5 text-slate-600 dark:text-slate-400" />
         </button>
         <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
-          {isEdit ? 'Edit Lawyer' : 'Add New Lawyer'}
+          {isBusiness
+            ? isEdit
+              ? 'Edit Business'
+              : 'Add New Business'
+            : isEdit
+              ? 'Edit Lawyer'
+              : 'Add New Lawyer'}
         </h1>
       </div>
 
       {/* Progress Steps */}
+      {!isBusiness && (
       <div className="mb-8">
         <div className="flex items-start">
           {STEPS.map((step, index) => (
@@ -208,11 +216,12 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
           ))}
         </div>
       </div>
+      )}
 
       {/* Form Content */}
       <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 mb-6">
         {/* Step 1: Basic Information */}
-        {currentStep === 0 && (
+        {!isBusiness && currentStep === 0 && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField label="Category" required>
@@ -305,7 +314,7 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
         )}
 
         {/* Step 2: Address */}
-        {currentStep === 1 && (
+        {!isBusiness && currentStep === 1 && (
           <div className="space-y-6">
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Current Address</h3>
             <AddressForm
@@ -342,7 +351,7 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
         )}
 
         {/* Step 3: Qualifications & Experience */}
-        {currentStep === 2 && (
+        {!isBusiness && currentStep === 2 && (
           <div className="space-y-8">
             {/* Qualifications */}
             <div>
@@ -550,7 +559,7 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
         )}
 
         {/* Step 4: KYC Documents */}
-        {currentStep === 3 && (
+        {!isBusiness && currentStep === 3 && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <DocumentUpload
@@ -606,7 +615,7 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
         )}
 
         {/* Step 5: Bank Details */}
-        {currentStep === 4 && (
+        {!isBusiness && currentStep === 4 && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField label="Account Holder Name" required>
@@ -670,8 +679,9 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
         )}
 
         {/* Step 6: Company Details */}
-        {currentStep === 5 && (
+        {(isBusiness ? currentStep === 0 : currentStep === 5) && (
           <div className="space-y-6">
+            {!isBusiness && (
             <label className="flex items-center gap-2 mb-4">
               <input
                 type="checkbox"
@@ -683,6 +693,7 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
                 Lawyer operates through a company/firm
               </span>
             </label>
+            )}
 
             {hasCompany && (
               <div className="space-y-4">
@@ -805,7 +816,7 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit }: LawyerFormProps) 
             onClick={handleSubmit}
             className="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors"
           >
-            {isEdit ? 'Save Changes' : 'Add Lawyer'}
+            {isEdit ? 'Save Changes' : isBusiness ? 'Add Business' : 'Add Lawyer'}
           </button>
         ) : (
           <button
