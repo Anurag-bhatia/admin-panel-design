@@ -1,23 +1,37 @@
 import React from 'react';
 import { AlertCircle, UserPlus, Users, UserCircle, Scale, Handshake, CreditCard, MessageSquare, HeadphonesIcon, BarChart3, UsersRound, Settings, FileText, CheckCircle2, FileInput, Gift, BookOpen, } from 'lucide-react';
+function lazyWithReload(factory) {
+    return React.lazy(() => factory().catch((err) => {
+        const flag = 'chunkReloaded';
+        if (typeof window !== 'undefined' && !sessionStorage.getItem(flag)) {
+            sessionStorage.setItem(flag, '1');
+            window.location.reload();
+            return new Promise(() => { });
+        }
+        throw err;
+    }));
+}
+if (typeof window !== 'undefined') {
+    window.addEventListener('load', () => sessionStorage.removeItem('chunkReloaded'));
+}
 // Lazy-loaded section preview components
-const IncidentListPreview = React.lazy(() => import('../sections/incidents/IncidentListPreview'));
-const LeadsDashboard = React.lazy(() => import('../sections/sales-crm/LeadsDashboard'));
-const SubscribersDashboardPreview = React.lazy(() => import('../sections/subscribers/SubscribersDashboardPreview'));
-const LawyerList = React.lazy(() => import('../sections/lawyers/LawyerList'));
-const TeamManagement = React.lazy(() => import('../sections/team/TeamManagement'));
-const PartnerListPreview = React.lazy(() => import('../sections/partners/PartnerListPreview'));
-const ReportsDashboard = React.lazy(() => import('../sections/reports/ReportsDashboard'));
-const SupportDashboard = React.lazy(() => import('../sections/support/SupportDashboard'));
-const CustomerListView = React.lazy(() => import('../sections/customers/CustomerListView'));
-const DisputeListPreview = React.lazy(() => import('../sections/disputes/DisputeListPreview'));
-const PaymentsDashboardPreview = React.lazy(() => import('../sections/payments/PaymentsDashboardPreview'));
-const SetupDashboard = React.lazy(() => import('../sections/setup/SetupDashboard'));
-const CMSDashboardPreview = React.lazy(() => import('../sections/cms/CMSDashboardPreview'));
-const SettledChallansPreview = React.lazy(() => import('../sections/settled-challans/SettledChallansPreview'));
-const ProposalListPreview = React.lazy(() => import('../sections/proposals/ProposalListPreview'));
-const RewardsConfigPreview = React.lazy(() => import('../sections/rewards-config/RewardsConfigPreview'));
-const KnowledgeBasePreview = React.lazy(() => import('../sections/knowledge-base/KnowledgeBasePreview'));
+const IncidentListPreview = lazyWithReload(() => import('../sections/incidents/IncidentListPreview'));
+const LeadsDashboard = lazyWithReload(() => import('../sections/sales-crm/LeadsDashboard'));
+const SubscribersDashboardPreview = lazyWithReload(() => import('../sections/subscribers/SubscribersDashboardPreview'));
+const LawyerList = lazyWithReload(() => import('../sections/lawyers/LawyerList'));
+const TeamManagement = lazyWithReload(() => import('../sections/team/TeamManagement'));
+const PartnerListPreview = lazyWithReload(() => import('../sections/partners/PartnerListPreview'));
+const ReportsDashboard = lazyWithReload(() => import('../sections/reports/ReportsDashboard'));
+const SupportDashboard = lazyWithReload(() => import('../sections/support/SupportDashboard'));
+const CustomerListView = lazyWithReload(() => import('../sections/customers/CustomerListView'));
+const DisputeListPreview = lazyWithReload(() => import('../sections/disputes/DisputeListPreview'));
+const PaymentsDashboardPreview = lazyWithReload(() => import('../sections/payments/PaymentsDashboardPreview'));
+const SetupDashboard = lazyWithReload(() => import('../sections/setup/SetupDashboard'));
+const CMSDashboardPreview = lazyWithReload(() => import('../sections/cms/CMSDashboardPreview'));
+const SettledChallansPreview = lazyWithReload(() => import('../sections/settled-challans/SettledChallansPreview'));
+const ProposalListPreview = lazyWithReload(() => import('../sections/proposals/ProposalListPreview'));
+const RewardsConfigPreview = lazyWithReload(() => import('../sections/rewards-config/RewardsConfigPreview'));
+const KnowledgeBasePreview = lazyWithReload(() => import('../sections/knowledge-base/KnowledgeBasePreview'));
 // Section metadata mapping
 export const SECTION_DATA = {
     incidents: {

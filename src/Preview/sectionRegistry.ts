@@ -19,56 +19,78 @@ import {
   BookOpen,
 } from 'lucide-react'
 
+// Wrap dynamic imports so a stale chunk (after a new deploy) triggers a
+// one-shot reload instead of a crash screen.
+function lazyWithReload<T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>
+) {
+  return React.lazy(() =>
+    factory().catch((err) => {
+      const flag = 'chunkReloaded'
+      if (typeof window !== 'undefined' && !sessionStorage.getItem(flag)) {
+        sessionStorage.setItem(flag, '1')
+        window.location.reload()
+        return new Promise<{ default: T }>(() => {})
+      }
+      throw err
+    })
+  )
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', () => sessionStorage.removeItem('chunkReloaded'))
+}
+
 // Lazy-loaded section preview components
-const IncidentListPreview = React.lazy(() =>
+const IncidentListPreview = lazyWithReload(() =>
   import('../sections/incidents/IncidentListPreview')
 )
-const LeadsDashboard = React.lazy(() =>
+const LeadsDashboard = lazyWithReload(() =>
   import('../sections/sales-crm/LeadsDashboard')
 )
-const SubscribersDashboardPreview = React.lazy(() =>
+const SubscribersDashboardPreview = lazyWithReload(() =>
   import('../sections/subscribers/SubscribersDashboardPreview')
 )
-const LawyerList = React.lazy(() =>
+const LawyerList = lazyWithReload(() =>
   import('../sections/lawyers/LawyerList')
 )
-const TeamManagement = React.lazy(() =>
+const TeamManagement = lazyWithReload(() =>
   import('../sections/team/TeamManagement')
 )
-const PartnerListPreview = React.lazy(() =>
+const PartnerListPreview = lazyWithReload(() =>
   import('../sections/partners/PartnerListPreview')
 )
-const ReportsDashboard = React.lazy(() =>
+const ReportsDashboard = lazyWithReload(() =>
   import('../sections/reports/ReportsDashboard')
 )
-const SupportDashboard = React.lazy(() =>
+const SupportDashboard = lazyWithReload(() =>
   import('../sections/support/SupportDashboard')
 )
-const CustomerListView = React.lazy(() =>
+const CustomerListView = lazyWithReload(() =>
   import('../sections/customers/CustomerListView')
 )
-const DisputeListPreview = React.lazy(() =>
+const DisputeListPreview = lazyWithReload(() =>
   import('../sections/disputes/DisputeListPreview')
 )
-const PaymentsDashboardPreview = React.lazy(() =>
+const PaymentsDashboardPreview = lazyWithReload(() =>
   import('../sections/payments/PaymentsDashboardPreview')
 )
-const SetupDashboard = React.lazy(() =>
+const SetupDashboard = lazyWithReload(() =>
   import('../sections/setup/SetupDashboard')
 )
-const CMSDashboardPreview = React.lazy(() =>
+const CMSDashboardPreview = lazyWithReload(() =>
   import('../sections/cms/CMSDashboardPreview')
 )
-const SettledChallansPreview = React.lazy(() =>
+const SettledChallansPreview = lazyWithReload(() =>
   import('../sections/settled-challans/SettledChallansPreview')
 )
-const ProposalListPreview = React.lazy(() =>
+const ProposalListPreview = lazyWithReload(() =>
   import('../sections/proposals/ProposalListPreview')
 )
-const RewardsConfigPreview = React.lazy(() =>
+const RewardsConfigPreview = lazyWithReload(() =>
   import('../sections/rewards-config/RewardsConfigPreview')
 )
-const KnowledgeBasePreview = React.lazy(() =>
+const KnowledgeBasePreview = lazyWithReload(() =>
   import('../sections/knowledge-base/KnowledgeBasePreview')
 )
 
