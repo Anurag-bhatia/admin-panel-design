@@ -495,26 +495,25 @@ export function AddCouponPage({
                 />
               </Field>
             </div>
-            <ToggleRow
+            <CheckboxRow
               label="Stackable with other coupons / rewards"
-              onText="On — can combine with other benefits"
-              offText="Off — used alone"
+              description={
+                form.stackable ? 'On — can combine with other benefits' : 'Off — used alone'
+              }
               checked={form.stackable}
               disabled={isLocked}
               onChange={(v) => update('stackable', v)}
             />
-            <ToggleRow
-              label="Auto-apply the oldest eligible coupon at checkout"
-              onText="On — applied automatically"
-              offText="Off — customer must enter code"
+            <CheckboxRow
+              label="Auto Apply"
+              info="In case of multiple auto apply coupons, the oldest eligible coupon will get applied at checkout"
               checked={form.autoApplyOldest}
               disabled={isLocked}
               onChange={(v) => update('autoApplyOldest', v)}
             />
-            <ToggleRow
+            <CheckboxRow
               label="Eligible for an exit-intent prompt"
-              onText="On — shown on exit intent"
-              offText="Off — not shown on exit intent"
+              info="In case of multiple exit intent coupons, the oldest eligible coupon will get applied at checkout"
               checked={form.exitIntentEligible}
               disabled={isLocked}
               onChange={(v) => update('exitIntentEligible', v)}
@@ -632,46 +631,55 @@ function Field({
   )
 }
 
-function ToggleRow({
+function CheckboxRow({
   label,
-  onText,
-  offText,
+  description,
+  info,
   checked,
   disabled,
   onChange,
 }: {
   label: string
-  onText: string
-  offText: string
+  description?: string
+  info?: string
   checked: boolean
   disabled?: boolean
   onChange: (v: boolean) => void
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 pt-1">
-      <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-          {label}
-        </label>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-          {checked ? onText : offText}
-        </p>
-      </div>
-      <button
-        type="button"
+    <label
+      className={`flex items-start gap-2.5 pt-1 ${
+        disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
         disabled={disabled}
-        onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
-          checked ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-600'
-        } disabled:opacity-60`}
-      >
-        <span
-          className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
-            checked ? 'translate-x-6' : 'translate-x-1'
-          }`}
-        />
-      </button>
-    </div>
+        onChange={(e) => onChange(e.target.checked)}
+        className="mt-0.5 w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500"
+      />
+      <div className="flex-1">
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            {label}
+          </span>
+          {info && (
+            <span
+              title={info}
+              className="inline-flex text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+            >
+              <Info className="w-3.5 h-3.5" />
+            </span>
+          )}
+        </div>
+        {description && (
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            {description}
+          </p>
+        )}
+      </div>
+    </label>
   )
 }
 
