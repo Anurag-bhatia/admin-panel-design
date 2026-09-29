@@ -495,46 +495,30 @@ export function AddCouponPage({
                 />
               </Field>
             </div>
-            <div className="flex items-center justify-between gap-4 pt-1">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Stackable with other coupons / rewards
-                </label>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  {form.stackable
-                    ? 'On — can combine with other benefits'
-                    : 'Off — used alone'}
-                </p>
-              </div>
-              <button
-                type="button"
-                disabled={isLocked}
-                onClick={() => update('stackable', !form.stackable)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
-                  form.stackable ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-600'
-                } disabled:opacity-60`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
-                    form.stackable ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-            <div className="pt-1 space-y-2">
-              <CheckboxRow
-                checked={form.autoApplyOldest}
-                disabled={isLocked}
-                onChange={(v) => update('autoApplyOldest', v)}
-                label="Auto-apply the oldest eligible coupon at checkout"
-              />
-              <CheckboxRow
-                checked={form.exitIntentEligible}
-                disabled={isLocked}
-                onChange={(v) => update('exitIntentEligible', v)}
-                label="Eligible for an exit-intent prompt"
-              />
-            </div>
+            <ToggleRow
+              label="Stackable with other coupons / rewards"
+              onText="On — can combine with other benefits"
+              offText="Off — used alone"
+              checked={form.stackable}
+              disabled={isLocked}
+              onChange={(v) => update('stackable', v)}
+            />
+            <ToggleRow
+              label="Auto-apply the oldest eligible coupon at checkout"
+              onText="On — applied automatically"
+              offText="Off — customer must enter code"
+              checked={form.autoApplyOldest}
+              disabled={isLocked}
+              onChange={(v) => update('autoApplyOldest', v)}
+            />
+            <ToggleRow
+              label="Eligible for an exit-intent prompt"
+              onText="On — shown on exit intent"
+              offText="Off — not shown on exit intent"
+              checked={form.exitIntentEligible}
+              disabled={isLocked}
+              onChange={(v) => update('exitIntentEligible', v)}
+            />
           </Section>
 
           <Section
@@ -648,32 +632,46 @@ function Field({
   )
 }
 
-function CheckboxRow({
+function ToggleRow({
+  label,
+  onText,
+  offText,
   checked,
   disabled,
   onChange,
-  label,
 }: {
+  label: string
+  onText: string
+  offText: string
   checked: boolean
   disabled?: boolean
   onChange: (v: boolean) => void
-  label: string
 }) {
   return (
-    <label
-      className={`flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 ${
-        disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
-      }`}
-    >
-      <input
-        type="checkbox"
-        checked={checked}
+    <div className="flex items-center justify-between gap-4 pt-1">
+      <div>
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+          {label}
+        </label>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          {checked ? onText : offText}
+        </p>
+      </div>
+      <button
+        type="button"
         disabled={disabled}
-        onChange={(e) => onChange(e.target.checked)}
-        className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500"
-      />
-      {label}
-    </label>
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
+          checked ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-600'
+        } disabled:opacity-60`}
+      >
+        <span
+          className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+            checked ? 'translate-x-6' : 'translate-x-1'
+          }`}
+        />
+      </button>
+    </div>
   )
 }
 

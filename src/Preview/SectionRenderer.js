@@ -20,7 +20,7 @@ const SectionRenderer = ({ sectionId, subRoute }) => {
     }
     // If component exists, render it with suspense boundary
     if (Component) {
-        return (_jsx(Suspense, { fallback: _jsx("div", { className: "flex items-center justify-center h-screen", children: _jsxs("div", { className: "text-center", children: [_jsxs("div", { className: "text-lg font-semibold text-stone-900 dark:text-stone-100", children: ["Loading ", label, "..."] }), _jsx("div", { className: "mt-2 text-sm text-stone-500 dark:text-stone-400", children: "Please wait while we prepare the section" })] }) }), children: _jsx(Component, {}) }));
+        return (_jsx(Suspense, { fallback: _jsx("div", { className: "flex items-center justify-center h-screen", children: _jsxs("div", { className: "text-center", children: [_jsxs("div", { className: "text-lg font-semibold text-stone-900 dark:text-stone-100", children: ["Loading ", label, "..."] }), _jsx("div", { className: "mt-2 text-sm text-stone-500 dark:text-stone-400", children: "Please wait while we prepare the section" })] }) }), children: sectionId === 'lawyers' ? _jsx(Component, { subRoute: subRoute }) : _jsx(Component, {}) }));
     }
     // Fallback if something went wrong
     return (_jsx("div", { className: "flex items-center justify-center h-screen", children: _jsxs("div", { className: "text-center", children: [_jsxs("div", { className: "text-lg font-semibold text-red-600 dark:text-red-400", children: ["Error loading ", label] }), _jsx("div", { className: "mt-2 text-sm text-stone-500 dark:text-stone-400", children: "The section could not be loaded. Please refresh the page or contact support." })] }) }));

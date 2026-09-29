@@ -50,6 +50,7 @@ const SectionRenderer: React.FC<SectionRendererProps> = ({ sectionId, subRoute }
 
   // If component exists, render it with suspense boundary
   if (Component) {
+    const ComponentAny = Component as React.ComponentType<{ subRoute?: string }>
     return (
       <Suspense
         fallback={
@@ -65,7 +66,11 @@ const SectionRenderer: React.FC<SectionRendererProps> = ({ sectionId, subRoute }
           </div>
         }
       >
-        <Component />
+        {sectionId === 'lawyers' ? (
+          <ComponentAny subRoute={subRoute} />
+        ) : (
+          <Component />
+        )}
       </Suspense>
     )
   }

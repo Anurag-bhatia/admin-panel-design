@@ -38,6 +38,7 @@ interface LawyerIncident {
   status: 'Assigned' | 'In Progress' | 'Resolved' | 'Closed'
   assignedDate: string
   resolutionDate: string | null
+  assignedTo?: string
 }
 
 interface PendingInvoice {
@@ -110,8 +111,16 @@ export function LawyerProfile({
 }: LawyerProfileProps) {
   const isBusiness = lawyer.company !== null
   const availableTabs: TabType[] = isBusiness
-    ? ['details', 'invoicing', 'transactions', 'team']
+    ? ['details', 'incidents', 'invoicing', 'transactions', 'team']
     : ['details', 'documents', 'incidents', 'invoicing', 'transactions']
+
+  const displayedIncidents: LawyerIncident[] =
+    isBusiness && team.length > 0
+      ? incidents.map((incident, index) => ({
+          ...incident,
+          assignedTo: incident.assignedTo ?? team[index % team.length].name,
+        }))
+      : incidents
   const [activeTab, setActiveTab] = useState<TabType>(
     availableTabs.includes(initialTab) ? initialTab : 'details'
   )
@@ -453,12 +462,16 @@ export function LawyerProfile({
           {activeTab === 'incidents' && (
             <div>
               <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">
-                Assigned Incidents ({incidents.length})
+                Assigned Incidents ({displayedIncidents.length})
               </h2>
-              {incidents.length === 0 ? (
+              {displayedIncidents.length === 0 ? (
                 <div className="text-center py-12">
                   <AlertTriangle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-500 dark:text-slate-400">No incidents assigned to this lawyer yet</p>
+                  <p className="text-slate-500 dark:text-slate-400">
+                    {isBusiness
+                      ? 'No incidents assigned to this business yet'
+                      : 'No incidents assigned to this lawyer yet'}
+                  </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -471,12 +484,15 @@ export function LawyerProfile({
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Violation Type</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Amount</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                        {isBusiness && (
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Team Member</th>
+                        )}
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Assigned Date</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Resolution Date</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {incidents.map((incident) => (
+                      {displayedIncidents.map((incident) => (
                         <tr key={incident.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                           <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{incident.incidentId}</td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{incident.challanNo}</td>
@@ -494,6 +510,11 @@ export function LawyerProfile({
                               {incident.status}
                             </span>
                           </td>
+                          {isBusiness && (
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                              {incident.assignedTo ?? '-'}
+                            </td>
+                          )}
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(incident.assignedDate)}</td>
                           <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
                             {incident.resolutionDate ? formatDate(incident.resolutionDate) : '-'}

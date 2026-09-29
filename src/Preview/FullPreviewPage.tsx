@@ -40,6 +40,29 @@ const FullPreviewPage: React.FC = () => {
       ]
     }
 
+    // Add children for Experts section
+    if (sectionId === 'lawyers') {
+      const currentGroup =
+        activeSection === 'lawyers'
+          ? activeSubRoute === 'individuals'
+            ? 'individuals'
+            : 'business'
+          : null
+      navItem.isActive = false
+      navItem.children = [
+        {
+          label: 'Business',
+          href: '#lawyers/business',
+          isActive: currentGroup === 'business',
+        },
+        {
+          label: 'Individuals',
+          href: '#lawyers/individuals',
+          isActive: currentGroup === 'individuals',
+        },
+      ]
+    }
+
     return navItem
   })
 
@@ -79,6 +102,10 @@ const FullPreviewPage: React.FC = () => {
         crumbs.push({ label: 'All Leads' })
       } else if (activeSection === 'leads' && activeSubRoute === 'my') {
         crumbs.push({ label: 'My Leads' })
+      } else if (activeSection === 'lawyers' && activeSubRoute === 'business') {
+        crumbs.push({ label: 'Business' })
+      } else if (activeSection === 'lawyers' && activeSubRoute === 'individuals') {
+        crumbs.push({ label: 'Individuals' })
       }
     } else {
       // Just the section name
