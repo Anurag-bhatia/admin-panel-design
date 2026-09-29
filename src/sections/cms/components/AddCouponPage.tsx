@@ -646,32 +646,34 @@ function CheckboxRow({
   disabled?: boolean
   onChange: (v: boolean) => void
 }) {
+  const id = `chk-${label.replace(/\s+/g, '-').toLowerCase()}`
   return (
-    <label
+    <div
       className={`flex items-start gap-2.5 pt-1 ${
-        disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+        disabled ? 'opacity-60' : ''
       }`}
     >
       <input
+        id={id}
         type="checkbox"
         checked={checked}
         disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500"
+        className={`mt-0.5 w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 ${
+          disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+        }`}
       />
       <div className="flex-1">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <label
+            htmlFor={id}
+            className={`text-sm font-medium text-slate-700 dark:text-slate-300 ${
+              disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+            }`}
+          >
             {label}
-          </span>
-          {info && (
-            <span
-              title={info}
-              className="inline-flex text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
-            >
-              <Info className="w-3.5 h-3.5" />
-            </span>
-          )}
+          </label>
+          {info && <InfoTooltip text={info} />}
         </div>
         {description && (
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -679,7 +681,21 @@ function CheckboxRow({
           </p>
         )}
       </div>
-    </label>
+    </div>
+  )
+}
+
+function InfoTooltip({ text }: { text: string }) {
+  return (
+    <span
+      className="group relative inline-flex text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+      onClick={(e) => e.preventDefault()}
+    >
+      <Info className="w-3.5 h-3.5 cursor-help" />
+      <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 w-64 rounded-md bg-slate-900 dark:bg-slate-700 px-2.5 py-1.5 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg">
+        {text}
+      </span>
+    </span>
   )
 }
 
