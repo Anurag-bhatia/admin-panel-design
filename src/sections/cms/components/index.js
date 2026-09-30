@@ -4,6 +4,7 @@ export { EventNewsList } from './EventNewsList';
 export { BannerList } from './BannerList';
 export { CouponList } from './CouponList';
 export { AddCouponPage } from './AddCouponPage';
+export { CouponDetailPage } from './CouponDetailPage';
 export { ProgrammeList } from './ProgrammeList';
 export { AddProgrammePage } from './AddProgrammePage';
 export { WalletSection } from './WalletSection';

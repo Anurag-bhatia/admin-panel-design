@@ -7,10 +7,12 @@ import {
   AlertCircle,
   Lock,
   Check,
+  Sparkles,
 } from 'lucide-react'
 import type {
   AdvancedRules,
   Coupon,
+  CouponApplicableOn,
   CouponChallanType,
   CouponPlatform,
   CouponProduct,
@@ -29,6 +31,7 @@ interface FormState {
   code: string
   description: string
   type: CouponType
+  applicableOn: CouponApplicableOn
   value: string
   maxDiscountCap: string
   startAt: string
@@ -56,6 +59,12 @@ const PLATFORM_LABELS: Record<CouponPlatform, string> = {
   lots247: 'LOTS247',
 }
 
+const APPLICABLE_ON_LABELS: Record<CouponApplicableOn, string> = {
+  challanAmount: 'Challan Amount',
+  convenienceFee: 'Convenience Fee',
+  both: 'Both',
+}
+
 function productsForPlatforms(platforms: CouponPlatform[]): CouponProduct[] {
   if (platforms.length === 0) return []
   const hasChallanPay = platforms.includes('challanpay')
@@ -64,6 +73,52 @@ function productsForPlatforms(platforms: CouponPlatform[]): CouponProduct[] {
   if (hasChallanPay) return ['challan']
   if (hasLots) return ['subscription']
   return []
+}
+
+const SUGGEST_STOPWORDS = new Set([
+  'THE', 'AND', 'FOR', 'WITH', 'FROM', 'THIS', 'THAT', 'ONLY', 'ARE', 'YOU',
+  'YOUR', 'OUR', 'NEW', 'GET', 'OFF', 'OFFER', 'CODE', 'COUPON', 'USE', 'USER',
+  'USERS', 'ALL', 'ANY', 'HAVE', 'WILL', 'CAN', 'BUY', 'ON', 'IN', 'TO', 'OF',
+  'A', 'AN', 'OR', 'AT', 'BE', 'IS', 'IT',
+])
+
+function suggestCouponCodes(description: string, existing: string[]): string[] {
+  const cleaned = description
+    .toUpperCase()
+    .replace(/[^A-Z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length >= 3 && w.length <= 12 && !SUGGEST_STOPWORDS.has(w))
+
+  const seeds = cleaned.length > 0
+    ? Array.from(new Set(cleaned)).slice(0, 3)
+    : ['SAVE', 'DEAL', 'HELLO']
+
+  const suffixes = ['10', '20', '50']
+  const prefixes = ['GET', 'TRY', 'HELLO']
+
+  const raw: string[] = []
+  seeds.forEach((seed, i) => {
+    raw.push(seed + suffixes[i % suffixes.length])
+  })
+  while (raw.length < 3) {
+    const seed = seeds[raw.length % seeds.length]
+    raw.push(prefixes[raw.length % prefixes.length] + seed)
+  }
+
+  const existingSet = new Set(existing.map((c) => c.toUpperCase()))
+  const out: string[] = []
+  raw.forEach((candidate) => {
+    let code = candidate.replace(/[^A-Z0-9]/g, '').slice(0, 32)
+    if (code.length < 3) code = (code + 'SAVE').slice(0, 8)
+    let final = code
+    let n = 1
+    while (existingSet.has(final) || out.includes(final)) {
+      final = (code + String(n)).slice(0, 32)
+      n++
+    }
+    out.push(final)
+  })
+  return out.slice(0, 3)
 }
 
 function toDatetimeLocal(iso?: string): string {
@@ -79,6 +134,7 @@ function initialFromCoupon(coupon?: Coupon): FormState {
     code: coupon?.code ?? '',
     description: coupon?.description ?? '',
     type: coupon?.type ?? 'flat',
+    applicableOn: coupon?.applicableOn ?? 'challanAmount',
     value: coupon?.value != null ? String(coupon.value) : '',
     maxDiscountCap:
       coupon?.maxDiscountCap != null ? String(coupon.maxDiscountCap) : '',
@@ -118,6 +174,7 @@ export function AddCouponPage({
     F: false,
   })
   const [errors, setErrors] = useState<Partial<Record<keyof FormState | 'form', string>>>({})
+  const [codeSuggestions, setCodeSuggestions] = useState<string[]>([])
 
   const update = <K extends keyof FormState>(key: K, val: FormState[K]) => {
     setForm((f) => ({ ...f, [key]: val }))
@@ -189,6 +246,7 @@ export function AddCouponPage({
       code: form.code.trim().toUpperCase(),
       description: form.description.trim() || undefined,
       type: form.type,
+      applicableOn: form.applicableOn,
       value: Number(form.value),
       maxDiscountCap:
         form.type === 'percentage' && form.maxDiscountCap
@@ -279,20 +337,6 @@ export function AddCouponPage({
             open={openSections.A}
             onToggle={() => toggleSection('A')}
           >
-            <Field label="Code" required error={errors.code}>
-              <input
-                type="text"
-                disabled={isLocked}
-                value={form.code}
-                onChange={(e) => update('code', e.target.value.toUpperCase())}
-                placeholder="WELCOME100"
-                className={inputCls(isLocked)}
-                maxLength={32}
-              />
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                3–32 characters, letters and numbers only. Auto-uppercased.
-              </p>
-            </Field>
             <Field label="Description">
               <textarea
                 disabled={isLocked}
@@ -303,6 +347,57 @@ export function AddCouponPage({
                 className={inputCls(isLocked)}
               />
             </Field>
+            <Field
+              label="Code"
+              required
+              error={errors.code}
+              action={
+                <button
+                  type="button"
+                  disabled={isLocked}
+                  onClick={() =>
+                    setCodeSuggestions(
+                      suggestCouponCodes(form.description, existingCodes),
+                    )
+                  }
+                  className="inline-flex items-center gap-1 text-xs font-medium text-cyan-700 dark:text-cyan-300 hover:text-cyan-800 dark:hover:text-cyan-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  Suggest
+                </button>
+              }
+            >
+              <input
+                type="text"
+                disabled={isLocked}
+                value={form.code}
+                onChange={(e) => update('code', e.target.value.toUpperCase())}
+                placeholder="WELCOME100"
+                className={inputCls(isLocked)}
+                maxLength={32}
+              />
+              {codeSuggestions.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                  {codeSuggestions.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      disabled={isLocked}
+                      onClick={() => {
+                        update('code', s)
+                        setCodeSuggestions([])
+                      }}
+                      className="px-2 py-1 text-xs font-mono font-medium text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-md hover:bg-cyan-100 dark:hover:bg-cyan-900/40 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                3–32 characters, letters and numbers only. Auto-uppercased.
+              </p>
+            </Field>
           </Section>
 
           <Section
@@ -311,21 +406,37 @@ export function AddCouponPage({
             open={openSections.B}
             onToggle={() => toggleSection('B')}
           >
-            <Field label="Type" required>
-              <div className="grid grid-cols-2 gap-2 max-w-md">
-                {(['flat', 'percentage'] as CouponType[]).map((t) => (
-                  <button
-                    type="button"
-                    key={t}
-                    disabled={isLocked}
-                    onClick={() => update('type', t)}
-                    className={selectableCls(form.type === t)}
-                  >
-                    {t === 'flat' ? 'Flat amount (₹)' : 'Percentage (%)'}
-                  </button>
-                ))}
-              </div>
-            </Field>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Type" required>
+                <select
+                  disabled={isLocked}
+                  value={form.type}
+                  onChange={(e) => update('type', e.target.value as CouponType)}
+                  className={inputCls(isLocked)}
+                >
+                  <option value="flat">Flat amount (₹)</option>
+                  <option value="percentage">Percentage (%)</option>
+                </select>
+              </Field>
+              <Field label="Applicable on" required>
+                <select
+                  disabled={isLocked}
+                  value={form.applicableOn}
+                  onChange={(e) =>
+                    update('applicableOn', e.target.value as CouponApplicableOn)
+                  }
+                  className={inputCls(isLocked)}
+                >
+                  {(['challanAmount', 'convenienceFee', 'both'] as CouponApplicableOn[]).map(
+                    (a) => (
+                      <option key={a} value={a}>
+                        {APPLICABLE_ON_LABELS[a]}
+                      </option>
+                    )
+                  )}
+                </select>
+              </Field>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field
                 label={form.type === 'flat' ? 'Discount amount (₹)' : 'Discount percentage'}
@@ -610,17 +721,22 @@ function Field({
   required,
   error,
   children,
+  action,
 }: {
   label: string
   required?: boolean
   error?: string
   children: React.ReactNode
+  action?: React.ReactNode
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
+      <div className="flex items-center justify-between mb-1">
+        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        {action}
+      </div>
       {children}
       {error && (
         <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">

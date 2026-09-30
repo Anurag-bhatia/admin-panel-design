@@ -55,6 +55,7 @@ export type CouponStatus = 'draft' | 'active' | 'paused' | 'expired' | 'archived
 export type CouponType = 'flat' | 'percentage'
 export type CouponPlatform = 'challanpay' | 'lots247'
 export type CouponProduct = 'all' | 'challan' | 'subscription'
+export type CouponApplicableOn = 'challanAmount' | 'convenienceFee' | 'both'
 export type CouponChallanType = 'online' | 'regularCourt' | 'xpressCourt'
 
 export interface Coupon {
@@ -62,6 +63,7 @@ export interface Coupon {
   code: string
   description?: string
   type: CouponType
+  applicableOn?: CouponApplicableOn
   value: number
   maxDiscountCap?: number
   startAt: string

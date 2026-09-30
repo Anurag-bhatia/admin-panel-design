@@ -10,6 +10,7 @@ import { AddBlogPage } from './AddBlogPage';
 import { AddEventNewsPage } from './AddEventNewsPage';
 import { AddBannerPage } from './AddBannerPage';
 import { AddCouponPage } from './AddCouponPage';
+import { CouponDetailPage } from './CouponDetailPage';
 const sidebarItems = [
     { id: 'blogs', label: 'Blogs' },
     { id: 'events-news', label: 'Events & News' },
@@ -89,6 +90,12 @@ export function CMSDashboard({ blogs, eventsNews, banners, coupons, programmes, 
                 setView('list');
             } }));
     }
+    if (view === 'view-coupon' && editingCoupon) {
+        return (_jsx(CouponDetailPage, { coupon: editingCoupon, onBack: () => {
+                setEditingCouponId(null);
+                setView('list');
+            }, onEdit: () => setView('edit-coupon') }));
+    }
     return (_jsxs("div", { className: "flex min-h-[calc(100vh-64px)]", children: [_jsx("div", { className: "flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 w-52", children: _jsx("div", { className: "flex-1 py-4", children: _jsx("div", { className: "space-y-0.5 px-2", children: sidebarItems.map((item) => {
                             const isActive = activeTab === item.id;
                             return (_jsx("button", { onClick: () => setActiveTab(item.id), className: `w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${isActive
@@ -99,7 +106,7 @@ export function CMSDashboard({ blogs, eventsNews, banners, coupons, programmes, 
                                 setView('edit-banner');
                             }, onDelete: (id) => console.log('Delete banner:', id), onSearch: (query) => console.log('Search banners:', query) })), activeTab === 'coupon' && (_jsx(CouponList, { coupons: coupons, onCreate: () => setView('add-coupon'), onView: (id) => {
                                 setEditingCouponId(id);
-                                setView('edit-coupon');
+                                setView('view-coupon');
                             }, onEdit: (id) => {
                                 setEditingCouponId(id);
                                 setView('edit-coupon');

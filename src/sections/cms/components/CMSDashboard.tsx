@@ -18,6 +18,7 @@ import { AddBlogPage } from './AddBlogPage'
 import { AddEventNewsPage } from './AddEventNewsPage'
 import { AddBannerPage } from './AddBannerPage'
 import { AddCouponPage } from './AddCouponPage'
+import { CouponDetailPage } from './CouponDetailPage'
 
 interface CMSDashboardProps {
   blogs: Blog[]
@@ -38,6 +39,7 @@ type View =
   | 'edit-banner'
   | 'add-coupon'
   | 'edit-coupon'
+  | 'view-coupon'
   | 'add-programme'
   | 'edit-programme'
 
@@ -188,6 +190,19 @@ export function CMSDashboard({
     )
   }
 
+  if (view === 'view-coupon' && editingCoupon) {
+    return (
+      <CouponDetailPage
+        coupon={editingCoupon}
+        onBack={() => {
+          setEditingCouponId(null)
+          setView('list')
+        }}
+        onEdit={() => setView('edit-coupon')}
+      />
+    )
+  }
+
   return (
     <div className="flex min-h-[calc(100vh-64px)]">
       {/* Left Sidebar */}
@@ -259,7 +274,7 @@ export function CMSDashboard({
               onCreate={() => setView('add-coupon')}
               onView={(id) => {
                 setEditingCouponId(id)
-                setView('edit-coupon')
+                setView('view-coupon')
               }}
               onEdit={(id) => {
                 setEditingCouponId(id)
