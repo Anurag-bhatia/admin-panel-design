@@ -4,6 +4,7 @@ import { ActivityTab } from './components/ActivityTab'
 import { NotesTab, type Note } from './components/NotesTab'
 import { DetailsTab } from './components/DetailsTab'
 import { CallSummaryTab } from './components/CallSummaryTab'
+import { SettlementAmountTab } from './components/SettlementAmountTab'
 import { AddExpenseModal } from './components/AddExpenseModal'
 import {
   MoveQueueDetailsModal,
@@ -20,7 +21,7 @@ const STAGES_REQUIRING_DETAILS: MoveQueueStage[] = [
   'hold',
 ]
 
-type TabType = 'screeningDetails' | 'activity' | 'notes' | 'details' | 'callSummary'
+type TabType = 'screeningDetails' | 'activity' | 'notes' | 'details' | 'callSummary' | 'settlementAmount'
 
 const CASE_CATEGORY_LABELS: Record<string, string> = {
   iaStart: 'IA Start',
@@ -223,6 +224,7 @@ export function IncidentDetailView({
                     {[
                       { key: 'newIncidents', label: 'New Incidents' },
                       { key: 'inProgress', label: 'In Progress' },
+                      { key: 'underReview', label: 'To Be Settled' },
                       { key: 'settled', label: 'Settled' },
                       { key: 'notSettled', label: 'Not Settled' },
                       { key: 'hold', label: 'Hold' },
@@ -456,6 +458,16 @@ export function IncidentDetailView({
                   >
                     Call Summary
                   </button>
+                  <button
+                    onClick={() => setActiveTab('settlementAmount')}
+                    className={`px-6 py-4 text-sm font-medium transition-colors border-b-2 ${
+                      activeTab === 'settlementAmount'
+                        ? 'border-cyan-600 text-cyan-600 dark:border-cyan-400 dark:text-cyan-400'
+                        : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    Settlement Amount
+                  </button>
                 </div>
               </div>
 
@@ -582,6 +594,9 @@ export function IncidentDetailView({
                 )}
                 {activeTab === 'callSummary' && (
                   <CallSummaryTab />
+                )}
+                {activeTab === 'settlementAmount' && (
+                  <SettlementAmountTab amount={incident.amount} />
                 )}
               </div>
             </div>

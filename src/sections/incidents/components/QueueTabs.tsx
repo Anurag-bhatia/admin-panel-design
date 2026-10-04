@@ -11,6 +11,7 @@ interface QueueTabsProps {
 const QUEUE_CONFIG: { key: IncidentQueue; label: string; caseLabel?: string; color: string }[] = [
   { key: 'newIncidents', label: 'New Incidents', caseLabel: 'New Cases', color: 'cyan' },
   { key: 'inProgress', label: 'In Progress', color: 'amber' },
+  { key: 'underReview', label: 'To Be Settled', color: 'indigo' },
   { key: 'settled', label: 'Settled', color: 'emerald' },
   { key: 'notSettled', label: 'Not Settled', color: 'red' },
   { key: 'hold', label: 'Hold', color: 'slate' },

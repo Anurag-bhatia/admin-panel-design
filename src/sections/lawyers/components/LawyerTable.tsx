@@ -106,53 +106,37 @@ export function LawyerTable({
 
   return (
     <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-      {isBusiness ? (
-        /* Header + Add on one row */
-        <div className="flex items-center justify-between gap-4 mb-6">
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{heading}</h1>
-          <button
-            onClick={onAdd}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Add {singular}
-          </button>
-        </div>
-      ) : (
-        <>
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{heading}</h1>
-          </div>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">{heading}</h1>
+      </div>
 
-          {/* Tabs and Actions */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div className="flex gap-1 p-1 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg w-fit">
-              {(Object.keys(EXPERT_LABELS) as ExpertType[]).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                    activeTab === tab
-                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {EXPERT_LABELS[tab].plural}
-                </button>
-              ))}
-            </div>
-
+      {/* Tabs and Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="flex gap-1 p-1 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg w-fit">
+          {(Object.keys(EXPERT_LABELS) as ExpertType[]).map((tab) => (
             <button
-              onClick={onAdd}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors"
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === tab
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
             >
-              <Plus className="w-4 h-4" />
-              Add {singular}
+              {EXPERT_LABELS[tab].plural}
             </button>
-          </div>
-        </>
-      )}
+          ))}
+        </div>
+
+        <button
+          onClick={onAdd}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add {singular}
+        </button>
+      </div>
 
       {/* Search and Filters */}
       <div className="mb-6">
@@ -308,11 +292,6 @@ export function LawyerTable({
                           <p className="text-sm text-slate-500 dark:text-slate-400 font-mono">
                             {lawyer.lawyerId}
                           </p>
-                          {!lawyer.company && (
-                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[220px] mt-0.5">
-                              {lawyer.category}
-                            </p>
-                          )}
                         </div>
                       </div>
                     </td>

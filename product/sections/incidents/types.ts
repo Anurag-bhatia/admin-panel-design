@@ -5,6 +5,7 @@
 export type IncidentQueue =
   | 'newIncidents'
   | 'inProgress'
+  | 'underReview'
   | 'settled'
   | 'notSettled'
   | 'hold'
@@ -158,6 +159,7 @@ export interface ScreeningResult {
 export interface QueueCounts {
   newIncidents: number
   inProgress: number
+  underReview: number
   settled: number
   notSettled: number
   hold: number

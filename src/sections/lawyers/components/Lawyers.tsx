@@ -10,47 +10,67 @@ type View = 'list' | 'profile' | 'add' | 'edit'
 const sampleIncidents = [
   {
     id: '1',
-    incidentId: 'INC-2024-001',
-    challanNo: 'DL-CH-2024-0892',
-    vehicleNo: 'DL-01-AB-1234',
+    incidentId: 'IRN-12341',
+    challanNo: 'MH012024789451',
+    vehicleNo: 'MH01AB1234',
     violationType: 'Over Speeding',
     amount: 2500,
     status: 'Resolved' as const,
     assignedDate: '2024-01-15',
     resolutionDate: '2024-01-22',
+    subscriberName: 'BlueDart Logistics',
+    subscriberId: 'LWD-1160521',
+    challanType: 'court' as const,
+    createdAt: '2026-07-01T15:00:00Z',
+    updatedAt: '2026-07-22T11:20:00Z',
   },
   {
     id: '2',
-    incidentId: 'INC-2024-002',
-    challanNo: 'DL-CH-2024-1023',
-    vehicleNo: 'DL-02-CD-5678',
+    incidentId: 'IRN-12342',
+    challanNo: 'MH012024789452',
+    vehicleNo: 'DL02CD5678',
     violationType: 'Red Light Violation',
     amount: 5000,
     status: 'In Progress' as const,
     assignedDate: '2024-01-20',
     resolutionDate: null,
+    subscriberName: 'Ramesh Sharma',
+    subscriberId: 'LWD-1160522',
+    challanType: 'online' as const,
+    createdAt: '2026-07-05T10:00:00Z',
+    updatedAt: '2026-07-25T14:10:00Z',
   },
   {
     id: '3',
-    incidentId: 'INC-2024-003',
-    challanNo: 'DL-CH-2024-1156',
-    vehicleNo: 'HR-26-EF-9012',
+    incidentId: 'IRN-12343',
+    challanNo: 'MH012024789453',
+    vehicleNo: 'HR26EF9012',
     violationType: 'No Parking',
     amount: 1500,
     status: 'Assigned' as const,
     assignedDate: '2024-01-25',
     resolutionDate: null,
+    subscriberName: 'FreshFleet Pvt Ltd',
+    subscriberId: 'LWD-1160523',
+    challanType: 'court' as const,
+    createdAt: '2026-07-09T09:30:00Z',
+    updatedAt: '2026-07-09T09:30:00Z',
   },
   {
     id: '4',
-    incidentId: 'INC-2024-004',
-    challanNo: 'DL-CH-2024-0756',
-    vehicleNo: 'DL-03-GH-3456',
+    incidentId: 'IRN-12344',
+    challanNo: 'MH012024789454',
+    vehicleNo: 'DL03GH3456',
     violationType: 'Driving Without Helmet',
     amount: 1000,
     status: 'Closed' as const,
     assignedDate: '2024-01-10',
     resolutionDate: '2024-01-18',
+    subscriberName: 'Priya Kapoor',
+    subscriberId: 'LWD-1160524',
+    challanType: 'online' as const,
+    createdAt: '2026-06-28T12:45:00Z',
+    updatedAt: '2026-07-18T09:15:00Z',
   },
 ]
 
@@ -75,6 +95,44 @@ const samplePendingInvoices = [
     resolutionDate: '2024-01-05',
     commissionAmount: 750,
     status: 'Refund' as const,
+  },
+]
+
+const sampleTransactionsLedger = [
+  {
+    id: 'l1',
+    incidentId: 'TXN-2024-0078',
+    resolutionDate: '2024-01-28',
+    commissionAmount: 1200,
+    status: 'Settled' as const,
+  },
+  {
+    id: 'l2',
+    incidentId: 'TXN-2024-0064',
+    resolutionDate: '2024-01-14',
+    commissionAmount: 450,
+    status: 'Settled' as const,
+  },
+  {
+    id: 'l3',
+    incidentId: 'TXN-2023-0952',
+    resolutionDate: '2023-12-30',
+    commissionAmount: 300,
+    status: 'Settled' as const,
+  },
+  {
+    id: 'l4',
+    incidentId: 'TXN-2023-0941',
+    resolutionDate: '2023-12-18',
+    commissionAmount: 900,
+    status: 'Settled' as const,
+  },
+  {
+    id: 'l5',
+    incidentId: 'TXN-2023-0929',
+    resolutionDate: '2023-12-02',
+    commissionAmount: 650,
+    status: 'Settled' as const,
   },
 ]
 
@@ -281,6 +339,7 @@ export function Lawyers({
         lawyer={selectedLawyer}
         incidents={sampleIncidents}
         pendingInvoices={samplePendingInvoices}
+        transactionsLedger={sampleTransactionsLedger}
         transactions={sampleTransactions}
         team={sampleTeam}
         onBack={handleBack}

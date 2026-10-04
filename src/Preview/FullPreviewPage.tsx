@@ -63,6 +63,29 @@ const FullPreviewPage: React.FC = () => {
       ]
     }
 
+    // Add children for Config section
+    if (sectionId === 'rewards-config') {
+      const currentConfig =
+        activeSection === 'rewards-config'
+          ? activeSubRoute === 'web'
+            ? 'web'
+            : 'sales'
+          : null
+      navItem.isActive = false
+      navItem.children = [
+        {
+          label: 'Sales Config',
+          href: '#rewards-config/sales',
+          isActive: currentConfig === 'sales',
+        },
+        {
+          label: 'Web Config',
+          href: '#rewards-config/web',
+          isActive: currentConfig === 'web',
+        },
+      ]
+    }
+
     return navItem
   })
 
@@ -106,6 +129,10 @@ const FullPreviewPage: React.FC = () => {
         crumbs.push({ label: 'Business' })
       } else if (activeSection === 'lawyers' && activeSubRoute === 'individuals') {
         crumbs.push({ label: 'Individuals' })
+      } else if (activeSection === 'rewards-config' && activeSubRoute === 'sales') {
+        crumbs.push({ label: 'Sales Config' })
+      } else if (activeSection === 'rewards-config' && activeSubRoute === 'web') {
+        crumbs.push({ label: 'Web Config' })
       }
     } else {
       // Just the section name

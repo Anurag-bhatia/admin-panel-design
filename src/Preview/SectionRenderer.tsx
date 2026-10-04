@@ -66,7 +66,7 @@ const SectionRenderer: React.FC<SectionRendererProps> = ({ sectionId, subRoute }
           </div>
         }
       >
-        {sectionId === 'lawyers' ? (
+        {sectionId === 'lawyers' || sectionId === 'rewards-config' ? (
           <ComponentAny subRoute={subRoute} />
         ) : (
           <Component />

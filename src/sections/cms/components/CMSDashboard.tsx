@@ -274,7 +274,8 @@ export function CMSDashboard({
               onCreate={() => setView('add-coupon')}
               onView={(id) => {
                 setEditingCouponId(id)
-                setView('view-coupon')
+                const coupon = coupons.find((c) => c.id === id)
+                setView(coupon?.status === 'draft' ? 'edit-coupon' : 'view-coupon')
               }}
               onEdit={(id) => {
                 setEditingCouponId(id)

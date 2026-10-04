@@ -22,15 +22,14 @@ const LAWYER_STEPS = [
 const BUSINESS_STEPS = ['Company Details']
 
 const CATEGORIES = [
-  'Criminal Law',
-  'Consumer Protection Law',
-  'Intellectual Property',
-  'Employment and Labour Laws',
-  'Taxation',
-  'ADR',
-  'Family Law',
-  'Insolvency and Bankruptcy Law',
-  'Other',
+  'Traffic Challans',
+  'Accident Response',
+  'Court Appearances',
+  'RC & Registration',
+  'Ownership Transfer',
+  'License Services',
+  'Fitness & Permits',
+  'General Legal Advisory',
 ]
 
 const emptyAddress: Address = {
@@ -223,29 +222,18 @@ export function LawyerForm({ lawyer, onBack, onSave, isEdit, isBusiness = false 
         {/* Step 1: Basic Information */}
         {!isBusiness && currentStep === 0 && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField label="Category" required>
-                <select
-                  value={formData.category}
-                  onChange={(e) => updateField('category', e.target.value)}
-                  className="form-select"
-                >
-                  <option value="">Select category</option>
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </FormField>
-              <FormField label="Sub-Category">
-                <input
-                  type="text"
-                  value={formData.subCategory}
-                  onChange={(e) => updateField('subCategory', e.target.value)}
-                  placeholder="e.g., Traffic Violations"
-                  className="form-input"
-                />
-              </FormField>
-            </div>
+            <FormField label="Expertise" required>
+              <select
+                value={formData.category}
+                onChange={(e) => updateField('category', e.target.value)}
+                className="form-select"
+              >
+                <option value="">Select expertise</option>
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </FormField>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField label="First Name" required>

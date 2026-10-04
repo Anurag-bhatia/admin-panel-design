@@ -85,6 +85,7 @@ const CASE_CATEGORY_LABELS: Record<string, string> = {
 const QUEUE_OPTIONS: { key: IncidentQueue; label: string }[] = [
   { key: 'newIncidents', label: 'New Incidents' },
   { key: 'inProgress', label: 'In Progress' },
+  { key: 'underReview', label: 'To Be Settled' },
   { key: 'settled', label: 'Settled' },
   { key: 'notSettled', label: 'Not Settled' },
   { key: 'hold', label: 'Hold' },
@@ -226,7 +227,7 @@ export function IncidentRow({
       onClick={onView}
     >
       {/* Checkbox */}
-      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+      <td className="px-4 py-5" onClick={(e) => e.stopPropagation()}>
         <input
           type="checkbox"
           checked={isSelected}
@@ -236,7 +237,7 @@ export function IncidentRow({
       </td>
 
       {/* Incident ID */}
-      <td className="px-4 py-3">
+      <td className="px-4 py-5">
         <div>
           {incident.isExpress && (
             <span className="inline-flex items-center px-1 py-px rounded text-[9px] font-semibold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 mb-1">
@@ -265,7 +266,7 @@ export function IncidentRow({
       </td>
 
       {/* Subscriber & Vehicle */}
-      <td className="px-4 py-3">
+      <td className="px-4 py-5">
         <div>
           <p className="text-sm font-medium text-slate-900 dark:text-white">
             {incident.subscriberName}
@@ -281,7 +282,7 @@ export function IncidentRow({
 
       {/* Challan No / Amount - challans only */}
       {!isCases && (
-        <td className="px-4 py-3">
+        <td className="px-4 py-5">
           <p className="font-mono text-sm font-medium text-slate-900 dark:text-white">
             {incident.challanNumber}
           </p>
@@ -292,7 +293,7 @@ export function IncidentRow({
       )}
 
       {/* Type (Case Type badges for cases; Challan Type only for challans) */}
-      <td className="px-4 py-3">
+      <td className="px-4 py-5">
         <div className="flex flex-wrap items-center gap-1">
           {isCases ? (
             <>
@@ -328,7 +329,7 @@ export function IncidentRow({
       </td>
 
       {/* Created */}
-      <td className="px-4 py-3">
+      <td className="px-4 py-5">
         <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
           {formatDate(incident.createdAt)}
         </p>
@@ -338,7 +339,7 @@ export function IncidentRow({
       </td>
 
       {/* Last Updated */}
-      <td className="px-4 py-3">
+      <td className="px-4 py-5">
         <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
           {formatDate(incident.lastUpdatedAt)}
         </p>
@@ -347,53 +348,40 @@ export function IncidentRow({
         </p>
       </td>
 
-      {/* Status */}
-      <td className="px-4 py-3">
+      {/* Settlement */}
+      <td className="px-4 py-5">
         {(() => {
-          if (incident.queue === 'newIncidents') {
-            return (
-              <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-            )
-          }
-          if (
-            isCases &&
-            (incident.queue === 'settled' ||
-              incident.queue === 'notSettled' ||
-              incident.queue === 'refundRequested' ||
-              incident.queue === 'refundCompleted')
-          ) {
-            return (
-              <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                ₹{incident.amount.toLocaleString('en-IN')}
-              </span>
-            )
-          }
-          const rawStatuses =
-            incident.statuses && incident.statuses.length > 0
-              ? incident.statuses
-              : incident.step
-                ? [incident.step]
-                : []
-          const filtered = rawStatuses.filter(
-            (s) => s === 'screening' || s === 'screenDone' || s === 'failed'
-          )
-          const statuses: typeof filtered =
-            filtered.length > 0 ? filtered : ['screening']
-          if (statuses.length === 0) {
-            return (
-              <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
-            )
-          }
+          const challanAmount = incident.amount
+          const governmentFee = Math.round(challanAmount * 0.1)
+          const professionalFees = 500
+          const miscFees = 150
+          const fmt = (v: number) => `₹${v.toLocaleString('en-IN')}`
           return (
-            <div className="flex flex-wrap items-center gap-1">
-              {statuses.map((s) => (
-                <span
-                  key={s}
-                  className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STEP_META[s].className}`}
-                >
-                  {STEP_META[s].label}
+            <div className="text-xs text-slate-600 dark:text-slate-400 space-y-0.5 whitespace-nowrap">
+              <div className="flex justify-between gap-3">
+                <span>Challan</span>
+                <span className="font-medium text-slate-900 dark:text-white tabular-nums">
+                  {fmt(challanAmount)}
                 </span>
-              ))}
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Govt</span>
+                <span className="font-medium text-slate-900 dark:text-white tabular-nums">
+                  {fmt(governmentFee)}
+                </span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Prof</span>
+                <span className="font-medium text-slate-900 dark:text-white tabular-nums">
+                  {fmt(professionalFees)}
+                </span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Misc</span>
+                <span className="font-medium text-slate-900 dark:text-white tabular-nums">
+                  {fmt(miscFees)}
+                </span>
+              </div>
             </div>
           )
         })()}
@@ -401,7 +389,7 @@ export function IncidentRow({
 
       {/* Assigned Agent - hidden for cases */}
       {!isCases && (
-        <td className="px-4 py-3">
+        <td className="px-4 py-5">
           {incident.queue === 'newIncidents' ? (
             <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
           ) : assignedAgent ? (
@@ -421,7 +409,7 @@ export function IncidentRow({
 
       {/* Assigned Lawyer - cases only */}
       {isCases && (
-        <td className="px-4 py-3">
+        <td className="px-4 py-5">
           {incident.queue === 'newIncidents' ? (
             <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
           ) : assignedLawyer ? (
@@ -435,7 +423,7 @@ export function IncidentRow({
       )}
 
       {/* Actions Menu */}
-      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+      <td className="px-4 py-5" onClick={(e) => e.stopPropagation()}>
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}

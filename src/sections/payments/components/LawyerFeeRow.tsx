@@ -87,27 +87,15 @@ export function LawyerFeeRow({
 
       {/* Lawyer Name */}
       <td className="px-4 py-3">
-        <div className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-xs font-semibold text-cyan-700 dark:text-cyan-400">
-            {fee.lawyerName.replace('Adv. ', '').charAt(0)}
-          </div>
-          <span className="text-sm font-medium text-slate-900 dark:text-white">
-            {fee.lawyerName}
-          </span>
-        </div>
+        <span className="text-sm font-medium text-slate-900 dark:text-white">
+          {fee.lawyerName}
+        </span>
       </td>
 
       {/* Total Amount */}
       <td className="px-4 py-3">
         <span className="text-sm font-semibold text-slate-900 dark:text-white">
           {formatCurrency(fee.totalAmount)}
-        </span>
-      </td>
-
-      {/* Commission Amount */}
-      <td className="px-4 py-3">
-        <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-          {formatCurrency(fee.commissionAmount)}
         </span>
       </td>
 

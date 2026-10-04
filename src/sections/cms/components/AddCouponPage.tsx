@@ -83,18 +83,20 @@ const SUGGEST_STOPWORDS = new Set([
 ])
 
 function suggestCouponCodes(description: string, existing: string[]): string[] {
+  const MIN = 8
+  const MAX = 12
   const cleaned = description
     .toUpperCase()
     .replace(/[^A-Z0-9\s]/g, ' ')
     .split(/\s+/)
-    .filter((w) => w.length >= 3 && w.length <= 12 && !SUGGEST_STOPWORDS.has(w))
+    .filter((w) => w.length >= 3 && w.length <= 10 && !SUGGEST_STOPWORDS.has(w))
 
   const seeds = cleaned.length > 0
     ? Array.from(new Set(cleaned)).slice(0, 3)
     : ['SAVE', 'DEAL', 'HELLO']
 
-  const suffixes = ['10', '20', '50']
-  const prefixes = ['GET', 'TRY', 'HELLO']
+  const suffixes = ['100', '250', '500']
+  const prefixes = ['GET', 'TRY', 'YAY']
 
   const raw: string[] = []
   seeds.forEach((seed, i) => {
@@ -105,15 +107,25 @@ function suggestCouponCodes(description: string, existing: string[]): string[] {
     raw.push(prefixes[raw.length % prefixes.length] + seed)
   }
 
+  const padTo = (code: string): string => {
+    let out = code
+    let n = 10
+    while (out.length < MIN) {
+      out = out + String(n)
+      n += 3
+    }
+    return out.slice(0, MAX)
+  }
+
   const existingSet = new Set(existing.map((c) => c.toUpperCase()))
   const out: string[] = []
   raw.forEach((candidate) => {
-    let code = candidate.replace(/[^A-Z0-9]/g, '').slice(0, 32)
-    if (code.length < 3) code = (code + 'SAVE').slice(0, 8)
+    const code = padTo(candidate.replace(/[^A-Z0-9]/g, ''))
     let final = code
     let n = 1
     while (existingSet.has(final) || out.includes(final)) {
-      final = (code + String(n)).slice(0, 32)
+      const suffix = String(n)
+      final = (code.slice(0, MAX - suffix.length) + suffix)
       n++
     }
     out.push(final)
@@ -200,8 +212,8 @@ export function AddCouponPage({
     if (!code) next.code = 'Code is required.'
     else if (!/^[A-Z0-9]+$/.test(code))
       next.code = 'Only letters and numbers allowed.'
-    else if (code.length < 3 || code.length > 32)
-      next.code = 'Must be between 3 and 32 characters.'
+    else if (code.length < 8 || code.length > 12)
+      next.code = 'Must be between 8 and 12 characters.'
     else if (
       existingCodes.some(
         (c) => c.toUpperCase() === code && (!isEdit || c !== initialCoupon!.code)
@@ -374,7 +386,7 @@ export function AddCouponPage({
                 onChange={(e) => update('code', e.target.value.toUpperCase())}
                 placeholder="WELCOME100"
                 className={inputCls(isLocked)}
-                maxLength={32}
+                maxLength={12}
               />
               {codeSuggestions.length > 0 && (
                 <div className="flex flex-wrap items-center gap-1.5 mt-2">
@@ -395,7 +407,7 @@ export function AddCouponPage({
                 </div>
               )}
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                3–32 characters, letters and numbers only. Auto-uppercased.
+                8–12 characters, letters and numbers only. Auto-uppercased.
               </p>
             </Field>
           </Section>
@@ -408,33 +420,25 @@ export function AddCouponPage({
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Type" required>
-                <select
+                <SingleSelectDropdown
                   disabled={isLocked}
                   value={form.type}
-                  onChange={(e) => update('type', e.target.value as CouponType)}
-                  className={inputCls(isLocked)}
-                >
-                  <option value="flat">Flat amount (₹)</option>
-                  <option value="percentage">Percentage (%)</option>
-                </select>
+                  onChange={(v) => update('type', v as CouponType)}
+                  options={[
+                    { value: 'flat', label: 'Flat amount (₹)' },
+                    { value: 'percentage', label: 'Percentage (%)' },
+                  ]}
+                />
               </Field>
               <Field label="Applicable on" required>
-                <select
+                <SingleSelectDropdown
                   disabled={isLocked}
                   value={form.applicableOn}
-                  onChange={(e) =>
-                    update('applicableOn', e.target.value as CouponApplicableOn)
-                  }
-                  className={inputCls(isLocked)}
-                >
-                  {(['challanAmount', 'convenienceFee', 'both'] as CouponApplicableOn[]).map(
-                    (a) => (
-                      <option key={a} value={a}>
-                        {APPLICABLE_ON_LABELS[a]}
-                      </option>
-                    )
+                  onChange={(v) => update('applicableOn', v as CouponApplicableOn)}
+                  options={(['challanAmount', 'convenienceFee', 'both'] as CouponApplicableOn[]).map(
+                    (a) => ({ value: a, label: APPLICABLE_ON_LABELS[a] })
                   )}
-                </select>
+                />
               </Field>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

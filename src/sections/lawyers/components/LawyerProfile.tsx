@@ -23,10 +23,11 @@ import {
   Eye,
   Upload,
   Users,
+  Sparkles,
 } from 'lucide-react'
 import type { Lawyer } from '@/../product/sections/lawyers/types'
 
-type TabType = 'details' | 'documents' | 'incidents' | 'invoicing' | 'transactions' | 'team'
+type TabType = 'details' | 'workingArea' | 'documents' | 'incidents' | 'invoicing' | 'transactions' | 'team'
 
 interface LawyerIncident {
   id: string
@@ -39,6 +40,12 @@ interface LawyerIncident {
   assignedDate: string
   resolutionDate: string | null
   assignedTo?: string
+  subscriberName?: string
+  subscriberId?: string
+  challanType?: 'court' | 'online'
+  createdAt?: string
+  updatedAt?: string
+  isExpress?: boolean
 }
 
 interface PendingInvoice {
@@ -78,6 +85,7 @@ interface LawyerProfileProps {
   lawyer: Lawyer
   incidents?: LawyerIncident[]
   pendingInvoices?: PendingInvoice[]
+  transactionsLedger?: PendingInvoice[]
   transactions?: LawyerTransaction[]
   team?: TeamMember[]
   initialTab?: TabType
@@ -96,6 +104,7 @@ export function LawyerProfile({
   lawyer,
   incidents = [],
   pendingInvoices = [],
+  transactionsLedger = [],
   transactions = [],
   team = [],
   initialTab = 'details',
@@ -111,8 +120,8 @@ export function LawyerProfile({
 }: LawyerProfileProps) {
   const isBusiness = lawyer.company !== null
   const availableTabs: TabType[] = isBusiness
-    ? ['details', 'incidents', 'invoicing', 'transactions', 'team']
-    : ['details', 'documents', 'incidents', 'invoicing', 'transactions']
+    ? ['details', 'workingArea', 'incidents', 'invoicing', 'transactions', 'team']
+    : ['details', 'workingArea', 'documents', 'incidents', 'invoicing', 'transactions']
 
   const displayedIncidents: LawyerIncident[] =
     isBusiness && team.length > 0
@@ -124,6 +133,14 @@ export function LawyerProfile({
   const [activeTab, setActiveTab] = useState<TabType>(
     availableTabs.includes(initialTab) ? initialTab : 'details'
   )
+  const [incidentsSubTab, setIncidentsSubTab] = useState<'assigned' | 'settled'>('settled')
+  const assignedIncidents = displayedIncidents.filter(
+    (i) => i.status === 'Assigned' || i.status === 'In Progress'
+  )
+  const settledIncidents = displayedIncidents.filter(
+    (i) => i.status === 'Resolved' || i.status === 'Closed'
+  )
+  const visibleIncidents = incidentsSubTab === 'assigned' ? assignedIncidents : settledIncidents
   const isActive = lawyer.activityState === 'Active'
   const fullName = `${lawyer.firstName} ${lawyer.lastName}`
 
@@ -152,6 +169,13 @@ export function LawyerProfile({
     })
   }
 
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
   const formatCurrency = (amount: number) => {
     return `₹${amount.toLocaleString('en-IN')}`
   }
@@ -159,6 +183,7 @@ export function LawyerProfile({
   const getTabIcon = (tab: TabType) => {
     const icons = {
       details: <Briefcase className="w-4 h-4" />,
+      workingArea: <MapPin className="w-4 h-4" />,
       documents: <FileText className="w-4 h-4" />,
       incidents: <AlertTriangle className="w-4 h-4" />,
       invoicing: <Receipt className="w-4 h-4" />,
@@ -168,9 +193,13 @@ export function LawyerProfile({
     return icons[tab]
   }
 
-  const [showDocumentUpload, setShowDocumentUpload] = useState(false)
+  const getTabLabel = (tab: TabType): string => {
+    if (tab === 'details' && isBusiness) return 'Business Details'
+    if (tab === 'workingArea') return 'Working Area'
+    return tab.charAt(0).toUpperCase() + tab.slice(1)
+  }
 
-  const totalPendingAmount = pendingInvoices.reduce((sum, inv) => sum + inv.commissionAmount, 0)
+  const [showDocumentUpload, setShowDocumentUpload] = useState(false)
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 lg:p-8">
@@ -288,9 +317,7 @@ export function LawyerProfile({
                     }`}
                   >
                     {getTabIcon(tab)}
-                    {tab === 'details' && isBusiness
-                      ? 'Business Details'
-                      : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    {getTabLabel(tab)}
                   </button>
                 ))}
               </div>
@@ -306,7 +333,6 @@ export function LawyerProfile({
                   {/* Basic Information */}
                   <Section title="Basic Information" icon={<Briefcase className="w-4 h-4" />}>
                     <InfoRow label="Category" value={lawyer.category} />
-                    <InfoRow label="Sub-Category" value={lawyer.subCategory} />
                     <InfoRow label="Gender" value={lawyer.gender} />
                     <InfoRow label="Date of Birth" value={formatDate(lawyer.dateOfBirth)} />
                     <InfoRow label="Source" value={lawyer.source} />
@@ -353,6 +379,26 @@ export function LawyerProfile({
                       </div>
                     ))}
                   </Section>
+
+                  {/* Expertise */}
+                  <Section title="Expertise" icon={<Sparkles className="w-4 h-4" />} fullWidth>
+                    {lawyer.expertise.caseTypes.length === 0 ? (
+                      <p className="py-3 text-sm text-slate-500 dark:text-slate-400">
+                        No expertise added yet.
+                      </p>
+                    ) : (
+                      <div className="py-3 flex flex-wrap gap-2">
+                        {lawyer.expertise.caseTypes.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border border-cyan-100 dark:border-cyan-900/40"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </Section>
                 </>
               )}
 
@@ -373,6 +419,28 @@ export function LawyerProfile({
                 </Section>
               )}
 
+              {/* Expertise (Business) */}
+              {isBusiness && (
+                <Section title="Expertise" icon={<Sparkles className="w-4 h-4" />} fullWidth>
+                  {lawyer.expertise.caseTypes.length === 0 ? (
+                    <p className="py-3 text-sm text-slate-500 dark:text-slate-400">
+                      No expertise added yet.
+                    </p>
+                  ) : (
+                    <div className="py-3 flex flex-wrap gap-2">
+                      {lawyer.expertise.caseTypes.map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border border-cyan-100 dark:border-cyan-900/40"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </Section>
+              )}
+
               {!isBusiness && (
                 /* Current Address */
                 <Section title="Current Address" icon={<MapPin className="w-4 h-4" />}>
@@ -389,6 +457,30 @@ export function LawyerProfile({
                     </p>
                   </div>
                 </Section>
+              )}
+            </div>
+          )}
+
+          {/* Working Area Tab */}
+          {activeTab === 'workingArea' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Working Area</h2>
+              {lawyer.expertise.preferredLocations.length === 0 ? (
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  No working areas added yet.
+                </p>
+              ) : (
+                <ul className="divide-y divide-slate-200 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+                  {lawyer.expertise.preferredLocations.map((area) => (
+                    <li
+                      key={area}
+                      className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900"
+                    >
+                      <MapPin className="w-4 h-4 text-slate-400 dark:text-slate-500 flex-shrink-0" />
+                      <span className="text-sm text-slate-900 dark:text-slate-50">{area}</span>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
           )}
@@ -462,65 +554,178 @@ export function LawyerProfile({
           {activeTab === 'incidents' && (
             <div>
               <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">
-                Assigned Incidents ({displayedIncidents.length})
+                Incidents
               </h2>
-              {displayedIncidents.length === 0 ? (
+              <div className="flex items-center gap-1 mb-4 border-b border-slate-200 dark:border-slate-800">
+                <button
+                  onClick={() => setIncidentsSubTab('settled')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                    incidentsSubTab === 'settled'
+                      ? 'border-cyan-600 text-cyan-600 dark:border-cyan-400 dark:text-cyan-400'
+                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  Settled ({settledIncidents.length})
+                </button>
+                <button
+                  onClick={() => setIncidentsSubTab('assigned')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                    incidentsSubTab === 'assigned'
+                      ? 'border-cyan-600 text-cyan-600 dark:border-cyan-400 dark:text-cyan-400'
+                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  Assigned ({assignedIncidents.length})
+                </button>
+              </div>
+              {visibleIncidents.length === 0 ? (
                 <div className="text-center py-12">
                   <AlertTriangle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                   <p className="text-slate-500 dark:text-slate-400">
-                    {isBusiness
-                      ? 'No incidents assigned to this business yet'
-                      : 'No incidents assigned to this lawyer yet'}
+                    {incidentsSubTab === 'assigned'
+                      ? isBusiness
+                        ? 'No incidents assigned to this business yet'
+                        : 'No incidents assigned to this lawyer yet'
+                      : 'No settled incidents yet'}
                   </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead>
+                    <thead className="bg-slate-50 dark:bg-slate-800/40">
                       <tr className="border-b border-slate-200 dark:border-slate-800">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident ID</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Challan No</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Vehicle No</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Violation Type</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Amount</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                        {isBusiness && (
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Team Member</th>
-                        )}
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Assigned Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Resolution Date</th>
+                        <th className="px-4 py-3 text-left">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 dark:bg-slate-800"
+                          />
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Incident ID</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Subscriber / Vehicle</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                          {incidentsSubTab === 'settled' ? 'Total Amount' : 'Challan No / Amount'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Challan</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Created</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Updated</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {displayedIncidents.map((incident) => (
-                        <tr key={incident.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{incident.incidentId}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{incident.challanNo}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{incident.vehicleNo}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{incident.violationType}</td>
-                          <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{formatCurrency(incident.amount)}</td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
-                              incident.status === 'Resolved' || incident.status === 'Closed'
-                                ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                                : incident.status === 'In Progress'
-                                ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
-                                : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                            }`}>
-                              {incident.status}
-                            </span>
-                          </td>
-                          {isBusiness && (
-                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
-                              {incident.assignedTo ?? '-'}
+                    <tbody>
+                      {visibleIncidents.map((incident) => {
+                        const createdAt = incident.createdAt ?? incident.assignedDate
+                        const updatedAt = incident.updatedAt ?? incident.resolutionDate ?? incident.assignedDate
+                        const slaDays = incident.isExpress ? 10 : 42
+                        const created = new Date(createdAt).getTime()
+                        const deadline = created + slaDays * 24 * 60 * 60 * 1000
+                        const daysLeft = Math.ceil((deadline - Date.now()) / (24 * 60 * 60 * 1000))
+                        const challanType = incident.challanType ?? 'court'
+                        return (
+                          <tr
+                            key={incident.id}
+                            className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                          >
+                            <td className="px-4 py-3">
+                              <input
+                                type="checkbox"
+                                className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 dark:bg-slate-800"
+                              />
                             </td>
-                          )}
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(incident.assignedDate)}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
-                            {incident.resolutionDate ? formatDate(incident.resolutionDate) : '-'}
-                          </td>
-                        </tr>
-                      ))}
+                            <td className="px-4 py-3">
+                              <div>
+                                {incident.isExpress && (
+                                  <span className="inline-flex items-center px-1 py-px rounded text-[9px] font-semibold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 mb-1">
+                                    Express
+                                  </span>
+                                )}
+                                <span className="block font-mono text-sm font-medium text-slate-900 dark:text-white">
+                                  {incident.incidentId}
+                                </span>
+                                {daysLeft <= 0 ? (
+                                  <p className="text-xs font-medium text-cyan-600 dark:text-cyan-400">
+                                    Overdue by {Math.abs(daysLeft)} {Math.abs(daysLeft) === 1 ? 'day' : 'days'}
+                                  </p>
+                                ) : (
+                                  <p className="text-xs text-cyan-600 dark:text-cyan-400">
+                                    {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
+                                  </p>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div>
+                                <p className="text-sm font-medium text-slate-900 dark:text-white">
+                                  {incident.subscriberName ?? '—'}
+                                </p>
+                                {incident.subscriberId && (
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    {incident.subscriberId}
+                                  </p>
+                                )}
+                                <span className="mt-1 inline-flex items-center px-2 py-0.5 rounded font-mono text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                  {incident.vehicleNo}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              {incidentsSubTab === 'settled' ? (
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                                  {formatCurrency(incident.amount)}
+                                </p>
+                              ) : (
+                                <>
+                                  <p className="font-mono text-sm font-medium text-slate-900 dark:text-white">
+                                    {incident.challanNo}
+                                  </p>
+                                  <p className="mt-2 text-xs font-medium text-slate-900 dark:text-white">
+                                    {formatCurrency(incident.amount)}
+                                  </p>
+                                </>
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                  challanType === 'court'
+                                    ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400'
+                                    : 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
+                                }`}
+                              >
+                                {challanType === 'court' ? 'Court' : 'Online'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                {formatDate(createdAt)}
+                              </p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                {formatTime(createdAt)}
+                              </p>
+                            </td>
+                            <td className="px-4 py-3">
+                              <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                {formatDate(updatedAt)}
+                              </p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                {formatTime(updatedAt)}
+                              </p>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                  incident.status === 'Resolved' || incident.status === 'Closed'
+                                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                                    : incident.status === 'In Progress'
+                                    ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400'
+                                    : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                                }`}
+                              >
+                                {incident.status}
+                              </span>
+                            </td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -531,64 +736,45 @@ export function LawyerProfile({
           {/* Invoicing Tab */}
           {activeTab === 'invoicing' && (
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                  Pending to Invoice ({pendingInvoices.length})
+              {/* Transactions Ledger */}
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">
+                  Transactions Ledger ({transactionsLedger.length})
                 </h2>
-                <button
-                  onClick={onRaiseInvoice}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  Raise Invoice
-                </button>
-              </div>
-
-              {/* Summary Card */}
-              <div className="mb-6 p-4 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/30 rounded-lg border border-amber-200 dark:border-amber-800">
-                <p className="text-xs text-amber-700 dark:text-amber-400 font-medium mb-1">Total Pending Amount</p>
-                <p className="text-2xl font-semibold text-amber-900 dark:text-amber-50">{formatCurrency(totalPendingAmount)}</p>
-              </div>
-
-              {pendingInvoices.length === 0 ? (
-                <div className="text-center py-12">
-                  <Receipt className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-500 dark:text-slate-400">No payments pending to invoice</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Incident ID</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Resolution Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Fees</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {pendingInvoices.map((invoice) => (
-                        <tr key={invoice.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{invoice.incidentId}</td>
-                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(invoice.resolutionDate)}</td>
-                          <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{formatCurrency(invoice.commissionAmount)}</td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${
-                              invoice.status === 'Settled'
-                                ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                                : invoice.status === 'Refund'
-                                ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                                : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                            }`}>
-                              {invoice.status}
-                            </span>
-                          </td>
+                {transactionsLedger.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Receipt className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-500 dark:text-slate-400">No ledger entries yet</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Transaction ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Date</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Amount</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                        {transactionsLedger.map((entry) => (
+                          <tr key={entry.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{entry.incidentId}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{formatDate(entry.resolutionDate)}</td>
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50">{formatCurrency(entry.commissionAmount)}</td>
+                            <td className="px-4 py-3">
+                              <span className="inline-block px-2.5 py-1 rounded text-xs font-medium bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+                                Paid
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

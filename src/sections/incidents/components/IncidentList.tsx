@@ -156,6 +156,7 @@ export function IncidentList({
     return {
       newIncidents: myIncidents.filter((inc) => inc.queue === 'newIncidents').length,
       inProgress: myIncidents.filter((inc) => inc.queue === 'inProgress').length,
+      underReview: myIncidents.filter((inc) => inc.queue === 'underReview').length,
       settled: myIncidents.filter((inc) => inc.queue === 'settled').length,
       notSettled: myIncidents.filter((inc) => inc.queue === 'notSettled').length,
       hold: myIncidents.filter((inc) => inc.queue === 'hold').length,
@@ -263,15 +264,7 @@ export function IncidentList({
                   Updated
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {isCases
-                    ? activeQueue === 'settled' || activeQueue === 'notSettled'
-                      ? 'Total Amount'
-                      : activeQueue === 'refundRequested'
-                        ? 'Requested Amount'
-                        : activeQueue === 'refundCompleted'
-                          ? 'Refunded Amount'
-                          : 'Status'
-                    : 'Status'}
+                  Settlement
                 </th>
                 {!isCases && (
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
