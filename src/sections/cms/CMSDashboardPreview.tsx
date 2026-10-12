@@ -1,9 +1,14 @@
 import data from '@/../product/sections/cms/data.json'
 import { CMSDashboard } from './components/CMSDashboard'
 
-export default function CMSDashboardPreview() {
+interface CMSDashboardPreviewProps {
+  subRoute?: string
+}
+
+export default function CMSDashboardPreview({ subRoute }: CMSDashboardPreviewProps) {
   return (
     <CMSDashboard
+      subRoute={subRoute}
       blogs={data.blogs as any}
       eventsNews={data.eventsNews as any}
       banners={data.banners as any}

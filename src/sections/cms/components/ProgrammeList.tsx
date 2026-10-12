@@ -15,6 +15,7 @@ import {
   Calendar,
 } from 'lucide-react'
 import type {
+  CustomerCredit,
   Programme,
   ProgrammeStatus,
   ProgrammeType,
@@ -24,6 +25,7 @@ import { defaultWalletPermissions } from '@/../product/sections/cms/types'
 
 interface ProgrammeListProps {
   programmes: Programme[]
+  customerCredits?: CustomerCredit[]
   permissions?: WalletPermissions
   onCreate?: () => void
   onEdit?: (id: string) => void
@@ -59,12 +61,11 @@ const statusBadgeClass: Record<ProgrammeStatus, string> = {
 const typeLabels: Record<ProgrammeType, string> = {
   firstTimeCheck: 'First-time check',
   postPaymentReward: 'Post-payment reward',
-  influencer: 'Influencer',
-  corporate: 'Corporate',
+  corporate: 'Corporate benefit',
   specificCustomers: 'Specific customers',
 }
 
-type SortKey = 'created' | 'expiry' | 'budgetUsed'
+type SortKey = 'created' | 'expiry' | 'budgetUsed' | 'customersCredited'
 
 const perPage = 25
 
@@ -98,6 +99,7 @@ function budgetPercent(p: Programme): number {
 
 export function ProgrammeList({
   programmes,
+  customerCredits = [],
   permissions = defaultWalletPermissions,
   onCreate,
   onEdit,
@@ -109,6 +111,24 @@ export function ProgrammeList({
   onClone,
   onSearch,
 }: ProgrammeListProps) {
+  const customersCreditedByProgramme = useMemo(() => {
+    const map = new Map<string, Set<string>>()
+    customerCredits.forEach((c) => {
+      c.lots.forEach((lot) => {
+        if (!lot.programmeId) return
+        if (!map.has(lot.programmeId)) map.set(lot.programmeId, new Set())
+        map.get(lot.programmeId)!.add(c.mobileNumber)
+      })
+    })
+    return map
+  }, [customerCredits])
+
+  const customersCreditedFor = (p: Programme): number => {
+    const direct = customersCreditedByProgramme.get(p.id)?.size
+    if (direct && direct > 0) return direct
+    if (p.coinsPerCustomer > 0) return Math.floor(p.coinsIssued / p.coinsPerCustomer)
+    return 0
+  }
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<ProgrammeStatus | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<ProgrammeType | 'all'>('all')
@@ -164,9 +184,11 @@ export function ProgrammeList({
         if (sortKey === 'budgetUsed') return dir * (budgetPercent(a) - budgetPercent(b))
         if (sortKey === 'expiry')
           return dir * (new Date(a.endAt).getTime() - new Date(b.endAt).getTime())
+        if (sortKey === 'customersCredited')
+          return dir * (customersCreditedFor(a) - customersCreditedFor(b))
         return dir * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
       })
-  }, [programmes, searchQuery, statusFilter, typeFilter, startDateFilter, endDateFilter, sortKey, sortDir, now])
+  }, [programmes, searchQuery, statusFilter, typeFilter, startDateFilter, endDateFilter, sortKey, sortDir, now, customersCreditedByProgramme])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
   const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage)
@@ -188,7 +210,7 @@ export function ProgrammeList({
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Wallet Programmes</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Credit Programmes</h1>
         {permissions.createProgramme && (
           <button
             onClick={onCreate}
@@ -277,8 +299,7 @@ export function ProgrammeList({
                 { value: 'all', label: 'All types' },
                 { value: 'firstTimeCheck', label: 'First-time check' },
                 { value: 'postPaymentReward', label: 'Post-payment reward' },
-                { value: 'influencer', label: 'Influencer' },
-                { value: 'corporate', label: 'Corporate' },
+                { value: 'corporate', label: 'Corporate benefit' },
                 { value: 'specificCustomers', label: 'Specific customers' },
               ]}
             />
@@ -334,7 +355,7 @@ export function ProgrammeList({
                   Budget Used
                 </th>
                 <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
-                  Created
+                  Customers Credited
                 </th>
                 <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3 w-20">
                   Actions
@@ -390,12 +411,8 @@ export function ProgrammeList({
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">
-                      <div className="flex flex-col">
-                        <span>{formatDate(p.startAt)}</span>
-                        <span className="text-xs text-slate-400">
-                          → {formatDate(p.endAt)}
-                        </span>
-                      </div>
+                      {formatDate(p.startAt)} <span className="text-slate-400">→</span>{' '}
+                      {formatDate(p.endAt)}
                     </td>
                     <td className="px-4 py-3.5 min-w-[180px]">
                       <BudgetBar
@@ -405,13 +422,8 @@ export function ProgrammeList({
                         alertLevel={p.alertLevelPercent}
                       />
                     </td>
-                    <td className="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">
-                      <div className="flex flex-col">
-                        <span>{p.createdBy}</span>
-                        <span className="text-xs text-slate-400">
-                          {formatDate(p.createdAt)}
-                        </span>
-                      </div>
+                    <td className="px-4 py-3.5 text-sm text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                      {formatCoins(customersCreditedFor(p))}
                     </td>
                     <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
                       <div className="relative" ref={openMenuId === p.id ? menuRef : null}>
@@ -621,6 +633,7 @@ function SortDropdown({
     { key: 'created', dir: 'desc', label: 'Newest' },
     { key: 'expiry', dir: 'asc', label: 'Expiring soon' },
     { key: 'budgetUsed', dir: 'desc', label: 'Highest budget used' },
+    { key: 'customersCredited', dir: 'desc', label: 'Most customers credited' },
   ]
 
   const current =

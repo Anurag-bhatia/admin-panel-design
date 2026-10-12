@@ -58,6 +58,36 @@ export type CouponProduct = 'all' | 'challan' | 'subscription'
 export type CouponApplicableOn = 'challanAmount' | 'convenienceFee' | 'both'
 export type CouponChallanType = 'online' | 'regularCourt' | 'xpressCourt'
 
+export type CouponConversionAudience = 'assigned' | 'anyVerified' | 'publicWithOtp'
+export type CouponConversionMethod = 'sameAsValue' | 'fixedAmount' | 'percentOfBenefit'
+export type CouponConversionAppliesTo = 'challan' | 'convenience' | 'both' | 'sameAsCoupon'
+export type CouponConversionCombination = 'couponFirst' | 'creditFirst'
+
+export interface CouponConversionSettings {
+  allowConversion: boolean
+  whoCanConvert: CouponConversionAudience
+  method: CouponConversionMethod
+  creditValue?: number
+  windowStart?: string
+  windowEnd?: string
+  creditExpiryDays?: number
+  creditExpiryDate?: string
+  appliesTo: CouponConversionAppliesTo
+  perCustomerLimit: number
+  combination: CouponConversionCombination
+  customerDisclosure?: string
+}
+
+export const defaultCouponConversionSettings: CouponConversionSettings = {
+  allowConversion: false,
+  whoCanConvert: 'assigned',
+  method: 'sameAsValue',
+  creditExpiryDays: 30,
+  appliesTo: 'sameAsCoupon',
+  perCustomerLimit: 1,
+  combination: 'couponFirst',
+}
+
 export interface Coupon {
   id: string
   code: string
@@ -80,6 +110,7 @@ export interface Coupon {
   status: CouponStatus
   usageCount: number
   advancedRules?: AdvancedRules
+  conversion?: CouponConversionSettings
   createdBy: string
   createdAt: string
   updatedAt: string
@@ -134,7 +165,6 @@ export type ProgrammeStatus =
 export type ProgrammeType =
   | 'firstTimeCheck'
   | 'postPaymentReward'
-  | 'influencer'
   | 'corporate'
   | 'specificCustomers'
 
@@ -167,7 +197,6 @@ export interface Programme {
   internalDescription?: string
   audience: ProgrammeAudience
   minimumCashPaid?: number
-  campaignCode?: string
   mobileNumbers?: string[]
   limitPerCustomer: number
   coinsPerCustomer: number
@@ -230,7 +259,6 @@ export interface AuditLogEntry {
 export type CreditLotSource =
   | 'firstTimeCheck'
   | 'postPaymentReward'
-  | 'influencer'
   | 'corporate'
   | 'specificCustomers'
   | 'couponConversion'

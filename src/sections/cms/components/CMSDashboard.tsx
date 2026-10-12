@@ -28,9 +28,17 @@ interface CMSDashboardProps {
   programmes: Programme[]
   auditLog: AuditLogEntry[]
   customerCredits: CustomerCredit[]
+  subRoute?: string
 }
 
-type Tab = 'blogs' | 'events-news' | 'banners' | 'coupon' | 'wallet'
+type Tab = 'blogs' | 'challanpay-org' | 'events-news' | 'banners' | 'coupon' | 'wallet'
+
+const VALID_TABS: Tab[] = ['blogs', 'challanpay-org', 'events-news', 'banners', 'coupon', 'wallet']
+
+function tabFromSubRoute(subRoute: string | undefined): Tab {
+  if (subRoute && (VALID_TABS as string[]).includes(subRoute)) return subRoute as Tab
+  return 'blogs'
+}
 type View =
   | 'list'
   | 'add-blog'
@@ -43,14 +51,6 @@ type View =
   | 'add-programme'
   | 'edit-programme'
 
-const sidebarItems: { id: Tab; label: string }[] = [
-  { id: 'blogs', label: 'Blogs' },
-  { id: 'events-news', label: 'Events & News' },
-  { id: 'banners', label: 'Banners' },
-  { id: 'coupon', label: 'Coupon' },
-  { id: 'wallet', label: 'Wallet' },
-]
-
 export function CMSDashboard({
   blogs,
   eventsNews,
@@ -59,8 +59,9 @@ export function CMSDashboard({
   programmes,
   auditLog,
   customerCredits,
+  subRoute,
 }: CMSDashboardProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('blogs')
+  const activeTab = tabFromSubRoute(subRoute)
   const [view, setView] = useState<View>('list')
   const [editingBannerId, setEditingBannerId] = useState<string | null>(null)
   const [editingCouponId, setEditingCouponId] = useState<string | null>(null)
@@ -74,8 +75,11 @@ export function CMSDashboard({
   const existingProgrammeNames = programmes.map((p) => p.name)
 
   if (view === 'add-blog') {
+    const isNews = activeTab === 'challanpay-org'
     return (
       <AddBlogPage
+        heading={isNews ? 'Add News' : 'Add Blog'}
+        submitLabel={isNews ? 'Add News' : 'Add Blog'}
         onSubmit={(data) => {
           console.log('Add blog:', data)
           setView('list')
@@ -204,37 +208,26 @@ export function CMSDashboard({
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)]">
-      {/* Left Sidebar */}
-      <div className="flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 w-52">
-        <div className="flex-1 py-4">
-          <div className="space-y-0.5 px-2">
-            {sidebarItems.map((item) => {
-              const isActive = activeTab === item.id
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${
-                    isActive
-                      ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <span>{item.label}</span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 p-6 lg:p-8 overflow-auto">
+    <div className="min-h-[calc(100vh-64px)] bg-slate-100 dark:bg-slate-950">
+      <div className="p-6 lg:p-8 overflow-auto">
         <div className="max-w-7xl">
           {activeTab === 'blogs' && (
             <BlogList
               blogs={blogs}
+              onAddBlog={() => setView('add-blog')}
+              onToggleStatus={(id, status) => console.log('Toggle blog status:', id, status)}
+              onEdit={(id) => console.log('Edit blog:', id)}
+              onDelete={(id) => console.log('Delete blog:', id)}
+              onSearch={(query) => console.log('Search blogs:', query)}
+            />
+          )}
+
+          {activeTab === 'challanpay-org' && (
+            <BlogList
+              blogs={blogs}
+              heading="ChallanPay.org - News Page"
+              addLabel="Add News"
+              searchPlaceholder="Search news..."
               onAddBlog={() => setView('add-blog')}
               onToggleStatus={(id, status) => console.log('Toggle blog status:', id, status)}
               onEdit={(id) => console.log('Edit blog:', id)}

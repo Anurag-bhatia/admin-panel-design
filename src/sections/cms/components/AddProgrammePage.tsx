@@ -35,7 +35,6 @@ interface AddProgrammePageProps {
 const typeLabels: Record<ProgrammeType, string> = {
   firstTimeCheck: 'First-time check',
   postPaymentReward: 'Post-payment reward',
-  influencer: 'Influencer campaign',
   corporate: 'Corporate benefit',
   specificCustomers: 'Specific customers',
 }
@@ -44,7 +43,6 @@ const triggerText: Record<ProgrammeType, string> = {
   firstTimeCheck:
     'A check completes for a new vehicle number + mobile number combination.',
   postPaymentReward: 'A payment succeeds and the order is confirmed.',
-  influencer: 'A claim carrying the campaign code.',
   corporate: 'A mobile number list is processed.',
   specificCustomers: 'A mobile number list is processed.',
 }
@@ -104,9 +102,6 @@ export function AddProgrammePage({
   )
   const [minimumCashPaid, setMinimumCashPaid] = useState<string>(
     initialProgramme?.minimumCashPaid?.toString() ?? '',
-  )
-  const [campaignCode, setCampaignCode] = useState(
-    initialProgramme?.campaignCode ?? '',
   )
   const [mobileNumbers, setMobileNumbers] = useState<string[]>(
     initialProgramme?.mobileNumbers ?? [],
@@ -217,7 +212,6 @@ export function AddProgrammePage({
 
   const showMinCash = type === 'postPaymentReward'
   const showRewardBasis = type === 'postPaymentReward'
-  const showCampaignCode = type === 'influencer'
   const showMobileList = type === 'corporate' || type === 'specificCustomers'
   const requiresInternalDesc = type === 'specificCustomers'
 
@@ -270,7 +264,6 @@ export function AddProgrammePage({
     if (codeError) errs.push(codeError)
     if (requiresInternalDesc && !internalDescription)
       errs.push('Internal description is required for specific-customer programmes')
-    if (showCampaignCode && !campaignCode) errs.push('Campaign code is required')
     if (showMobileList && mobileNumbers.length === 0)
       errs.push('At least one mobile number is required')
     if (!(Number(coinsPerCustomer) > 0)) errs.push('Coins per customer must be > 0')
@@ -293,7 +286,7 @@ export function AddProgrammePage({
     return errs
   }, [
     name, nameError, code, codeError, requiresInternalDesc, internalDescription,
-    showCampaignCode, campaignCode, showMobileList, mobileNumbers, coinsPerCustomer,
+    showMobileList, mobileNumbers, coinsPerCustomer,
     startAt, endAt, perCartCapValue, perCartCapType, chargeComponents, budgetCoins,
     hardStopCoins, customerText,
   ])
@@ -308,7 +301,6 @@ export function AddProgrammePage({
     internalDescription: internalDescription || undefined,
     audience,
     minimumCashPaid: showMinCash && minimumCashPaid ? Number(minimumCashPaid) : undefined,
-    campaignCode: showCampaignCode ? campaignCode : undefined,
     mobileNumbers: showMobileList ? mobileNumbers : undefined,
     limitPerCustomer: Number(limitPerCustomer),
     coinsPerCustomer: Number(coinsPerCustomer),
@@ -395,8 +387,8 @@ export function AddProgrammePage({
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
+      <div className="max-w-5xl mx-auto p-6">
+        <div className="space-y-4">
           {saveFailure && (
             <div className="p-4 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
@@ -568,22 +560,14 @@ export function AddProgrammePage({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Customer status" required>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setAudience('all')}
-                    className={selectableCls(audience === 'all')}
-                  >
-                    All customers
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAudience('newOnly')}
-                    className={selectableCls(audience === 'newOnly')}
-                  >
-                    New to ChallanPay only
-                  </button>
-                </div>
+                <select
+                  value={audience}
+                  onChange={(e) => setAudience(e.target.value as ProgrammeAudience)}
+                  className={inputCls(false)}
+                >
+                  <option value="all">All customers</option>
+                  <option value="newOnly">New to ChallanPay only</option>
+                </select>
               </Field>
 
               <Field label="Limit per customer" required>
@@ -608,18 +592,6 @@ export function AddProgrammePage({
                     onChange={(e) => setMinimumCashPaid(e.target.value)}
                     placeholder="e.g. 200"
                     className={inputCls(false)}
-                  />
-                </Field>
-              )}
-
-              {showCampaignCode && (
-                <Field label="Campaign code" required>
-                  <input
-                    type="text"
-                    value={campaignCode}
-                    onChange={(e) => setCampaignCode(e.target.value.toUpperCase())}
-                    placeholder="ROHIT100"
-                    className={inputCls(false) + ' font-mono uppercase'}
                   />
                 </Field>
               )}
@@ -955,57 +927,6 @@ export function AddProgrammePage({
               </Field>
             </div>
           </SectionCard>
-        </div>
-
-        {/* Live preview panel */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
-              Live Preview
-            </h3>
-
-            <div className="p-3 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-900 mb-4">
-              <p className="text-sm text-cyan-900 dark:text-cyan-100 leading-relaxed">
-                {previewSentence}
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs text-slate-500 mb-1">Cart (₹)</label>
-                  <input
-                    type="number"
-                    value={sampleCart}
-                    onChange={(e) => setSampleCart(Number(e.target.value) || 0)}
-                    className={inputCls(false)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-slate-500 mb-1">Balance (coins)</label>
-                  <input
-                    type="number"
-                    value={sampleBalance}
-                    onChange={(e) => setSampleBalance(Number(e.target.value) || 0)}
-                    className={inputCls(false)}
-                  />
-                </div>
-              </div>
-
-              <div className="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-1.5 text-sm">
-                <PreviewRow label="Cart" value={`₹${sampleCart}`} />
-                <PreviewRow label="Per-cart cap" value={`₹${capApplied}`} />
-                <PreviewRow label="Coins usable" value={`${coinsUsable} coins`} highlight />
-                <PreviewRow label="Cash payable" value={`₹${cashPayable}`} />
-              </div>
-
-              {coinsUsable > 0 && (
-                <div className="p-2.5 rounded-md bg-emerald-50 dark:bg-emerald-900/20 text-xs text-emerald-700 dark:text-emerald-300 font-medium">
-                  Customer saves ₹{coinsUsable} on this order.
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </div>

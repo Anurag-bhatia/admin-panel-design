@@ -16,8 +16,7 @@ interface CustomerCreditViewProps {
 const sourceLabels: Record<CreditLotSource, string> = {
   firstTimeCheck: 'First-time check',
   postPaymentReward: 'Post-payment reward',
-  influencer: 'Influencer',
-  corporate: 'Corporate',
+  corporate: 'Corporate benefit',
   specificCustomers: 'Specific customer',
   couponConversion: 'Coupon conversion',
 }

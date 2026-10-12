@@ -63,12 +63,45 @@ const FullPreviewPage: React.FC = () => {
       ]
     }
 
+    // Add children for CMS section
+    if (sectionId === 'cms') {
+      const currentCms =
+        activeSection === 'cms'
+          ? activeSubRoute === 'challanpay-org'
+            ? 'challanpay-org'
+            : activeSubRoute === 'events-news'
+            ? 'events-news'
+            : activeSubRoute === 'banners'
+            ? 'banners'
+            : 'blogs'
+          : null
+      navItem.isActive = false
+      navItem.children = [
+        { label: 'Blogs', href: '#cms/blogs', isActive: currentCms === 'blogs' },
+        {
+          label: 'ChallanPay.org',
+          href: '#cms/challanpay-org',
+          isActive: currentCms === 'challanpay-org',
+        },
+        {
+          label: 'Events & News',
+          href: '#cms/events-news',
+          isActive: currentCms === 'events-news',
+        },
+        { label: 'Banners', href: '#cms/banners', isActive: currentCms === 'banners' },
+      ]
+    }
+
     // Add children for Config section
     if (sectionId === 'rewards-config') {
       const currentConfig =
         activeSection === 'rewards-config'
           ? activeSubRoute === 'web'
             ? 'web'
+            : activeSubRoute === 'coupon'
+            ? 'coupon'
+            : activeSubRoute === 'wallet'
+            ? 'wallet'
             : 'sales'
           : null
       navItem.isActive = false
@@ -82,6 +115,16 @@ const FullPreviewPage: React.FC = () => {
           label: 'Web Config',
           href: '#rewards-config/web',
           isActive: currentConfig === 'web',
+        },
+        {
+          label: 'Coupon',
+          href: '#rewards-config/coupon',
+          isActive: currentConfig === 'coupon',
+        },
+        {
+          label: 'ChallanPay Credit',
+          href: '#rewards-config/wallet',
+          isActive: currentConfig === 'wallet',
         },
       ]
     }
@@ -129,10 +172,22 @@ const FullPreviewPage: React.FC = () => {
         crumbs.push({ label: 'Business' })
       } else if (activeSection === 'lawyers' && activeSubRoute === 'individuals') {
         crumbs.push({ label: 'Individuals' })
-      } else if (activeSection === 'rewards-config' && activeSubRoute === 'sales') {
-        crumbs.push({ label: 'Sales Config' })
-      } else if (activeSection === 'rewards-config' && activeSubRoute === 'web') {
-        crumbs.push({ label: 'Web Config' })
+      } else if (activeSection === 'rewards-config') {
+        const configLabel: Record<string, string> = {
+          sales: 'Sales Config',
+          web: 'Web Config',
+          coupon: 'Coupon',
+          wallet: 'ChallanPay Credit',
+        }
+        crumbs.push({ label: configLabel[activeSubRoute] ?? activeSubRoute })
+      } else if (activeSection === 'cms') {
+        const cmsLabel: Record<string, string> = {
+          blogs: 'Blogs',
+          'challanpay-org': 'ChallanPay.org',
+          'events-news': 'Events & News',
+          banners: 'Banners',
+        }
+        crumbs.push({ label: cmsLabel[activeSubRoute] ?? activeSubRoute })
       }
     } else {
       // Just the section name

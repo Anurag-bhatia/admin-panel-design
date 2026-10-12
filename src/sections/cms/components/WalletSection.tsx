@@ -12,11 +12,11 @@ import {
   walletPermissionLabels,
 } from '@/../product/sections/cms/types'
 import { ProgrammeList } from './ProgrammeList'
-import { WalletDashboard } from './WalletDashboard'
+import { WalletReports } from './WalletReports'
 import { CustomerCreditView } from './CustomerCreditView'
 import { WalletAuditLog } from './WalletAuditLog'
 
-export type WalletTab = 'programmes' | 'dashboard' | 'customer-credit' | 'audit-log'
+export type WalletTab = 'programmes' | 'reports' | 'customer-credit' | 'audit-log'
 
 interface WalletSectionProps {
   programmes: Programme[]
@@ -34,8 +34,8 @@ interface Tab {
 }
 
 const tabs: Tab[] = [
-  { id: 'dashboard', label: 'Dashboard', requires: 'viewReports' },
   { id: 'programmes', label: 'Programmes' },
+  { id: 'reports', label: 'Reports', requires: 'viewReports' },
   { id: 'customer-credit', label: 'Customer Credit', requires: 'viewCustomerCredit' },
   { id: 'audit-log', label: 'Audit Log', requires: 'viewAuditLog' },
 ]
@@ -48,7 +48,7 @@ export function WalletSection({
   onEditProgramme,
   onViewProgramme,
 }: WalletSectionProps) {
-  const [activeTab, setActiveTab] = useState<WalletTab>('dashboard')
+  const [activeTab, setActiveTab] = useState<WalletTab>('programmes')
   const [permissions, setPermissions] = useState<WalletPermissions>(defaultWalletPermissions)
 
   const visibleTabs = tabs.filter((t) => !t.requires || permissions[t.requires])
@@ -84,14 +84,12 @@ export function WalletSection({
           })}
         </div>
 
-        <div className="pb-2">
-          <PermissionPreview permissions={permissions} onChange={setPermissions} />
-        </div>
       </div>
 
       {activeTab === 'programmes' && (
         <ProgrammeList
           programmes={programmes}
+          customerCredits={customerCredits}
           permissions={permissions}
           onCreate={onCreateProgramme}
           onView={onViewProgramme}
@@ -105,8 +103,8 @@ export function WalletSection({
         />
       )}
 
-      {activeTab === 'dashboard' && permissions.viewReports && (
-        <WalletDashboard programmes={programmes} />
+      {activeTab === 'reports' && permissions.viewReports && (
+        <WalletReports programmes={programmes} permissions={permissions} />
       )}
 
       {activeTab === 'customer-credit' && permissions.viewCustomerCredit && (

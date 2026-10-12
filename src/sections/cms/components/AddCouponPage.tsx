@@ -14,10 +14,16 @@ import type {
   Coupon,
   CouponApplicableOn,
   CouponChallanType,
+  CouponConversionAppliesTo,
+  CouponConversionAudience,
+  CouponConversionCombination,
+  CouponConversionMethod,
+  CouponConversionSettings,
   CouponPlatform,
   CouponProduct,
   CouponType,
 } from '@/../product/sections/cms/types'
+import { defaultCouponConversionSettings } from '@/../product/sections/cms/types'
 import { AdvancedRulesBuilder } from './AdvancedRulesBuilder'
 
 interface AddCouponPageProps {
@@ -46,6 +52,7 @@ interface FormState {
   autoApplyOldest: boolean
   exitIntentEligible: boolean
   advancedRules: AdvancedRules
+  conversion: CouponConversionSettings
 }
 
 const CHALLAN_TYPE_LABELS: Record<CouponChallanType, string> = {
@@ -164,6 +171,7 @@ function initialFromCoupon(coupon?: Coupon): FormState {
     autoApplyOldest: coupon?.autoApplyOldest ?? false,
     exitIntentEligible: coupon?.exitIntentEligible ?? false,
     advancedRules: coupon?.advancedRules ?? { groups: [] },
+    conversion: coupon?.conversion ?? defaultCouponConversionSettings,
   }
 }
 
@@ -184,6 +192,7 @@ export function AddCouponPage({
     D: true,
     E: true,
     F: false,
+    G: false,
   })
   const [errors, setErrors] = useState<Partial<Record<keyof FormState | 'form', string>>>({})
   const [codeSuggestions, setCodeSuggestions] = useState<string[]>([])
@@ -278,6 +287,7 @@ export function AddCouponPage({
       autoApplyOldest: form.autoApplyOldest,
       exitIntentEligible: form.exitIntentEligible,
       advancedRules: form.advancedRules.groups.length > 0 ? form.advancedRules : undefined,
+      conversion: form.conversion.allowConversion ? form.conversion : undefined,
       status: mode === 'publish' && !startsInFuture ? 'active' : 'draft',
     }
     onSubmit?.(payload)
@@ -650,6 +660,20 @@ export function AddCouponPage({
             />
           </Section>
 
+          <Section
+            id="G"
+            title="Convert to Credit"
+            subtitle="Let eligible customers exchange this coupon for ChallanPay Credit"
+            open={openSections.G}
+            onToggle={() => toggleSection('G')}
+          >
+            <ConversionSettings
+              value={form.conversion}
+              onChange={(next) => update('conversion', next)}
+              disabled={isLocked}
+            />
+          </Section>
+
           {isLocked && (
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 rounded-xl p-4 text-xs text-amber-800 dark:text-amber-300">
               <div className="flex items-start gap-2">
@@ -985,4 +1009,302 @@ function selectableCls(selected: boolean): string {
       ? 'border-cyan-600 bg-cyan-50 text-cyan-700 dark:border-cyan-500 dark:bg-cyan-900/30 dark:text-cyan-200'
       : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
   } disabled:opacity-60 disabled:cursor-not-allowed`
+}
+
+const AUDIENCE_LABELS: Record<CouponConversionAudience, string> = {
+  assigned: 'Assigned customers only',
+  anyVerified: 'Any verified customer',
+  publicWithOtp: 'Public code with mobile OTP',
+}
+
+const METHOD_LABELS: Record<CouponConversionMethod, string> = {
+  sameAsValue: 'Same as coupon value',
+  fixedAmount: 'Fixed amount',
+  percentOfBenefit: '% of coupon benefit',
+}
+
+const APPLIES_TO_LABELS: Record<CouponConversionAppliesTo, string> = {
+  sameAsCoupon: 'Same as coupon',
+  challan: 'Challan fee',
+  convenience: 'Convenience fee',
+  both: 'Both',
+}
+
+const COMBINATION_LABELS: Record<CouponConversionCombination, string> = {
+  couponFirst: 'Coupon first, then credit',
+  creditFirst: 'Credit first, then coupon',
+}
+
+function ConversionSettings({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: CouponConversionSettings
+  onChange: (next: CouponConversionSettings) => void
+  disabled: boolean
+}) {
+  const set = <K extends keyof CouponConversionSettings>(
+    key: K,
+    v: CouponConversionSettings[K],
+  ) => onChange({ ...value, [key]: v })
+
+  const expiryMode: 'days' | 'date' = value.creditExpiryDate ? 'date' : 'days'
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">
+            Allow conversion to ChallanPay Credit
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            When on, eligible customers can exchange this coupon for credit instead of applying
+            it at the current checkout. Once converted, the coupon can no longer be used.
+          </p>
+        </div>
+        <ConversionToggle
+          checked={value.allowConversion}
+          disabled={disabled}
+          onChange={(v) => set('allowConversion', v)}
+        />
+      </div>
+
+      {value.allowConversion && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ConvField label="Who can convert">
+            <select
+              disabled={disabled}
+              value={value.whoCanConvert}
+              onChange={(e) => set('whoCanConvert', e.target.value as CouponConversionAudience)}
+              className={inputCls(disabled)}
+            >
+              {(Object.keys(AUDIENCE_LABELS) as CouponConversionAudience[]).map((k) => (
+                <option key={k} value={k}>
+                  {AUDIENCE_LABELS[k]}
+                </option>
+              ))}
+            </select>
+          </ConvField>
+
+          <ConvField label="Conversion method">
+            <select
+              disabled={disabled}
+              value={value.method}
+              onChange={(e) => set('method', e.target.value as CouponConversionMethod)}
+              className={inputCls(disabled)}
+            >
+              {(Object.keys(METHOD_LABELS) as CouponConversionMethod[]).map((k) => (
+                <option key={k} value={k}>
+                  {METHOD_LABELS[k]}
+                </option>
+              ))}
+            </select>
+          </ConvField>
+
+          {value.method !== 'sameAsValue' && (
+            <ConvField
+              label={value.method === 'fixedAmount' ? 'Credit value (₹)' : 'Credit value (%)'}
+              help={
+                value.method === 'fixedAmount'
+                  ? 'Flat credit value, regardless of coupon amount'
+                  : 'Percentage of the coupon benefit'
+              }
+            >
+              <input
+                type="number"
+                min={1}
+                max={value.method === 'percentOfBenefit' ? 100 : undefined}
+                disabled={disabled}
+                value={value.creditValue ?? ''}
+                onChange={(e) =>
+                  set('creditValue', e.target.value ? Number(e.target.value) : undefined)
+                }
+                className={inputCls(disabled)}
+              />
+            </ConvField>
+          )}
+
+          <ConvField label="Per-customer limit">
+            <input
+              type="number"
+              min={1}
+              disabled={disabled}
+              value={value.perCustomerLimit}
+              onChange={(e) => set('perCustomerLimit', Number(e.target.value) || 1)}
+              className={inputCls(disabled)}
+            />
+          </ConvField>
+
+          <ConvField label="Conversion window starts" help="Defaults to coupon validity">
+            <input
+              type="datetime-local"
+              disabled={disabled}
+              value={value.windowStart ?? ''}
+              onChange={(e) => set('windowStart', e.target.value || undefined)}
+              className={inputCls(disabled)}
+            />
+          </ConvField>
+
+          <ConvField label="Conversion window ends">
+            <input
+              type="datetime-local"
+              disabled={disabled}
+              value={value.windowEnd ?? ''}
+              onChange={(e) => set('windowEnd', e.target.value || undefined)}
+              className={inputCls(disabled)}
+            />
+          </ConvField>
+
+          <ConvField label="Credit expiry" className="sm:col-span-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() =>
+                    onChange({
+                      ...value,
+                      creditExpiryDate: undefined,
+                      creditExpiryDays: value.creditExpiryDays ?? 30,
+                    })
+                  }
+                  className={selectableCls(expiryMode === 'days')}
+                >
+                  Days from conversion
+                </button>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() =>
+                    onChange({
+                      ...value,
+                      creditExpiryDays: undefined,
+                      creditExpiryDate: value.creditExpiryDate ?? '',
+                    })
+                  }
+                  className={selectableCls(expiryMode === 'date')}
+                >
+                  Fixed date
+                </button>
+              </div>
+              {expiryMode === 'days' ? (
+                <input
+                  type="number"
+                  min={1}
+                  disabled={disabled}
+                  value={value.creditExpiryDays ?? ''}
+                  onChange={(e) =>
+                    set('creditExpiryDays', e.target.value ? Number(e.target.value) : undefined)
+                  }
+                  placeholder="30"
+                  className={inputCls(disabled)}
+                />
+              ) : (
+                <input
+                  type="date"
+                  disabled={disabled}
+                  value={value.creditExpiryDate ?? ''}
+                  onChange={(e) => set('creditExpiryDate', e.target.value || undefined)}
+                  className={inputCls(disabled)}
+                />
+              )}
+            </div>
+          </ConvField>
+
+          <ConvField label="Where the credit can be used">
+            <select
+              disabled={disabled}
+              value={value.appliesTo}
+              onChange={(e) => set('appliesTo', e.target.value as CouponConversionAppliesTo)}
+              className={inputCls(disabled)}
+            >
+              {(Object.keys(APPLIES_TO_LABELS) as CouponConversionAppliesTo[]).map((k) => (
+                <option key={k} value={k}>
+                  {APPLIES_TO_LABELS[k]}
+                </option>
+              ))}
+            </select>
+          </ConvField>
+
+          <ConvField label="Combination policy">
+            <select
+              disabled={disabled}
+              value={value.combination}
+              onChange={(e) => set('combination', e.target.value as CouponConversionCombination)}
+              className={inputCls(disabled)}
+            >
+              {(Object.keys(COMBINATION_LABELS) as CouponConversionCombination[]).map((k) => (
+                <option key={k} value={k}>
+                  {COMBINATION_LABELS[k]}
+                </option>
+              ))}
+            </select>
+          </ConvField>
+
+          <ConvField
+            label="Customer disclosure"
+            className="sm:col-span-2"
+            help="Must state the value, expiry, eligible use, and that credit is non-transferable and non-withdrawable."
+          >
+            <textarea
+              disabled={disabled}
+              value={value.customerDisclosure ?? ''}
+              onChange={(e) => set('customerDisclosure', e.target.value)}
+              rows={3}
+              placeholder="e.g. Convert this coupon for 100 ChallanPay Credit, valid for 30 days on convenience fees. Credit is not cash and cannot be withdrawn or transferred."
+              className={inputCls(disabled)}
+            />
+          </ConvField>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ConvField({
+  label,
+  help,
+  className,
+  children,
+}: {
+  label: string
+  help?: string
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <label className={`flex flex-col gap-1.5 ${className ?? ''}`}>
+      <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{label}</span>
+      {children}
+      {help && <span className="text-xs text-slate-400">{help}</span>}
+    </label>
+  )
+}
+
+function ConversionToggle({
+  checked,
+  disabled,
+  onChange,
+}: {
+  checked: boolean
+  disabled: boolean
+  onChange: (v: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${
+        checked ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-600'
+      } disabled:opacity-60 disabled:cursor-not-allowed`}
+    >
+      <span
+        className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+          checked ? 'translate-x-6' : 'translate-x-1'
+        }`}
+      />
+    </button>
+  )
 }
