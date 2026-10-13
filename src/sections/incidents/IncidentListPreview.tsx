@@ -33,6 +33,7 @@ export default function IncidentListPreview() {
   // View state
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null)
+  const [initialDetailTab, setInitialDetailTab] = useState<'activity' | 'chats' | undefined>(undefined)
 
   // Modal state
   const [activeModal, setActiveModal] = useState<ModalType>(null)
@@ -60,12 +61,20 @@ export default function IncidentListPreview() {
   // Handlers
   const handleViewIncident = (incidentId: string) => {
     setSelectedIncidentId(incidentId)
+    setInitialDetailTab(undefined)
+    setViewMode('detail')
+  }
+
+  const handleOpenChat = (incidentId: string) => {
+    setSelectedIncidentId(incidentId)
+    setInitialDetailTab('chats')
     setViewMode('detail')
   }
 
   const handleBack = () => {
     setViewMode('list')
     setSelectedIncidentId(null)
+    setInitialDetailTab(undefined)
   }
 
   const handleAddChallan = () => {
@@ -165,6 +174,7 @@ export default function IncidentListPreview() {
           documents={documents}
           users={data.users as User[]}
           lawyers={data.lawyers as Lawyer[]}
+          initialTab={initialDetailTab}
           onBack={handleBack}
           onAddFollowUp={(incidentId, followUp) => {
             console.log('Add follow-up:', incidentId, followUp)
@@ -230,6 +240,7 @@ export default function IncidentListPreview() {
           sources={data.sources as IncidentSource[]}
           offenceTypes={data.offenceTypes}
           onViewIncident={handleViewIncident}
+          onOpenChat={handleOpenChat}
           onAddChallan={handleAddChallan}
           onAddCase={handleAddCase}
           onScreen={handleScreen}

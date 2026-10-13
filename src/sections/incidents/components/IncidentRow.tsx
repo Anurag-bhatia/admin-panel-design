@@ -8,6 +8,7 @@ import {
   Edit,
   X,
   Receipt,
+  MessageCircle,
 } from 'lucide-react'
 import type {
   Incident,
@@ -35,8 +36,10 @@ interface IncidentRowProps {
   users: User[]
   lawyers: Lawyer[]
   workType?: 'cases' | 'challans'
+  unreadChatCount?: number
   onSelect: (selected: boolean) => void
   onView?: () => void
+  onOpenChat?: () => void
   onScreen?: () => void
   onAssignAgent?: (agentId: string) => void
   onAssignLawyer?: (lawyerId: string) => void
@@ -152,8 +155,10 @@ export function IncidentRow({
   users,
   lawyers,
   workType = 'challans',
+  unreadChatCount = 0,
   onSelect,
   onView,
+  onOpenChat,
   onScreen,
   onAssignAgent,
   onAssignLawyer,
@@ -239,12 +244,27 @@ export function IncidentRow({
       {/* Incident ID */}
       <td className="px-4 py-5">
         <div>
-          {incident.isExpress && (
-            <span className="inline-flex items-center px-1 py-px rounded text-[9px] font-semibold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 mb-1">
-              Express
-            </span>
-          )}
-          <span className="block font-mono text-sm font-medium text-slate-900 dark:text-white">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {incident.isExpress && (
+              <span className="inline-flex items-center px-1 py-px rounded text-[9px] font-semibold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                Express
+              </span>
+            )}
+            {unreadChatCount > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onOpenChat?.()
+                }}
+                className="inline-flex items-center gap-0.5 px-1.5 py-px rounded-full text-[10px] font-semibold bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 hover:bg-cyan-200 dark:hover:bg-cyan-900/50"
+                title={`${unreadChatCount} unread chat message${unreadChatCount === 1 ? '' : 's'}`}
+              >
+                <MessageCircle className="h-2.5 w-2.5" />
+                {unreadChatCount}
+              </button>
+            )}
+          </div>
+          <span className="mt-1 block font-mono text-sm font-medium text-slate-900 dark:text-white">
             {incident.incidentId}
           </span>
           {(() => {

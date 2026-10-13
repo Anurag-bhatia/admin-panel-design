@@ -21,6 +21,8 @@ import { DesignationsTable } from './DesignationsTable'
 import { MastersTable } from './MastersTable'
 import { GeographicTable } from './GeographicTable'
 import { AuditLogTable } from './AuditLogTable'
+import { ChatSettingsPanel } from './ChatSettingsPanel'
+import { ChatTemplatesPanel } from './ChatTemplatesPanel'
 
 const TAB_LABELS: Record<SetupTab, string> = {
   services: 'Services',
@@ -29,6 +31,8 @@ const TAB_LABELS: Record<SetupTab, string> = {
   designations: 'Designations',
   masters: 'Masters',
   geographic: 'Geographic',
+  chatSettings: 'Chat Settings',
+  chatTemplates: 'Chat Templates & Chips',
   auditLog: 'Audit Log',
 }
 
@@ -39,6 +43,8 @@ const TAB_DESCRIPTIONS: Record<SetupTab, string> = {
   designations: 'Configure job titles and role mappings',
   masters: 'Manage dropdown categories and configurable values',
   geographic: 'Configure countries, states, and cities',
+  chatSettings: 'Rules for the Lawyer ↔ Ops incident chat',
+  chatTemplates: 'Saved ops replies and lawyer quick-reply chips',
   auditLog: 'View all configuration changes',
 }
 
@@ -99,9 +105,12 @@ export function SetupDashboard({
   }
 
   const handleAdd = () => {
-    if (activeTab === 'auditLog') return
+    if (activeTab === 'auditLog' || activeTab === 'chatSettings' || activeTab === 'chatTemplates')
+      return
     setSlideOver({ mode: 'add', tab: activeTab })
   }
+
+  const isCustomPanel = activeTab === 'chatSettings' || activeTab === 'chatTemplates'
 
   const handleEdit = (itemId: string) => {
     setSlideOver({ mode: 'edit', tab: activeTab, itemId })
@@ -151,7 +160,7 @@ export function SetupDashboard({
                 {TAB_DESCRIPTIONS[activeTab]}
               </p>
             </div>
-            {!isAudit && (
+            {!isAudit && !isCustomPanel && (
               <button
                 onClick={handleAdd}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
@@ -163,6 +172,7 @@ export function SetupDashboard({
           </div>
 
           {/* Search + Status filter */}
+          {!isCustomPanel && (
           <div className="flex items-center gap-3">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -189,10 +199,13 @@ export function SetupDashboard({
               </div>
             )}
           </div>
+          )}
         </div>
 
         {/* Table Content */}
-        <div className="flex-1 bg-white dark:bg-slate-900 overflow-auto">
+        <div className={`flex-1 overflow-auto ${isCustomPanel ? '' : 'bg-white dark:bg-slate-900'}`}>
+          {activeTab === 'chatSettings' && <ChatSettingsPanel />}
+          {activeTab === 'chatTemplates' && <ChatTemplatesPanel />}
           {activeTab === 'services' && (
             <ServicesTable
               services={services}

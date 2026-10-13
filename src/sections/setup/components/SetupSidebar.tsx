@@ -1,13 +1,15 @@
 import type { SetupTab } from '@/../product/sections/setup/types'
 
-const NAV_ITEMS: { key: SetupTab; label: string }[] = [
+const NAV_ITEMS: { key: SetupTab; label: string; groupBreakBefore?: boolean }[] = [
   { key: 'services', label: 'Services' },
   { key: 'priceCategories', label: 'Price Categories' },
   { key: 'departments', label: 'Departments' },
   { key: 'designations', label: 'Designations' },
   { key: 'masters', label: 'Masters' },
   { key: 'geographic', label: 'Geographic' },
-  { key: 'auditLog', label: 'Audit Log' },
+  { key: 'chatSettings', label: 'Chat Settings', groupBreakBefore: true },
+  { key: 'chatTemplates', label: 'Chat Templates' },
+  { key: 'auditLog', label: 'Audit Log', groupBreakBefore: true },
 ]
 
 interface SetupSidebarProps {
@@ -21,11 +23,10 @@ export function SetupSidebar({ activeTab, onTabChange }: SetupSidebarProps) {
       <div className="flex-1 py-4">
         {NAV_ITEMS.map((item) => {
           const isActive = activeTab === item.key
-          const isAudit = item.key === 'auditLog'
 
           return (
             <div key={item.key}>
-              {isAudit && (
+              {item.groupBreakBefore && (
                 <div className="mx-4 my-3 border-t border-slate-200 dark:border-slate-700" />
               )}
               <div className="px-2 mb-0.5">

@@ -9,7 +9,9 @@ import type {
   IncidentSource,
   IncidentFilters,
 } from '@/../product/sections/incidents/types'
-import { IncidentsSidebar } from './IncidentsSidebar'
+import { IncidentsSidebar, type SidebarSelection } from './IncidentsSidebar'
+import { ChatsInbox, type ChatThreadSummary } from './ChatsInbox'
+import { buildSampleChatThreads } from './chatThreadsSampleData'
 import { QueueTabs } from './QueueTabs'
 import { IncidentsTableHeader } from './IncidentsTableHeader'
 import { IncidentRow } from './IncidentRow'
@@ -26,6 +28,7 @@ export interface IncidentListProps {
   sources: IncidentSource[]
   offenceTypes: string[]
   onViewIncident?: (incidentId: string) => void
+  onOpenChat?: (incidentId: string) => void
   onAddChallan?: () => void
   onAddCase?: () => void
   onScreen?: (incidentIds: string[]) => void
@@ -50,6 +53,7 @@ export function IncidentList({
   sources,
   offenceTypes,
   onViewIncident,
+  onOpenChat,
   onAddChallan,
   onAddCase,
   onScreen,
@@ -64,8 +68,30 @@ export function IncidentList({
   onPageChange,
 }: IncidentListProps) {
   // Sidebar state
-  const [sidebarView, setSidebarView] = useState<'all' | 'my'>('all')
-  const [workType, setWorkType] = useState<'cases' | 'challans'>('challans')
+  const [selection, setSelection] = useState<SidebarSelection>({
+    kind: 'incidents',
+    view: 'all',
+    workType: 'challans',
+  })
+  const sidebarView = selection.kind === 'incidents' ? selection.view : 'all'
+  const workType = selection.kind === 'incidents' ? selection.workType : 'challans'
+  const isChatsView = selection.kind === 'chats'
+
+  const chatThreads: ChatThreadSummary[] = useMemo(
+    () => buildSampleChatThreads(incidents),
+    [incidents],
+  )
+  const chatsUnreadCount = useMemo(
+    () => chatThreads.filter((t) => t.unreadCount > 0).length,
+    [chatThreads],
+  )
+  const unreadByIncident = useMemo(() => {
+    const map = new Map<string, number>()
+    chatThreads.forEach((t) => {
+      if (t.unreadCount > 0) map.set(t.incidentId, t.unreadCount)
+    })
+    return map
+  }, [chatThreads])
 
   // Active queue
   const [activeQueue, setActiveQueue] = useState<IncidentQueue>('newIncidents')
@@ -165,28 +191,41 @@ export function IncidentList({
     }
   }, [sidebarView, queueCounts, incidents, isCases])
 
+  const handleSelectionChange = (next: SidebarSelection) => {
+    setSelection(next)
+    if (next.kind === 'incidents') {
+      setSelectedIds(new Set())
+      if (next.view === 'my' && activeQueue === 'newIncidents') {
+        setActiveQueue('inProgress')
+      }
+      if (next.workType !== workType) {
+        setActiveQueue('newIncidents')
+      }
+    }
+  }
+
   return (
     <div className="flex h-full bg-slate-100 dark:bg-slate-950">
       {/* Sidebar */}
       <IncidentsSidebar
-        view={sidebarView}
-        workType={workType}
-        onViewChange={(view) => {
-          setSidebarView(view)
-          if (view === 'my' && activeQueue === 'newIncidents') {
-            setActiveQueue('inProgress')
-          }
-        }}
-        onWorkTypeChange={(type) => {
-          setWorkType(type)
-          setSelectedIds(new Set())
-          // Reset to newIncidents when switching workType
-          setActiveQueue('newIncidents')
-        }}
+        selection={selection}
+        chatsUnreadCount={chatsUnreadCount}
+        onChangeSelection={handleSelectionChange}
       />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
+        {isChatsView ? (
+          <ChatsInbox
+            threads={chatThreads}
+            incidents={incidents}
+            lawyers={lawyers}
+            users={users}
+            currentUserId={currentUserId}
+            onOpenThread={(incidentId) => (onOpenChat ?? onViewIncident)?.(incidentId)}
+          />
+        ) : (
+          <>
         {/* Queue Tabs */}
         <QueueTabs
           activeQueue={activeQueue}
@@ -322,6 +361,8 @@ export function IncidentList({
                     users={users}
                     lawyers={lawyers}
                     workType={workType}
+                    unreadChatCount={unreadByIncident.get(incident.id) ?? 0}
+                    onOpenChat={() => onOpenChat?.(incident.id)}
                     onSelect={(checked) => handleSelectOne(incident.id, checked)}
                     onView={() => onViewIncident?.(incident.id)}
                     onScreen={() => onScreen?.([incident.id])}
@@ -342,10 +383,12 @@ export function IncidentList({
 
         {/* Pagination */}
         <Pagination pagination={pagination} onPageChange={onPageChange} />
+          </>
+        )}
       </div>
 
       {/* Bulk Actions Bar */}
-      {selectedIds.size > 0 && (
+      {!isChatsView && selectedIds.size > 0 && (
         <BulkActionsBar
           selectedCount={selectedIds.size}
           activeQueue={activeQueue}

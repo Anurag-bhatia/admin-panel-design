@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ArrowLeft, Clock, UserPlus, Scale, Search, IndianRupee, ArrowRightLeft, ChevronDown } from 'lucide-react'
 import { ActivityTab } from './components/ActivityTab'
-import { NotesTab, type Note } from './components/NotesTab'
+import { ChatsTab } from './components/ChatsTab'
 import { DetailsTab } from './components/DetailsTab'
 import { CallSummaryTab } from './components/CallSummaryTab'
 import { SettlementAmountTab } from './components/SettlementAmountTab'
@@ -21,7 +21,7 @@ const STAGES_REQUIRING_DETAILS: MoveQueueStage[] = [
   'hold',
 ]
 
-type TabType = 'screeningDetails' | 'activity' | 'notes' | 'details' | 'callSummary' | 'settlementAmount'
+type TabType = 'screeningDetails' | 'activity' | 'chats' | 'details' | 'callSummary' | 'settlementAmount'
 
 const CASE_CATEGORY_LABELS: Record<string, string> = {
   iaStart: 'IA Start',
@@ -37,24 +37,6 @@ const CASE_CATEGORY_LABELS: Record<string, string> = {
   employmentLabour: 'Employment and Labour Case',
 }
 
-// Sample notes data for demo
-const SAMPLE_NOTES: Note[] = [
-  {
-    id: 'note-001',
-    content: 'Subscriber confirmed they were driving the vehicle at the time of violation. Need to verify RC documents.',
-    createdAt: '2024-01-14T10:30:00Z',
-    createdById: 'usr-001',
-    createdByName: 'Arun Kumar',
-  },
-  {
-    id: 'note-002',
-    content: 'Challan amount seems higher than usual for this type of violation. Check with lawyer if this can be contested.',
-    createdAt: '2024-01-13T15:45:00Z',
-    createdById: 'usr-002',
-    createdByName: 'Priya Sharma',
-  },
-]
-
 export function IncidentDetailView({
   incident,
   subscriber,
@@ -63,6 +45,8 @@ export function IncidentDetailView({
   followUps,
   timelineActivities,
   documents,
+  users = [],
+  initialTab,
   onBack,
   onAddFollowUp,
   onUploadDocument,
@@ -73,10 +57,13 @@ export function IncidentDetailView({
   onMoveQueue,
   onScreen,
   onUpdate,
-}: IncidentDetailProps) {
+}: IncidentDetailProps & { initialTab?: TabType }) {
   const isCases = incident.workType === 'case'
-  const [activeTab, setActiveTab] = useState<TabType>('activity')
-  const [notes, setNotes] = useState<Note[]>(SAMPLE_NOTES)
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab ?? 'activity')
+  const [chatOwnerId, setChatOwnerId] = useState<string | null>(assignedAgent?.id ?? null)
+  const [chatIsReadOnly, setChatIsReadOnly] = useState(
+    incident.queue === 'settled' || incident.queue === 'notSettled' || incident.queue === 'refundCompleted',
+  )
   const [showExpenseModal, setShowExpenseModal] = useState(false)
   const [showMoveDropdown, setShowMoveDropdown] = useState(false)
   const [pendingMoveStage, setPendingMoveStage] = useState<MoveQueueStage | null>(null)
@@ -125,28 +112,7 @@ export function IncidentDetailView({
     onScreen?.(incident.id)
   }
 
-  const handleAddNote = (content: string) => {
-    const newNote: Note = {
-      id: `note-${Date.now()}`,
-      content,
-      createdAt: new Date().toISOString(),
-      createdById: 'usr-001',
-      createdByName: 'Current User',
-    }
-    setNotes([newNote, ...notes])
-  }
-
-  const handleEditNote = (noteId: string, content: string) => {
-    setNotes(notes.map(note =>
-      note.id === noteId
-        ? { ...note, content, updatedAt: new Date().toISOString() }
-        : note
-    ))
-  }
-
-  const handleDeleteNote = (noteId: string) => {
-    setNotes(notes.filter(note => note.id !== noteId))
-  }
+  const chatOwner = users.find((u) => u.id === chatOwnerId) ?? assignedAgent ?? null
 
   const getTatInfo = (deadline: string) => {
     const now = new Date()
@@ -429,14 +395,17 @@ export function IncidentDetailView({
                     Activity
                   </button>
                   <button
-                    onClick={() => setActiveTab('notes')}
-                    className={`px-6 py-4 text-sm font-medium transition-colors border-b-2 ${
-                      activeTab === 'notes'
+                    onClick={() => setActiveTab('chats')}
+                    className={`relative px-6 py-4 text-sm font-medium transition-colors border-b-2 ${
+                      activeTab === 'chats'
                         ? 'border-cyan-600 text-cyan-600 dark:border-cyan-400 dark:text-cyan-400'
                         : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
-                    Notes
+                    Chats
+                    <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full text-[10px] font-semibold bg-red-500 text-white">
+                      2
+                    </span>
                   </button>
                   <button
                     onClick={() => setActiveTab('details')}
@@ -574,12 +543,21 @@ export function IncidentDetailView({
                     onAddFollowUp={handleAddFollowUp}
                   />
                 )}
-                {activeTab === 'notes' && (
-                  <NotesTab
-                    notes={notes}
-                    onAddNote={handleAddNote}
-                    onEditNote={handleEditNote}
-                    onDeleteNote={handleDeleteNote}
+                {activeTab === 'chats' && (
+                  <ChatsTab
+                    incidentId={incident.incidentId}
+                    lawyer={assignedLawyer}
+                    owner={chatOwner}
+                    users={users}
+                    isReadOnly={chatIsReadOnly}
+                    canReopen={chatIsReadOnly}
+                    onCall={(phone) => console.log('Click to call:', phone)}
+                    onAssignToMe={() => setChatOwnerId('usr-001')}
+                    onAssign={(userId) => setChatOwnerId(userId)}
+                    onReopen={() => setChatIsReadOnly(false)}
+                    onSaveAttachmentToDocuments={(messageId, attachmentId) =>
+                      console.log('Save attachment to documents:', messageId, attachmentId)
+                    }
                   />
                 )}
                 {activeTab === 'details' && (

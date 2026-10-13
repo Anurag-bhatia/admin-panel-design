@@ -27,6 +27,8 @@ export type SetupTab =
   | 'designations'
   | 'masters'
   | 'geographic'
+  | 'chatSettings'
+  | 'chatTemplates'
   | 'auditLog'
 
 export type UsageModule =
