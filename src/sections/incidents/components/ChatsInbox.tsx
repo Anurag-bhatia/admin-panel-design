@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import {
   Search,
   MessageCircle,
-  AlertTriangle,
   Filter,
   CheckCheck,
   Paperclip,
@@ -336,11 +335,13 @@ export function ChatsInbox({
                           </span>
                         )}
                         {tatBreaching && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
-                            <AlertTriangle className="h-2.5 w-2.5" />
-                            TAT {t.tatDaysLeft}d
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                            {t.tatDaysLeft}d
                           </span>
                         )}
+                        <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                          {lawyer?.name ?? 'Unassigned'}
+                        </span>
                       </div>
                       <div className="mt-1 flex items-center gap-2">
                         <p
