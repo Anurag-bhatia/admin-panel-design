@@ -285,7 +285,6 @@ export function CMSDashboard({
           {activeTab === 'wallet' && (
             <WalletSection
               programmes={programmes}
-              auditLog={auditLog}
               customerCredits={customerCredits}
               onCreateProgramme={() => setView('add-programme')}
               onViewProgramme={(id) => {

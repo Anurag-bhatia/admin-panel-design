@@ -122,7 +122,7 @@ const FullPreviewPage: React.FC = () => {
           isActive: currentConfig === 'coupon',
         },
         {
-          label: 'ChallanPay Credit',
+          label: 'CP Pockets',
           href: '#rewards-config/wallet',
           isActive: currentConfig === 'wallet',
         },
@@ -177,7 +177,7 @@ const FullPreviewPage: React.FC = () => {
           sales: 'Sales Config',
           web: 'Web Config',
           coupon: 'Coupon',
-          wallet: 'ChallanPay Credit',
+          wallet: 'CP Pockets',
         }
         crumbs.push({ label: configLabel[activeSubRoute] ?? activeSubRoute })
       } else if (activeSection === 'cms') {

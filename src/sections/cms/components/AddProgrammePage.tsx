@@ -60,9 +60,9 @@ function defaultCustomerText(): ProgrammeCustomerText {
   return {
     displayName: '',
     description: '',
-    issuedMessage: 'You got {coins} coins. Expires on {expiry}.',
-    usedMessage: 'You used {coins} coins. Balance: {balance}.',
-    expiringMessage: '{coins} coins expire on {expiry}.',
+    issuedMessage: 'You got {coins} CP Coins. Expires on {expiry}.',
+    usedMessage: 'You used {coins} CP Coins. Balance: {balance}.',
+    expiringMessage: '{coins} CP Coins expire on {expiry}.',
   }
 }
 
@@ -244,7 +244,7 @@ export function AddProgrammePage({
 
   const previewSentence = useMemo(() => {
     const parts: string[] = []
-    parts.push(`Issue ${previewCoins || 0} coins`)
+    parts.push(`Issue ${previewCoins || 0} CP Coins`)
     if (audience === 'newOnly') parts.push('to new customers')
     if (showMinCash && Number(minimumCashPaid) > 0)
       parts.push(`when they pay ₹${minimumCashPaid} cash or more`)
@@ -266,7 +266,7 @@ export function AddProgrammePage({
       errs.push('Internal description is required for specific-customer programmes')
     if (showMobileList && mobileNumbers.length === 0)
       errs.push('At least one mobile number is required')
-    if (!(Number(coinsPerCustomer) > 0)) errs.push('Coins per customer must be > 0')
+    if (!(Number(coinsPerCustomer) > 0)) errs.push('CP Coins per customer must be > 0')
     if (!startAt) errs.push('Start date is required')
     if (!endAt) errs.push('End date is required')
     if (startAt && endAt && new Date(endAt).getTime() <= new Date(startAt).getTime())
@@ -280,7 +280,7 @@ export function AddProgrammePage({
     if (Number(hardStopCoins) > Number(budgetCoins))
       errs.push('Hard stop cannot exceed the budget')
     if (showMobileList && mobileNumbers.length * Number(coinsPerCustomer) > Number(budgetCoins))
-      errs.push('Total coins for the mobile list exceed the budget')
+      errs.push('Total CP Coins for the mobile list exceed the budget')
     if (!customerText.displayName) errs.push('Customer display name is required')
     if (!customerText.description) errs.push('Customer description is required')
     return errs
@@ -432,9 +432,9 @@ export function AddProgrammePage({
                   Mobile list exceeds the programme budget
                 </p>
                 <p className="text-xs text-amber-700 dark:text-amber-300">
-                  {mobileNumbers.length} numbers × {Number(coinsPerCustomer) || 0} coins = {' '}
-                  {listTotalCoins.toLocaleString('en-IN')} coins, but the budget is only {' '}
-                  {(Number(budgetCoins) || 0).toLocaleString('en-IN')} coins. The whole upload will
+                  {mobileNumbers.length} numbers × {Number(coinsPerCustomer) || 0} CP Coins = {' '}
+                  {listTotalCoins.toLocaleString('en-IN')} CP Coins, but the budget is only {' '}
+                  {(Number(budgetCoins) || 0).toLocaleString('en-IN')} CP Coins. The whole upload will
                   be refused. Raise the budget or trim the list.
                 </p>
               </div>
@@ -495,7 +495,7 @@ export function AddProgrammePage({
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Welcome Coins for New Users"
+                  placeholder="e.g. Welcome CP Coins for New Users"
                   className={inputCls(!!nameError)}
                 />
               </Field>
@@ -621,7 +621,7 @@ export function AddProgrammePage({
             onToggle={() => toggle('C')}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Coins per customer" required help="1 coin = ₹1.">
+              <Field label="CP Coins per customer" required help="1 CP Coin = ₹1.">
                 <div className="relative">
                   <input
                     type="number"
@@ -645,7 +645,7 @@ export function AddProgrammePage({
                       onClick={() => setRewardBasis('fixedCoins')}
                       className={selectableCls(rewardBasis === 'fixedCoins')}
                     >
-                      Fixed coins
+                      Fixed CP Coins
                     </button>
                     <button
                       type="button"
@@ -659,7 +659,7 @@ export function AddProgrammePage({
               )}
 
               {showRewardBasis && rewardBasis === 'percentOfCash' && (
-                <Field label="Percent of cash paid (1–100)" required help="Coins per customer becomes the maximum reward per order.">
+                <Field label="Percent of cash paid (1–100)" required help="CP Coins per customer becomes the maximum reward per order.">
                   <input
                     type="number"
                     min={1}
@@ -772,7 +772,7 @@ export function AddProgrammePage({
               <Field label="Partial use">
                 <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                   <span className="text-sm text-slate-700 dark:text-slate-200">
-                    Unused coins stay in the balance
+                    Unused CP Coins stay in the balance
                   </span>
                   <Toggle checked={partialUse} onChange={setPartialUse} />
                 </div>
@@ -824,7 +824,7 @@ export function AddProgrammePage({
             onToggle={() => toggle('E')}
           >
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Field label="Programme budget (coins)" required>
+              <Field label="Programme budget (CP Coins)" required>
                 <input
                   type="number"
                   min={1}
@@ -850,7 +850,7 @@ export function AddProgrammePage({
                 />
               </Field>
 
-              <Field label="Hard stop (coins)">
+              <Field label="Hard stop (CP Coins)">
                 <input
                   type="number"
                   min={0}
@@ -892,7 +892,7 @@ export function AddProgrammePage({
                   }
                   rows={3}
                   className={inputCls(false)}
-                  placeholder="Free coins for ChallanPay charges. Not withdrawable, expires in 60 days."
+                  placeholder="Free CP Coins for ChallanPay charges. Not withdrawable, expires in 60 days."
                 />
               </Field>
               <Field label="Issued message" required className="sm:col-span-2" help="Placeholders: {coins}, {expiry}, {balance}">

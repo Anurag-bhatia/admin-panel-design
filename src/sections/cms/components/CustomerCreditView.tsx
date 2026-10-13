@@ -126,13 +126,13 @@ export function CustomerCreditView({ customerCredits, permissions = defaultWalle
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <StatCard
             label="Total available"
-            value={`${formatCoins(selected.totalAvailable)} coins`}
+            value={`${formatCoins(selected.totalAvailable)} CP Coins`}
             sub={`≈ ₹${formatCoins(selected.totalAvailable)}`}
             tone="cyan"
           />
           <StatCard
             label="Reserved"
-            value={`${formatCoins(selected.totalReserved)} coins`}
+            value={`${formatCoins(selected.totalReserved)} CP Coins`}
             sub="Held by unpaid orders"
             tone="amber"
           />
@@ -247,7 +247,7 @@ export function CustomerCreditView({ customerCredits, permissions = defaultWalle
                     Entry
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-2.5">
-                    Coins
+                    CP Coins
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-2.5">
                     Running Balance
@@ -362,7 +362,7 @@ export function CustomerCreditView({ customerCredits, permissions = defaultWalle
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300">
-                    {formatCoins(c.totalAvailable)} coins
+                    {formatCoins(c.totalAvailable)} CP Coins
                   </p>
                   <p className="text-xs text-slate-400">
                     {c.lots.length} active lot{c.lots.length > 1 ? 's' : ''}

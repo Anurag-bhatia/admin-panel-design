@@ -393,7 +393,7 @@ function AgeingReport({ programmes }: { programmes: Programme[] }) {
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
               <Th>Age bucket</Th>
-              <Th align="right">Outstanding coins</Th>
+              <Th align="right">Outstanding CP Coins</Th>
               <Th align="right">Share</Th>
               <Th align="right">Expiring in next 30 days</Th>
             </tr>

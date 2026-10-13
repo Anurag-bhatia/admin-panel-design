@@ -69,17 +69,17 @@ export function WalletDashboard({ programmes }: WalletDashboardProps) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Credit Dashboard</h1>
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">CP Pockets Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Tile
           label="Outstanding credit"
-          primary={`${formatCoins(totals.outstanding)} coins`}
+          primary={`${formatCoins(totals.outstanding)} CP Coins`}
           sub={`≈ ₹${formatInr(totals.outstanding)}`}
         />
         <Tile
           label="Issued (all time)"
-          primary={`${formatCoins(totals.issued)} coins`}
+          primary={`${formatCoins(totals.issued)} CP Coins`}
           sub={`${formatCoins(totals.used)} used · ${formatCoins(totals.expired)} expired`}
         />
         <Tile
@@ -193,7 +193,7 @@ export function WalletDashboard({ programmes }: WalletDashboardProps) {
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
             <p className="text-xs text-slate-400">
-              Refunds go back to the original payment method; coins used on a refunded incident
+              Refunds go back to the original payment method; CP Coins used on a refunded incident
               return to the balance.
             </p>
           </div>

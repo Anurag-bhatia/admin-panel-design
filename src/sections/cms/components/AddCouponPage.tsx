@@ -663,7 +663,7 @@ export function AddCouponPage({
           <Section
             id="G"
             title="Convert to Credit"
-            subtitle="Let eligible customers exchange this coupon for ChallanPay Credit"
+            subtitle="Let eligible customers exchange this coupon for CP Pockets"
             open={openSections.G}
             onToggle={() => toggleSection('G')}
           >
@@ -1056,7 +1056,7 @@ function ConversionSettings({
       <div className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-slate-900 dark:text-white">
-            Allow conversion to ChallanPay Credit
+            Allow conversion to CP Pockets
           </p>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             When on, eligible customers can exchange this coupon for credit instead of applying
@@ -1252,7 +1252,7 @@ function ConversionSettings({
               value={value.customerDisclosure ?? ''}
               onChange={(e) => set('customerDisclosure', e.target.value)}
               rows={3}
-              placeholder="e.g. Convert this coupon for 100 ChallanPay Credit, valid for 30 days on convenience fees. Credit is not cash and cannot be withdrawn or transferred."
+              placeholder="e.g. Convert this coupon for 100 CP Coins, valid for 30 days on convenience fees. CP Pockets is not cash and cannot be withdrawn or transferred."
               className={inputCls(disabled)}
             />
           </ConvField>

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Shield, ChevronDown, Check } from 'lucide-react'
 import type {
   Programme,
-  AuditLogEntry,
   CustomerCredit,
   WalletPermission,
   WalletPermissions,
@@ -14,13 +13,11 @@ import {
 import { ProgrammeList } from './ProgrammeList'
 import { WalletReports } from './WalletReports'
 import { CustomerCreditView } from './CustomerCreditView'
-import { WalletAuditLog } from './WalletAuditLog'
 
-export type WalletTab = 'programmes' | 'reports' | 'customer-credit' | 'audit-log'
+export type WalletTab = 'programmes' | 'reports' | 'customer-credit'
 
 interface WalletSectionProps {
   programmes: Programme[]
-  auditLog: AuditLogEntry[]
   customerCredits: CustomerCredit[]
   onCreateProgramme: () => void
   onEditProgramme: (id: string) => void
@@ -37,12 +34,10 @@ const tabs: Tab[] = [
   { id: 'programmes', label: 'Programmes' },
   { id: 'reports', label: 'Reports', requires: 'viewReports' },
   { id: 'customer-credit', label: 'Customer Credit', requires: 'viewCustomerCredit' },
-  { id: 'audit-log', label: 'Audit Log', requires: 'viewAuditLog' },
 ]
 
 export function WalletSection({
   programmes,
-  auditLog,
   customerCredits,
   onCreateProgramme,
   onEditProgramme,
@@ -109,10 +104,6 @@ export function WalletSection({
 
       {activeTab === 'customer-credit' && permissions.viewCustomerCredit && (
         <CustomerCreditView customerCredits={customerCredits} permissions={permissions} />
-      )}
-
-      {activeTab === 'audit-log' && permissions.viewAuditLog && (
-        <WalletAuditLog entries={auditLog} permissions={permissions} />
       )}
     </div>
   )

@@ -387,7 +387,7 @@ export function ProgrammeList({
                 return (
                   <tr
                     key={p.id}
-                    onClick={() => onView?.(p.id)}
+                    onClick={() => (effective === 'draft' ? onEdit?.(p.id) : onView?.(p.id))}
                     className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors cursor-pointer"
                   >
                     <td className="px-4 py-3.5">
@@ -439,14 +439,16 @@ export function ProgrammeList({
 
                         {openMenuId === p.id && (
                           <div className="absolute right-0 top-full mt-1 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-20">
-                            <MenuItem
-                              icon={<Eye className="w-3.5 h-3.5" />}
-                              label="View details"
-                              onClick={() => {
-                                setOpenMenuId(null)
-                                onView?.(p.id)
-                              }}
-                            />
+                            {effective !== 'draft' && (
+                              <MenuItem
+                                icon={<Eye className="w-3.5 h-3.5" />}
+                                label="View details"
+                                onClick={() => {
+                                  setOpenMenuId(null)
+                                  onView?.(p.id)
+                                }}
+                              />
+                            )}
                             {(canEdit || canEditLive) && (
                               <MenuItem
                                 icon={<Pencil className="w-3.5 h-3.5" />}
