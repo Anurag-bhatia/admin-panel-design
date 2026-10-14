@@ -290,7 +290,7 @@ export function SubscriberDetail({
   const [bulkUpdateFile, setBulkUpdateFile] = useState<File | null>(null)
   const [isBulkUpdateDragging, setIsBulkUpdateDragging] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
-  const [addPolicyStep, setAddPolicyStep] = useState<null | 'choice' | 'new' | 'existing'>(null)
+  const [addPolicyStep, setAddPolicyStep] = useState<null | 'choice' | 'new' | 'existing' | 'bulk'>(null)
   const [showUploadDocModal, setShowUploadDocModal] = useState(false)
   const [uploadDocCategory, setUploadDocCategory] = useState('')
   const [uploadDocFile, setUploadDocFile] = useState<File | null>(null)
@@ -2735,7 +2735,7 @@ function PolicyField({
   )
 }
 
-type AddPolicyStep = 'choice' | 'new' | 'existing'
+type AddPolicyStep = 'choice' | 'new' | 'existing' | 'bulk'
 
 interface FleetDriver {
   id: string
@@ -2765,9 +2765,11 @@ function AddDriverInsuranceModal({
 }) {
   const header =
     step === 'choice'
-      ? { title: 'Add driver insurance', sub: 'Issue a policy for a new driver or someone already on your fleet' }
+      ? { title: 'Add driver insurance', sub: 'Issue a policy for a new driver, someone already on your fleet, or a bulk list' }
       : step === 'new'
       ? { title: 'Activate Driver Insurance', sub: 'Issue a personal accident policy for one of your drivers' }
+      : step === 'bulk'
+      ? { title: 'Create bulk insurance', sub: 'Upload a sheet to issue policies for many drivers at once' }
       : { title: 'Choose existing driver', sub: 'Pick a driver already on your fleet and issue a policy' }
 
   return (
@@ -2802,9 +2804,10 @@ function AddDriverInsuranceModal({
           {step === 'choice' && <ChoiceStep onPick={onChangeStep} />}
           {step === 'new' && <NewPolicyForm />}
           {step === 'existing' && <ExistingDriverList />}
+          {step === 'bulk' && <BulkUploadStep />}
         </div>
 
-        {step === 'new' && (
+        {(step === 'new' || step === 'bulk') && (
           <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
             <button
               type="button"
@@ -2818,7 +2821,7 @@ function AddDriverInsuranceModal({
               onClick={onClose}
               className="px-5 py-2 text-sm font-semibold text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg"
             >
-              Activate Policy
+              {step === 'bulk' ? 'Upload & Activate' : 'Activate Policy'}
             </button>
           </div>
         )}
@@ -2829,7 +2832,7 @@ function AddDriverInsuranceModal({
 
 function ChoiceStep({ onPick }: { onPick: (s: AddPolicyStep) => void }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-10">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 p-10">
       <ChoiceCard
         icon={<PlusCircle className="w-7 h-7" />}
         title="Add new insurance"
@@ -2841,6 +2844,12 @@ function ChoiceStep({ onPick }: { onPick: (s: AddPolicyStep) => void }) {
         title="Choose existing driver"
         description="Pick a driver already on your fleet and issue a policy"
         onClick={() => onPick('existing')}
+      />
+      <ChoiceCard
+        icon={<Upload className="w-7 h-7" />}
+        title="Create bulk insurance"
+        description="Upload a sheet to issue policies for many drivers at once"
+        onClick={() => onPick('bulk')}
       />
     </div>
   )
@@ -3046,6 +3055,110 @@ function ExistingDriverList() {
           )}
         </div>
       ))}
+    </div>
+  )
+}
+
+function BulkUploadStep() {
+  const [file, setFile] = useState<File | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  return (
+    <div className="p-6 space-y-5">
+      <div className="flex items-start justify-between gap-4 p-4 rounded-xl bg-cyan-50 dark:bg-cyan-900/15 border border-cyan-100 dark:border-cyan-900/40">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-cyan-900 dark:text-cyan-100">
+            Need a template?
+          </p>
+          <p className="text-xs text-cyan-800/80 dark:text-cyan-200/80 mt-0.5">
+            Use the sample sheet with the required columns (Name, Mobile, DOB, Gender, Aadhaar,
+            License, Nominee, Vehicle RC, …).
+          </p>
+        </div>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 bg-white dark:bg-slate-900 hover:bg-cyan-50 dark:hover:bg-cyan-900/30 rounded-lg flex-shrink-0"
+        >
+          <Download className="w-3.5 h-3.5" />
+          Download template
+        </button>
+      </div>
+
+      <div
+        onDragOver={(e) => {
+          e.preventDefault()
+          setIsDragging(true)
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setIsDragging(false)
+          const dropped = e.dataTransfer.files?.[0]
+          if (dropped) setFile(dropped)
+        }}
+        onClick={() => inputRef.current?.click()}
+        className={`flex flex-col items-center justify-center gap-3 py-14 rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
+          isDragging
+            ? 'border-cyan-400 bg-cyan-50/60 dark:bg-cyan-900/20'
+            : file
+            ? 'border-cyan-300 bg-cyan-50/40 dark:bg-cyan-900/10'
+            : 'border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 hover:border-cyan-400'
+        }`}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".csv,.xls,.xlsx"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          className="hidden"
+        />
+        {file ? (
+          <>
+            <div className="w-12 h-12 rounded-xl bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center">
+              <FileText className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
+                {file.name}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {(file.size / 1024).toFixed(1)} KB · click to replace
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                setFile(null)
+                if (inputRef.current) inputRef.current.value = ''
+              }}
+              className="text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 underline"
+            >
+              Remove file
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="w-12 h-12 rounded-xl bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center">
+              <Upload className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
+                Drag & drop your sheet here
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                or click to browse · CSV, XLS or XLSX up to 10 MB
+              </p>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+        We'll validate each row before any policy is issued. Rows with missing or invalid data
+        are rejected individually; everything else is activated in one go.
+      </div>
     </div>
   )
 }
