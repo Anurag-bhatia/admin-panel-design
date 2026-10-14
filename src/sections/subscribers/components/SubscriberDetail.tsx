@@ -1,9 +1,9 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3, RefreshCw, Loader2, Shield, Plus } from 'lucide-react'
+import { ArrowLeft, Upload, Trash2, FileText, Building2, CreditCard, AlertCircle, Users, AlertTriangle, Truck, ChevronDown, Calendar, Search, Filter, X, Eye, Download, MoreVertical, Pencil, Power, BookOpen, BarChart3, RefreshCw, Loader2, Shield, ShieldCheck, Plus, User, ChevronRight, PlusCircle, Check } from 'lucide-react'
 import type { Subscriber, Subscription, User as UserType, Vehicle, SubscriberReport } from '@/../product/sections/subscribers/types'
 import { AddSubscriberModal } from './AddSubscriberModal'
 
-type TabType = 'details' | 'subscriptions' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'team' | 'api-catalogue' | 'report' | 'permissions'
+type TabType = 'details' | 'subscriptions' | 'challans' | 'incidents' | 'documents' | 'vehicles' | 'team' | 'api-catalogue' | 'report' | 'insurance' | 'permissions'
 
 type PermissionItem = { key: string; label: string }
 type PermissionGroup = { label?: string; items: PermissionItem[] }
@@ -290,6 +290,7 @@ export function SubscriberDetail({
   const [bulkUpdateFile, setBulkUpdateFile] = useState<File | null>(null)
   const [isBulkUpdateDragging, setIsBulkUpdateDragging] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [addPolicyStep, setAddPolicyStep] = useState<null | 'choice' | 'new' | 'existing'>(null)
   const [showUploadDocModal, setShowUploadDocModal] = useState(false)
   const [uploadDocCategory, setUploadDocCategory] = useState('')
   const [uploadDocFile, setUploadDocFile] = useState<File | null>(null)
@@ -538,6 +539,7 @@ export function SubscriberDetail({
       team: <Users className="w-4 h-4" />,
       'api-catalogue': <BookOpen className="w-4 h-4" />,
       report: <BarChart3 className="w-4 h-4" />,
+      insurance: <ShieldCheck className="w-4 h-4" />,
       permissions: <Shield className="w-4 h-4" />
     }
     return icons[tab]
@@ -578,7 +580,7 @@ export function SubscriberDetail({
         {/* Tabs */}
         <div className="mb-6 -mx-6 lg:-mx-8 px-6 lg:px-8 overflow-x-auto">
           <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit min-w-full">
-            {(['details', 'subscriptions', 'vehicles', 'incidents', 'challans', 'documents', 'team', 'api-catalogue', 'report', 'permissions'] as TabType[]).map((tab) => (
+            {(['details', 'subscriptions', 'vehicles', 'incidents', 'challans', 'documents', 'team', 'api-catalogue', 'report', 'insurance', 'permissions'] as TabType[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -1678,6 +1680,35 @@ export function SubscriberDetail({
             </div>
           )}
 
+          {/* Insurance Tab */}
+          {activeTab === 'insurance' && (
+            <div>
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+                    Driver Insurance
+                  </h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                    Personal accident / health policies for each driver.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setAddPolicyStep('choice')}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Policy
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {driverPolicies.map((policy) => (
+                  <DriverPolicyCard key={policy.id} policy={policy} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Permissions Tab */}
           {activeTab === 'permissions' && (
             <div className="flex min-h-[480px] -m-6 overflow-hidden rounded-lg">
@@ -1750,6 +1781,14 @@ export function SubscriberDetail({
             setShowEditModal(false)
           }}
           onClose={() => setShowEditModal(false)}
+        />
+      )}
+
+      {addPolicyStep && (
+        <AddDriverInsuranceModal
+          step={addPolicyStep}
+          onChangeStep={setAddPolicyStep}
+          onClose={() => setAddPolicyStep(null)}
         />
       )}
 
@@ -2534,6 +2573,484 @@ function PermissionRow({ label, description, enabled, onToggle }: { label: strin
           enabled ? 'translate-x-[18px]' : 'translate-x-[3px]'
         }`} />
       </button>
+    </div>
+  )
+}
+
+type DriverPolicyStatus = 'active' | 'requested' | 'expired'
+
+interface DriverPolicy {
+  id: string
+  driverName: string
+  insurer: string
+  policyNumber?: string
+  sumInsured?: number
+  validTill?: string
+  nominee?: string
+  status: DriverPolicyStatus
+}
+
+const driverPolicies: DriverPolicy[] = [
+  {
+    id: 'dp-1',
+    driverName: 'Rajesh Kumar',
+    insurer: 'HDFC ERGO General Insurance',
+    policyNumber: 'HDFCERGO/PA/2025/0012345',
+    sumInsured: 1500000,
+    validTill: '2026-08-11',
+    nominee: 'Sunita Kumar',
+    status: 'active',
+  },
+  {
+    id: 'dp-2',
+    driverName: 'Suresh Patel',
+    insurer: 'Bajaj Allianz General Insurance',
+    policyNumber: 'BAJAJ/PA/2025/0054321',
+    sumInsured: 1500000,
+    validTill: '2026-11-02',
+    nominee: 'Meena Patel',
+    status: 'active',
+  },
+  {
+    id: 'dp-3',
+    driverName: 'Amit Sharma',
+    insurer: 'ICICI Lombard General Insurance',
+    status: 'requested',
+  },
+]
+
+function formatIndianCurrency(n: number): string {
+  return n.toLocaleString('en-IN')
+}
+
+function formatPolicyDate(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+function DriverPolicyCard({ policy }: { policy: DriverPolicy }) {
+  const isRequested = policy.status === 'requested'
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
+      <div className="flex items-start justify-between gap-3 mb-5">
+        <div className="flex items-start gap-3 min-w-0">
+          <div className="w-11 h-11 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+            <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-base font-bold text-slate-900 dark:text-slate-50 truncate">
+              {policy.driverName}
+            </p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+              {policy.insurer}
+            </p>
+          </div>
+        </div>
+        <PolicyStatusBadge status={policy.status} />
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+        <PolicyField label="Policy" value={policy.policyNumber} mono truncate />
+        <PolicyField
+          label="Sum Insured"
+          value={policy.sumInsured ? `₹${formatIndianCurrency(policy.sumInsured)}` : undefined}
+        />
+        <PolicyField
+          label="Valid till"
+          value={policy.validTill ? formatPolicyDate(policy.validTill) : undefined}
+          icon={<Calendar className="w-3.5 h-3.5" />}
+        />
+        <PolicyField label="Nominee" value={policy.nominee} />
+      </div>
+
+      <div className="flex items-center justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+        <button
+          disabled={isRequested}
+          className={`inline-flex items-center gap-1 text-sm font-semibold ${
+            isRequested
+              ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
+              : 'text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300'
+          }`}
+        >
+          View policy
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function PolicyStatusBadge({ status }: { status: DriverPolicyStatus }) {
+  const styles: Record<DriverPolicyStatus, { label: string; cls: string; dot: string }> = {
+    active: {
+      label: 'ACTIVE',
+      cls: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+      dot: 'bg-emerald-500',
+    },
+    requested: {
+      label: 'REQUESTED',
+      cls: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+      dot: 'bg-amber-500',
+    },
+    expired: {
+      label: 'EXPIRED',
+      cls: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
+      dot: 'bg-red-500',
+    },
+  }
+  const s = styles[status]
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold tracking-wide rounded-full border ${s.cls}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+      {s.label}
+    </span>
+  )
+}
+
+function PolicyField({
+  label,
+  value,
+  icon,
+  mono,
+  truncate,
+}: {
+  label: string
+  value?: string
+  icon?: React.ReactNode
+  mono?: boolean
+  truncate?: boolean
+}) {
+  return (
+    <div className="min-w-0">
+      <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mb-1">
+        {icon}
+        {label}
+      </p>
+      <p
+        className={`text-sm font-semibold text-slate-900 dark:text-slate-50 ${
+          mono ? 'font-mono' : ''
+        } ${truncate ? 'truncate' : ''}`}
+      >
+        {value ?? '—'}
+      </p>
+    </div>
+  )
+}
+
+type AddPolicyStep = 'choice' | 'new' | 'existing'
+
+interface FleetDriver {
+  id: string
+  name: string
+  mobile: string
+  license: string
+  insured: boolean
+}
+
+const fleetDrivers: FleetDriver[] = [
+  { id: 'fd-1', name: 'Mohammad Irfan', mobile: '917654321098', license: 'RJ14210023456', insured: false },
+  { id: 'fd-2', name: 'Arjun Reddy', mobile: '915432109876', license: 'TN07200012345', insured: false },
+  { id: 'fd-3', name: 'Deepak Yadav', mobile: '914321098765', license: 'UP32220067890', insured: false },
+  { id: 'fd-4', name: 'Rajesh Kumar', mobile: '918976543210', license: 'MH12190045678', insured: true },
+  { id: 'fd-5', name: 'Suresh Patel', mobile: '918765432109', license: 'GJ05200034567', insured: true },
+  { id: 'fd-6', name: 'Vikram Singh', mobile: '916543210987', license: 'MP09180056789', insured: true },
+]
+
+function AddDriverInsuranceModal({
+  step,
+  onChangeStep,
+  onClose,
+}: {
+  step: AddPolicyStep
+  onChangeStep: (s: AddPolicyStep) => void
+  onClose: () => void
+}) {
+  const header =
+    step === 'choice'
+      ? { title: 'Add driver insurance', sub: 'Issue a policy for a new driver or someone already on your fleet' }
+      : step === 'new'
+      ? { title: 'Activate Driver Insurance', sub: 'Issue a personal accident policy for one of your drivers' }
+      : { title: 'Choose existing driver', sub: 'Pick a driver already on your fleet and issue a policy' }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div className="flex items-start justify-between gap-3 px-6 py-5 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-start gap-4 min-w-0">
+            <button
+              type="button"
+              onClick={() => (step === 'choice' ? onClose() : onChangeStep('choice'))}
+              className="w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex-shrink-0"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <div className="min-w-0">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+                {header.title}
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{header.sub}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex-shrink-0"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          {step === 'choice' && <ChoiceStep onPick={onChangeStep} />}
+          {step === 'new' && <NewPolicyForm />}
+          {step === 'existing' && <ExistingDriverList />}
+        </div>
+
+        {step === 'new' && (
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+            >
+              Activate Policy
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ChoiceStep({ onPick }: { onPick: (s: AddPolicyStep) => void }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-10">
+      <ChoiceCard
+        icon={<PlusCircle className="w-7 h-7" />}
+        title="Add new insurance"
+        description="Start a fresh personal accident policy for a driver"
+        onClick={() => onPick('new')}
+      />
+      <ChoiceCard
+        icon={<User className="w-7 h-7" />}
+        title="Choose existing driver"
+        description="Pick a driver already on your fleet and issue a policy"
+        onClick={() => onPick('existing')}
+      />
+    </div>
+  )
+}
+
+function ChoiceCard({
+  icon,
+  title,
+  description,
+  onClick,
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex flex-col items-center text-center gap-4 p-8 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-600 hover:bg-emerald-50/40 dark:hover:bg-emerald-900/10 transition-colors"
+    >
+      <div className="w-14 h-14 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+        {icon}
+      </div>
+      <div>
+        <p className="text-base font-bold text-slate-900 dark:text-slate-50">{title}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 max-w-xs">
+          {description}
+        </p>
+      </div>
+    </button>
+  )
+}
+
+function NewPolicyForm() {
+  const [dob, setDob] = useState<string>('')
+  const age = useMemo(() => {
+    if (!dob) return ''
+    const d = new Date(dob)
+    if (Number.isNaN(d.getTime())) return ''
+    const now = new Date()
+    let a = now.getFullYear() - d.getFullYear()
+    const m = now.getMonth() - d.getMonth()
+    if (m < 0 || (m === 0 && now.getDate() < d.getDate())) a--
+    return a > 0 && a < 120 ? String(a) : ''
+  }, [dob])
+
+  return (
+    <form className="p-6 space-y-5">
+      <PolicyFormField label="Member Name" required>
+        <input
+          type="text"
+          placeholder="Full name as on government ID or Aadhaar"
+          className={policyInputCls}
+        />
+      </PolicyFormField>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <PolicyFormField label="Email ID" required>
+          <input type="email" placeholder="driver@example.com" className={policyInputCls} />
+        </PolicyFormField>
+        <PolicyFormField label="Mobile Number" required>
+          <input type="tel" placeholder="+91 98765 43210" className={policyInputCls} />
+        </PolicyFormField>
+
+        <PolicyFormField label="Date of Birth" required>
+          <input
+            type="date"
+            value={dob}
+            onChange={(e) => setDob(e.target.value)}
+            className={policyInputCls}
+          />
+        </PolicyFormField>
+        <PolicyFormField label="Age" required>
+          <input
+            type="text"
+            readOnly
+            value={age}
+            placeholder="Auto-calculated"
+            className={`${policyInputCls} bg-slate-50 dark:bg-slate-800/60`}
+          />
+        </PolicyFormField>
+
+        <PolicyFormField label="Gender" required>
+          <select className={policyInputCls} defaultValue="">
+            <option value="" disabled>Select gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </PolicyFormField>
+        <PolicyFormField label="State" required>
+          <select className={policyInputCls} defaultValue="">
+            <option value="" disabled>Select state</option>
+            <option>Maharashtra</option>
+            <option>Delhi</option>
+            <option>Karnataka</option>
+            <option>Tamil Nadu</option>
+            <option>Gujarat</option>
+          </select>
+        </PolicyFormField>
+
+        <PolicyFormField label="Pincode" required>
+          <input type="text" placeholder="6-digit pincode" maxLength={6} className={policyInputCls} />
+        </PolicyFormField>
+        <PolicyFormField label="Aadhaar Number" required>
+          <input type="text" placeholder="1234 5678 9012" className={policyInputCls} />
+        </PolicyFormField>
+      </div>
+
+      <PolicyFormField label="License no." required>
+        <input type="text" placeholder="e.g. MH12 19 0045678" className={policyInputCls} />
+      </PolicyFormField>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <PolicyFormField label="Nominee Name" required>
+          <input type="text" placeholder="Full name of nominee" className={policyInputCls} />
+        </PolicyFormField>
+        <PolicyFormField label="Nominee Relationship" required>
+          <select className={policyInputCls} defaultValue="">
+            <option value="" disabled>Select relationship</option>
+            <option>Spouse</option>
+            <option>Parent</option>
+            <option>Child</option>
+            <option>Sibling</option>
+            <option>Other</option>
+          </select>
+        </PolicyFormField>
+      </div>
+
+      <PolicyFormField label="Vehicle Assigned" required>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by RC number, make, model…"
+            className={`${policyInputCls} pl-10`}
+          />
+        </div>
+      </PolicyFormField>
+    </form>
+  )
+}
+
+const policyInputCls =
+  'w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent'
+
+function PolicyFormField({
+  label,
+  required,
+  children,
+}: {
+  label: string
+  required?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <label className="block">
+      <span className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
+      </span>
+      {children}
+    </label>
+  )
+}
+
+function ExistingDriverList() {
+  return (
+    <div className="p-6 space-y-3">
+      {fleetDrivers.map((d) => (
+        <div
+          key={d.id}
+          className="flex items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-11 h-11 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+              <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-base font-bold text-slate-900 dark:text-slate-50 truncate">
+                {d.name}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">
+                {d.mobile} · {d.license}
+              </p>
+            </div>
+          </div>
+          {d.insured ? (
+            <span className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/20">
+              <Check className="w-4 h-4" />
+              Insured
+            </span>
+          ) : (
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+            >
+              <PlusCircle className="w-4 h-4" />
+              Add insurance
+            </button>
+          )}
+        </div>
+      ))}
     </div>
   )
 }

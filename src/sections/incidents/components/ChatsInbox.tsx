@@ -339,9 +339,6 @@ export function ChatsInbox({
                             {t.tatDaysLeft}d
                           </span>
                         )}
-                        <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                          {lawyer?.name ?? 'Unassigned'}
-                        </span>
                       </div>
                       <div className="mt-1 flex items-center gap-2">
                         <p
@@ -354,6 +351,12 @@ export function ChatsInbox({
                           {t.lastMessageSender === 'ops' && (
                             <CheckCheck className="h-3 w-3 inline mr-1 text-sky-500" />
                           )}
+                          <span className="font-semibold text-slate-700 dark:text-slate-200">
+                            {t.lastMessageSender === 'ops'
+                              ? (t.lastMessageSenderName ?? 'You')
+                              : (lawyer?.name ?? 'Unassigned')}
+                            :
+                          </span>{' '}
                           {t.lastMessageHasAttachment && (
                             <Paperclip className="h-3 w-3 inline mr-0.5 text-slate-400" />
                           )}
