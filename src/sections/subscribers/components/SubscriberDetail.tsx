@@ -1684,24 +1684,19 @@ export function SubscriberDetail({
           {activeTab === 'insurance' && (
             <div>
               <div className="flex items-center justify-between mb-5">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
-                    Driver Insurance
-                  </h2>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                    Personal accident / health policies for each driver.
-                  </p>
-                </div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+                  Driver Insurance
+                </h2>
                 <button
                   onClick={() => setAddPolicyStep('choice')}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Policy
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {driverPolicies.map((policy) => (
                   <DriverPolicyCard key={policy.id} policy={policy} />
                 ))}
@@ -2635,8 +2630,8 @@ function DriverPolicyCard({ policy }: { policy: DriverPolicy }) {
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
       <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex items-start gap-3 min-w-0">
-          <div className="w-11 h-11 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
-            <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <div className="w-11 h-11 rounded-lg bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center flex-shrink-0">
+            <User className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
           </div>
           <div className="min-w-0">
             <p className="text-base font-bold text-slate-900 dark:text-slate-50 truncate">
@@ -2650,7 +2645,7 @@ function DriverPolicyCard({ policy }: { policy: DriverPolicy }) {
         <PolicyStatusBadge status={policy.status} />
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-4">
         <PolicyField label="Policy" value={policy.policyNumber} mono truncate />
         <PolicyField
           label="Sum Insured"
@@ -2670,7 +2665,7 @@ function DriverPolicyCard({ policy }: { policy: DriverPolicy }) {
           className={`inline-flex items-center gap-1 text-sm font-semibold ${
             isRequested
               ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
-              : 'text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300'
+              : 'text-cyan-700 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-300'
           }`}
         >
           View policy
@@ -2821,7 +2816,7 @@ function AddDriverInsuranceModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+              className="px-5 py-2 text-sm font-semibold text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg"
             >
               Activate Policy
             </button>
@@ -2866,9 +2861,9 @@ function ChoiceCard({
     <button
       type="button"
       onClick={onClick}
-      className="flex flex-col items-center text-center gap-4 p-8 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-600 hover:bg-emerald-50/40 dark:hover:bg-emerald-900/10 transition-colors"
+      className="flex flex-col items-center text-center gap-4 p-8 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-cyan-400 dark:hover:border-cyan-600 hover:bg-cyan-50/40 dark:hover:bg-cyan-900/10 transition-colors"
     >
-      <div className="w-14 h-14 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+      <div className="w-14 h-14 rounded-xl bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
         {icon}
       </div>
       <div>
@@ -2992,7 +2987,7 @@ function NewPolicyForm() {
 }
 
 const policyInputCls =
-  'w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent'
+  'w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent'
 
 function PolicyFormField({
   label,
@@ -3023,8 +3018,8 @@ function ExistingDriverList() {
           className="flex items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-11 h-11 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
-              <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="w-11 h-11 rounded-lg bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center flex-shrink-0">
+              <User className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             </div>
             <div className="min-w-0">
               <p className="text-base font-bold text-slate-900 dark:text-slate-50 truncate">
@@ -3043,7 +3038,7 @@ function ExistingDriverList() {
           ) : (
             <button
               type="button"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg"
             >
               <PlusCircle className="w-4 h-4" />
               Add insurance
