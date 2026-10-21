@@ -1,7 +1,7 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
 import { Plus, Search, Image, Pencil, Trash2 } from 'lucide-react';
-export function BlogList({ blogs, onAddBlog, onToggleStatus, onEdit, onDelete, onSearch }) {
+export function BlogList({ blogs, heading = 'Blog', addLabel = 'Add Blog', searchPlaceholder = 'Search blogs...', onAddBlog, onToggleStatus, onEdit, onDelete, onSearch }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const perPage = 10;
@@ -10,7 +10,7 @@ export function BlogList({ blogs, onAddBlog, onToggleStatus, onEdit, onDelete, o
         b.author.toLowerCase().includes(searchQuery.toLowerCase()));
     const totalPages = Math.ceil(filtered.length / perPage);
     const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
-    return (_jsxs("div", { children: [_jsxs("div", { className: "flex items-start justify-between mb-6", children: [_jsx("div", { children: _jsx("h1", { className: "text-2xl font-bold text-slate-900 dark:text-white", children: "Blog" }) }), _jsxs("button", { onClick: onAddBlog, className: "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm", children: [_jsx(Plus, { className: "w-4 h-4" }), "Add Blog"] })] }), _jsx("div", { className: "mb-4", children: _jsxs("div", { className: "relative max-w-sm", children: [_jsx(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" }), _jsx("input", { type: "text", placeholder: "Search blogs...", value: searchQuery, onChange: (e) => {
+    return (_jsxs("div", { children: [_jsxs("div", { className: "flex items-start justify-between mb-6", children: [_jsx("div", { children: _jsx("h1", { className: "text-2xl font-bold text-slate-900 dark:text-white", children: heading }) }), _jsxs("button", { onClick: onAddBlog, className: "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm", children: [_jsx(Plus, { className: "w-4 h-4" }), addLabel] })] }), _jsx("div", { className: "mb-4", children: _jsxs("div", { className: "relative max-w-sm", children: [_jsx(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" }), _jsx("input", { type: "text", placeholder: searchPlaceholder, value: searchQuery, onChange: (e) => {
                                 setSearchQuery(e.target.value);
                                 setCurrentPage(1);
                                 onSearch?.(e.target.value);

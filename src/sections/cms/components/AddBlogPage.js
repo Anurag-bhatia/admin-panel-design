@@ -7,7 +7,7 @@ const steps = [
     { id: 1, label: 'Details' },
     { id: 2, label: 'Content & Media' },
 ];
-export function AddBlogPage({ onSubmit, onCancel }) {
+export function AddBlogPage({ heading = 'Add Blog', submitLabel = 'Add Blog', onSubmit, onCancel }) {
     const [currentStep, setCurrentStep] = useState(1);
     const [form, setForm] = useState({
         name: '',
@@ -33,7 +33,7 @@ export function AddBlogPage({ onSubmit, onCancel }) {
             content: form.content,
         });
     };
-    return (_jsxs("div", { className: "min-h-[calc(100vh-64px)] bg-slate-50 dark:bg-slate-950", children: [_jsx("div", { className: "bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-5", children: _jsxs("div", { className: "flex items-center gap-4 max-w-4xl", children: [_jsx("button", { onClick: onCancel, className: "p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors", children: _jsx(ArrowLeft, { className: "w-5 h-5" }) }), _jsx("h1", { className: "text-xl font-bold text-slate-900 dark:text-white", children: "Add Blog" })] }) }), _jsxs("div", { className: "max-w-4xl mx-auto px-8 py-8", children: [_jsx("div", { className: "flex items-start justify-center mb-10", children: steps.map((step, index) => (_jsxs("div", { className: "flex items-start", children: [_jsxs("div", { className: "flex flex-col items-center", children: [_jsx("button", { onClick: () => {
+    return (_jsxs("div", { className: "min-h-[calc(100vh-64px)] bg-slate-50 dark:bg-slate-950", children: [_jsx("div", { className: "bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-5", children: _jsxs("div", { className: "flex items-center gap-4 max-w-4xl", children: [_jsx("button", { onClick: onCancel, className: "p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors", children: _jsx(ArrowLeft, { className: "w-5 h-5" }) }), _jsx("h1", { className: "text-xl font-bold text-slate-900 dark:text-white", children: heading })] }) }), _jsxs("div", { className: "max-w-4xl mx-auto px-8 py-8", children: [_jsx("div", { className: "flex items-start justify-center mb-10", children: steps.map((step, index) => (_jsxs("div", { className: "flex items-start", children: [_jsxs("div", { className: "flex flex-col items-center", children: [_jsx("button", { onClick: () => {
                                                 if (step.id < currentStep)
                                                     setCurrentStep(step.id);
                                                 if (step.id === 2 && canProceed)
@@ -53,5 +53,5 @@ export function AddBlogPage({ onSubmit, onCancel }) {
                                         onCancel?.();
                                     else
                                         setCurrentStep(1);
-                                }, className: "px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors", children: currentStep === 1 ? 'Cancel' : 'Back' }), currentStep === 1 ? (_jsx("button", { type: "button", onClick: () => setCurrentStep(2), disabled: !canProceed, className: "px-6 py-2.5 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed", children: "Next" })) : (_jsx("button", { type: "button", onClick: handleSubmit, className: "px-6 py-2.5 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-xl transition-colors", children: "Add Blog" }))] })] })] }));
+                                }, className: "px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors", children: currentStep === 1 ? 'Cancel' : 'Back' }), currentStep === 1 ? (_jsx("button", { type: "button", onClick: () => setCurrentStep(2), disabled: !canProceed, className: "px-6 py-2.5 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed", children: "Next" })) : (_jsx("button", { type: "button", onClick: handleSubmit, className: "px-6 py-2.5 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-xl transition-colors", children: submitLabel }))] })] })] }));
 }

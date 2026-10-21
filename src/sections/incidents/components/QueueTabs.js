@@ -2,6 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 const QUEUE_CONFIG = [
     { key: 'newIncidents', label: 'New Incidents', caseLabel: 'New Cases', color: 'cyan' },
     { key: 'inProgress', label: 'In Progress', color: 'amber' },
+    { key: 'underReview', label: 'To Be Settled', color: 'indigo' },
     { key: 'settled', label: 'Settled', color: 'emerald' },
     { key: 'notSettled', label: 'Not Settled', color: 'red' },
     { key: 'hold', label: 'Hold', color: 'slate' },

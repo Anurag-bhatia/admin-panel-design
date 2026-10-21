@@ -13,6 +13,11 @@ const QUEUE_OPTIONS = [
         description: 'Challans currently being worked on',
     },
     {
+        value: 'underReview',
+        label: 'To Be Settled',
+        description: 'Challans awaiting review before settlement',
+    },
+    {
         value: 'settled',
         label: 'Settled',
         description: 'Successfully resolved challans',

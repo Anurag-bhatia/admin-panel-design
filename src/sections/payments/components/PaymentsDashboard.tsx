@@ -31,6 +31,7 @@ const CASE_REFUND_TABS = [
 
 const LAWYER_FEE_TABS = [
   { key: 'to_pay', label: 'To Pay' },
+  { key: 'verified', label: 'Verified' },
   { key: 'completed', label: 'Completed' },
   { key: 'hold', label: 'Hold' },
   { key: 'rejected', label: 'Rejected' },
@@ -58,6 +59,7 @@ const REFUND_STATUS_OPTIONS = [
 
 const LAWYER_FEE_STATUS_OPTIONS = [
   { value: 'To Pay', label: 'To Pay' },
+  { value: 'Verified', label: 'Verified' },
   { value: 'Completed', label: 'Completed' },
   { value: 'Hold', label: 'Hold' },
   { value: 'Rejected', label: 'Rejected' },
@@ -83,6 +85,7 @@ function isRefundInStage(refund: Refund, stage: string): boolean {
 
 function isLawyerFeeInStage(fee: LawyerFee, stage: string): boolean {
   if (stage === 'to_pay') return fee.status === 'To Pay'
+  if (stage === 'verified') return fee.status === 'Verified'
   if (stage === 'completed') return fee.status === 'Completed'
   if (stage === 'hold') return fee.status === 'Hold'
   if (stage === 'rejected') return fee.status === 'Rejected'
@@ -195,6 +198,7 @@ export function PaymentsDashboard({
   // Lawyer fee stage counts
   const feeStageCounts = useMemo(() => ({
     to_pay: lawyerFees.filter((f) => f.status === 'To Pay').length,
+    verified: lawyerFees.filter((f) => f.status === 'Verified').length,
     completed: lawyerFees.filter((f) => f.status === 'Completed').length,
     hold: lawyerFees.filter((f) => f.status === 'Hold').length,
     rejected: lawyerFees.filter((f) => f.status === 'Rejected').length,

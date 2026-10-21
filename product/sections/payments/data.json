@@ -391,6 +391,28 @@
       "paidDate": null
     },
     {
+      "lawyerId": "LAW-1007",
+      "lawyerName": "Adv. Neha Patel",
+      "incidentId": "IRN-44712",
+      "challanNo": "CH-GJ-2026-30221",
+      "totalAmount": 6200.00,
+      "commissionAmount": 1860.00,
+      "status": "Verified",
+      "dueDate": "2026-03-08",
+      "paidDate": null
+    },
+    {
+      "lawyerId": "LAW-1003",
+      "lawyerName": "Adv. Anil Kumar",
+      "incidentId": "IRN-44755",
+      "challanNo": "CH-KA-2026-31045",
+      "totalAmount": 8900.00,
+      "commissionAmount": 2670.00,
+      "status": "Verified",
+      "dueDate": "2026-03-12",
+      "paidDate": null
+    },
+    {
       "lawyerId": "LAW-1002",
       "lawyerName": "Adv. Priya Mehta",
       "incidentId": "IRN-44801",

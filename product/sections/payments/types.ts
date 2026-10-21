@@ -52,7 +52,7 @@ export interface LawyerFee {
   challanNo: string
   totalAmount: number
   commissionAmount: number
-  status: 'To Pay' | 'Completed' | 'Hold' | 'Rejected'
+  status: 'To Pay' | 'Verified' | 'Completed' | 'Hold' | 'Rejected'
   dueDate: string
   paidDate: string | null
 }

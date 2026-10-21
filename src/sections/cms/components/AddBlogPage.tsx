@@ -4,6 +4,8 @@ import type { Blog } from '@/../product/sections/cms/types'
 import { RichTextEditor } from './RichTextEditor'
 
 interface AddBlogPageProps {
+  heading?: string
+  submitLabel?: string
   onSubmit?: (blogData: Partial<Blog>) => void
   onCancel?: () => void
 }
@@ -15,7 +17,7 @@ const steps = [
   { id: 2, label: 'Content & Media' },
 ]
 
-export function AddBlogPage({ onSubmit, onCancel }: AddBlogPageProps) {
+export function AddBlogPage({ heading = 'Add Blog', submitLabel = 'Add Blog', onSubmit, onCancel }: AddBlogPageProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [form, setForm] = useState({
     name: '',
@@ -56,7 +58,7 @@ export function AddBlogPage({ onSubmit, onCancel }: AddBlogPageProps) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white">Add Blog</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">{heading}</h1>
         </div>
       </div>
 
@@ -272,7 +274,7 @@ export function AddBlogPage({ onSubmit, onCancel }: AddBlogPageProps) {
               onClick={handleSubmit}
               className="px-6 py-2.5 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-xl transition-colors"
             >
-              Add Blog
+              {submitLabel}
             </button>
           )}
         </div>

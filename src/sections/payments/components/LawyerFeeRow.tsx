@@ -15,6 +15,10 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
     label: 'To Pay',
     className: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
   },
+  Verified: {
+    label: 'Verified',
+    className: 'bg-sky-50 dark:bg-sky-900/20 text-sky-700 dark:text-sky-400',
+  },
   Completed: {
     label: 'Completed',
     className: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400',

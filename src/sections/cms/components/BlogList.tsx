@@ -4,6 +4,9 @@ import type { Blog } from '@/../product/sections/cms/types'
 
 interface BlogListProps {
   blogs: Blog[]
+  heading?: string
+  addLabel?: string
+  searchPlaceholder?: string
   onAddBlog?: () => void
   onToggleStatus?: (id: string, newStatus: 'enabled' | 'disabled') => void
   onEdit?: (id: string) => void
@@ -11,7 +14,7 @@ interface BlogListProps {
   onSearch?: (query: string) => void
 }
 
-export function BlogList({ blogs, onAddBlog, onToggleStatus, onEdit, onDelete, onSearch }: BlogListProps) {
+export function BlogList({ blogs, heading = 'Blog', addLabel = 'Add Blog', searchPlaceholder = 'Search blogs...', onAddBlog, onToggleStatus, onEdit, onDelete, onSearch }: BlogListProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const perPage = 10
@@ -31,14 +34,14 @@ export function BlogList({ blogs, onAddBlog, onToggleStatus, onEdit, onDelete, o
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Blog</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{heading}</h1>
         </div>
         <button
           onClick={onAddBlog}
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" />
-          Add Blog
+          {addLabel}
         </button>
       </div>
 
@@ -48,7 +51,7 @@ export function BlogList({ blogs, onAddBlog, onToggleStatus, onEdit, onDelete, o
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search blogs..."
+            placeholder={searchPlaceholder}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value)

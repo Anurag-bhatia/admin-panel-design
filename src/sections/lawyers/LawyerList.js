@@ -1,7 +1,7 @@
 import { jsx as _jsx } from "react/jsx-runtime";
 import data from '@/../product/sections/lawyers/data.json';
 import { Lawyers } from './components/Lawyers';
-export default function LawyersPreview({ subRoute } = {}) {
+export default function LawyersPreview({ subRoute }) {
     const activeGroup = subRoute === 'individuals' ? 'individuals' : 'business';
     const label = activeGroup === 'business' ? 'Business' : 'Individuals';
     const allLawyers = data.lawyers;

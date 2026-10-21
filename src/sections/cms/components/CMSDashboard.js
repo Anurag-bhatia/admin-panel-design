@@ -13,6 +13,7 @@ import { AddCouponPage } from './AddCouponPage';
 import { CouponDetailPage } from './CouponDetailPage';
 const sidebarItems = [
     { id: 'blogs', label: 'Blogs' },
+    { id: 'challanpay-org', label: 'ChallanPay.org' },
     { id: 'events-news', label: 'Events & News' },
     { id: 'banners', label: 'Banners' },
     { id: 'coupon', label: 'Coupon' },
@@ -31,7 +32,8 @@ export function CMSDashboard({ blogs, eventsNews, banners, coupons, programmes, 
     const existingProgrammeCodes = programmes.map((p) => p.code);
     const existingProgrammeNames = programmes.map((p) => p.name);
     if (view === 'add-blog') {
-        return (_jsx(AddBlogPage, { onSubmit: (data) => {
+        const isNews = activeTab === 'challanpay-org';
+        return (_jsx(AddBlogPage, { heading: isNews ? 'Add News' : 'Add Blog', submitLabel: isNews ? 'Add News' : 'Add Blog', onSubmit: (data) => {
                 console.log('Add blog:', data);
                 setView('list');
             }, onCancel: () => setView('list') }));
@@ -101,12 +103,13 @@ export function CMSDashboard({ blogs, eventsNews, banners, coupons, programmes, 
                             return (_jsx("button", { onClick: () => setActiveTab(item.id), className: `w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${isActive
                                     ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
                                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`, children: _jsx("span", { children: item.label }) }, item.id));
-                        }) }) }) }), _jsx("div", { className: "flex-1 p-6 lg:p-8 overflow-auto", children: _jsxs("div", { className: "max-w-7xl", children: [activeTab === 'blogs' && (_jsx(BlogList, { blogs: blogs, onAddBlog: () => setView('add-blog'), onToggleStatus: (id, status) => console.log('Toggle blog status:', id, status), onEdit: (id) => console.log('Edit blog:', id), onDelete: (id) => console.log('Delete blog:', id), onSearch: (query) => console.log('Search blogs:', query) })), activeTab === 'events-news' && (_jsx(EventNewsList, { eventsNews: eventsNews, onAddEventNews: () => setView('add-event-news'), onToggleStatus: (id, status) => console.log('Toggle status:', id, status), onEdit: (id) => console.log('Edit event/news:', id), onDelete: (id) => console.log('Delete event/news:', id), onSearch: (query) => console.log('Search events/news:', query) })), activeTab === 'banners' && (_jsx(BannerList, { banners: banners, onAddBanner: () => setView('add-banner'), onToggleStatus: (id, status) => console.log('Toggle banner status:', id, status), onEdit: (id) => {
+                        }) }) }) }), _jsx("div", { className: "flex-1 p-6 lg:p-8 overflow-auto", children: _jsxs("div", { className: "max-w-7xl", children: [activeTab === 'blogs' && (_jsx(BlogList, { blogs: blogs, onAddBlog: () => setView('add-blog'), onToggleStatus: (id, status) => console.log('Toggle blog status:', id, status), onEdit: (id) => console.log('Edit blog:', id), onDelete: (id) => console.log('Delete blog:', id), onSearch: (query) => console.log('Search blogs:', query) })), activeTab === 'challanpay-org' && (_jsx(BlogList, { blogs: blogs, heading: "ChallanPay.org - News Page", addLabel: "Add News", searchPlaceholder: "Search news...", onAddBlog: () => setView('add-blog'), onToggleStatus: (id, status) => console.log('Toggle blog status:', id, status), onEdit: (id) => console.log('Edit blog:', id), onDelete: (id) => console.log('Delete blog:', id), onSearch: (query) => console.log('Search blogs:', query) })), activeTab === 'events-news' && (_jsx(EventNewsList, { eventsNews: eventsNews, onAddEventNews: () => setView('add-event-news'), onToggleStatus: (id, status) => console.log('Toggle status:', id, status), onEdit: (id) => console.log('Edit event/news:', id), onDelete: (id) => console.log('Delete event/news:', id), onSearch: (query) => console.log('Search events/news:', query) })), activeTab === 'banners' && (_jsx(BannerList, { banners: banners, onAddBanner: () => setView('add-banner'), onToggleStatus: (id, status) => console.log('Toggle banner status:', id, status), onEdit: (id) => {
                                 setEditingBannerId(id);
                                 setView('edit-banner');
                             }, onDelete: (id) => console.log('Delete banner:', id), onSearch: (query) => console.log('Search banners:', query) })), activeTab === 'coupon' && (_jsx(CouponList, { coupons: coupons, onCreate: () => setView('add-coupon'), onView: (id) => {
                                 setEditingCouponId(id);
-                                setView('view-coupon');
+                                const coupon = coupons.find((c) => c.id === id);
+                                setView(coupon?.status === 'draft' ? 'edit-coupon' : 'view-coupon');
                             }, onEdit: (id) => {
                                 setEditingCouponId(id);
                                 setView('edit-coupon');

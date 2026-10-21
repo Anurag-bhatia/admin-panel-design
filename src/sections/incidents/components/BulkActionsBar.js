@@ -5,6 +5,7 @@ import { MoveQueueDetailsModal } from './MoveQueueDetailsModal';
 const QUEUE_OPTIONS = [
     { key: 'newIncidents', label: 'New Incidents' },
     { key: 'inProgress', label: 'In Progress' },
+    { key: 'underReview', label: 'To Be Settled' },
     { key: 'settled', label: 'Settled' },
     { key: 'notSettled', label: 'Not Settled' },
     { key: 'hold', label: 'Hold' },

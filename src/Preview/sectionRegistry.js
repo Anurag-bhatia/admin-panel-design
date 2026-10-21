@@ -1,5 +1,7 @@
 import React from 'react';
 import { AlertCircle, UserPlus, Users, UserCircle, Scale, Handshake, CreditCard, MessageSquare, HeadphonesIcon, BarChart3, UsersRound, Settings, FileText, CheckCircle2, FileInput, Gift, BookOpen, } from 'lucide-react';
+// Wrap dynamic imports so a stale chunk (after a new deploy) triggers a
+// one-shot reload instead of a crash screen.
 function lazyWithReload(factory) {
     return React.lazy(() => factory().catch((err) => {
         const flag = 'chunkReloaded';
