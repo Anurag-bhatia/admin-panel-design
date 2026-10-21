@@ -11,16 +11,14 @@ import { AddEventNewsPage } from './AddEventNewsPage';
 import { AddBannerPage } from './AddBannerPage';
 import { AddCouponPage } from './AddCouponPage';
 import { CouponDetailPage } from './CouponDetailPage';
-const sidebarItems = [
-    { id: 'blogs', label: 'Blogs' },
-    { id: 'challanpay-org', label: 'ChallanPay.org' },
-    { id: 'events-news', label: 'Events & News' },
-    { id: 'banners', label: 'Banners' },
-    { id: 'coupon', label: 'Coupon' },
-    { id: 'wallet', label: 'Wallet' },
-];
-export function CMSDashboard({ blogs, eventsNews, banners, coupons, programmes, auditLog, customerCredits, }) {
-    const [activeTab, setActiveTab] = useState('blogs');
+const VALID_TABS = ['blogs', 'challanpay-org', 'events-news', 'banners', 'coupon', 'wallet'];
+function tabFromSubRoute(subRoute) {
+    if (subRoute && VALID_TABS.includes(subRoute))
+        return subRoute;
+    return 'blogs';
+}
+export function CMSDashboard({ blogs, eventsNews, banners, coupons, programmes, auditLog, customerCredits, subRoute, }) {
+    const activeTab = tabFromSubRoute(subRoute);
     const [view, setView] = useState('list');
     const [editingBannerId, setEditingBannerId] = useState(null);
     const [editingCouponId, setEditingCouponId] = useState(null);
@@ -98,26 +96,21 @@ export function CMSDashboard({ blogs, eventsNews, banners, coupons, programmes, 
                 setView('list');
             }, onEdit: () => setView('edit-coupon') }));
     }
-    return (_jsxs("div", { className: "flex min-h-[calc(100vh-64px)]", children: [_jsx("div", { className: "flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 w-52", children: _jsx("div", { className: "flex-1 py-4", children: _jsx("div", { className: "space-y-0.5 px-2", children: sidebarItems.map((item) => {
-                            const isActive = activeTab === item.id;
-                            return (_jsx("button", { onClick: () => setActiveTab(item.id), className: `w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${isActive
-                                    ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400'
-                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`, children: _jsx("span", { children: item.label }) }, item.id));
-                        }) }) }) }), _jsx("div", { className: "flex-1 p-6 lg:p-8 overflow-auto", children: _jsxs("div", { className: "max-w-7xl", children: [activeTab === 'blogs' && (_jsx(BlogList, { blogs: blogs, onAddBlog: () => setView('add-blog'), onToggleStatus: (id, status) => console.log('Toggle blog status:', id, status), onEdit: (id) => console.log('Edit blog:', id), onDelete: (id) => console.log('Delete blog:', id), onSearch: (query) => console.log('Search blogs:', query) })), activeTab === 'challanpay-org' && (_jsx(BlogList, { blogs: blogs, heading: "ChallanPay.org - News Page", addLabel: "Add News", searchPlaceholder: "Search news...", onAddBlog: () => setView('add-blog'), onToggleStatus: (id, status) => console.log('Toggle blog status:', id, status), onEdit: (id) => console.log('Edit blog:', id), onDelete: (id) => console.log('Delete blog:', id), onSearch: (query) => console.log('Search blogs:', query) })), activeTab === 'events-news' && (_jsx(EventNewsList, { eventsNews: eventsNews, onAddEventNews: () => setView('add-event-news'), onToggleStatus: (id, status) => console.log('Toggle status:', id, status), onEdit: (id) => console.log('Edit event/news:', id), onDelete: (id) => console.log('Delete event/news:', id), onSearch: (query) => console.log('Search events/news:', query) })), activeTab === 'banners' && (_jsx(BannerList, { banners: banners, onAddBanner: () => setView('add-banner'), onToggleStatus: (id, status) => console.log('Toggle banner status:', id, status), onEdit: (id) => {
-                                setEditingBannerId(id);
-                                setView('edit-banner');
-                            }, onDelete: (id) => console.log('Delete banner:', id), onSearch: (query) => console.log('Search banners:', query) })), activeTab === 'coupon' && (_jsx(CouponList, { coupons: coupons, onCreate: () => setView('add-coupon'), onView: (id) => {
-                                setEditingCouponId(id);
-                                const coupon = coupons.find((c) => c.id === id);
-                                setView(coupon?.status === 'draft' ? 'edit-coupon' : 'view-coupon');
-                            }, onEdit: (id) => {
-                                setEditingCouponId(id);
-                                setView('edit-coupon');
-                            }, onPause: (id) => console.log('Pause coupon:', id), onResume: (id) => console.log('Resume coupon:', id), onArchive: (id) => console.log('Archive coupon:', id), onClone: (id) => console.log('Clone coupon:', id), onSearch: (query) => console.log('Search coupons:', query) })), activeTab === 'wallet' && (_jsx(WalletSection, { programmes: programmes, auditLog: auditLog, customerCredits: customerCredits, onCreateProgramme: () => setView('add-programme'), onViewProgramme: (id) => {
-                                setEditingProgrammeId(id);
-                                setView('edit-programme');
-                            }, onEditProgramme: (id) => {
-                                setEditingProgrammeId(id);
-                                setView('edit-programme');
-                            } }))] }) })] }));
+    return (_jsx("div", { className: "min-h-[calc(100vh-64px)] bg-slate-100 dark:bg-slate-950", children: _jsx("div", { className: "p-6 lg:p-8 overflow-auto", children: _jsxs("div", { className: "max-w-7xl", children: [activeTab === 'blogs' && (_jsx(BlogList, { blogs: blogs, onAddBlog: () => setView('add-blog'), onToggleStatus: (id, status) => console.log('Toggle blog status:', id, status), onEdit: (id) => console.log('Edit blog:', id), onDelete: (id) => console.log('Delete blog:', id), onSearch: (query) => console.log('Search blogs:', query) })), activeTab === 'challanpay-org' && (_jsx(BlogList, { blogs: blogs, heading: "ChallanPay.org - News Page", addLabel: "Add News", searchPlaceholder: "Search news...", onAddBlog: () => setView('add-blog'), onToggleStatus: (id, status) => console.log('Toggle blog status:', id, status), onEdit: (id) => console.log('Edit blog:', id), onDelete: (id) => console.log('Delete blog:', id), onSearch: (query) => console.log('Search blogs:', query) })), activeTab === 'events-news' && (_jsx(EventNewsList, { eventsNews: eventsNews, onAddEventNews: () => setView('add-event-news'), onToggleStatus: (id, status) => console.log('Toggle status:', id, status), onEdit: (id) => console.log('Edit event/news:', id), onDelete: (id) => console.log('Delete event/news:', id), onSearch: (query) => console.log('Search events/news:', query) })), activeTab === 'banners' && (_jsx(BannerList, { banners: banners, onAddBanner: () => setView('add-banner'), onToggleStatus: (id, status) => console.log('Toggle banner status:', id, status), onEdit: (id) => {
+                            setEditingBannerId(id);
+                            setView('edit-banner');
+                        }, onDelete: (id) => console.log('Delete banner:', id), onSearch: (query) => console.log('Search banners:', query) })), activeTab === 'coupon' && (_jsx(CouponList, { coupons: coupons, onCreate: () => setView('add-coupon'), onView: (id) => {
+                            setEditingCouponId(id);
+                            const coupon = coupons.find((c) => c.id === id);
+                            setView(coupon?.status === 'draft' ? 'edit-coupon' : 'view-coupon');
+                        }, onEdit: (id) => {
+                            setEditingCouponId(id);
+                            setView('edit-coupon');
+                        }, onPause: (id) => console.log('Pause coupon:', id), onResume: (id) => console.log('Resume coupon:', id), onArchive: (id) => console.log('Archive coupon:', id), onClone: (id) => console.log('Clone coupon:', id), onSearch: (query) => console.log('Search coupons:', query) })), activeTab === 'wallet' && (_jsx(WalletSection, { programmes: programmes, customerCredits: customerCredits, onCreateProgramme: () => setView('add-programme'), onViewProgramme: (id) => {
+                            setEditingProgrammeId(id);
+                            setView('edit-programme');
+                        }, onEditProgramme: (id) => {
+                            setEditingProgrammeId(id);
+                            setView('edit-programme');
+                        } }))] }) }) }));
 }

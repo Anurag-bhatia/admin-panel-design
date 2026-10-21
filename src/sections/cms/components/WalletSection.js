@@ -3,17 +3,15 @@ import { useEffect, useRef, useState } from 'react';
 import { Shield, ChevronDown, Check } from 'lucide-react';
 import { defaultWalletPermissions, walletPermissionLabels, } from '@/../product/sections/cms/types';
 import { ProgrammeList } from './ProgrammeList';
-import { WalletDashboard } from './WalletDashboard';
+import { WalletReports } from './WalletReports';
 import { CustomerCreditView } from './CustomerCreditView';
-import { WalletAuditLog } from './WalletAuditLog';
 const tabs = [
-    { id: 'dashboard', label: 'Dashboard', requires: 'viewReports' },
     { id: 'programmes', label: 'Programmes' },
+    { id: 'reports', label: 'Reports', requires: 'viewReports' },
     { id: 'customer-credit', label: 'Customer Credit', requires: 'viewCustomerCredit' },
-    { id: 'audit-log', label: 'Audit Log', requires: 'viewAuditLog' },
 ];
-export function WalletSection({ programmes, auditLog, customerCredits, onCreateProgramme, onEditProgramme, onViewProgramme, }) {
-    const [activeTab, setActiveTab] = useState('dashboard');
+export function WalletSection({ programmes, customerCredits, onCreateProgramme, onEditProgramme, onViewProgramme, }) {
+    const [activeTab, setActiveTab] = useState('programmes');
     const [permissions, setPermissions] = useState(defaultWalletPermissions);
     const visibleTabs = tabs.filter((t) => !t.requires || permissions[t.requires]);
     useEffect(() => {
@@ -21,12 +19,12 @@ export function WalletSection({ programmes, auditLog, customerCredits, onCreateP
             setActiveTab(visibleTabs[0]?.id ?? 'programmes');
         }
     }, [visibleTabs, activeTab]);
-    return (_jsxs("div", { children: [_jsxs("div", { className: "flex items-end justify-between border-b border-slate-200 dark:border-slate-700 mb-6 -mt-1", children: [_jsx("div", { className: "flex items-center gap-1", children: visibleTabs.map((tab) => {
-                            const isActive = activeTab === tab.id;
-                            return (_jsxs("button", { onClick: () => setActiveTab(tab.id), className: `px-4 py-2.5 text-sm font-medium relative transition-colors ${isActive
-                                    ? 'text-cyan-700 dark:text-cyan-300'
-                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`, children: [tab.label, isActive && (_jsx("span", { className: "absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-600 rounded-t" }))] }, tab.id));
-                        }) }), _jsx("div", { className: "pb-2", children: _jsx(PermissionPreview, { permissions: permissions, onChange: setPermissions }) })] }), activeTab === 'programmes' && (_jsx(ProgrammeList, { programmes: programmes, permissions: permissions, onCreate: onCreateProgramme, onView: onViewProgramme, onEdit: onEditProgramme, onPauseIssuing: (id) => console.log('Pause issuing:', id), onPauseRedemption: (id) => console.log('Pause redemption:', id), onResume: (id) => console.log('Resume programme:', id), onArchive: (id) => console.log('Archive programme:', id), onClone: (id) => console.log('Clone programme:', id), onSearch: (query) => console.log('Search programmes:', query) })), activeTab === 'dashboard' && permissions.viewReports && (_jsx(WalletDashboard, { programmes: programmes })), activeTab === 'customer-credit' && permissions.viewCustomerCredit && (_jsx(CustomerCreditView, { customerCredits: customerCredits, permissions: permissions })), activeTab === 'audit-log' && permissions.viewAuditLog && (_jsx(WalletAuditLog, { entries: auditLog, permissions: permissions }))] }));
+    return (_jsxs("div", { children: [_jsx("div", { className: "flex items-end justify-between border-b border-slate-200 dark:border-slate-700 mb-6 -mt-1", children: _jsx("div", { className: "flex items-center gap-1", children: visibleTabs.map((tab) => {
+                        const isActive = activeTab === tab.id;
+                        return (_jsxs("button", { onClick: () => setActiveTab(tab.id), className: `px-4 py-2.5 text-sm font-medium relative transition-colors ${isActive
+                                ? 'text-cyan-700 dark:text-cyan-300'
+                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`, children: [tab.label, isActive && (_jsx("span", { className: "absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-600 rounded-t" }))] }, tab.id));
+                    }) }) }), activeTab === 'programmes' && (_jsx(ProgrammeList, { programmes: programmes, customerCredits: customerCredits, permissions: permissions, onCreate: onCreateProgramme, onView: onViewProgramme, onEdit: onEditProgramme, onPauseIssuing: (id) => console.log('Pause issuing:', id), onPauseRedemption: (id) => console.log('Pause redemption:', id), onResume: (id) => console.log('Resume programme:', id), onArchive: (id) => console.log('Archive programme:', id), onClone: (id) => console.log('Clone programme:', id), onSearch: (query) => console.log('Search programmes:', query) })), activeTab === 'reports' && permissions.viewReports && (_jsx(WalletReports, { programmes: programmes, permissions: permissions })), activeTab === 'customer-credit' && permissions.viewCustomerCredit && (_jsx(CustomerCreditView, { customerCredits: customerCredits, permissions: permissions }))] }));
 }
 function PermissionPreview({ permissions, onChange, }) {
     const [open, setOpen] = useState(false);

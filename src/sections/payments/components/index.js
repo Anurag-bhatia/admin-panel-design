@@ -5,6 +5,7 @@ export { PaymentsTableHeader } from './PaymentsTableHeader';
 export { RefundRow } from './RefundRow';
 export { LawyerFeeRow } from './LawyerFeeRow';
 export { PartnerPayoutRow } from './PartnerPayoutRow';
+export { BatchRow } from './BatchRow';
 export { RefundBulkActionsBar } from './RefundBulkActionsBar';
 export { RefundDetailView } from './RefundDetailView';
 export { RefundActivityTab } from './RefundActivityTab';

@@ -1,6 +1,15 @@
 // =============================================================================
 // Data Types
 // =============================================================================
+export const defaultCouponConversionSettings = {
+    allowConversion: false,
+    whoCanConvert: 'assigned',
+    method: 'sameAsValue',
+    creditExpiryDays: 30,
+    appliesTo: 'sameAsCoupon',
+    perCustomerLimit: 1,
+    combination: 'couponFirst',
+};
 export const walletPermissionLabels = {
     createProgramme: 'Create programme',
     editDraftProgramme: 'Edit draft programme',

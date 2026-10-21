@@ -3,7 +3,7 @@ import leadsData from '@/../product/sections/sales-crm/data.json'
 import lawyersData from '@/../product/sections/lawyers/data.json'
 import partnersData from '@/../product/sections/partners/data.json'
 import { PaymentsDashboard } from './components/PaymentsDashboard'
-import type { Refund, LawyerFee, PartnerPayout } from '@/../product/sections/payments/types'
+import type { Refund, LawyerFee, PartnerPayout, Batch } from '@/../product/sections/payments/types'
 import type { Lead, User, Document as LeadDocument, TimelineActivity } from '@/../product/sections/sales-crm/types'
 import type { Lawyer } from '@/../product/sections/lawyers/types'
 import type { Partner } from '@/../product/sections/partners/types'
@@ -19,6 +19,7 @@ export default function PaymentsDashboardPreview() {
         leadDocuments={leadsData.documents as LeadDocument[]}
         leadTimelineActivities={leadsData.timelineActivities as TimelineActivity[]}
         partnerPayouts={data.partnerPayouts as PartnerPayout[]}
+        batches={data.batches as Batch[]}
         lawyers={lawyersData.lawyers as Lawyer[]}
         partners={partnersData.partners as Partner[]}
         onApproveRefund={(id) => console.log('Approve refund:', id)}
@@ -35,6 +36,7 @@ export default function PaymentsDashboardPreview() {
         onBulkMarkPartnerPayoutsPaid={(keys) => console.log('Bulk mark partner payouts paid:', keys)}
         onViewPartnerProfile={(partnerId) => console.log('View partner profile:', partnerId)}
         onExportPartnerPayouts={() => console.log('Export partner payouts')}
+        onExportBatches={() => console.log('Export batches')}
       />
     </div>
   )

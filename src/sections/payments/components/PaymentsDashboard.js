@@ -6,6 +6,7 @@ import { PaymentsTableHeader } from './PaymentsTableHeader';
 import { RefundRow } from './RefundRow';
 import { LawyerFeeRow } from './LawyerFeeRow';
 import { PartnerPayoutRow } from './PartnerPayoutRow';
+import { BatchRow } from './BatchRow';
 import { RefundBulkActionsBar } from './RefundBulkActionsBar';
 import { RefundDetailView } from './RefundDetailView';
 import { Pagination } from './Pagination';
@@ -27,6 +28,7 @@ const CASE_REFUND_TABS = [
 ];
 const LAWYER_FEE_TABS = [
     { key: 'to_pay', label: 'To Pay' },
+    { key: 'verified', label: 'Verified' },
     { key: 'completed', label: 'Completed' },
     { key: 'hold', label: 'Hold' },
     { key: 'rejected', label: 'Rejected' },
@@ -42,6 +44,18 @@ const PARTNER_TABS = [
     { key: 'hold', label: 'Hold' },
     { key: 'rejected', label: 'Failed' },
 ];
+const BATCH_TABS = [
+    { key: 'created', label: 'Batch Created' },
+    { key: 'accepted', label: 'Batch Accepted' },
+    { key: 'in_progress', label: 'Batch In Progress' },
+    { key: 'completed', label: 'Batch Completed' },
+];
+const BATCH_STATUS_OPTIONS = [
+    { value: 'Created', label: 'Created' },
+    { value: 'Accepted', label: 'Accepted' },
+    { value: 'In Progress', label: 'In Progress' },
+    { value: 'Completed', label: 'Completed' },
+];
 const REFUND_STATUS_OPTIONS = [
     { value: 'Refund Requested', label: 'Refund Requested' },
     { value: 'Completed', label: 'Completed' },
@@ -50,6 +64,7 @@ const REFUND_STATUS_OPTIONS = [
 ];
 const LAWYER_FEE_STATUS_OPTIONS = [
     { value: 'To Pay', label: 'To Pay' },
+    { value: 'Verified', label: 'Verified' },
     { value: 'Completed', label: 'Completed' },
     { value: 'Hold', label: 'Hold' },
     { value: 'Rejected', label: 'Rejected' },
@@ -78,6 +93,8 @@ function isRefundInStage(refund, stage) {
 function isLawyerFeeInStage(fee, stage) {
     if (stage === 'to_pay')
         return fee.status === 'To Pay';
+    if (stage === 'verified')
+        return fee.status === 'Verified';
     if (stage === 'completed')
         return fee.status === 'Completed';
     if (stage === 'hold')
@@ -97,7 +114,18 @@ function isPartnerPayoutInStage(payout, stage) {
         return payout.status === 'Failed';
     return true;
 }
-export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [], leadDocuments = [], leadTimelineActivities = [], lawyers = [], partners = [], partnerPayouts = [], onApproveRefund, onProcessRefund, onBulkApproveRefunds, onBulkProcessRefunds, onExportRefunds, onViewLawyerProfile, onExportLawyerFees, onViewLead, onAssignLead, onBulkMarkLeadsConverted, onBulkMarkLawyerFeesPaid, onBulkMarkPartnerPayoutsPaid, onViewPartnerProfile, onExportPartnerPayouts, }) {
+function isBatchInStage(batch, stage) {
+    if (stage === 'created')
+        return batch.status === 'Created';
+    if (stage === 'accepted')
+        return batch.status === 'Accepted';
+    if (stage === 'in_progress')
+        return batch.status === 'In Progress';
+    if (stage === 'completed')
+        return batch.status === 'Completed';
+    return true;
+}
+export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [], leadDocuments = [], leadTimelineActivities = [], lawyers = [], partners = [], partnerPayouts = [], batches = [], onApproveRefund, onProcessRefund, onBulkApproveRefunds, onBulkProcessRefunds, onExportRefunds, onViewLawyerProfile, onExportLawyerFees, onViewLead, onAssignLead, onBulkMarkLeadsConverted, onBulkMarkLawyerFeesPaid, onBulkMarkPartnerPayoutsPaid, onViewPartnerProfile, onExportPartnerPayouts, onExportBatches, }) {
     // Sidebar state
     const [sidebarView, setSidebarView] = useState('challan-refunds');
     // Active stage tab
@@ -106,6 +134,7 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
     const [feeStage, setFeeStage] = useState('to_pay');
     const [leadsStage, setLeadsStage] = useState('ready_to_invoice');
     const [partnerStage, setPartnerStage] = useState('to_pay');
+    const [batchStage, setBatchStage] = useState('created');
     // Search
     const [searchQuery, setSearchQuery] = useState('');
     // Selection (challan refunds)
@@ -155,6 +184,7 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
     // Lawyer fee stage counts
     const feeStageCounts = useMemo(() => ({
         to_pay: lawyerFees.filter((f) => f.status === 'To Pay').length,
+        verified: lawyerFees.filter((f) => f.status === 'Verified').length,
         completed: lawyerFees.filter((f) => f.status === 'Completed').length,
         hold: lawyerFees.filter((f) => f.status === 'Hold').length,
         rejected: lawyerFees.filter((f) => f.status === 'Rejected').length,
@@ -172,6 +202,13 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
         hold: partnerPayouts.filter((p) => p.status === 'Processing').length,
         rejected: partnerPayouts.filter((p) => p.status === 'Failed').length,
     }), [partnerPayouts]);
+    // Batch stage counts
+    const batchStageCounts = useMemo(() => ({
+        created: batches.filter((b) => b.status === 'Created').length,
+        accepted: batches.filter((b) => b.status === 'Accepted').length,
+        in_progress: batches.filter((b) => b.status === 'In Progress').length,
+        completed: batches.filter((b) => b.status === 'Completed').length,
+    }), [batches]);
     // Filtered leads
     const filteredLeads = useMemo(() => {
         const statusFilter = leadsStage === 'ready_to_invoice'
@@ -223,6 +260,17 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
         }
         return filtered;
     }, [lawyerFees, feeStage, searchQuery]);
+    // Filtered batches
+    const filteredBatches = useMemo(() => {
+        let filtered = batches.filter((b) => isBatchInStage(b, batchStage));
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter((b) => b.batchId.toLowerCase().includes(query) ||
+                b.assignedExpertId.toLowerCase().includes(query) ||
+                b.assignedExpertName.toLowerCase().includes(query));
+        }
+        return filtered;
+    }, [batches, batchStage, searchQuery]);
     // Filtered partner payouts
     const filteredPartnerPayouts = useMemo(() => {
         let filtered = partnerPayouts.filter((p) => isPartnerPayoutInStage(p, partnerStage));
@@ -359,6 +407,9 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
         setPartnerStage(stage);
         setSelectedPartnerKeys(new Set());
     };
+    const handleBatchStageChange = (stage) => {
+        setBatchStage(stage);
+    };
     // Derive pending invoices from lawyerFees for the selected lawyer
     const lawyerPendingInvoices = useMemo(() => {
         if (!selectedLawyerId)
@@ -408,40 +459,49 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
         : sidebarView === 'case-refunds' ? CASE_REFUND_TABS
             : sidebarView === 'lawyer-fees' ? LAWYER_FEE_TABS
                 : sidebarView === 'leads' ? LEADS_TABS
-                    : PARTNER_TABS;
+                    : sidebarView === 'batch' ? BATCH_TABS
+                        : PARTNER_TABS;
     const currentCounts = sidebarView === 'challan-refunds' ? challanRefundStageCounts
         : sidebarView === 'case-refunds' ? caseRefundStageCounts
             : sidebarView === 'lawyer-fees' ? feeStageCounts
                 : sidebarView === 'leads' ? leadsStageCounts
-                    : partnerStageCounts;
+                    : sidebarView === 'batch' ? batchStageCounts
+                        : partnerStageCounts;
     const currentActiveTab = sidebarView === 'challan-refunds' ? challanRefundStage
         : sidebarView === 'case-refunds' ? caseRefundStage
             : sidebarView === 'lawyer-fees' ? feeStage
                 : sidebarView === 'leads' ? leadsStage
-                    : partnerStage;
+                    : sidebarView === 'batch' ? batchStage
+                        : partnerStage;
     const currentTabChange = sidebarView === 'challan-refunds' ? handleChallanRefundStageChange
         : sidebarView === 'case-refunds' ? handleCaseRefundStageChange
             : sidebarView === 'lawyer-fees' ? handleFeeStageChange
                 : sidebarView === 'leads' ? handleLeadsStageChange
-                    : handlePartnerStageChange;
+                    : sidebarView === 'batch' ? handleBatchStageChange
+                        : handlePartnerStageChange;
     const currentSearchPlaceholder = isRefundView
         ? 'Search by Refund ID, incident, customer...'
         : sidebarView === 'lawyer-fees'
             ? 'Search by Lawyer ID, name, incident...'
             : sidebarView === 'leads'
                 ? 'Search by Lead ID, company, contact...'
-                : 'Search by Partner ID, name, company...';
+                : sidebarView === 'batch'
+                    ? 'Search by Batch ID, expert ID, name...'
+                    : 'Search by Partner ID, name, company...';
     const currentStatusOptions = isRefundView ? REFUND_STATUS_OPTIONS
         : sidebarView === 'lawyer-fees' ? LAWYER_FEE_STATUS_OPTIONS
             : sidebarView === 'partners' ? PARTNER_STATUS_OPTIONS
-                : LAWYER_FEE_STATUS_OPTIONS;
+                : sidebarView === 'batch' ? BATCH_STATUS_OPTIONS
+                    : LAWYER_FEE_STATUS_OPTIONS;
     const currentExport = isRefundView ? onExportRefunds
         : sidebarView === 'partners' ? onExportPartnerPayouts
-            : onExportLawyerFees;
+            : sidebarView === 'batch' ? onExportBatches
+                : onExportLawyerFees;
     const currentTotalItems = isRefundView ? filteredRefunds.length
         : sidebarView === 'lawyer-fees' ? filteredFees.length
             : sidebarView === 'leads' ? filteredLeads.length
-                : filteredPartnerPayouts.length;
+                : sidebarView === 'batch' ? filteredBatches.length
+                    : filteredPartnerPayouts.length;
     return (_jsxs("div", { className: "flex h-full bg-slate-100 dark:bg-slate-950", children: [_jsx(PaymentsSidebar, { view: sidebarView, onViewChange: handleSidebarChange }), _jsxs("div", { className: "flex-1 flex flex-col min-w-0", children: [_jsx(PaymentsStageTabs, { tabs: currentTabs, activeTab: currentActiveTab, counts: currentCounts, onTabChange: currentTabChange }), _jsx(PaymentsTableHeader, { searchPlaceholder: currentSearchPlaceholder, searchQuery: searchQuery, onSearchChange: setSearchQuery, onExport: currentExport, statusOptions: currentStatusOptions, ...(sidebarView === 'partners' ? { fromDateLabel: 'Requested Date', toDateLabel: 'Paid Date' } : {}) }), _jsx("div", { className: `flex-1 bg-white dark:bg-slate-900 ${sidebarView === 'leads' ? 'overflow-visible' : 'overflow-auto'}`, children: sidebarView === 'challan-refunds' ? (_jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Incident ID" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Subscriber" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Status" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Govt Amount" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Convenience Fee" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Challan Refund" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Refund Txn ID" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Updated" })] }) }), _jsx("tbody", { children: filteredRefunds.length === 0 ? (_jsx("tr", { children: _jsx("td", { colSpan: 8, className: "px-4 py-16 text-center text-slate-500 dark:text-slate-400", children: _jsxs("div", { className: "flex flex-col items-center gap-2", children: [_jsx("div", { className: "w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center", children: _jsx("svg", { className: "w-6 h-6 text-slate-400", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 1.5, d: "M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" }) }) }), _jsx("p", { className: "font-medium", children: "No refunds found" }), _jsx("p", { className: "text-sm", children: searchQuery
                                                             ? 'Try adjusting your search query'
                                                             : 'No refunds in this stage yet' })] }) }) })) : (filteredRefunds.map((refund) => (_jsx(RefundRow, { refund: refund, variant: "challan", onClick: () => setSelectedRefundId(refund.id) }, refund.id)))) })] })) : sidebarView === 'case-refunds' ? (_jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 text-left", children: _jsx("input", { type: "checkbox", checked: allSelected, ref: (el) => {
@@ -465,7 +525,9 @@ export function PaymentsDashboard({ refunds, lawyerFees, leads = [], users = [],
                                                             : 'No payouts in this stage yet' })] }) }) })) : (filteredPartnerPayouts.map((payout, index) => {
                                         const key = partnerKey(payout);
                                         return (_jsx(PartnerPayoutRow, { payout: payout, isSelected: selectedPartnerKeys.has(key), onSelect: (checked) => handleSelectOnePartner(key, checked), onViewPartnerProfile: () => setSelectedPartnerId(payout.partnerId), onMarkComplete: () => console.log('Mark as paid:', payout.partnerId) }, `${key}-${index}`));
-                                    })) })] })) : (_jsx("div", { className: "p-4", children: _jsx(LeadsTable, { leads: filteredLeads, users: users, selectedLeads: selectedLeadIds, onSelectLead: (id, selected) => {
+                                    })) })] })) : sidebarView === 'batch' ? (_jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700", children: _jsxs("tr", { children: [_jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Batch ID" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Expert" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Items" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Total Amount" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Status" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Created Date" }), _jsx("th", { className: "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400", children: "Last Updated" })] }) }), _jsx("tbody", { children: filteredBatches.length === 0 ? (_jsx("tr", { children: _jsx("td", { colSpan: 7, className: "px-4 py-16 text-center text-slate-500 dark:text-slate-400", children: _jsxs("div", { className: "flex flex-col items-center gap-2", children: [_jsx("div", { className: "w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center", children: _jsx("svg", { className: "w-6 h-6 text-slate-400", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 1.5, d: "M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" }) }) }), _jsx("p", { className: "font-medium", children: "No batches found" }), _jsx("p", { className: "text-sm", children: searchQuery
+                                                            ? 'Try adjusting your search query'
+                                                            : 'No batches in this stage yet' })] }) }) })) : (filteredBatches.map((batch) => (_jsx(BatchRow, { batch: batch, onClick: () => console.log('View batch:', batch.batchId) }, batch.batchId)))) })] })) : (_jsx("div", { className: "p-4", children: _jsx(LeadsTable, { leads: filteredLeads, users: users, selectedLeads: selectedLeadIds, onSelectLead: (id, selected) => {
                                     const next = new Set(selectedLeadIds);
                                     if (selected)
                                         next.add(id);

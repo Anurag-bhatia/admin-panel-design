@@ -1,6 +1,7 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ChevronDown, ChevronRight, Info, AlertCircle, Lock, Check, Sparkles, } from 'lucide-react';
+import { defaultCouponConversionSettings } from '@/../product/sections/cms/types';
 import { AdvancedRulesBuilder } from './AdvancedRulesBuilder';
 const CHALLAN_TYPE_LABELS = {
     online: 'Online',
@@ -109,6 +110,7 @@ function initialFromCoupon(coupon) {
         autoApplyOldest: coupon?.autoApplyOldest ?? false,
         exitIntentEligible: coupon?.exitIntentEligible ?? false,
         advancedRules: coupon?.advancedRules ?? { groups: [] },
+        conversion: coupon?.conversion ?? defaultCouponConversionSettings,
     };
 }
 export function AddCouponPage({ initialCoupon, existingCodes = [], onSubmit, onCancel, }) {
@@ -122,6 +124,7 @@ export function AddCouponPage({ initialCoupon, existingCodes = [], onSubmit, onC
         D: true,
         E: true,
         F: false,
+        G: false,
     });
     const [errors, setErrors] = useState({});
     const [codeSuggestions, setCodeSuggestions] = useState([]);
@@ -205,6 +208,7 @@ export function AddCouponPage({ initialCoupon, existingCodes = [], onSubmit, onC
             autoApplyOldest: form.autoApplyOldest,
             exitIntentEligible: form.exitIntentEligible,
             advancedRules: form.advancedRules.groups.length > 0 ? form.advancedRules : undefined,
+            conversion: form.conversion.allowConversion ? form.conversion : undefined,
             status: mode === 'publish' && !startsInFuture ? 'active' : 'draft',
         };
         onSubmit?.(payload);
@@ -224,7 +228,7 @@ export function AddCouponPage({ initialCoupon, existingCodes = [], onSubmit, onC
                                                 })), value: form.product, onChange: (next) => update('product', next) }) }), _jsx(Field, { label: "Applicable Challan Type", required: true, error: errors.challanTypes, children: _jsx(MultiSelectDropdown, { placeholder: "Select challan types", disabled: isLocked, options: Object.keys(CHALLAN_TYPE_LABELS).map((t) => ({
                                                     value: t,
                                                     label: CHALLAN_TYPE_LABELS[t],
-                                                })), value: form.challanTypes, onChange: (next) => update('challanTypes', next) }) })] })] }), _jsxs(Section, { id: "E", title: "Usage Limits", open: openSections.E, onToggle: () => toggleSection('E'), children: [_jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [_jsx(Field, { label: "Total usage limit", children: _jsx("input", { type: "number", disabled: isLocked, value: form.totalUsageLimit, onChange: (e) => update('totalUsageLimit', e.target.value), placeholder: "Blank = unlimited", className: inputCls(isLocked) }) }), _jsx(Field, { label: "Per-user usage limit", children: _jsx("input", { type: "number", disabled: isLocked, value: form.perUserUsageLimit, onChange: (e) => update('perUserUsageLimit', e.target.value), placeholder: "Blank = unlimited", className: inputCls(isLocked) }) })] }), _jsx(CheckboxRow, { label: "Stackable with other coupons / rewards", description: form.stackable ? 'On — can combine with other benefits' : 'Off — used alone', checked: form.stackable, disabled: isLocked, onChange: (v) => update('stackable', v) }), _jsx(CheckboxRow, { label: "Auto Apply", info: "In case of multiple auto apply coupons, the oldest eligible coupon will get applied at checkout", checked: form.autoApplyOldest, disabled: isLocked, onChange: (v) => update('autoApplyOldest', v) }), _jsx(CheckboxRow, { label: "Eligible for an exit-intent prompt", info: "In case of multiple exit intent coupons, the oldest eligible coupon will get applied at checkout", checked: form.exitIntentEligible, disabled: isLocked, onChange: (v) => update('exitIntentEligible', v) })] }), _jsx(Section, { id: "F", title: "Advanced Rules", subtitle: "Optional targeted eligibility conditions", open: openSections.F, onToggle: () => toggleSection('F'), children: _jsx(AdvancedRulesBuilder, { value: form.advancedRules, onChange: (next) => update('advancedRules', next), readOnly: isLocked, platforms: form.platforms }) }), isLocked && (_jsx("div", { className: "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 rounded-xl p-4 text-xs text-amber-800 dark:text-amber-300", children: _jsxs("div", { className: "flex items-start gap-2", children: [_jsx(Lock, { className: "w-4 h-4 mt-0.5 flex-shrink-0" }), _jsxs("div", { children: [_jsx("p", { className: "font-semibold mb-0.5", children: "Editing is locked" }), _jsx("p", { children: "The validity period has started. Only Pause, Resume and Archive actions are available." })] })] }) }))] }) })] }));
+                                                })), value: form.challanTypes, onChange: (next) => update('challanTypes', next) }) })] })] }), _jsxs(Section, { id: "E", title: "Usage Limits", open: openSections.E, onToggle: () => toggleSection('E'), children: [_jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [_jsx(Field, { label: "Total usage limit", children: _jsx("input", { type: "number", disabled: isLocked, value: form.totalUsageLimit, onChange: (e) => update('totalUsageLimit', e.target.value), placeholder: "Blank = unlimited", className: inputCls(isLocked) }) }), _jsx(Field, { label: "Per-user usage limit", children: _jsx("input", { type: "number", disabled: isLocked, value: form.perUserUsageLimit, onChange: (e) => update('perUserUsageLimit', e.target.value), placeholder: "Blank = unlimited", className: inputCls(isLocked) }) })] }), _jsx(CheckboxRow, { label: "Stackable with other coupons / rewards", description: form.stackable ? 'On — can combine with other benefits' : 'Off — used alone', checked: form.stackable, disabled: isLocked, onChange: (v) => update('stackable', v) }), _jsx(CheckboxRow, { label: "Auto Apply", info: "In case of multiple auto apply coupons, the oldest eligible coupon will get applied at checkout", checked: form.autoApplyOldest, disabled: isLocked, onChange: (v) => update('autoApplyOldest', v) }), _jsx(CheckboxRow, { label: "Eligible for an exit-intent prompt", info: "In case of multiple exit intent coupons, the oldest eligible coupon will get applied at checkout", checked: form.exitIntentEligible, disabled: isLocked, onChange: (v) => update('exitIntentEligible', v) })] }), _jsx(Section, { id: "F", title: "Advanced Rules", subtitle: "Optional targeted eligibility conditions", open: openSections.F, onToggle: () => toggleSection('F'), children: _jsx(AdvancedRulesBuilder, { value: form.advancedRules, onChange: (next) => update('advancedRules', next), readOnly: isLocked, platforms: form.platforms }) }), _jsx(Section, { id: "G", title: "Convert to Credit", subtitle: "Let eligible customers exchange this coupon for CP Pockets", open: openSections.G, onToggle: () => toggleSection('G'), children: _jsx(ConversionSettings, { value: form.conversion, onChange: (next) => update('conversion', next), disabled: isLocked }) }), isLocked && (_jsx("div", { className: "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 rounded-xl p-4 text-xs text-amber-800 dark:text-amber-300", children: _jsxs("div", { className: "flex items-start gap-2", children: [_jsx(Lock, { className: "w-4 h-4 mt-0.5 flex-shrink-0" }), _jsxs("div", { children: [_jsx("p", { className: "font-semibold mb-0.5", children: "Editing is locked" }), _jsx("p", { children: "The validity period has started. Only Pause, Resume and Archive actions are available." })] })] }) }))] }) })] }));
 }
 function Section({ id, title, subtitle, open, onToggle, children, }) {
     return (_jsxs("div", { className: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl", children: [_jsxs("button", { type: "button", onClick: onToggle, className: `w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${open ? 'rounded-t-xl' : 'rounded-xl'}`, children: [_jsxs("div", { className: "flex items-center gap-3 text-left", children: [_jsx("span", { className: "inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-900/40 rounded", children: id }), _jsxs("div", { children: [_jsx("h2", { className: "text-sm font-semibold text-slate-900 dark:text-white", children: title }), subtitle && (_jsx("p", { className: "text-xs text-slate-500 dark:text-slate-400 mt-0.5", children: subtitle }))] })] }), open ? (_jsx(ChevronDown, { className: "w-4 h-4 text-slate-400" })) : (_jsx(ChevronRight, { className: "w-4 h-4 text-slate-400" }))] }), open && (_jsx("div", { className: "border-t border-slate-100 dark:border-slate-700 px-4 py-4 space-y-3 rounded-b-xl", children: children }))] }));
@@ -299,4 +303,45 @@ function selectableCls(selected) {
     return `px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-colors ${selected
         ? 'border-cyan-600 bg-cyan-50 text-cyan-700 dark:border-cyan-500 dark:bg-cyan-900/30 dark:text-cyan-200'
         : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'} disabled:opacity-60 disabled:cursor-not-allowed`;
+}
+const AUDIENCE_LABELS = {
+    assigned: 'Assigned customers only',
+    anyVerified: 'Any verified customer',
+    publicWithOtp: 'Public code with mobile OTP',
+};
+const METHOD_LABELS = {
+    sameAsValue: 'Same as coupon value',
+    fixedAmount: 'Fixed amount',
+    percentOfBenefit: '% of coupon benefit',
+};
+const APPLIES_TO_LABELS = {
+    sameAsCoupon: 'Same as coupon',
+    challan: 'Challan fee',
+    convenience: 'Convenience fee',
+    both: 'Both',
+};
+const COMBINATION_LABELS = {
+    couponFirst: 'Coupon first, then credit',
+    creditFirst: 'Credit first, then coupon',
+};
+function ConversionSettings({ value, onChange, disabled, }) {
+    const set = (key, v) => onChange({ ...value, [key]: v });
+    const expiryMode = value.creditExpiryDate ? 'date' : 'days';
+    return (_jsxs("div", { className: "space-y-5", children: [_jsxs("div", { className: "flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800", children: [_jsxs("div", { className: "min-w-0", children: [_jsx("p", { className: "text-sm font-semibold text-slate-900 dark:text-white", children: "Allow conversion to CP Pockets" }), _jsx("p", { className: "text-xs text-slate-500 dark:text-slate-400 mt-0.5", children: "When on, eligible customers can exchange this coupon for credit instead of applying it at the current checkout. Once converted, the coupon can no longer be used." })] }), _jsx(ConversionToggle, { checked: value.allowConversion, disabled: disabled, onChange: (v) => set('allowConversion', v) })] }), value.allowConversion && (_jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [_jsx(ConvField, { label: "Who can convert", children: _jsx("select", { disabled: disabled, value: value.whoCanConvert, onChange: (e) => set('whoCanConvert', e.target.value), className: inputCls(disabled), children: Object.keys(AUDIENCE_LABELS).map((k) => (_jsx("option", { value: k, children: AUDIENCE_LABELS[k] }, k))) }) }), _jsx(ConvField, { label: "Conversion method", children: _jsx("select", { disabled: disabled, value: value.method, onChange: (e) => set('method', e.target.value), className: inputCls(disabled), children: Object.keys(METHOD_LABELS).map((k) => (_jsx("option", { value: k, children: METHOD_LABELS[k] }, k))) }) }), value.method !== 'sameAsValue' && (_jsx(ConvField, { label: value.method === 'fixedAmount' ? 'Credit value (₹)' : 'Credit value (%)', help: value.method === 'fixedAmount'
+                            ? 'Flat credit value, regardless of coupon amount'
+                            : 'Percentage of the coupon benefit', children: _jsx("input", { type: "number", min: 1, max: value.method === 'percentOfBenefit' ? 100 : undefined, disabled: disabled, value: value.creditValue ?? '', onChange: (e) => set('creditValue', e.target.value ? Number(e.target.value) : undefined), className: inputCls(disabled) }) })), _jsx(ConvField, { label: "Per-customer limit", children: _jsx("input", { type: "number", min: 1, disabled: disabled, value: value.perCustomerLimit, onChange: (e) => set('perCustomerLimit', Number(e.target.value) || 1), className: inputCls(disabled) }) }), _jsx(ConvField, { label: "Conversion window starts", help: "Defaults to coupon validity", children: _jsx("input", { type: "datetime-local", disabled: disabled, value: value.windowStart ?? '', onChange: (e) => set('windowStart', e.target.value || undefined), className: inputCls(disabled) }) }), _jsx(ConvField, { label: "Conversion window ends", children: _jsx("input", { type: "datetime-local", disabled: disabled, value: value.windowEnd ?? '', onChange: (e) => set('windowEnd', e.target.value || undefined), className: inputCls(disabled) }) }), _jsx(ConvField, { label: "Credit expiry", className: "sm:col-span-2", children: _jsxs("div", { className: "flex flex-col gap-2", children: [_jsxs("div", { className: "flex gap-2", children: [_jsx("button", { type: "button", disabled: disabled, onClick: () => onChange({
+                                                ...value,
+                                                creditExpiryDate: undefined,
+                                                creditExpiryDays: value.creditExpiryDays ?? 30,
+                                            }), className: selectableCls(expiryMode === 'days'), children: "Days from conversion" }), _jsx("button", { type: "button", disabled: disabled, onClick: () => onChange({
+                                                ...value,
+                                                creditExpiryDays: undefined,
+                                                creditExpiryDate: value.creditExpiryDate ?? '',
+                                            }), className: selectableCls(expiryMode === 'date'), children: "Fixed date" })] }), expiryMode === 'days' ? (_jsx("input", { type: "number", min: 1, disabled: disabled, value: value.creditExpiryDays ?? '', onChange: (e) => set('creditExpiryDays', e.target.value ? Number(e.target.value) : undefined), placeholder: "30", className: inputCls(disabled) })) : (_jsx("input", { type: "date", disabled: disabled, value: value.creditExpiryDate ?? '', onChange: (e) => set('creditExpiryDate', e.target.value || undefined), className: inputCls(disabled) }))] }) }), _jsx(ConvField, { label: "Where the credit can be used", children: _jsx("select", { disabled: disabled, value: value.appliesTo, onChange: (e) => set('appliesTo', e.target.value), className: inputCls(disabled), children: Object.keys(APPLIES_TO_LABELS).map((k) => (_jsx("option", { value: k, children: APPLIES_TO_LABELS[k] }, k))) }) }), _jsx(ConvField, { label: "Combination policy", children: _jsx("select", { disabled: disabled, value: value.combination, onChange: (e) => set('combination', e.target.value), className: inputCls(disabled), children: Object.keys(COMBINATION_LABELS).map((k) => (_jsx("option", { value: k, children: COMBINATION_LABELS[k] }, k))) }) }), _jsx(ConvField, { label: "Customer disclosure", className: "sm:col-span-2", help: "Must state the value, expiry, eligible use, and that credit is non-transferable and non-withdrawable.", children: _jsx("textarea", { disabled: disabled, value: value.customerDisclosure ?? '', onChange: (e) => set('customerDisclosure', e.target.value), rows: 3, placeholder: "e.g. Convert this coupon for 100 CP Coins, valid for 30 days on convenience fees. CP Pockets is not cash and cannot be withdrawn or transferred.", className: inputCls(disabled) }) })] }))] }));
+}
+function ConvField({ label, help, className, children, }) {
+    return (_jsxs("label", { className: `flex flex-col gap-1.5 ${className ?? ''}`, children: [_jsx("span", { className: "text-xs font-medium text-slate-700 dark:text-slate-300", children: label }), children, help && _jsx("span", { className: "text-xs text-slate-400", children: help })] }));
+}
+function ConversionToggle({ checked, disabled, onChange, }) {
+    return (_jsx("button", { type: "button", disabled: disabled, onClick: () => onChange(!checked), className: `relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${checked ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-600'} disabled:opacity-60 disabled:cursor-not-allowed`, children: _jsx("span", { className: `inline-block h-4 w-4 rounded-full bg-white transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'}` }) }));
 }

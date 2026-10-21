@@ -187,16 +187,6 @@ export function CallSummaryTab() {
               {isExpanded && (
                 <div className="px-4 pb-4 border-t border-slate-200 dark:border-slate-700">
                   <div className="pt-4 space-y-4">
-                    {/* Summary */}
-                    <div>
-                      <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Summary
-                      </h4>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        {call.summary}
-                      </p>
-                    </div>
-
                     {/* Key Points */}
                     <div>
                       <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">

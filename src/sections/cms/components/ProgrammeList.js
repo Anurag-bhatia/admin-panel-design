@@ -23,8 +23,7 @@ const statusBadgeClass = {
 const typeLabels = {
     firstTimeCheck: 'First-time check',
     postPaymentReward: 'Post-payment reward',
-    influencer: 'Influencer',
-    corporate: 'Corporate',
+    corporate: 'Corporate benefit',
     specificCustomers: 'Specific customers',
 };
 const perPage = 25;
@@ -60,7 +59,28 @@ function budgetPercent(p) {
         return 0;
     return Math.min(100, Math.round((p.coinsIssued / p.budgetCoins) * 100));
 }
-export function ProgrammeList({ programmes, permissions = defaultWalletPermissions, onCreate, onEdit, onView, onPauseIssuing, onPauseRedemption, onResume, onArchive, onClone, onSearch, }) {
+export function ProgrammeList({ programmes, customerCredits = [], permissions = defaultWalletPermissions, onCreate, onEdit, onView, onPauseIssuing, onPauseRedemption, onResume, onArchive, onClone, onSearch, }) {
+    const customersCreditedByProgramme = useMemo(() => {
+        const map = new Map();
+        customerCredits.forEach((c) => {
+            c.lots.forEach((lot) => {
+                if (!lot.programmeId)
+                    return;
+                if (!map.has(lot.programmeId))
+                    map.set(lot.programmeId, new Set());
+                map.get(lot.programmeId).add(c.mobileNumber);
+            });
+        });
+        return map;
+    }, [customerCredits]);
+    const customersCreditedFor = (p) => {
+        const direct = customersCreditedByProgramme.get(p.id)?.size;
+        if (direct && direct > 0)
+            return direct;
+        if (p.coinsPerCustomer > 0)
+            return Math.floor(p.coinsIssued / p.coinsPerCustomer);
+        return 0;
+    };
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [typeFilter, setTypeFilter] = useState('all');
@@ -114,9 +134,11 @@ export function ProgrammeList({ programmes, permissions = defaultWalletPermissio
                 return dir * (budgetPercent(a) - budgetPercent(b));
             if (sortKey === 'expiry')
                 return dir * (new Date(a.endAt).getTime() - new Date(b.endAt).getTime());
+            if (sortKey === 'customersCredited')
+                return dir * (customersCreditedFor(a) - customersCreditedFor(b));
             return dir * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         });
-    }, [programmes, searchQuery, statusFilter, typeFilter, startDateFilter, endDateFilter, sortKey, sortDir, now]);
+    }, [programmes, searchQuery, statusFilter, typeFilter, startDateFilter, endDateFilter, sortKey, sortDir, now, customersCreditedByProgramme]);
     const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
     const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
     const activeFilterCount = (statusFilter !== 'all' ? 1 : 0) +
@@ -130,7 +152,7 @@ export function ProgrammeList({ programmes, permissions = defaultWalletPermissio
         setEndDateFilter('');
         setCurrentPage(1);
     };
-    return (_jsxs("div", { children: [_jsxs("div", { className: "flex items-center justify-between mb-6", children: [_jsx("h1", { className: "text-2xl font-bold text-slate-900 dark:text-white", children: "Wallet Programmes" }), permissions.createProgramme && (_jsxs("button", { onClick: onCreate, className: "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm", children: [_jsx(Plus, { className: "w-4 h-4" }), "Create Programme"] }))] }), _jsxs("div", { className: "flex flex-wrap items-center justify-between gap-3 mb-4", children: [_jsxs("div", { className: "relative w-full sm:flex-1 sm:max-w-2xl", children: [_jsx(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" }), _jsx("input", { type: "text", placeholder: "Search by name or code\u2026", value: searchQuery, onChange: (e) => {
+    return (_jsxs("div", { children: [_jsxs("div", { className: "flex items-center justify-between mb-6", children: [_jsx("h1", { className: "text-2xl font-bold text-slate-900 dark:text-white", children: "Credit Programmes" }), permissions.createProgramme && (_jsxs("button", { onClick: onCreate, className: "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-sm", children: [_jsx(Plus, { className: "w-4 h-4" }), "Create Programme"] }))] }), _jsxs("div", { className: "flex flex-wrap items-center justify-between gap-3 mb-4", children: [_jsxs("div", { className: "relative w-full sm:flex-1 sm:max-w-2xl", children: [_jsx(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" }), _jsx("input", { type: "text", placeholder: "Search by name or code\u2026", value: searchQuery, onChange: (e) => {
                                     setSearchQuery(e.target.value);
                                     setCurrentPage(1);
                                     onSearch?.(e.target.value);
@@ -158,8 +180,7 @@ export function ProgrammeList({ programmes, permissions = defaultWalletPermissio
                                     { value: 'all', label: 'All types' },
                                     { value: 'firstTimeCheck', label: 'First-time check' },
                                     { value: 'postPaymentReward', label: 'Post-payment reward' },
-                                    { value: 'influencer', label: 'Influencer' },
-                                    { value: 'corporate', label: 'Corporate' },
+                                    { value: 'corporate', label: 'Corporate benefit' },
                                     { value: 'specificCustomers', label: 'Specific customers' },
                                 ] }), _jsx(DateInput, { label: "Start on or after", value: startDateFilter, onChange: (v) => {
                                     setStartDateFilter(v);
@@ -167,7 +188,7 @@ export function ProgrammeList({ programmes, permissions = defaultWalletPermissio
                                 } }), _jsx(DateInput, { label: "End on or before", value: endDateFilter, onChange: (v) => {
                                     setEndDateFilter(v);
                                     setCurrentPage(1);
-                                } })] }), activeFilterCount > 0 && (_jsx("div", { className: "flex items-center justify-end mt-3", children: _jsxs("button", { onClick: clearFilters, className: "inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white", children: [_jsx(X, { className: "w-3.5 h-3.5" }), "Clear filters"] }) }))] })), _jsxs("div", { className: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-visible", children: [_jsx("div", { className: "overflow-x-auto", children: _jsxs("table", { className: "w-full", children: [_jsx("thead", { children: _jsxs("tr", { className: "bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700", children: [_jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Name & Code" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Type" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Status" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Validity" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3 min-w-[180px]", children: "Budget Used" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Created" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3 w-20", children: "Actions" })] }) }), _jsxs("tbody", { className: "divide-y divide-slate-100 dark:divide-slate-700", children: [paginated.map((p) => {
+                                } })] }), activeFilterCount > 0 && (_jsx("div", { className: "flex items-center justify-end mt-3", children: _jsxs("button", { onClick: clearFilters, className: "inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white", children: [_jsx(X, { className: "w-3.5 h-3.5" }), "Clear filters"] }) }))] })), _jsxs("div", { className: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-visible", children: [_jsx("div", { className: "overflow-x-auto", children: _jsxs("table", { className: "w-full", children: [_jsx("thead", { children: _jsxs("tr", { className: "bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700", children: [_jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Name & Code" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Type" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Status" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Validity" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3 min-w-[180px]", children: "Budget Used" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3", children: "Customers Credited" }), _jsx("th", { className: "text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3 w-20", children: "Actions" })] }) }), _jsxs("tbody", { className: "divide-y divide-slate-100 dark:divide-slate-700", children: [paginated.map((p) => {
                                             const effective = p.effectiveStatus;
                                             const canEdit = effective === 'draft' && permissions.editDraftProgramme;
                                             const canEditLive = (effective === 'active' || effective === 'scheduled' || effective === 'paused') &&
@@ -184,13 +205,13 @@ export function ProgrammeList({ programmes, permissions = defaultWalletPermissio
                                             const canClone = permissions.cloneProgramme;
                                             const isTerminal = effective === 'expired' || effective === 'archived' || effective === 'exhausted';
                                             const pct = budgetPercent(p);
-                                            return (_jsxs("tr", { onClick: () => onView?.(p.id), className: "hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors cursor-pointer", children: [_jsx("td", { className: "px-4 py-3.5", children: _jsxs("div", { className: "flex flex-col", children: [_jsx("span", { className: "text-sm font-semibold text-slate-900 dark:text-white", children: p.name }), _jsx("span", { className: "text-xs text-slate-500 dark:text-slate-400 font-mono", children: p.code })] }) }), _jsx("td", { className: "px-4 py-3.5 text-sm text-slate-700 dark:text-slate-200 whitespace-nowrap", children: typeLabels[p.type] }), _jsx("td", { className: "px-4 py-3.5", children: _jsx("span", { className: `inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ${statusBadgeClass[effective]}`, children: statusLabels[effective] }) }), _jsx("td", { className: "px-4 py-3.5 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap", children: _jsxs("div", { className: "flex flex-col", children: [_jsx("span", { children: formatDate(p.startAt) }), _jsxs("span", { className: "text-xs text-slate-400", children: ["\u2192 ", formatDate(p.endAt)] })] }) }), _jsx("td", { className: "px-4 py-3.5 min-w-[180px]", children: _jsx(BudgetBar, { percent: pct, issued: p.coinsIssued, budget: p.budgetCoins, alertLevel: p.alertLevelPercent }) }), _jsx("td", { className: "px-4 py-3.5 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap", children: _jsxs("div", { className: "flex flex-col", children: [_jsx("span", { children: p.createdBy }), _jsx("span", { className: "text-xs text-slate-400", children: formatDate(p.createdAt) })] }) }), _jsx("td", { className: "px-4 py-3.5", onClick: (e) => e.stopPropagation(), children: _jsxs("div", { className: "relative", ref: openMenuId === p.id ? menuRef : null, children: [_jsx("button", { onClick: (e) => {
+                                            return (_jsxs("tr", { onClick: () => (effective === 'draft' ? onEdit?.(p.id) : onView?.(p.id)), className: "hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors cursor-pointer", children: [_jsx("td", { className: "px-4 py-3.5", children: _jsxs("div", { className: "flex flex-col", children: [_jsx("span", { className: "text-sm font-semibold text-slate-900 dark:text-white", children: p.name }), _jsx("span", { className: "text-xs text-slate-500 dark:text-slate-400 font-mono", children: p.code })] }) }), _jsx("td", { className: "px-4 py-3.5 text-sm text-slate-700 dark:text-slate-200 whitespace-nowrap", children: typeLabels[p.type] }), _jsx("td", { className: "px-4 py-3.5", children: _jsx("span", { className: `inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ${statusBadgeClass[effective]}`, children: statusLabels[effective] }) }), _jsxs("td", { className: "px-4 py-3.5 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap", children: [formatDate(p.startAt), " ", _jsx("span", { className: "text-slate-400", children: "\u2192" }), ' ', formatDate(p.endAt)] }), _jsx("td", { className: "px-4 py-3.5 min-w-[180px]", children: _jsx(BudgetBar, { percent: pct, issued: p.coinsIssued, budget: p.budgetCoins, alertLevel: p.alertLevelPercent }) }), _jsx("td", { className: "px-4 py-3.5 text-sm text-slate-700 dark:text-slate-200 whitespace-nowrap", children: formatCoins(customersCreditedFor(p)) }), _jsx("td", { className: "px-4 py-3.5", onClick: (e) => e.stopPropagation(), children: _jsxs("div", { className: "relative", ref: openMenuId === p.id ? menuRef : null, children: [_jsx("button", { onClick: (e) => {
                                                                         e.stopPropagation();
                                                                         setOpenMenuId((prev) => (prev === p.id ? null : p.id));
-                                                                    }, className: "p-1.5 rounded-md text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors", children: _jsx(MoreVertical, { className: "w-4 h-4" }) }), openMenuId === p.id && (_jsxs("div", { className: "absolute right-0 top-full mt-1 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-20", children: [_jsx(MenuItem, { icon: _jsx(Eye, { className: "w-3.5 h-3.5" }), label: "View details", onClick: () => {
+                                                                    }, className: "p-1.5 rounded-md text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors", children: _jsx(MoreVertical, { className: "w-4 h-4" }) }), openMenuId === p.id && (_jsxs("div", { className: "absolute right-0 top-full mt-1 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-20", children: [effective !== 'draft' && (_jsx(MenuItem, { icon: _jsx(Eye, { className: "w-3.5 h-3.5" }), label: "View details", onClick: () => {
                                                                                 setOpenMenuId(null);
                                                                                 onView?.(p.id);
-                                                                            } }), (canEdit || canEditLive) && (_jsx(MenuItem, { icon: _jsx(Pencil, { className: "w-3.5 h-3.5" }), label: canEdit ? 'Edit' : 'Edit (saves new version)', onClick: () => {
+                                                                            } })), (canEdit || canEditLive) && (_jsx(MenuItem, { icon: _jsx(Pencil, { className: "w-3.5 h-3.5" }), label: canEdit ? 'Edit' : 'Edit (saves new version)', onClick: () => {
                                                                                 setOpenMenuId(null);
                                                                                 onEdit?.(p.id);
                                                                             } })), canPause && (_jsx(MenuItem, { icon: _jsx(Pause, { className: "w-3.5 h-3.5" }), label: "Pause issuing", onClick: () => {
@@ -240,6 +261,7 @@ function SortDropdown({ sortKey, sortDir, onChange, }) {
         { key: 'created', dir: 'desc', label: 'Newest' },
         { key: 'expiry', dir: 'asc', label: 'Expiring soon' },
         { key: 'budgetUsed', dir: 'desc', label: 'Highest budget used' },
+        { key: 'customersCredited', dir: 'desc', label: 'Most customers credited' },
     ];
     const current = options.find((o) => o.key === sortKey && o.dir === sortDir) ??
         options.find((o) => o.key === sortKey) ??
