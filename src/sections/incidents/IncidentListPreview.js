@@ -11,10 +11,13 @@ import { MoveQueueModal } from './components/MoveQueueModal';
 import { MoveQueueDetailsModal } from './components/MoveQueueDetailsModal';
 import { BulkUpdateModal } from './components/BulkUpdateModal';
 import { ScreenResultsView } from './components/ScreenResultsView';
+import { BatchDetailView } from '../batch/BatchDetailView';
+import batchData from '@/../product/sections/batch/data.json';
 export default function IncidentListPreview() {
     // View state
     const [viewMode, setViewMode] = useState('list');
     const [selectedIncidentId, setSelectedIncidentId] = useState(null);
+    const [selectedBatchId, setSelectedBatchId] = useState(null);
     const [initialDetailTab, setInitialDetailTab] = useState(undefined);
     // Modal state
     const [activeModal, setActiveModal] = useState(null);
@@ -52,6 +55,20 @@ export default function IncidentListPreview() {
         setSelectedIncidentId(null);
         setInitialDetailTab(undefined);
     };
+    const handleViewBatch = (batchId) => {
+        setSelectedBatchId(batchId);
+        setViewMode('batchDetail');
+    };
+    const handleBackFromBatch = () => {
+        setViewMode('list');
+        setSelectedBatchId(null);
+    };
+    const handleIncidentFromBatch = (incidentId) => {
+        setSelectedIncidentId(incidentId);
+        setInitialDetailTab(undefined);
+        setViewMode('detail');
+    };
+    const selectedBatch = batchData.batches.find((b) => b.batchId === selectedBatchId) ?? null;
     const handleAddChallan = () => {
         setActiveModal('addChallan');
     };
@@ -122,6 +139,10 @@ export default function IncidentListPreview() {
                 handleBack();
             } }));
     }
+    // Render batch detail view
+    if (viewMode === 'batchDetail' && selectedBatch) {
+        return (_jsx(BatchDetailView, { batch: selectedBatch, incidents: data.incidents, onBack: handleBackFromBatch, onViewIncident: handleIncidentFromBatch }));
+    }
     // Render detail view
     if (viewMode === 'detail' && selectedIncident && subscriber) {
         return (_jsxs(_Fragment, { children: [_jsx(IncidentDetailView, { incident: selectedIncident, subscriber: subscriber, assignedAgent: assignedAgent, assignedLawyer: assignedLawyer, followUps: followUps, timelineActivities: timelineActivities, documents: documents, users: data.users, lawyers: data.lawyers, initialTab: initialDetailTab, onBack: handleBack, onAddFollowUp: (incidentId, followUp) => {
@@ -147,7 +168,7 @@ export default function IncidentListPreview() {
                     }, onClose: () => setActiveModal(null) }))] }));
     }
     // Render list view with modals
-    return (_jsxs(_Fragment, { children: [_jsx("div", { className: "h-[calc(100vh-64px)]", children: _jsx(IncidentList, { incidents: data.incidents, challanQueueCounts: data.challanQueueCounts, caseQueueCounts: data.caseQueueCounts, pagination: data.pagination, users: data.users, lawyers: data.lawyers, sources: data.sources, offenceTypes: data.offenceTypes, onViewIncident: handleViewIncident, onOpenChat: handleOpenChat, onAddChallan: handleAddChallan, onAddCase: handleAddCase, onScreen: handleScreen, onAssignAgent: (ids, agentId) => handleAssignAgent(ids, agentId), onAssignLawyer: (ids, lawyerId) => handleAssignLawyer(ids, lawyerId), onMoveQueue: (ids, queue) => handleMoveQueue(ids, queue), onBulkUpdate: (ids, file) => handleBulkUpdate(ids, file), onExport: (ids) => console.log('Export incidents:', ids), onSearch: (query) => console.log('Search:', query), onFilter: (filters) => console.log('Filter:', filters), onQueueChange: (queue) => console.log('Queue changed:', queue), onPageChange: (page) => console.log('Page changed:', page) }) }), activeModal === 'addChallan' && (_jsx(AddChallanModal, { subscribers: data.subscribers, sources: data.sources, onSubmit: (challan) => {
+    return (_jsxs(_Fragment, { children: [_jsx("div", { className: "h-[calc(100vh-64px)]", children: _jsx(IncidentList, { incidents: data.incidents, challanQueueCounts: data.challanQueueCounts, caseQueueCounts: data.caseQueueCounts, pagination: data.pagination, users: data.users, lawyers: data.lawyers, sources: data.sources, offenceTypes: data.offenceTypes, onViewIncident: handleViewIncident, onOpenChat: handleOpenChat, onViewBatch: handleViewBatch, onAddChallan: handleAddChallan, onAddCase: handleAddCase, onScreen: handleScreen, onAssignAgent: (ids, agentId) => handleAssignAgent(ids, agentId), onAssignLawyer: (ids, lawyerId) => handleAssignLawyer(ids, lawyerId), onMoveQueue: (ids, queue) => handleMoveQueue(ids, queue), onBulkUpdate: (ids, file) => handleBulkUpdate(ids, file), onExport: (ids) => console.log('Export incidents:', ids), onSearch: (query) => console.log('Search:', query), onFilter: (filters) => console.log('Filter:', filters), onQueueChange: (queue) => console.log('Queue changed:', queue), onPageChange: (page) => console.log('Page changed:', page) }) }), activeModal === 'addChallan' && (_jsx(AddChallanModal, { subscribers: data.subscribers, sources: data.sources, onSubmit: (challan) => {
                     console.log('Add challan:', challan);
                     setActiveModal(null);
                 }, onCancel: () => setActiveModal(null) })), activeModal === 'addCase' && (_jsx(AddCaseModal, { subscribers: data.subscribers, sources: data.sources, onSubmit: (caseData) => {

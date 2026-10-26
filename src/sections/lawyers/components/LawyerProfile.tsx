@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   ArrowLeft,
   Pencil,
@@ -24,8 +24,13 @@ import {
   Upload,
   Users,
   Sparkles,
+  LayoutGrid,
+  UserRound,
+  ChevronDown,
 } from 'lucide-react'
 import type { Lawyer } from '@/../product/sections/lawyers/types'
+import batchData from '@/../product/sections/batch/data.json'
+import type { Batch } from '@/../product/sections/batch/types'
 
 type TabType = 'details' | 'workingArea' | 'documents' | 'incidents' | 'invoicing' | 'transactions' | 'team'
 
@@ -134,6 +139,7 @@ export function LawyerProfile({
     availableTabs.includes(initialTab) ? initialTab : 'details'
   )
   const [incidentsSubTab, setIncidentsSubTab] = useState<'assigned' | 'settled'>('settled')
+  const [incidentsView, setIncidentsView] = useState<'incident' | 'batch'>('incident')
   const assignedIncidents = displayedIncidents.filter(
     (i) => i.status === 'Assigned' || i.status === 'In Progress'
   )
@@ -141,6 +147,12 @@ export function LawyerProfile({
     (i) => i.status === 'Resolved' || i.status === 'Closed'
   )
   const visibleIncidents = incidentsSubTab === 'assigned' ? assignedIncidents : settledIncidents
+
+  const lawyerBatches = useMemo(() => {
+    const batches = (batchData.batches as Batch[]) ?? []
+    return batches.filter((b) => b.assignedExpertId === lawyer.lawyerId)
+  }, [lawyer.lawyerId])
+
   const isActive = lawyer.activityState === 'Active'
   const fullName = `${lawyer.firstName} ${lawyer.lastName}`
 
@@ -553,9 +565,36 @@ export function LawyerProfile({
           {/* Incidents Tab */}
           {activeTab === 'incidents' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">
-                Incidents
-              </h2>
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-3">
+                  Incidents
+                </h2>
+                <div className="flex items-center gap-1 border-b border-slate-200 dark:border-slate-800">
+                  {([
+                    { key: 'incident', label: 'Incidents' },
+                    { key: 'batch', label: 'Batch View' },
+                  ] as const).map((t) => (
+                    <button
+                      key={t.key}
+                      onClick={() => setIncidentsView(t.key)}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                        incidentsView === t.key
+                          ? 'border-cyan-600 text-cyan-600 dark:border-cyan-400 dark:text-cyan-400'
+                          : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {incidentsView === 'batch' && (
+                <LawyerBatchesView batches={lawyerBatches} />
+              )}
+
+              {incidentsView === 'incident' && (
+                <>
               <div className="flex items-center gap-1 mb-4 border-b border-slate-200 dark:border-slate-800">
                 <button
                   onClick={() => setIncidentsSubTab('settled')}
@@ -730,12 +769,62 @@ export function LawyerProfile({
                   </table>
                 </div>
               )}
+                </>
+              )}
             </div>
           )}
 
           {/* Invoicing Tab */}
           {activeTab === 'invoicing' && (
-            <div>
+            <div className="space-y-6">
+              {/* Earnings Summary */}
+              {(() => {
+                const thirtyDaysAgo = new Date()
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+                const earningsLast30Days = transactionsLedger
+                  .filter((entry) => new Date(entry.resolutionDate) >= thirtyDaysAgo)
+                  .reduce((sum, entry) => sum + entry.commissionAmount, 0)
+                const lifetimeEarnings = transactionsLedger.reduce(
+                  (sum, entry) => sum + entry.commissionAmount,
+                  0,
+                )
+                const potentialEarnings = pendingInvoices.reduce(
+                  (sum, entry) => sum + entry.commissionAmount,
+                  0,
+                )
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+                      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide">
+                        <Calendar className="w-4 h-4" />
+                        Earnings (Last 30 Days)
+                      </div>
+                      <div className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-50">
+                        {formatCurrency(earningsLast30Days)}
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+                      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide">
+                        <Wallet className="w-4 h-4" />
+                        Lifetime Earnings
+                      </div>
+                      <div className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-50">
+                        {formatCurrency(lifetimeEarnings)}
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+                      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide">
+                        <Sparkles className="w-4 h-4" />
+                        Potential Earnings
+                      </div>
+                      <div className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-50">
+                        {formatCurrency(potentialEarnings)}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })()}
+
               {/* Transactions Ledger */}
               <div>
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">
@@ -983,6 +1072,76 @@ function InfoRow({ label, value }: { label: string; value: string }) {
     <div className="py-3 border-b border-slate-100 dark:border-slate-700 last:border-0 flex justify-between items-start gap-4">
       <p className="text-xs text-slate-500 dark:text-slate-400 flex-shrink-0">{label}</p>
       <p className="text-sm text-slate-900 dark:text-white text-right">{value}</p>
+    </div>
+  )
+}
+
+const BATCH_STATUS_CLASSES: Record<string, string> = {
+  'Pending Acceptance': 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
+  Accepted: 'bg-sky-50 dark:bg-sky-900/20 text-sky-700 dark:text-sky-400',
+  Completed: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400',
+  'Not Completed': 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
+}
+
+function formatBatchDate(dateString: string | null): string {
+  if (!dateString) return '—'
+  return new Date(dateString).toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function formatBatchCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
+
+function LawyerBatchesView({ batches }: { batches: Batch[] }) {
+  if (batches.length === 0) {
+    return (
+      <div className="text-center py-12 border border-slate-200 dark:border-slate-800 rounded-xl">
+        <AlertTriangle className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+        <p className="text-slate-500 dark:text-slate-400">No batches assigned yet</p>
+      </div>
+    )
+  }
+  return (
+    <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
+      <table className="w-full">
+        <thead className="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800">
+          <tr>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Batch ID</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Incidents</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Challan Amount</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Accepted Incidents</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rejected Incidents</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {batches.map((batch) => (
+            <tr key={batch.batchId} className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+              <td className="px-4 py-3 font-mono text-sm font-semibold text-slate-900 dark:text-white">{batch.batchId}</td>
+              <td className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{batch.itemCount}</td>
+              <td className="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">{formatBatchCurrency(batch.totalAmount)}</td>
+              <td className="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">{batch.assignedCount}</td>
+              <td className="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">{batch.rejectedCount}</td>
+              <td className="px-4 py-3">
+                <span className={`inline-flex items-center px-2.5 py-1 rounded text-sm font-semibold ${BATCH_STATUS_CLASSES[batch.status] ?? ''}`}>
+                  {batch.status}
+                </span>
+              </td>
+              <td className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">{formatBatchDate(batch.createdDate)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }

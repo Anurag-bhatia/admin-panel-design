@@ -17,6 +17,7 @@ import {
   FileInput,
   Gift,
   BookOpen,
+  Layers,
 } from 'lucide-react'
 
 // Wrap dynamic imports so a stale chunk (after a new deploy) triggers a
@@ -93,6 +94,9 @@ const RewardsConfigPreview = lazyWithReload(() =>
 const KnowledgeBasePreview = lazyWithReload(() =>
   import('../sections/knowledge-base/KnowledgeBasePreview')
 )
+const BatchListPreview = lazyWithReload(() =>
+  import('../sections/batch/BatchListPreview')
+)
 
 // Section metadata mapping
 export const SECTION_DATA: Record<string, { label: string; description: string; icon: React.ComponentType<{ className?: string }> }> = {
@@ -100,6 +104,11 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
     label: 'Incidents',
     description: 'Core workflow for challan intake, screening, assignment, resolution tracking, and SLA enforcement with automated lawyer coordination.',
     icon: AlertCircle,
+  },
+  batch: {
+    label: 'Batch',
+    description: 'Bundles of challans or cases assigned to an expert for processing, tracked through a 4-stage lifecycle: Created → Accepted → In Progress → Completed.',
+    icon: Layers,
   },
   leads: {
     label: 'Sales CRM',
@@ -186,6 +195,7 @@ export const SECTION_DATA: Record<string, { label: string; description: string; 
 // Component mapping for implemented sections
 export const SECTION_COMPONENTS: Record<string, React.ComponentType<any> | null> = {
   incidents: IncidentListPreview,
+  batch: BatchListPreview,
   leads: LeadsDashboard,
   subscribers: SubscribersDashboardPreview,
   customers: CustomerListView,
@@ -210,6 +220,7 @@ export const SECTION_IDS = [
   'leads',
   'payments',
   'incidents',
+  'batch',
   'subscribers',
   'disputes',
   'partners',
@@ -226,7 +237,7 @@ export const SECTION_IDS = [
 ] as const
 
 // Sections hidden from sidebar navigation (kept in registry for data access)
-export const HIDDEN_SECTIONS: Set<string> = new Set(['customers'])
+export const HIDDEN_SECTIONS: Set<string> = new Set(['customers', 'batch'])
 
 // Visible section IDs for navigation
 export const VISIBLE_SECTION_IDS = SECTION_IDS.filter((id) => !HIDDEN_SECTIONS.has(id))

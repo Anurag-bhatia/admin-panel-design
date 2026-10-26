@@ -10,6 +10,9 @@ import { MoveQueueModal } from './components/MoveQueueModal'
 import { MoveQueueDetailsModal } from './components/MoveQueueDetailsModal'
 import { BulkUpdateModal } from './components/BulkUpdateModal'
 import { ScreenResultsView } from './components/ScreenResultsView'
+import { BatchDetailView } from '../batch/BatchDetailView'
+import batchData from '@/../product/sections/batch/data.json'
+import type { Batch } from '@/../product/sections/batch/types'
 import type {
   Incident,
   QueueCounts,
@@ -25,7 +28,7 @@ import type {
   ScreeningResult,
 } from '@/../product/sections/incidents/types'
 
-type ViewMode = 'list' | 'detail' | 'screenResults'
+type ViewMode = 'list' | 'detail' | 'screenResults' | 'batchDetail'
 
 type ModalType = 'addChallan' | 'addCase' | 'assignAgent' | 'assignLawyer' | 'moveQueue' | 'bulkUpdate' | 'assignAgentForMove' | null
 
@@ -33,6 +36,7 @@ export default function IncidentListPreview() {
   // View state
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null)
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null)
   const [initialDetailTab, setInitialDetailTab] = useState<'activity' | 'chats' | undefined>(undefined)
 
   // Modal state
@@ -76,6 +80,24 @@ export default function IncidentListPreview() {
     setSelectedIncidentId(null)
     setInitialDetailTab(undefined)
   }
+
+  const handleViewBatch = (batchId: string) => {
+    setSelectedBatchId(batchId)
+    setViewMode('batchDetail')
+  }
+
+  const handleBackFromBatch = () => {
+    setViewMode('list')
+    setSelectedBatchId(null)
+  }
+
+  const handleIncidentFromBatch = (incidentId: string) => {
+    setSelectedIncidentId(incidentId)
+    setInitialDetailTab(undefined)
+    setViewMode('detail')
+  }
+
+  const selectedBatch = (batchData.batches as Batch[]).find((b) => b.batchId === selectedBatchId) ?? null
 
   const handleAddChallan = () => {
     setActiveModal('addChallan')
@@ -156,6 +178,18 @@ export default function IncidentListPreview() {
           console.log('Confirming screening for challans:', selectedChallans)
           handleBack()
         }}
+      />
+    )
+  }
+
+  // Render batch detail view
+  if (viewMode === 'batchDetail' && selectedBatch) {
+    return (
+      <BatchDetailView
+        batch={selectedBatch}
+        incidents={data.incidents as Incident[]}
+        onBack={handleBackFromBatch}
+        onViewIncident={handleIncidentFromBatch}
       />
     )
   }
@@ -241,6 +275,7 @@ export default function IncidentListPreview() {
           offenceTypes={data.offenceTypes}
           onViewIncident={handleViewIncident}
           onOpenChat={handleOpenChat}
+          onViewBatch={handleViewBatch}
           onAddChallan={handleAddChallan}
           onAddCase={handleAddCase}
           onScreen={handleScreen}

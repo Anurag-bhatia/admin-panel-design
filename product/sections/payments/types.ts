@@ -69,19 +69,6 @@ export interface PartnerPayout {
   paidDate: string | null
 }
 
-export type BatchStatus = 'Created' | 'Accepted' | 'In Progress' | 'Completed'
-
-export interface Batch {
-  batchId: string
-  assignedExpertId: string
-  assignedExpertName: string
-  itemCount: number
-  totalAmount: number
-  status: BatchStatus
-  createdDate: string
-  lastUpdated: string
-}
-
 // =============================================================================
 // Component Props
 // =============================================================================
@@ -133,8 +120,4 @@ export interface PaymentsProps {
   onViewPartnerProfile?: (partnerId: string) => void
   /** Called when user exports partner payouts */
   onExportPartnerPayouts?: () => void
-  /** List of batch records (bulk packs assigned to an expert) */
-  batches?: Batch[]
-  /** Called when user exports batches */
-  onExportBatches?: () => void
 }

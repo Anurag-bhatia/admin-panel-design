@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, UserPlus, Users, UserCircle, Scale, Handshake, CreditCard, MessageSquare, HeadphonesIcon, BarChart3, UsersRound, Settings, FileText, CheckCircle2, FileInput, Gift, BookOpen, } from 'lucide-react';
+import { AlertCircle, UserPlus, Users, UserCircle, Scale, Handshake, CreditCard, MessageSquare, HeadphonesIcon, BarChart3, UsersRound, Settings, FileText, CheckCircle2, FileInput, Gift, BookOpen, Layers, } from 'lucide-react';
 // Wrap dynamic imports so a stale chunk (after a new deploy) triggers a
 // one-shot reload instead of a crash screen.
 function lazyWithReload(factory) {
@@ -34,12 +34,18 @@ const SettledChallansPreview = lazyWithReload(() => import('../sections/settled-
 const ProposalListPreview = lazyWithReload(() => import('../sections/proposals/ProposalListPreview'));
 const RewardsConfigPreview = lazyWithReload(() => import('../sections/rewards-config/RewardsConfigPreview'));
 const KnowledgeBasePreview = lazyWithReload(() => import('../sections/knowledge-base/KnowledgeBasePreview'));
+const BatchListPreview = lazyWithReload(() => import('../sections/batch/BatchListPreview'));
 // Section metadata mapping
 export const SECTION_DATA = {
     incidents: {
         label: 'Incidents',
         description: 'Core workflow for challan intake, screening, assignment, resolution tracking, and SLA enforcement with automated lawyer coordination.',
         icon: AlertCircle,
+    },
+    batch: {
+        label: 'Batch',
+        description: 'Bundles of challans or cases assigned to an expert for processing, tracked through a 4-stage lifecycle: Created → Accepted → In Progress → Completed.',
+        icon: Layers,
     },
     leads: {
         label: 'Sales CRM',
@@ -125,6 +131,7 @@ export const SECTION_DATA = {
 // Component mapping for implemented sections
 export const SECTION_COMPONENTS = {
     incidents: IncidentListPreview,
+    batch: BatchListPreview,
     leads: LeadsDashboard,
     subscribers: SubscribersDashboardPreview,
     customers: CustomerListView,
@@ -148,6 +155,7 @@ export const SECTION_IDS = [
     'leads',
     'payments',
     'incidents',
+    'batch',
     'subscribers',
     'disputes',
     'partners',
@@ -163,7 +171,7 @@ export const SECTION_IDS = [
     'knowledge-base',
 ];
 // Sections hidden from sidebar navigation (kept in registry for data access)
-export const HIDDEN_SECTIONS = new Set(['customers']);
+export const HIDDEN_SECTIONS = new Set(['customers', 'batch']);
 // Visible section IDs for navigation
 export const VISIBLE_SECTION_IDS = SECTION_IDS.filter((id) => !HIDDEN_SECTIONS.has(id));
 export function isSectionId(value) {

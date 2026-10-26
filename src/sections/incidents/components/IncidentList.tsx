@@ -17,6 +17,7 @@ import { IncidentsTableHeader } from './IncidentsTableHeader'
 import { IncidentRow } from './IncidentRow'
 import { BulkActionsBar } from './BulkActionsBar'
 import { Pagination } from './Pagination'
+import { ExpertAssignedBatchesView } from './ExpertAssignedBatchesView'
 
 export interface IncidentListProps {
   incidents: Incident[]
@@ -41,6 +42,7 @@ export interface IncidentListProps {
   onFilter?: (filters: IncidentFilters) => void
   onQueueChange?: (queue: IncidentQueue) => void
   onPageChange?: (page: number) => void
+  onViewBatch?: (batchId: string) => void
 }
 
 export function IncidentList({
@@ -66,6 +68,7 @@ export function IncidentList({
   onFilter,
   onQueueChange,
   onPageChange,
+  onViewBatch,
 }: IncidentListProps) {
   // Sidebar state
   const [selection, setSelection] = useState<SidebarSelection>({
@@ -74,8 +77,15 @@ export function IncidentList({
     workType: 'challans',
   })
   const sidebarView = selection.kind === 'incidents' ? selection.view : 'all'
-  const workType = selection.kind === 'incidents' ? selection.workType : 'challans'
+  const rawWorkType = selection.kind === 'incidents' ? selection.workType : 'challans'
+  const workType: 'cases' | 'challans' =
+    rawWorkType === 'cases' || rawWorkType === 'challans' ? rawWorkType : 'challans'
+  const isPlaceholderWorkType =
+    selection.kind === 'incidents' &&
+    selection.workType !== 'cases' &&
+    selection.workType !== 'challans'
   const isChatsView = selection.kind === 'chats'
+  const isToolsView = selection.kind === 'tools'
 
   const chatThreads: ChatThreadSummary[] = useMemo(
     () => buildSampleChatThreads(incidents),
@@ -110,9 +120,14 @@ export function IncidentList({
 
   // Filter incidents by workType, active queue, and view (all vs my)
   const filteredIncidents = useMemo(() => {
-    let filtered = incidents.filter(
-      (incident) => incident.queue === activeQueue && incident.workType === (isCases ? 'case' : 'challan')
-    )
+    const workTypeMatch = (incident: Incident) =>
+      incident.workType === (isCases ? 'case' : 'challan')
+    let filtered =
+      activeQueue === 'all'
+        ? incidents.filter(workTypeMatch)
+        : incidents.filter(
+            (incident) => incident.queue === activeQueue && workTypeMatch(incident),
+          )
 
     // If "My Incidents" view, filter by assigned agent (for challans) or assigned lawyer (for cases)
     if (sidebarView === 'my') {
@@ -169,6 +184,7 @@ export function IncidentList({
     displayedIncidents.length > 0 &&
     displayedIncidents.every((i) => selectedIds.has(i.id))
   const someSelected = selectedIds.size > 0 && !allSelected
+  const showSettlement = activeQueue !== 'inProgress'
 
   // Compute queue counts based on view (all vs my)
   const displayedQueueCounts = useMemo(() => {
@@ -180,13 +196,18 @@ export function IncidentList({
       ? incidents.filter((inc) => inc.workType === workTypeValue && inc.assignedLawyerId !== null)
       : incidents.filter((inc) => inc.workType === workTypeValue && inc.assignedAgentId === currentUserId)
     return {
+      all: myIncidents.length,
       newIncidents: myIncidents.filter((inc) => inc.queue === 'newIncidents').length,
+      screening: myIncidents.filter((inc) => inc.queue === 'screening').length,
       inProgress: myIncidents.filter((inc) => inc.queue === 'inProgress').length,
+      expertAssigned: myIncidents.filter((inc) => inc.queue === 'expertAssigned').length,
       underReview: myIncidents.filter((inc) => inc.queue === 'underReview').length,
       settled: myIncidents.filter((inc) => inc.queue === 'settled').length,
       notSettled: myIncidents.filter((inc) => inc.queue === 'notSettled').length,
       hold: myIncidents.filter((inc) => inc.queue === 'hold').length,
       refundRequested: myIncidents.filter((inc) => inc.queue === 'refundRequested').length,
+      refundHold: myIncidents.filter((inc) => inc.queue === 'refundHold').length,
+      refundRejected: myIncidents.filter((inc) => inc.queue === 'refundRejected').length,
       refundCompleted: myIncidents.filter((inc) => inc.queue === 'refundCompleted').length,
     }
   }, [sidebarView, queueCounts, incidents, isCases])
@@ -224,6 +245,24 @@ export function IncidentList({
             currentUserId={currentUserId}
             onOpenThread={(incidentId) => (onOpenChat ?? onViewIncident)?.(incidentId)}
           />
+        ) : isToolsView ? (
+          <PlaceholderPanel
+            title={
+              selection.kind === 'tools' && selection.tool === 'incidentDid'
+                ? 'Incident DID'
+                : 'Vendor cancellations'
+            }
+            hint="This tool is coming soon."
+          />
+        ) : isPlaceholderWorkType ? (
+          <PlaceholderPanel
+            title={
+              selection.kind === 'incidents' && selection.workType === 'rtoAssistance'
+                ? 'RTO Assistance'
+                : 'Other'
+            }
+            hint="No incidents to show in this workstream yet."
+          />
         ) : (
           <>
         {/* Queue Tabs */}
@@ -235,6 +274,14 @@ export function IncidentList({
           onQueueChange={handleQueueChange}
         />
 
+        {activeQueue === 'expertAssigned' ? (
+          <ExpertAssignedBatchesView
+            workType={workType}
+            onViewBatch={(batchId) => onViewBatch?.(batchId)}
+            onViewIncident={(incidentId) => onViewIncident?.(incidentId)}
+          />
+        ) : (
+          <>
         {/* Table Header */}
         <IncidentsTableHeader
           users={users}
@@ -264,7 +311,7 @@ export function IncidentList({
               <col className="w-32" />
               <col className="w-32" />
               <col className="w-32" />
-              <col className="w-36" />
+              {showSettlement && <col className="w-36" />}
               {!isCases && <col className="w-40" />}
               {isCases && <col className="w-40" />}
               <col className="w-12" />
@@ -302,9 +349,11 @@ export function IncidentList({
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Updated
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Settlement
-                </th>
+                {showSettlement && (
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Settlement
+                  </th>
+                )}
                 {!isCases && (
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Employee
@@ -324,7 +373,7 @@ export function IncidentList({
               {displayedIncidents.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={isCases ? 9 : 10}
+                    colSpan={(isCases ? 9 : 10) - (showSettlement ? 0 : 1)}
                     className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
@@ -361,6 +410,7 @@ export function IncidentList({
                     users={users}
                     lawyers={lawyers}
                     workType={workType}
+                    showSettlement={showSettlement}
                     unreadChatCount={unreadByIncident.get(incident.id) ?? 0}
                     onOpenChat={() => onOpenChat?.(incident.id)}
                     onSelect={(checked) => handleSelectOne(incident.id, checked)}
@@ -385,10 +435,12 @@ export function IncidentList({
         <Pagination pagination={pagination} onPageChange={onPageChange} />
           </>
         )}
+          </>
+        )}
       </div>
 
       {/* Bulk Actions Bar */}
-      {!isChatsView && selectedIds.size > 0 && (
+      {!isChatsView && activeQueue !== 'expertAssigned' && selectedIds.size > 0 && (
         <BulkActionsBar
           selectedCount={selectedIds.size}
           activeQueue={activeQueue}
@@ -401,6 +453,17 @@ export function IncidentList({
           onBulkUpdate={(file) => onBulkUpdate?.(selectedArray, file)}
         />
       )}
+    </div>
+  )
+}
+
+function PlaceholderPanel({ title, hint }: { title: string; hint: string }) {
+  return (
+    <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="text-center px-6">
+        <p className="text-lg font-semibold text-slate-700 dark:text-slate-200">{title}</p>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{hint}</p>
+      </div>
     </div>
   )
 }

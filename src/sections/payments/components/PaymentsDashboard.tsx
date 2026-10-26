@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import type { PaymentsProps, Refund, LawyerFee, PartnerPayout, Batch } from '@/../product/sections/payments/types'
+import type { PaymentsProps, Refund, LawyerFee, PartnerPayout } from '@/../product/sections/payments/types'
 import type { Lead } from '@/../product/sections/sales-crm/types'
 import { PaymentsSidebar } from './PaymentsSidebar'
 import { PaymentsStageTabs } from './PaymentsStageTabs'
@@ -7,7 +7,6 @@ import { PaymentsTableHeader, type PaymentFilters } from './PaymentsTableHeader'
 import { RefundRow } from './RefundRow'
 import { LawyerFeeRow } from './LawyerFeeRow'
 import { PartnerPayoutRow } from './PartnerPayoutRow'
-import { BatchRow } from './BatchRow'
 import { RefundBulkActionsBar } from './RefundBulkActionsBar'
 import { RefundDetailView } from './RefundDetailView'
 import { Pagination } from './Pagination'
@@ -49,20 +48,6 @@ const PARTNER_TABS = [
   { key: 'completed', label: 'Completed' },
   { key: 'hold', label: 'Hold' },
   { key: 'rejected', label: 'Failed' },
-]
-
-const BATCH_TABS = [
-  { key: 'created', label: 'Batch Created' },
-  { key: 'accepted', label: 'Batch Accepted' },
-  { key: 'in_progress', label: 'Batch In Progress' },
-  { key: 'completed', label: 'Batch Completed' },
-]
-
-const BATCH_STATUS_OPTIONS = [
-  { value: 'Created', label: 'Created' },
-  { value: 'Accepted', label: 'Accepted' },
-  { value: 'In Progress', label: 'In Progress' },
-  { value: 'Completed', label: 'Completed' },
 ]
 
 const REFUND_STATUS_OPTIONS = [
@@ -115,14 +100,6 @@ function isPartnerPayoutInStage(payout: PartnerPayout, stage: string): boolean {
   return true
 }
 
-function isBatchInStage(batch: Batch, stage: string): boolean {
-  if (stage === 'created') return batch.status === 'Created'
-  if (stage === 'accepted') return batch.status === 'Accepted'
-  if (stage === 'in_progress') return batch.status === 'In Progress'
-  if (stage === 'completed') return batch.status === 'Completed'
-  return true
-}
-
 export function PaymentsDashboard({
   refunds,
   lawyerFees,
@@ -133,7 +110,6 @@ export function PaymentsDashboard({
   lawyers = [],
   partners = [],
   partnerPayouts = [],
-  batches = [],
   onApproveRefund,
   onProcessRefund,
   onBulkApproveRefunds,
@@ -148,10 +124,9 @@ export function PaymentsDashboard({
   onBulkMarkPartnerPayoutsPaid,
   onViewPartnerProfile,
   onExportPartnerPayouts,
-  onExportBatches,
 }: PaymentsProps) {
   // Sidebar state
-  const [sidebarView, setSidebarView] = useState<'challan-refunds' | 'case-refunds' | 'lawyer-fees' | 'leads' | 'partners' | 'batch'>('challan-refunds')
+  const [sidebarView, setSidebarView] = useState<'challan-refunds' | 'case-refunds' | 'lawyer-fees' | 'leads' | 'partners'>('challan-refunds')
 
   // Active stage tab
   const [challanRefundStage, setChallanRefundStage] = useState('all')
@@ -159,7 +134,6 @@ export function PaymentsDashboard({
   const [feeStage, setFeeStage] = useState('to_pay')
   const [leadsStage, setLeadsStage] = useState('ready_to_invoice')
   const [partnerStage, setPartnerStage] = useState('to_pay')
-  const [batchStage, setBatchStage] = useState('created')
 
   // Search
   const [searchQuery, setSearchQuery] = useState('')
@@ -245,14 +219,6 @@ export function PaymentsDashboard({
     rejected: partnerPayouts.filter((p) => p.status === 'Failed').length,
   }), [partnerPayouts])
 
-  // Batch stage counts
-  const batchStageCounts = useMemo(() => ({
-    created: batches.filter((b) => b.status === 'Created').length,
-    accepted: batches.filter((b) => b.status === 'Accepted').length,
-    in_progress: batches.filter((b) => b.status === 'In Progress').length,
-    completed: batches.filter((b) => b.status === 'Completed').length,
-  }), [batches])
-
   // Filtered leads
   const filteredLeads = useMemo(() => {
     const statusFilter: Lead['status'] =
@@ -329,23 +295,6 @@ export function PaymentsDashboard({
 
     return filtered
   }, [lawyerFees, feeStage, searchQuery])
-
-  // Filtered batches
-  const filteredBatches = useMemo(() => {
-    let filtered = batches.filter((b) => isBatchInStage(b, batchStage))
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (b) =>
-          b.batchId.toLowerCase().includes(query) ||
-          b.assignedExpertId.toLowerCase().includes(query) ||
-          b.assignedExpertName.toLowerCase().includes(query)
-      )
-    }
-
-    return filtered
-  }, [batches, batchStage, searchQuery])
 
   // Filtered partner payouts
   const filteredPartnerPayouts = useMemo(() => {
@@ -468,7 +417,7 @@ export function PaymentsDashboard({
   const somePartnersSelected = selectedPartnerKeys.size > 0 && !allPartnersSelected
 
   // Clear selection on view/stage change
-  const handleSidebarChange = (view: 'challan-refunds' | 'case-refunds' | 'lawyer-fees' | 'leads' | 'partners' | 'batch') => {
+  const handleSidebarChange = (view: 'challan-refunds' | 'case-refunds' | 'lawyer-fees' | 'leads' | 'partners') => {
     setSidebarView(view)
     setSelectedIds(new Set())
     setSelectedCaseRefundIds(new Set())
@@ -501,10 +450,6 @@ export function PaymentsDashboard({
   const handlePartnerStageChange = (stage: string) => {
     setPartnerStage(stage)
     setSelectedPartnerKeys(new Set())
-  }
-
-  const handleBatchStageChange = (stage: string) => {
-    setBatchStage(stage)
   }
 
   // Derive pending invoices from lawyerFees for the selected lawyer
@@ -628,28 +573,24 @@ export function PaymentsDashboard({
     : sidebarView === 'case-refunds' ? CASE_REFUND_TABS
     : sidebarView === 'lawyer-fees' ? LAWYER_FEE_TABS
     : sidebarView === 'leads' ? LEADS_TABS
-    : sidebarView === 'batch' ? BATCH_TABS
     : PARTNER_TABS
 
   const currentCounts = sidebarView === 'challan-refunds' ? challanRefundStageCounts
     : sidebarView === 'case-refunds' ? caseRefundStageCounts
     : sidebarView === 'lawyer-fees' ? feeStageCounts
     : sidebarView === 'leads' ? leadsStageCounts
-    : sidebarView === 'batch' ? batchStageCounts
     : partnerStageCounts
 
   const currentActiveTab = sidebarView === 'challan-refunds' ? challanRefundStage
     : sidebarView === 'case-refunds' ? caseRefundStage
     : sidebarView === 'lawyer-fees' ? feeStage
     : sidebarView === 'leads' ? leadsStage
-    : sidebarView === 'batch' ? batchStage
     : partnerStage
 
   const currentTabChange = sidebarView === 'challan-refunds' ? handleChallanRefundStageChange
     : sidebarView === 'case-refunds' ? handleCaseRefundStageChange
     : sidebarView === 'lawyer-fees' ? handleFeeStageChange
     : sidebarView === 'leads' ? handleLeadsStageChange
-    : sidebarView === 'batch' ? handleBatchStageChange
     : handlePartnerStageChange
 
   const currentSearchPlaceholder = isRefundView
@@ -658,25 +599,20 @@ export function PaymentsDashboard({
     ? 'Search by Lawyer ID, name, incident...'
     : sidebarView === 'leads'
     ? 'Search by Lead ID, company, contact...'
-    : sidebarView === 'batch'
-    ? 'Search by Batch ID, expert ID, name...'
     : 'Search by Partner ID, name, company...'
 
   const currentStatusOptions = isRefundView ? REFUND_STATUS_OPTIONS
     : sidebarView === 'lawyer-fees' ? LAWYER_FEE_STATUS_OPTIONS
     : sidebarView === 'partners' ? PARTNER_STATUS_OPTIONS
-    : sidebarView === 'batch' ? BATCH_STATUS_OPTIONS
     : LAWYER_FEE_STATUS_OPTIONS
 
   const currentExport = isRefundView ? onExportRefunds
     : sidebarView === 'partners' ? onExportPartnerPayouts
-    : sidebarView === 'batch' ? onExportBatches
     : onExportLawyerFees
 
   const currentTotalItems = isRefundView ? filteredRefunds.length
     : sidebarView === 'lawyer-fees' ? filteredFees.length
     : sidebarView === 'leads' ? filteredLeads.length
-    : sidebarView === 'batch' ? filteredBatches.length
     : filteredPartnerPayouts.length
 
   return (
@@ -1048,76 +984,6 @@ export function PaymentsDashboard({
                       />
                     )
                   })
-                )}
-              </tbody>
-            </table>
-          ) : sidebarView === 'batch' ? (
-            <table className="w-full">
-              <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Batch ID
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Expert
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Items
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Total Amount
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Created Date
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Last Updated
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBatches.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-4 py-16 text-center text-slate-500 dark:text-slate-400"
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                          <svg
-                            className="w-6 h-6 text-slate-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={1.5}
-                              d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
-                            />
-                          </svg>
-                        </div>
-                        <p className="font-medium">No batches found</p>
-                        <p className="text-sm">
-                          {searchQuery
-                            ? 'Try adjusting your search query'
-                            : 'No batches in this stage yet'}
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredBatches.map((batch) => (
-                    <BatchRow
-                      key={batch.batchId}
-                      batch={batch}
-                      onClick={() => console.log('View batch:', batch.batchId)}
-                    />
-                  ))
                 )}
               </tbody>
             </table>

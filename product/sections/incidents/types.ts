@@ -3,13 +3,18 @@
 // =============================================================================
 
 export type IncidentQueue =
+  | 'all'
   | 'newIncidents'
+  | 'screening'
   | 'inProgress'
+  | 'expertAssigned'
   | 'underReview'
   | 'settled'
   | 'notSettled'
   | 'hold'
   | 'refundRequested'
+  | 'refundHold'
+  | 'refundRejected'
   | 'refundCompleted'
 
 export type IncidentStep = 'screening' | 'screenDone' | 'failed' | 'agentAssigned' | 'lawyerAssigned' | 'validated'
@@ -157,13 +162,18 @@ export interface ScreeningResult {
 }
 
 export interface QueueCounts {
+  all: number
   newIncidents: number
+  screening: number
   inProgress: number
+  expertAssigned: number
   underReview: number
   settled: number
   notSettled: number
   hold: number
   refundRequested: number
+  refundHold: number
+  refundRejected: number
   refundCompleted: number
 }
 

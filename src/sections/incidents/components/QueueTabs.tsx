@@ -9,13 +9,18 @@ interface QueueTabsProps {
 }
 
 const QUEUE_CONFIG: { key: IncidentQueue; label: string; caseLabel?: string; color: string }[] = [
+  { key: 'all', label: 'All Incidents', caseLabel: 'All Cases', color: 'slate' },
   { key: 'newIncidents', label: 'New Incidents', caseLabel: 'New Cases', color: 'cyan' },
+  { key: 'screening', label: 'Screening', color: 'amber' },
   { key: 'inProgress', label: 'In Progress', color: 'amber' },
+  { key: 'expertAssigned', label: 'Expert Assigned', color: 'sky' },
   { key: 'underReview', label: 'To Be Settled', color: 'indigo' },
   { key: 'settled', label: 'Settled', color: 'emerald' },
   { key: 'notSettled', label: 'Not Settled', color: 'red' },
   { key: 'hold', label: 'Hold', color: 'slate' },
   { key: 'refundRequested', label: 'Refund Requested', color: 'purple' },
+  { key: 'refundHold', label: 'Refund Hold', color: 'slate' },
+  { key: 'refundRejected', label: 'Refund Rejected', color: 'red' },
   { key: 'refundCompleted', label: 'Refund Completed', color: 'emerald' },
 ]
 

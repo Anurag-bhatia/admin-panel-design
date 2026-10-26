@@ -37,6 +37,8 @@ interface IncidentRowProps {
   lawyers: Lawyer[]
   workType?: 'cases' | 'challans'
   unreadChatCount?: number
+  showSettlement?: boolean
+  batchId?: string
   onSelect: (selected: boolean) => void
   onView?: () => void
   onOpenChat?: () => void
@@ -156,6 +158,8 @@ export function IncidentRow({
   lawyers,
   workType = 'challans',
   unreadChatCount = 0,
+  showSettlement = true,
+  batchId,
   onSelect,
   onView,
   onOpenChat,
@@ -285,6 +289,15 @@ export function IncidentRow({
         </div>
       </td>
 
+      {/* Batch ID (only shown when batchId prop is set) */}
+      {batchId && (
+        <td className="px-4 py-5">
+          <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">
+            {batchId}
+          </span>
+        </td>
+      )}
+
       {/* Subscriber & Vehicle */}
       <td className="px-4 py-5">
         <div>
@@ -369,43 +382,45 @@ export function IncidentRow({
       </td>
 
       {/* Settlement */}
-      <td className="px-4 py-5">
-        {(() => {
-          const challanAmount = incident.amount
-          const governmentFee = Math.round(challanAmount * 0.1)
-          const professionalFees = 500
-          const miscFees = 150
-          const fmt = (v: number) => `₹${v.toLocaleString('en-IN')}`
-          return (
-            <div className="text-xs text-slate-600 dark:text-slate-400 space-y-0.5 whitespace-nowrap">
-              <div className="flex justify-between gap-3">
-                <span>Challan</span>
-                <span className="font-medium text-slate-900 dark:text-white tabular-nums">
-                  {fmt(challanAmount)}
-                </span>
+      {showSettlement && (
+        <td className="px-4 py-5">
+          {(() => {
+            const challanAmount = incident.amount
+            const governmentFee = Math.round(challanAmount * 0.1)
+            const professionalFees = 500
+            const miscFees = 150
+            const fmt = (v: number) => `₹${v.toLocaleString('en-IN')}`
+            return (
+              <div className="text-xs text-slate-600 dark:text-slate-400 space-y-0.5 whitespace-nowrap">
+                <div className="flex justify-between gap-3">
+                  <span>Challan</span>
+                  <span className="font-medium text-slate-900 dark:text-white tabular-nums">
+                    {fmt(challanAmount)}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span>Govt</span>
+                  <span className="font-medium text-slate-900 dark:text-white tabular-nums">
+                    {fmt(governmentFee)}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span>Prof</span>
+                  <span className="font-medium text-slate-900 dark:text-white tabular-nums">
+                    {fmt(professionalFees)}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span>Misc</span>
+                  <span className="font-medium text-slate-900 dark:text-white tabular-nums">
+                    {fmt(miscFees)}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between gap-3">
-                <span>Govt</span>
-                <span className="font-medium text-slate-900 dark:text-white tabular-nums">
-                  {fmt(governmentFee)}
-                </span>
-              </div>
-              <div className="flex justify-between gap-3">
-                <span>Prof</span>
-                <span className="font-medium text-slate-900 dark:text-white tabular-nums">
-                  {fmt(professionalFees)}
-                </span>
-              </div>
-              <div className="flex justify-between gap-3">
-                <span>Misc</span>
-                <span className="font-medium text-slate-900 dark:text-white tabular-nums">
-                  {fmt(miscFees)}
-                </span>
-              </div>
-            </div>
-          )
-        })()}
-      </td>
+            )
+          })()}
+        </td>
+      )}
 
       {/* Assigned Agent - hidden for cases */}
       {!isCases && (
@@ -644,7 +659,7 @@ export function IncidentRow({
     {/* Settlement Modal — Settled uses the shared MoveQueueDetailsModal */}
     {showSettlementModal && !isAddingExpense && pendingQueue === 'settled' && (
       <tr>
-        <td colSpan={isCases ? 9 : 10} className="p-0">
+        <td colSpan={(isCases ? 9 : 10) - (showSettlement ? 0 : 1)} className="p-0">
           <MoveQueueDetailsModal
             incidentId={incident.incidentId}
             stage="settled"
@@ -666,7 +681,7 @@ export function IncidentRow({
     {/* Settlement Modal — Not Settled / Add Expense keep the fee form */}
     {showSettlementModal && (isAddingExpense || pendingQueue !== 'settled') && (
       <tr>
-        <td colSpan={isCases ? 9 : 10} className="p-0">
+        <td colSpan={(isCases ? 9 : 10) - (showSettlement ? 0 : 1)} className="p-0">
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div
               className="absolute inset-0 bg-black/50"
