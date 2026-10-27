@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Search, Filter, Users, LayoutGrid, UserRound, FileText, ChevronDown } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Search, Filter, Users, LayoutGrid, UserRound, FileText, ChevronDown, X } from 'lucide-react'
 import batchData from '@/../product/sections/batch/data.json'
 import incidentData from '@/../product/sections/incidents/data.json'
 import type { Batch } from '@/../product/sections/batch/types'
@@ -68,6 +68,9 @@ export function ExpertAssignedBatchesView({
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
   const [view, setView] = useState<ViewKind>('batch')
   const [showFilters, setShowFilters] = useState(false)
+  const [expertSearch, setExpertSearch] = useState('')
+  const [showExpertSuggestions, setShowExpertSuggestions] = useState(false)
+  const expertComboRef = useRef<HTMLDivElement>(null)
 
   // Active batches = assigned to an expert but not yet terminal
   // (Pending Acceptance = awaiting expert; Accepted = expert is working on it)
@@ -95,6 +98,17 @@ export function ExpertAssignedBatchesView({
     }
     return rows
   }, [activeBatches, allIncidents])
+
+  useEffect(() => {
+    if (!showExpertSuggestions) return
+    const onDocClick = (e: MouseEvent) => {
+      if (!expertComboRef.current?.contains(e.target as Node)) {
+        setShowExpertSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', onDocClick)
+    return () => document.removeEventListener('mousedown', onDocClick)
+  }, [showExpertSuggestions])
 
   const experts = useMemo(() => {
     const map = new Map<string, { id: string; name: string; mobile: string; batches: number }>()
@@ -206,6 +220,29 @@ export function ExpertAssignedBatchesView({
     return Array.from(expertMap.values()).sort((a, b) => a.name.localeCompare(b.name))
   }, [filteredBatches])
 
+  const expertSuggestions = useMemo(() => {
+    const q = expertSearch.trim().toLowerCase()
+    if (!q) return experts
+    return experts.filter(
+      (e) =>
+        e.name.toLowerCase().includes(q) ||
+        e.id.toLowerCase().includes(q) ||
+        e.mobile.toLowerCase().includes(q),
+    )
+  }, [experts, expertSearch])
+
+  const selectExpert = (id: string, name: string) => {
+    setExpertFilter(id)
+    setExpertSearch(name)
+    setShowExpertSuggestions(false)
+  }
+
+  const clearExpert = () => {
+    setExpertFilter('all')
+    setExpertSearch('')
+    setShowExpertSuggestions(false)
+  }
+
   const label = workType === 'cases' ? 'cases' : 'challans'
 
   const countsRight =
@@ -274,21 +311,77 @@ export function ExpertAssignedBatchesView({
             />
           </div>
 
-          {/* Expert filter (standalone) */}
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-            <select
-              value={expertFilter}
-              onChange={(e) => setExpertFilter(e.target.value)}
-              className="pl-9 pr-8 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 appearance-none min-w-[200px]"
-            >
-              <option value="all">All experts ({experts.length})</option>
-              {experts.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.name} ({e.batches})
-                </option>
-              ))}
-            </select>
+          {/* Expert search combobox */}
+          <div ref={expertComboRef} className="relative min-w-[220px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              value={expertSearch}
+              onChange={(e) => {
+                setExpertSearch(e.target.value)
+                setShowExpertSuggestions(true)
+                if (expertFilter !== 'all') setExpertFilter('all')
+              }}
+              onFocus={() => setShowExpertSuggestions(true)}
+              placeholder={`Search experts (${experts.length})`}
+              className="w-full pl-9 pr-8 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
+            />
+            {expertSearch ? (
+              <button
+                type="button"
+                onClick={clearExpert}
+                aria-label="Clear expert"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            )}
+            {showExpertSuggestions && (
+              <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-30 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={clearExpert}
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 ${
+                    expertFilter === 'all'
+                      ? 'text-cyan-700 dark:text-cyan-300 font-medium'
+                      : 'text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  All experts ({experts.length})
+                </button>
+                <div className="max-h-64 overflow-y-auto border-t border-slate-100 dark:border-slate-800">
+                  {expertSuggestions.length === 0 ? (
+                    <p className="px-3 py-3 text-sm text-slate-500 dark:text-slate-400">
+                      No experts match "{expertSearch}"
+                    </p>
+                  ) : (
+                    expertSuggestions.map((e) => (
+                      <button
+                        key={e.id}
+                        type="button"
+                        onClick={() => selectExpert(e.id, e.name)}
+                        className={`w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 ${
+                          expertFilter === e.id ? 'bg-cyan-50 dark:bg-cyan-900/20' : ''
+                        }`}
+                      >
+                        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                          {e.name}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                          <span className="font-mono">{e.id}</span>
+                          <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                          {e.mobile}
+                          <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                          {e.batches} {e.batches === 1 ? 'batch' : 'batches'}
+                        </p>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Combined filters popover */}
