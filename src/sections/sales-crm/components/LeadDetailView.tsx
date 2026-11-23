@@ -246,8 +246,16 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
             <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Lead Information</h2>
               <div className="space-y-8">
-                {/* Classification */}
+                {/* Lead Summary */}
                 <div>
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Lead Summary</h3>
+                  <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+                    {lead.summary || <span className="text-slate-400 dark:text-slate-500">No summary added</span>}
+                  </p>
+                </div>
+
+                {/* Classification */}
+                <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Classification</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InfoField label="Company Name" value={lead.companyName} />
