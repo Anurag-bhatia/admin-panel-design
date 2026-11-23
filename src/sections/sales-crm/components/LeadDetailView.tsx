@@ -377,16 +377,19 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
 
         {/* Summary Tab */}
         {activeTab === 'summary' && (
-          <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Lead Summary</h2>
-            {lead.summary ? (
-              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">{lead.summary}</p>
-            ) : (
-              <p className="text-sm text-slate-400 dark:text-slate-500">No summary added</p>
-            )}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            {/* Left: Current Summary */}
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Lead Summary</h2>
+              {lead.summary ? (
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">{lead.summary}</p>
+              ) : (
+                <p className="text-sm text-slate-400 dark:text-slate-500">No summary added</p>
+              )}
+            </div>
 
-            {/* Summary History */}
-            <div className="border-t border-slate-200 dark:border-slate-800 mt-6 pt-6">
+            {/* Right: Summary History */}
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">
                 Summary History ({lead.summaryHistory?.length ?? 0})
               </h3>
