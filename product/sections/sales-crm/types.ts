@@ -22,11 +22,20 @@ export interface Lead {
   addressLane: string
   pinCode: string
   summary?: string
+  summaryHistory?: SummaryHistoryEntry[]
   status: 'new' | 'assigned' | 'follow-up' | 'quotations' | 'projected' | 'invoiced' | 'sales' | 'lost' | 'rejected'
   assignedTo: string | null
   assignedTeam: 'Service' | 'Accounts' | null
   createdDate: string
   lastActivityDate: string
+}
+
+export interface SummaryHistoryEntry {
+  id: string
+  summary: string
+  updatedBy: string
+  updatedByName: string
+  updatedAt: string
 }
 
 export interface TimelineActivity {

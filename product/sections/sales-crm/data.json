@@ -34,6 +34,29 @@
       "addressLane": "Plot No. 15, MIDC Industrial Area",
       "pinCode": "400069",
       "summary": "Mid-sized logistics operator running 45 commercial vehicles across Maharashtra. Facing frequent challan issues on inter-state routes and wants a single dashboard to track and settle them. Decision maker is the operations head; pricing is the key concern.",
+      "summaryHistory": [
+        {
+          "id": "SUM-901-3",
+          "summary": "Mid-sized logistics operator running 45 commercial vehicles across Maharashtra. Facing frequent challan issues on inter-state routes and wants a single dashboard to track and settle them. Decision maker is the operations head; pricing is the key concern.",
+          "updatedBy": "USR-003",
+          "updatedByName": "Amit Patel",
+          "updatedAt": "2024-01-20T17:30:00Z"
+        },
+        {
+          "id": "SUM-901-2",
+          "summary": "Logistics operator with 45 commercial vehicles in Maharashtra. Facing challan issues on inter-state routes; wants a single dashboard. Pricing discussion pending.",
+          "updatedBy": "USR-003",
+          "updatedByName": "Amit Patel",
+          "updatedAt": "2024-01-17T12:30:00Z"
+        },
+        {
+          "id": "SUM-901-1",
+          "summary": "Logistics operator with ~40 commercial vehicles in Maharashtra. Enquired about challan tracking via website form.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-15T09:30:00Z"
+        }
+      ],
       "status": "quotations",
       "assignedTo": "USR-003",
       "assignedTeam": "Service",
@@ -60,6 +83,22 @@
       "addressLane": "Survey No. 234, GIDC Estate",
       "pinCode": "382330",
       "summary": "Manufacturing company with a captive fleet of 12 vehicles for raw material movement. Interested in compliance tracking and document renewals. Requested a demo for the admin team.",
+      "summaryHistory": [
+        {
+          "id": "SUM-902-2",
+          "summary": "Manufacturing company with a captive fleet of 12 vehicles for raw material movement. Interested in compliance tracking and document renewals. Requested a demo for the admin team.",
+          "updatedBy": "USR-001",
+          "updatedByName": "Priya Sharma",
+          "updatedAt": "2024-01-20T14:15:00Z"
+        },
+        {
+          "id": "SUM-902-1",
+          "summary": "Manufacturing company with a small captive fleet. Interested in compliance tracking.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-18T11:15:00Z"
+        }
+      ],
       "status": "follow-up",
       "assignedTo": "USR-001",
       "assignedTeam": "Service",
@@ -86,6 +125,22 @@
       "addressLane": "Block B, Logistics Hub, KIADB Industrial Area",
       "pinCode": "560066",
       "summary": "Large heavy-vehicle transporter with 78 trucks on long-haul routes. Wants bulk challan resolution and legal support for disputed cases. Already evaluated a competitor.",
+      "summaryHistory": [
+        {
+          "id": "SUM-903-2",
+          "summary": "Large heavy-vehicle transporter with 78 trucks on long-haul routes. Wants bulk challan resolution and legal support for disputed cases. Already evaluated a competitor.",
+          "updatedBy": "USR-002",
+          "updatedByName": "Rahul Verma",
+          "updatedAt": "2024-01-12T11:00:00Z"
+        },
+        {
+          "id": "SUM-903-1",
+          "summary": "Heavy-vehicle transporter on long-haul routes. Wants help with bulk challans.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-10T08:00:00Z"
+        }
+      ],
       "status": "sales",
       "assignedTo": "USR-002",
       "assignedTeam": "Accounts",
@@ -112,6 +167,15 @@
       "addressLane": "Shop No. 42, Industrial Area Phase II",
       "pinCode": "110064",
       "summary": "Small business owner with 3 light commercial vehicles in Delhi NCR. Looking for an affordable plan to handle occasional traffic challans.",
+      "summaryHistory": [
+        {
+          "id": "SUM-904-1",
+          "summary": "Small business owner with 3 light commercial vehicles in Delhi NCR. Looking for an affordable plan to handle occasional traffic challans.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-29T13:45:00Z"
+        }
+      ],
       "status": "new",
       "assignedTo": null,
       "assignedTeam": null,
@@ -138,6 +202,29 @@
       "addressLane": "Tower C, 4th Floor, Cyber Park",
       "pinCode": "122016",
       "summary": "E-commerce delivery company with 120 vehicles across NCR. Needs fleet-wide challan monitoring and monthly reports. Procurement team involved; expects annual contract.",
+      "summaryHistory": [
+        {
+          "id": "SUM-905-3",
+          "summary": "E-commerce delivery company with 120 vehicles across NCR. Needs fleet-wide challan monitoring and monthly reports. Procurement team involved; expects annual contract.",
+          "updatedBy": "USR-001",
+          "updatedByName": "Priya Sharma",
+          "updatedAt": "2024-01-17T18:20:00Z"
+        },
+        {
+          "id": "SUM-905-2",
+          "summary": "E-commerce delivery company with 120 vehicles in NCR. Needs fleet-wide challan monitoring. Procurement team now involved.",
+          "updatedBy": "USR-001",
+          "updatedByName": "Priya Sharma",
+          "updatedAt": "2024-01-14T13:20:00Z"
+        },
+        {
+          "id": "SUM-905-1",
+          "summary": "E-commerce delivery company in NCR with a large fleet. Looking for challan monitoring.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-12T10:20:00Z"
+        }
+      ],
       "status": "projected",
       "assignedTo": "USR-001",
       "assignedTeam": "Service",
@@ -164,6 +251,22 @@
       "addressLane": "No. 78, Industrial Estate Road",
       "pinCode": "600058",
       "summary": "Cold chain operator with 25 refrigerated trucks in South India. Primary need is document compliance and permit tracking to avoid route delays.",
+      "summaryHistory": [
+        {
+          "id": "SUM-906-2",
+          "summary": "Cold chain operator with 25 refrigerated trucks in South India. Primary need is document compliance and permit tracking to avoid route delays.",
+          "updatedBy": "USR-003",
+          "updatedByName": "Amit Patel",
+          "updatedAt": "2024-01-24T18:30:00Z"
+        },
+        {
+          "id": "SUM-906-1",
+          "summary": "Cold chain operator in South India. Needs permit and document tracking.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-22T15:30:00Z"
+        }
+      ],
       "status": "assigned",
       "assignedTo": "USR-003",
       "assignedTeam": "Service",
@@ -190,6 +293,15 @@
       "addressLane": "Khasra No. 456, Industrial Area",
       "pinCode": "302022",
       "summary": "Construction equipment transporter with 32 vehicles. Showed initial interest but budget was put on hold for this quarter.",
+      "summaryHistory": [
+        {
+          "id": "SUM-907-1",
+          "summary": "Construction equipment transporter with 32 vehicles. Showed initial interest but budget was put on hold for this quarter.",
+          "updatedBy": "USR-002",
+          "updatedByName": "Rahul Verma",
+          "updatedAt": "2024-01-05T12:00:00Z"
+        }
+      ],
       "status": "lost",
       "assignedTo": "USR-002",
       "assignedTeam": "Service",
@@ -216,6 +328,22 @@
       "addressLane": "Warehouse Complex, Gate No. 7, Kidderpore",
       "pinCode": "700023",
       "summary": "FMCG distribution company running 95 vehicles in East India. Wants centralized challan management for its distribution fleet and driver-level reporting.",
+      "summaryHistory": [
+        {
+          "id": "SUM-908-2",
+          "summary": "FMCG distribution company running 95 vehicles in East India. Wants centralized challan management for its distribution fleet and driver-level reporting.",
+          "updatedBy": "USR-002",
+          "updatedByName": "Rahul Verma",
+          "updatedAt": "2024-01-10T12:45:00Z"
+        },
+        {
+          "id": "SUM-908-1",
+          "summary": "FMCG distributor with a large fleet in East India. Asked for a product walkthrough.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-08T09:45:00Z"
+        }
+      ],
       "status": "invoiced",
       "assignedTo": "USR-002",
       "assignedTeam": "Accounts",
@@ -242,6 +370,15 @@
       "addressLane": "Plot No. 123, Phase IV",
       "pinCode": "141010",
       "summary": "Owner-operator with 8 commercial vehicles in Punjab. Interested in pay-and-close challan service; prefers communication over phone.",
+      "summaryHistory": [
+        {
+          "id": "SUM-909-1",
+          "summary": "Owner-operator with 8 commercial vehicles in Punjab. Interested in pay-and-close challan service; prefers communication over phone.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-28T16:20:00Z"
+        }
+      ],
       "status": "new",
       "assignedTo": null,
       "assignedTeam": null,
@@ -268,6 +405,22 @@
       "addressLane": "Building No. 8, Hi-Tech City Road",
       "pinCode": "500032",
       "summary": "Vehicle rental company with 55 cars and SUVs. Challans issued during rentals need to be tracked and recovered from customers. Wants API access.",
+      "summaryHistory": [
+        {
+          "id": "SUM-910-2",
+          "summary": "Vehicle rental company with 55 cars and SUVs. Challans issued during rentals need to be tracked and recovered from customers. Wants API access.",
+          "updatedBy": "USR-003",
+          "updatedByName": "Amit Patel",
+          "updatedAt": "2024-01-22T13:30:00Z"
+        },
+        {
+          "id": "SUM-910-1",
+          "summary": "Vehicle rental company. Wants to track challans raised during customer rentals.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-20T10:30:00Z"
+        }
+      ],
       "status": "follow-up",
       "assignedTo": "USR-003",
       "assignedTeam": "Service",
@@ -294,6 +447,15 @@
       "addressLane": "Phase II, Rajiv Gandhi Infotech Park",
       "pinCode": "411057",
       "summary": "Pharma distributor with 18 medical supply vehicles. Time-sensitive deliveries; needs quick challan resolution and permit renewals.",
+      "summaryHistory": [
+        {
+          "id": "SUM-911-1",
+          "summary": "Pharma distributor with 18 medical supply vehicles. Time-sensitive deliveries; needs quick challan resolution and permit renewals.",
+          "updatedBy": "USR-001",
+          "updatedByName": "Priya Sharma",
+          "updatedAt": "2024-01-24T11:00:00Z"
+        }
+      ],
       "status": "assigned",
       "assignedTo": "USR-001",
       "assignedTeam": "Service",
@@ -320,6 +482,29 @@
       "addressLane": "Hosur Road, Phase I",
       "pinCode": "560100",
       "summary": "Courier company with 210 express delivery vehicles in Bangalore. Very high challan volume; looking for bulk processing and dedicated account manager.",
+      "summaryHistory": [
+        {
+          "id": "SUM-912-3",
+          "summary": "Courier company with 210 express delivery vehicles in Bangalore. Very high challan volume; looking for bulk processing and dedicated account manager.",
+          "updatedBy": "USR-002",
+          "updatedByName": "Rahul Verma",
+          "updatedAt": "2024-01-21T22:15:00Z"
+        },
+        {
+          "id": "SUM-912-2",
+          "summary": "Courier company with 210 vehicles in Bangalore. Very high challan volume; wants bulk processing.",
+          "updatedBy": "USR-002",
+          "updatedByName": "Rahul Verma",
+          "updatedAt": "2024-01-18T17:15:00Z"
+        },
+        {
+          "id": "SUM-912-1",
+          "summary": "Courier company in Bangalore with very high challan volume.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-16T14:15:00Z"
+        }
+      ],
       "status": "quotations",
       "assignedTo": "USR-002",
       "assignedTeam": "Service",
@@ -346,6 +531,15 @@
       "addressLane": "Plot No. 89, Sector 3",
       "pinCode": "454775",
       "summary": "Logistics company with 68 commercial vehicles in Central India. Requires consolidated monthly billing and challan reports per branch.",
+      "summaryHistory": [
+        {
+          "id": "SUM-913-1",
+          "summary": "Logistics company with 68 commercial vehicles in Central India. Requires consolidated monthly billing and challan reports per branch.",
+          "updatedBy": "USR-001",
+          "updatedByName": "Priya Sharma",
+          "updatedAt": "2024-01-06T08:30:00Z"
+        }
+      ],
       "status": "invoiced",
       "assignedTo": "USR-001",
       "assignedTeam": "Accounts",
@@ -372,6 +566,22 @@
       "addressLane": "A-Block, Logix Techno Park",
       "pinCode": "201301",
       "summary": "E-commerce logistics player with 140 delivery vehicles in Noida. Wants integration with their fleet system and automated challan alerts.",
+      "summaryHistory": [
+        {
+          "id": "SUM-914-2",
+          "summary": "E-commerce logistics player with 140 delivery vehicles in Noida. Wants integration with their fleet system and automated challan alerts.",
+          "updatedBy": "USR-002",
+          "updatedByName": "Rahul Verma",
+          "updatedAt": "2024-01-05T13:15:00Z"
+        },
+        {
+          "id": "SUM-914-1",
+          "summary": "E-commerce logistics player in Noida. Interested in automated challan alerts.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-03T10:15:00Z"
+        }
+      ],
       "status": "invoiced",
       "assignedTo": "USR-002",
       "assignedTeam": "Accounts",
@@ -398,6 +608,15 @@
       "addressLane": "NH-19, Near Toll Plaza",
       "pinCode": "844101",
       "summary": "Heavy-vehicle transporter with 42 trucks operating from Bihar. Needs legal assistance for court challans and inter-state compliance.",
+      "summaryHistory": [
+        {
+          "id": "SUM-915-1",
+          "summary": "Heavy-vehicle transporter with 42 trucks operating from Bihar. Needs legal assistance for court challans and inter-state compliance.",
+          "updatedBy": "USR-003",
+          "updatedByName": "Amit Patel",
+          "updatedAt": "2024-01-09T14:00:00Z"
+        }
+      ],
       "status": "invoiced",
       "assignedTo": "USR-003",
       "assignedTeam": "Accounts",
@@ -424,6 +643,15 @@
       "addressLane": "Unit 45, Main Road",
       "pinCode": "394230",
       "summary": "Textile exporter with a 35-vehicle company fleet in Surat. Interested in compliance tracking and challan settlement for its delivery vans.",
+      "summaryHistory": [
+        {
+          "id": "SUM-916-1",
+          "summary": "Textile exporter with a 35-vehicle company fleet in Surat. Interested in compliance tracking and challan settlement for its delivery vans.",
+          "updatedBy": "USR-001",
+          "updatedByName": "Priya Sharma",
+          "updatedAt": "2024-01-02T09:00:00Z"
+        }
+      ],
       "status": "sales",
       "assignedTo": "USR-001",
       "assignedTeam": "Accounts",
@@ -450,6 +678,22 @@
       "addressLane": "Logistics Hub, Gate 3",
       "pinCode": "441108",
       "summary": "Express courier operator with 180 vehicles in Nagpur. Needs bulk challan settlement and real-time tracking of pending cases.",
+      "summaryHistory": [
+        {
+          "id": "SUM-917-2",
+          "summary": "Express courier operator with 180 vehicles in Nagpur. Needs bulk challan settlement and real-time tracking of pending cases.",
+          "updatedBy": "USR-002",
+          "updatedByName": "Rahul Verma",
+          "updatedAt": "2024-01-03T14:30:00Z"
+        },
+        {
+          "id": "SUM-917-1",
+          "summary": "Express courier operator in Nagpur. Needs bulk challan settlement.",
+          "updatedBy": "USR-004",
+          "updatedByName": "System Admin",
+          "updatedAt": "2024-01-01T11:30:00Z"
+        }
+      ],
       "status": "sales",
       "assignedTo": "USR-002",
       "assignedTeam": "Accounts",

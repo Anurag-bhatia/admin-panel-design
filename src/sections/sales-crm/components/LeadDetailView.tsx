@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock, Download, Pencil, Truck, X, Paperclip } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Building2, FileText, UserPlus, MessageSquare, Upload, ChevronDown, Clock, Download, Pencil, Truck, X, Paperclip, ScrollText } from 'lucide-react'
 import type { Lead, TimelineActivity, Document, User as UserType } from '@/../product/sections/sales-crm/types'
 import { IssuerHeader } from './AddQuotationModal'
 import { VehicleAnalysisModal } from './VehicleAnalysisModal'
 
-type TabType = 'details' | 'documents' | 'quotations' | 'pre-sales'
+type TabType = 'details' | 'summary' | 'documents' | 'quotations' | 'pre-sales'
 
 const TAB_LABELS: Record<TabType, string> = {
   details: 'Details',
+  summary: 'Summary',
   documents: 'Documents',
   quotations: 'Quotations',
   'pre-sales': 'Pre-Sales',
@@ -120,6 +121,7 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
   const getTabIcon = (tab: TabType) => {
     const icons = {
       details: <Building2 className="w-4 h-4" />,
+      summary: <ScrollText className="w-4 h-4" />,
       documents: <FileText className="w-4 h-4" />,
       quotations: <FileText className="w-4 h-4" />,
       'pre-sales': <Truck className="w-4 h-4" />,
@@ -128,10 +130,10 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
   }
 
   const availableTabs: TabType[] = hideSalesActions
-    ? ['details', 'documents']
+    ? ['details', 'summary', 'documents']
     : lead.status === 'quotations'
-      ? ['details', 'documents', 'quotations', 'pre-sales']
-      : ['details', 'documents', 'pre-sales']
+      ? ['details', 'summary', 'documents', 'quotations', 'pre-sales']
+      : ['details', 'summary', 'documents', 'pre-sales']
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 lg:p-8">
@@ -246,16 +248,8 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
             <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-6">Lead Information</h2>
               <div className="space-y-8">
-                {/* Lead Summary */}
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Lead Summary</h3>
-                  <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
-                    {lead.summary || <span className="text-slate-400 dark:text-slate-500">No summary added</span>}
-                  </p>
-                </div>
-
                 {/* Classification */}
-                <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
+                <div>
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">Classification</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InfoField label="Company Name" value={lead.companyName} />
@@ -370,6 +364,65 @@ export function LeadDetailView({ lead, timelineActivities, documents, users, onC
                           <p className="text-sm font-medium text-slate-900 dark:text-slate-50 mb-0.5">{activity.description}</p>
                           <p className="text-xs text-slate-500 dark:text-slate-400">
                             {activity.performedByName} &middot; {formatDateTime(activity.timestamp)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Summary Tab */}
+        {activeTab === 'summary' && (
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Lead Summary</h2>
+            {lead.summary ? (
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">{lead.summary}</p>
+            ) : (
+              <p className="text-sm text-slate-400 dark:text-slate-500">No summary added</p>
+            )}
+
+            {/* Summary History */}
+            <div className="border-t border-slate-200 dark:border-slate-800 mt-6 pt-6">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-4">
+                Summary History ({lead.summaryHistory?.length ?? 0})
+              </h3>
+              {!lead.summaryHistory || lead.summaryHistory.length === 0 ? (
+                <div className="text-center py-8">
+                  <Clock className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No summary history yet</p>
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-slate-200 dark:bg-slate-700" />
+                  <div className="space-y-5">
+                    {lead.summaryHistory.map((entry, index) => (
+                      <div key={entry.id} className="relative flex gap-4">
+                        <div
+                          className={`w-4 h-4 rounded-full border-2 shrink-0 mt-0.5 z-10 ${
+                            index === 0
+                              ? 'border-cyan-600 bg-cyan-600'
+                              : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
+                          }`}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                              {entry.updatedByName} &middot; {formatDateTime(entry.updatedAt)}
+                            </p>
+                            {index === 0 && (
+                              <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300">
+                                Current
+                              </span>
+                            )}
+                          </div>
+                          <p className={`text-sm leading-relaxed whitespace-pre-line ${
+                            index === 0 ? 'text-slate-900 dark:text-slate-50' : 'text-slate-600 dark:text-slate-400'
+                          }`}>
+                            {entry.summary}
                           </p>
                         </div>
                       </div>
