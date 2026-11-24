@@ -30,6 +30,7 @@ export function EditLeadModal({ lead, leadSources, serviceTypes, serviceSubTypes
     area: lead.area,
     addressLane: lead.addressLane,
     pinCode: lead.pinCode,
+    summary: lead.summary ?? '',
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -56,6 +57,7 @@ export function EditLeadModal({ lead, leadSources, serviceTypes, serviceSubTypes
     if (!formData.area) newErrors.area = 'Area is required'
     if (!formData.addressLane) newErrors.addressLane = 'Address Lane is required'
     if (!formData.pinCode) newErrors.pinCode = 'Pin Code is required'
+    if (!formData.summary.trim()) newErrors.summary = 'Summary is required'
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -398,6 +400,24 @@ export function EditLeadModal({ lead, leadSources, serviceTypes, serviceSubTypes
                   {errors.pinCode && <p className="mt-1 text-xs text-red-500">{errors.pinCode}</p>}
                 </div>
               </div>
+            </div>
+
+            {/* Lead Summary */}
+            <div>
+              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Lead Summary</h3>
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 sm:mb-2">
+                Summary <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={formData.summary}
+                onChange={e => setFormData({ ...formData, summary: e.target.value })}
+                rows={6}
+                placeholder="Write a brief about the lead..."
+                className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border text-xs sm:text-sm resize-none ${
+                  errors.summary ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'
+                } rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+              />
+              {errors.summary && <p className="mt-1 text-xs text-red-500">{errors.summary}</p>}
             </div>
           </div>
 
